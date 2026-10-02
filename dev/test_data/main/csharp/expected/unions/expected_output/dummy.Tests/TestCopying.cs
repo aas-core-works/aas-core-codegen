@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,26 +15,33 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformStructuralFirst(
                 Our.IStructuralFirst that,
                 Our.IClass other)
             {
-                if (!(other is Our.StructuralFirst casted))
+                if (!(other is Our.StructuralFirst casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -47,7 +54,7 @@ namespace dummy.Tests
                 Our.IStructuralSecond that,
                 Our.IClass other)
             {
-                if (!(other is Our.StructuralSecond casted))
+                if (!(other is Our.StructuralSecond casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -60,7 +67,7 @@ namespace dummy.Tests
                 Our.IMixedAbstractDescendantOne that,
                 Our.IClass other)
             {
-                if (!(other is Our.MixedAbstractDescendantOne casted))
+                if (!(other is Our.MixedAbstractDescendantOne casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -73,7 +80,7 @@ namespace dummy.Tests
                 Our.IMixedAbstractDescendantTwo that,
                 Our.IClass other)
             {
-                if (!(other is Our.MixedAbstractDescendantTwo casted))
+                if (!(other is Our.MixedAbstractDescendantTwo casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -86,7 +93,7 @@ namespace dummy.Tests
                 Our.IMixedConcreteWithDescendants that,
                 Our.IClass other)
             {
-                if (!(other is Our.MixedConcreteWithDescendants casted))
+                if (!(other is Our.MixedConcreteWithDescendants casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -99,7 +106,7 @@ namespace dummy.Tests
                 Our.IMixedConcreteWithDescendantsChild that,
                 Our.IClass other)
             {
-                if (!(other is Our.MixedConcreteWithDescendantsChild casted))
+                if (!(other is Our.MixedConcreteWithDescendantsChild casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -113,7 +120,7 @@ namespace dummy.Tests
                 Our.IMixedConcreteLeaf that,
                 Our.IClass other)
             {
-                if (!(other is Our.MixedConcreteLeaf casted))
+                if (!(other is Our.MixedConcreteLeaf casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -126,7 +133,7 @@ namespace dummy.Tests
                 Our.IModelTypedFirst that,
                 Our.IClass other)
             {
-                if (!(other is Our.ModelTypedFirst casted))
+                if (!(other is Our.ModelTypedFirst casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -139,7 +146,7 @@ namespace dummy.Tests
                 Our.IModelTypedSecond that,
                 Our.IClass other)
             {
-                if (!(other is Our.ModelTypedSecond casted))
+                if (!(other is Our.ModelTypedSecond casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -152,7 +159,7 @@ namespace dummy.Tests
                 Our.ISomething that,
                 Our.IClass other)
             {
-                if (!(other is Our.Something casted))
+                if (!(other is Our.Something casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -167,60 +174,37 @@ namespace dummy.Tests
                     && Transform(
                         that.ModelTypedProperty,
                         casted.ModelTypedProperty)
-                    && that.ListStructuralProperty.Count == casted.ListStructuralProperty.Count
-                    && (
-                        that.ListStructuralProperty
-                            .Zip(
-                                casted.ListStructuralProperty,
-                                Transform)
-                            .All(item => item))
-                    && that.ListMixedProperty.Count == casted.ListMixedProperty.Count
-                    && (
-                        that.ListMixedProperty
-                            .Zip(
-                                casted.ListMixedProperty,
-                                Transform)
-                            .All(item => item))
-                    && that.ListModelTypedProperty.Count == casted.ListModelTypedProperty.Count
-                    && (
-                        that.ListModelTypedProperty
-                            .Zip(
-                                casted.ListModelTypedProperty,
-                                Transform)
-                            .All(item => item))
-                    && (
-                        Transform(
-                            that.TupleProperty.Item1,
-                            casted.TupleProperty.Item1)
-                        && Transform(
-                            that.TupleProperty.Item2,
-                            casted.TupleProperty.Item2)
-                        && Transform(
-                            that.TupleProperty.Item3,
-                            casted.TupleProperty.Item3))
+                    && Check_ListOf_StructuralUnion(
+                        that.ListStructuralProperty,
+                        casted.ListStructuralProperty)
+                    && Check_ListOf_MixedUnion(
+                        that.ListMixedProperty,
+                        casted.ListMixedProperty)
+                    && Check_ListOf_ModelTypedUnion(
+                        that.ListModelTypedProperty,
+                        casted.ListModelTypedProperty)
+                    && Check_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+                        that.TupleProperty,
+                        casted.TupleProperty)
                     && ((that.OptionalStructuralProperty != null && casted.OptionalStructuralProperty != null)
                         ? Transform(
-                                that.OptionalStructuralProperty,
-                                casted.OptionalStructuralProperty)
+                            that.OptionalStructuralProperty,
+                            casted.OptionalStructuralProperty)
                         : that.OptionalStructuralProperty == null && casted.OptionalStructuralProperty == null)
                     && ((that.OptionalMixedProperty != null && casted.OptionalMixedProperty != null)
                         ? Transform(
-                                that.OptionalMixedProperty,
-                                casted.OptionalMixedProperty)
+                            that.OptionalMixedProperty,
+                            casted.OptionalMixedProperty)
                         : that.OptionalMixedProperty == null && casted.OptionalMixedProperty == null)
                     && ((that.OptionalModelTypedProperty != null && casted.OptionalModelTypedProperty != null)
                         ? Transform(
-                                that.OptionalModelTypedProperty,
-                                casted.OptionalModelTypedProperty)
+                            that.OptionalModelTypedProperty,
+                            casted.OptionalModelTypedProperty)
                         : that.OptionalModelTypedProperty == null && casted.OptionalModelTypedProperty == null)
                     && ((that.OptionalListOverlappingProperty != null && casted.OptionalListOverlappingProperty != null)
-                        ? that.OptionalListOverlappingProperty.Count == casted.OptionalListOverlappingProperty.Count
-                            && (
-                                that.OptionalListOverlappingProperty
-                                    .Zip(
-                                        casted.OptionalListOverlappingProperty,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_OverlappingUnion(
+                            that.OptionalListOverlappingProperty,
+                            casted.OptionalListOverlappingProperty)
                         : that.OptionalListOverlappingProperty == null && casted.OptionalListOverlappingProperty == null));
             }
 
@@ -228,9 +212,118 @@ namespace dummy.Tests
             {
                 return Transform(that.Underlying, other.Underlying);
             }
-        }  // internal class DeepEqualiser
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+            private bool Check_ListOf_StructuralUnion(
+                List<Our.StructuralUnion> that,
+                List<Our.StructuralUnion> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_MixedUnion(
+                List<Our.MixedUnion> that,
+                List<Our.MixedUnion> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ModelTypedUnion(
+                List<Our.ModelTypedUnion> that,
+                List<Our.ModelTypedUnion> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+                (Our.StructuralUnion, Our.MixedUnion, Our.ModelTypedUnion) that,
+                (Our.StructuralUnion, Our.MixedUnion, Our.ModelTypedUnion) other)
+            {
+                return (
+                    Transform(
+                        that.Item1,
+                        other.Item1)
+                    && Transform(
+                        that.Item2,
+                        other.Item2)
+                    && Transform(
+                        that.Item3,
+                        other.Item3));
+            }
+
+            private bool Check_ListOf_OverlappingUnion(
+                List<Our.OverlappingUnion> that,
+                List<Our.OverlappingUnion> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }  // internal class DeepCopyChecker
+
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool StructuralFirstShallowEquals(
             Our.StructuralFirst that,
@@ -317,76 +410,6 @@ namespace dummy.Tests
                 && that.OptionalListOverlappingProperty == other.OptionalListOverlappingProperty);
         }
 
-        private static bool StructuralFirstDeepEquals(
-            Our.StructuralFirst that,
-            Our.StructuralFirst other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool StructuralSecondDeepEquals(
-            Our.StructuralSecond that,
-            Our.StructuralSecond other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool MixedAbstractDescendantOneDeepEquals(
-            Our.MixedAbstractDescendantOne that,
-            Our.MixedAbstractDescendantOne other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool MixedAbstractDescendantTwoDeepEquals(
-            Our.MixedAbstractDescendantTwo that,
-            Our.MixedAbstractDescendantTwo other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool MixedConcreteWithDescendantsDeepEquals(
-            Our.MixedConcreteWithDescendants that,
-            Our.MixedConcreteWithDescendants other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool MixedConcreteWithDescendantsChildDeepEquals(
-            Our.MixedConcreteWithDescendantsChild that,
-            Our.MixedConcreteWithDescendantsChild other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool MixedConcreteLeafDeepEquals(
-            Our.MixedConcreteLeaf that,
-            Our.MixedConcreteLeaf other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ModelTypedFirstDeepEquals(
-            Our.ModelTypedFirst that,
-            Our.ModelTypedFirst other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ModelTypedSecondDeepEquals(
-            Our.ModelTypedSecond that,
-            Our.ModelTypedSecond other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SomethingDeepEquals(
-            Our.Something that,
-            Our.Something other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
         [Test]
         public void Test_StructuralFirst_shallow_copy()
         {
@@ -410,7 +433,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                StructuralFirstDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "StructuralFirst");
         }  // public void Test_StructuralFirst_deep_copy
@@ -438,7 +461,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                StructuralSecondDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "StructuralSecond");
         }  // public void Test_StructuralSecond_deep_copy
@@ -466,7 +489,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                MixedAbstractDescendantOneDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "MixedAbstractDescendantOne");
         }  // public void Test_MixedAbstractDescendantOne_deep_copy
@@ -494,7 +517,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                MixedAbstractDescendantTwoDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "MixedAbstractDescendantTwo");
         }  // public void Test_MixedAbstractDescendantTwo_deep_copy
@@ -522,7 +545,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                MixedConcreteWithDescendantsDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "MixedConcreteWithDescendants");
         }  // public void Test_MixedConcreteWithDescendants_deep_copy
@@ -550,7 +573,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                MixedConcreteWithDescendantsChildDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "MixedConcreteWithDescendantsChild");
         }  // public void Test_MixedConcreteWithDescendantsChild_deep_copy
@@ -578,7 +601,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                MixedConcreteLeafDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "MixedConcreteLeaf");
         }  // public void Test_MixedConcreteLeaf_deep_copy
@@ -606,7 +629,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ModelTypedFirstDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ModelTypedFirst");
         }  // public void Test_ModelTypedFirst_deep_copy
@@ -634,7 +657,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ModelTypedSecondDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ModelTypedSecond");
         }  // public void Test_ModelTypedSecond_deep_copy
@@ -662,7 +685,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SomethingDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy

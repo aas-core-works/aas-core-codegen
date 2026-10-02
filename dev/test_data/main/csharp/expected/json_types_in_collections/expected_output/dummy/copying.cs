@@ -45,6 +45,56 @@ namespace dummy
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<Nodes.JsonNode> Deep_ListOf_jsonValue(
+            List<Nodes.JsonNode> that)
+        {
+            var result = new List<Nodes.JsonNode>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(
+                    (Nodes.JsonNode)(
+                        System.Text.Json.JsonSerializer.SerializeToNode(
+                            item)
+                        ?? throw new System.InvalidOperationException(
+                            "Expected SerializeToNode to copy a non-null value, "
+                                + "but it returned null")));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static (string, Nodes.JsonNode, Nodes.JsonArray, Nodes.JsonObject) Deep_TupleOf4_string_jsonValue_jsonArray_jsonObject(
+            (string, Nodes.JsonNode, Nodes.JsonArray, Nodes.JsonObject) that)
+        {
+            return (
+                that.Item1,
+                (Nodes.JsonNode)(
+                    System.Text.Json.JsonSerializer.SerializeToNode(
+                        that.Item2)
+                    ?? throw new System.InvalidOperationException(
+                        "Expected SerializeToNode to copy a non-null value, "
+                            + "but it returned null")),
+                (Nodes.JsonArray)(
+                    System.Text.Json.JsonSerializer.SerializeToNode(
+                        that.Item3)
+                    ?? throw new System.InvalidOperationException(
+                        "Expected SerializeToNode to copy a non-null value, "
+                            + "but it returned null")),
+                (Nodes.JsonObject)(
+                    System.Text.Json.JsonSerializer.SerializeToNode(
+                        that.Item4)
+                    ?? throw new System.InvalidOperationException(
+                        "Expected SerializeToNode to copy a non-null value, "
+                            + "but it returned null"))
+            );
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -62,27 +112,9 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theValues = new List<Nodes.JsonNode>(
-                    that.Values.Count);
-                foreach (var item in that.Values)
-                {
-                    theValues.Add(
-                        (Nodes.JsonNode)(
-                            System.Text.Json.JsonSerializer.SerializeToNode(
-                                item)
-                            ?? throw new System.InvalidOperationException(
-                                "Expected SerializeToNode to copy the non-null item of the property Values, "
-                                    + "but it returned null")));
-                }
-
                 return new Our.Something(
-                    theValues,
-                    (
-                        that.TupleWithJson.Item1,
-                        that.TupleWithJson.Item2,
-                        that.TupleWithJson.Item3,
-                        that.TupleWithJson.Item4
-                    )
+                    Deep_ListOf_jsonValue(that.Values),
+                    Deep_TupleOf4_string_jsonValue_jsonArray_jsonObject(that.TupleWithJson)
                 );
             }
         }  // internal class DeepCopier

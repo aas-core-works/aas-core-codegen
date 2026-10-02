@@ -74,32 +74,32 @@ namespace dummy
                         System.Text.Json.JsonSerializer.SerializeToNode(
                             that.Value)
                         ?? throw new System.InvalidOperationException(
-                            "Expected SerializeToNode to copy the non-null property Value, "
+                            "Expected SerializeToNode to copy a non-null value, "
                                 + "but it returned null")),
                     (Nodes.JsonArray)(
                         System.Text.Json.JsonSerializer.SerializeToNode(
                             that.Values)
                         ?? throw new System.InvalidOperationException(
-                            "Expected SerializeToNode to copy the non-null property Values, "
+                            "Expected SerializeToNode to copy a non-null value, "
                                 + "but it returned null")),
                     (Nodes.JsonObject)(
                         System.Text.Json.JsonSerializer.SerializeToNode(
                             that.Mapping)
                         ?? throw new System.InvalidOperationException(
-                            "Expected SerializeToNode to copy the non-null property Mapping, "
+                            "Expected SerializeToNode to copy a non-null value, "
                                 + "but it returned null")),
                     (Nodes.JsonObject)(
                         System.Text.Json.JsonSerializer.SerializeToNode(
                             that.MappingWithConstrainedKey)
                         ?? throw new System.InvalidOperationException(
-                            "Expected SerializeToNode to copy the non-null property MappingWithConstrainedKey, "
+                            "Expected SerializeToNode to copy a non-null value, "
                                 + "but it returned null")),
                     (that.OptionalValue != null)
                         ? (Nodes.JsonNode)(
                             System.Text.Json.JsonSerializer.SerializeToNode(
                                 that.OptionalValue)
                             ?? throw new System.InvalidOperationException(
-                                "Expected SerializeToNode to copy the non-null property OptionalValue, "
+                                "Expected SerializeToNode to copy a non-null value, "
                                     + "but it returned null"))
                         : null,
                     (that.OptionalValues != null)
@@ -107,7 +107,7 @@ namespace dummy
                             System.Text.Json.JsonSerializer.SerializeToNode(
                                 that.OptionalValues)
                             ?? throw new System.InvalidOperationException(
-                                "Expected SerializeToNode to copy the non-null property OptionalValues, "
+                                "Expected SerializeToNode to copy a non-null value, "
                                     + "but it returned null"))
                         : null,
                     (that.OptionalMapping != null)
@@ -115,7 +115,7 @@ namespace dummy
                             System.Text.Json.JsonSerializer.SerializeToNode(
                                 that.OptionalMapping)
                             ?? throw new System.InvalidOperationException(
-                                "Expected SerializeToNode to copy the non-null property OptionalMapping, "
+                                "Expected SerializeToNode to copy a non-null value, "
                                     + "but it returned null"))
                         : null
                 );

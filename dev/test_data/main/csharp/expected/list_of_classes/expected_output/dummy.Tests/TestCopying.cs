@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,26 +15,33 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformSomeItem(
                 Our.ISomeItem that,
                 Our.IClass other)
             {
-                if (!(other is Our.SomeItem casted))
+                if (!(other is Our.SomeItem casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -47,7 +54,7 @@ namespace dummy.Tests
                 Our.IAnotherItem that,
                 Our.IClass other)
             {
-                if (!(other is Our.AnotherItem casted))
+                if (!(other is Our.AnotherItem casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -60,7 +67,7 @@ namespace dummy.Tests
                 Our.ISimple that,
                 Our.IClass other)
             {
-                if (!(other is Our.Simple casted))
+                if (!(other is Our.Simple casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -73,7 +80,7 @@ namespace dummy.Tests
                 Our.ISomething that,
                 Our.IClass other)
             {
-                if (!(other is Our.Something casted))
+                if (!(other is Our.Something casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -82,24 +89,63 @@ namespace dummy.Tests
                     Transform(
                         that.Item,
                         casted.Item)
-                    && that.SomeItems.Count == casted.SomeItems.Count
-                    && (
-                        that.SomeItems
-                            .Zip(
-                                casted.SomeItems,
-                                Transform)
-                            .All(item => item))
-                    && that.SomeSimples.Count == casted.SomeSimples.Count
-                    && (
-                        that.SomeSimples
-                            .Zip(
-                                casted.SomeSimples,
-                                Transform)
-                            .All(item => item)));
+                    && Check_ListOf_IAbstractItem(
+                        that.SomeItems,
+                        casted.SomeItems)
+                    && Check_ListOf_ISimple(
+                        that.SomeSimples,
+                        casted.SomeSimples));
             }
-        }  // internal class DeepEqualiser
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+            private bool Check_ListOf_IAbstractItem(
+                List<Our.IAbstractItem> that,
+                List<Our.IAbstractItem> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ISimple(
+                List<Our.ISimple> that,
+                List<Our.ISimple> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }  // internal class DeepCopyChecker
+
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool SomeItemShallowEquals(
             Our.SomeItem that,
@@ -132,34 +178,6 @@ namespace dummy.Tests
                 && that.SomeSimples == other.SomeSimples);
         }
 
-        private static bool SomeItemDeepEquals(
-            Our.SomeItem that,
-            Our.SomeItem other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool AnotherItemDeepEquals(
-            Our.AnotherItem that,
-            Our.AnotherItem other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SimpleDeepEquals(
-            Our.Simple that,
-            Our.Simple other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SomethingDeepEquals(
-            Our.Something that,
-            Our.Something other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
         [Test]
         public void Test_SomeItem_shallow_copy()
         {
@@ -183,7 +201,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SomeItemDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "SomeItem");
         }  // public void Test_SomeItem_deep_copy
@@ -211,7 +229,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                AnotherItemDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "AnotherItem");
         }  // public void Test_AnotherItem_deep_copy
@@ -239,7 +257,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SimpleDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Simple");
         }  // public void Test_Simple_deep_copy
@@ -267,7 +285,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SomethingDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy

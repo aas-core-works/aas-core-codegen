@@ -7,7 +7,7 @@ using Our = AasCore.Aas3_0;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,26 +15,33 @@ namespace AasCore.Aas3_0.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformExtension(
                 Our.IExtension that,
                 Our.IClass other)
             {
-                if (!(other is Our.Extension casted))
+                if (!(other is Our.Extension casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -42,31 +49,23 @@ namespace AasCore.Aas3_0.Tests
                 return (
                     ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && that.Name == casted.Name
-                    && ((that.ValueType.HasValue && casted.ValueType.HasValue)
-                        ? that.ValueType == casted.ValueType
-                        : !that.ValueType.HasValue && !casted.ValueType.HasValue)
-                    && that.Value == casted.Value
+                    && that.ValueType == casted.ValueType
+                    && ((that.Value != null && casted.Value != null)
+                        ? that.Value == casted.Value
+                        : that.Value == null && casted.Value == null)
                     && ((that.RefersTo != null && casted.RefersTo != null)
-                        ? that.RefersTo.Count == casted.RefersTo.Count
-                            && (
-                                that.RefersTo
-                                    .Zip(
-                                        casted.RefersTo,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.RefersTo,
+                            casted.RefersTo)
                         : that.RefersTo == null && casted.RefersTo == null));
             }
 
@@ -74,36 +73,38 @@ namespace AasCore.Aas3_0.Tests
                 Our.IAdministrativeInformation that,
                 Our.IClass other)
             {
-                if (!(other is Our.AdministrativeInformation casted))
+                if (!(other is Our.AdministrativeInformation casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
-                    && that.Version == casted.Version
-                    && that.Revision == casted.Revision
+                    && ((that.Version != null && casted.Version != null)
+                        ? that.Version == casted.Version
+                        : that.Version == null && casted.Version == null)
+                    && ((that.Revision != null && casted.Revision != null)
+                        ? that.Revision == casted.Revision
+                        : that.Revision == null && casted.Revision == null)
                     && ((that.Creator != null && casted.Creator != null)
                         ? Transform(
-                                that.Creator,
-                                casted.Creator)
+                            that.Creator,
+                            casted.Creator)
                         : that.Creator == null && casted.Creator == null)
-                    && that.TemplateId == casted.TemplateId);
+                    && ((that.TemplateId != null && casted.TemplateId != null)
+                        ? that.TemplateId == casted.TemplateId
+                        : that.TemplateId == null && casted.TemplateId == null));
             }
 
             public override bool TransformQualifier(
                 Our.IQualifier that,
                 Our.IClass other)
             {
-                if (!(other is Our.Qualifier casted))
+                if (!(other is Our.Qualifier casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -111,28 +112,24 @@ namespace AasCore.Aas3_0.Tests
                 return (
                     ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
-                    && ((that.Kind.HasValue && casted.Kind.HasValue)
-                        ? that.Kind == casted.Kind
-                        : !that.Kind.HasValue && !casted.Kind.HasValue)
+                    && that.Kind == casted.Kind
                     && that.Type == casted.Type
                     && that.ValueType == casted.ValueType
-                    && that.Value == casted.Value
+                    && ((that.Value != null && casted.Value != null)
+                        ? that.Value == casted.Value
+                        : that.Value == null && casted.Value == null)
                     && ((that.ValueId != null && casted.ValueId != null)
                         ? Transform(
-                                that.ValueId,
-                                casted.ValueId)
+                            that.ValueId,
+                            casted.ValueId)
                         : that.ValueId == null && casted.ValueId == null));
             }
 
@@ -140,72 +137,56 @@ namespace AasCore.Aas3_0.Tests
                 Our.IAssetAdministrationShell that,
                 Our.IClass other)
             {
-                if (!(other is Our.AssetAdministrationShell casted))
+                if (!(other is Our.AssetAdministrationShell casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.Administration != null && casted.Administration != null)
                         ? Transform(
-                                that.Administration,
-                                casted.Administration)
+                            that.Administration,
+                            casted.Administration)
                         : that.Administration == null && casted.Administration == null)
                     && that.Id == casted.Id
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.DerivedFrom != null && casted.DerivedFrom != null)
                         ? Transform(
-                                that.DerivedFrom,
-                                casted.DerivedFrom)
+                            that.DerivedFrom,
+                            casted.DerivedFrom)
                         : that.DerivedFrom == null && casted.DerivedFrom == null)
                     && Transform(
                         that.AssetInformation,
                         casted.AssetInformation)
                     && ((that.Submodels != null && casted.Submodels != null)
-                        ? that.Submodels.Count == casted.Submodels.Count
-                            && (
-                                that.Submodels
-                                    .Zip(
-                                        casted.Submodels,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.Submodels,
+                            casted.Submodels)
                         : that.Submodels == null && casted.Submodels == null));
             }
 
@@ -213,28 +194,28 @@ namespace AasCore.Aas3_0.Tests
                 Our.IAssetInformation that,
                 Our.IClass other)
             {
-                if (!(other is Our.AssetInformation casted))
+                if (!(other is Our.AssetInformation casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     that.AssetKind == casted.AssetKind
-                    && that.GlobalAssetId == casted.GlobalAssetId
+                    && ((that.GlobalAssetId != null && casted.GlobalAssetId != null)
+                        ? that.GlobalAssetId == casted.GlobalAssetId
+                        : that.GlobalAssetId == null && casted.GlobalAssetId == null)
                     && ((that.SpecificAssetIds != null && casted.SpecificAssetIds != null)
-                        ? that.SpecificAssetIds.Count == casted.SpecificAssetIds.Count
-                            && (
-                                that.SpecificAssetIds
-                                    .Zip(
-                                        casted.SpecificAssetIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISpecificAssetId(
+                            that.SpecificAssetIds,
+                            casted.SpecificAssetIds)
                         : that.SpecificAssetIds == null && casted.SpecificAssetIds == null)
-                    && that.AssetType == casted.AssetType
+                    && ((that.AssetType != null && casted.AssetType != null)
+                        ? that.AssetType == casted.AssetType
+                        : that.AssetType == null && casted.AssetType == null)
                     && ((that.DefaultThumbnail != null && casted.DefaultThumbnail != null)
                         ? Transform(
-                                that.DefaultThumbnail,
-                                casted.DefaultThumbnail)
+                            that.DefaultThumbnail,
+                            casted.DefaultThumbnail)
                         : that.DefaultThumbnail == null && casted.DefaultThumbnail == null));
             }
 
@@ -242,21 +223,23 @@ namespace AasCore.Aas3_0.Tests
                 Our.IResource that,
                 Our.IClass other)
             {
-                if (!(other is Our.Resource casted))
+                if (!(other is Our.Resource casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     that.Path == casted.Path
-                    && that.ContentType == casted.ContentType);
+                    && ((that.ContentType != null && casted.ContentType != null)
+                        ? that.ContentType == casted.ContentType
+                        : that.ContentType == null && casted.ContentType == null));
             }
 
             public override bool TransformSpecificAssetId(
                 Our.ISpecificAssetId that,
                 Our.IClass other)
             {
-                if (!(other is Our.SpecificAssetId casted))
+                if (!(other is Our.SpecificAssetId casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -264,24 +247,20 @@ namespace AasCore.Aas3_0.Tests
                 return (
                     ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && that.Name == casted.Name
                     && that.Value == casted.Value
                     && ((that.ExternalSubjectId != null && casted.ExternalSubjectId != null)
                         ? Transform(
-                                that.ExternalSubjectId,
-                                casted.ExternalSubjectId)
+                            that.ExternalSubjectId,
+                            casted.ExternalSubjectId)
                         : that.ExternalSubjectId == null && casted.ExternalSubjectId == null));
             }
 
@@ -289,90 +268,64 @@ namespace AasCore.Aas3_0.Tests
                 Our.ISubmodel that,
                 Our.IClass other)
             {
-                if (!(other is Our.Submodel casted))
+                if (!(other is Our.Submodel casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.Administration != null && casted.Administration != null)
                         ? Transform(
-                                that.Administration,
-                                casted.Administration)
+                            that.Administration,
+                            casted.Administration)
                         : that.Administration == null && casted.Administration == null)
                     && that.Id == casted.Id
-                    && ((that.Kind.HasValue && casted.Kind.HasValue)
-                        ? that.Kind == casted.Kind
-                        : !that.Kind.HasValue && !casted.Kind.HasValue)
+                    && that.Kind == casted.Kind
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.SubmodelElements != null && casted.SubmodelElements != null)
-                        ? that.SubmodelElements.Count == casted.SubmodelElements.Count
-                            && (
-                                that.SubmodelElements
-                                    .Zip(
-                                        casted.SubmodelElements,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISubmodelElement(
+                            that.SubmodelElements,
+                            casted.SubmodelElements)
                         : that.SubmodelElements == null && casted.SubmodelElements == null));
             }
 
@@ -380,72 +333,52 @@ namespace AasCore.Aas3_0.Tests
                 Our.IRelationshipElement that,
                 Our.IClass other)
             {
-                if (!(other is Our.RelationshipElement casted))
+                if (!(other is Our.RelationshipElement casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && Transform(
                         that.First,
@@ -459,91 +392,65 @@ namespace AasCore.Aas3_0.Tests
                 Our.ISubmodelElementList that,
                 Our.IClass other)
             {
-                if (!(other is Our.SubmodelElementList casted))
+                if (!(other is Our.SubmodelElementList casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && that.OrderRelevant == casted.OrderRelevant
                     && ((that.SemanticIdListElement != null && casted.SemanticIdListElement != null)
                         ? Transform(
-                                that.SemanticIdListElement,
-                                casted.SemanticIdListElement)
+                            that.SemanticIdListElement,
+                            casted.SemanticIdListElement)
                         : that.SemanticIdListElement == null && casted.SemanticIdListElement == null)
                     && that.TypeValueListElement == casted.TypeValueListElement
-                    && ((that.ValueTypeListElement.HasValue && casted.ValueTypeListElement.HasValue)
-                        ? that.ValueTypeListElement == casted.ValueTypeListElement
-                        : !that.ValueTypeListElement.HasValue && !casted.ValueTypeListElement.HasValue)
+                    && that.ValueTypeListElement == casted.ValueTypeListElement
                     && ((that.Value != null && casted.Value != null)
-                        ? that.Value.Count == casted.Value.Count
-                            && (
-                                that.Value
-                                    .Zip(
-                                        casted.Value,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISubmodelElement(
+                            that.Value,
+                            casted.Value)
                         : that.Value == null && casted.Value == null));
             }
 
@@ -551,81 +458,57 @@ namespace AasCore.Aas3_0.Tests
                 Our.ISubmodelElementCollection that,
                 Our.IClass other)
             {
-                if (!(other is Our.SubmodelElementCollection casted))
+                if (!(other is Our.SubmodelElementCollection casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.Value != null && casted.Value != null)
-                        ? that.Value.Count == casted.Value.Count
-                            && (
-                                that.Value
-                                    .Zip(
-                                        casted.Value,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISubmodelElement(
+                            that.Value,
+                            casted.Value)
                         : that.Value == null && casted.Value == null));
             }
 
@@ -633,79 +516,61 @@ namespace AasCore.Aas3_0.Tests
                 Our.IProperty that,
                 Our.IClass other)
             {
-                if (!(other is Our.Property casted))
+                if (!(other is Our.Property casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && that.ValueType == casted.ValueType
-                    && that.Value == casted.Value
+                    && ((that.Value != null && casted.Value != null)
+                        ? that.Value == casted.Value
+                        : that.Value == null && casted.Value == null)
                     && ((that.ValueId != null && casted.ValueId != null)
                         ? Transform(
-                                that.ValueId,
-                                casted.ValueId)
+                            that.ValueId,
+                            casted.ValueId)
                         : that.ValueId == null && casted.ValueId == null));
             }
 
@@ -713,86 +578,62 @@ namespace AasCore.Aas3_0.Tests
                 Our.IMultiLanguageProperty that,
                 Our.IClass other)
             {
-                if (!(other is Our.MultiLanguageProperty casted))
+                if (!(other is Our.MultiLanguageProperty casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.Value != null && casted.Value != null)
-                        ? that.Value.Count == casted.Value.Count
-                            && (
-                                that.Value
-                                    .Zip(
-                                        casted.Value,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Value,
+                            casted.Value)
                         : that.Value == null && casted.Value == null)
                     && ((that.ValueId != null && casted.ValueId != null)
                         ? Transform(
-                                that.ValueId,
-                                casted.ValueId)
+                            that.ValueId,
+                            casted.ValueId)
                         : that.ValueId == null && casted.ValueId == null));
             }
 
@@ -800,153 +641,117 @@ namespace AasCore.Aas3_0.Tests
                 Our.IRange that,
                 Our.IClass other)
             {
-                if (!(other is Our.Range casted))
+                if (!(other is Our.Range casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && that.ValueType == casted.ValueType
-                    && that.Min == casted.Min
-                    && that.Max == casted.Max);
+                    && ((that.Min != null && casted.Min != null)
+                        ? that.Min == casted.Min
+                        : that.Min == null && casted.Min == null)
+                    && ((that.Max != null && casted.Max != null)
+                        ? that.Max == casted.Max
+                        : that.Max == null && casted.Max == null));
             }
 
             public override bool TransformReferenceElement(
                 Our.IReferenceElement that,
                 Our.IClass other)
             {
-                if (!(other is Our.ReferenceElement casted))
+                if (!(other is Our.ReferenceElement casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.Value != null && casted.Value != null)
                         ? Transform(
-                                that.Value,
-                                casted.Value)
+                            that.Value,
+                            casted.Value)
                         : that.Value == null && casted.Value == null));
             }
 
@@ -954,76 +759,58 @@ namespace AasCore.Aas3_0.Tests
                 Our.IBlob that,
                 Our.IClass other)
             {
-                if (!(other is Our.Blob casted))
+                if (!(other is Our.Blob casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
-                    && ByteSpansEqual(
-                        that.Value,
-                        casted.Value)
+                    && ((that.Value != null && casted.Value != null)
+                        ? BytesEqualButDistinct(
+                            that.Value,
+                            casted.Value)
+                        : that.Value == null && casted.Value == null)
                     && that.ContentType == casted.ContentType);
             }
 
@@ -1031,74 +818,56 @@ namespace AasCore.Aas3_0.Tests
                 Our.IFile that,
                 Our.IClass other)
             {
-                if (!(other is Our.File casted))
+                if (!(other is Our.File casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
-                    && that.Value == casted.Value
+                    && ((that.Value != null && casted.Value != null)
+                        ? that.Value == casted.Value
+                        : that.Value == null && casted.Value == null)
                     && that.ContentType == casted.ContentType);
             }
 
@@ -1106,72 +875,52 @@ namespace AasCore.Aas3_0.Tests
                 Our.IAnnotatedRelationshipElement that,
                 Our.IClass other)
             {
-                if (!(other is Our.AnnotatedRelationshipElement casted))
+                if (!(other is Our.AnnotatedRelationshipElement casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && Transform(
                         that.First,
@@ -1180,13 +929,9 @@ namespace AasCore.Aas3_0.Tests
                         that.Second,
                         casted.Second)
                     && ((that.Annotations != null && casted.Annotations != null)
-                        ? that.Annotations.Count == casted.Annotations.Count
-                            && (
-                                that.Annotations
-                                    .Zip(
-                                        casted.Annotations,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IDataElement(
+                            that.Annotations,
+                            casted.Annotations)
                         : that.Annotations == null && casted.Annotations == null));
             }
 
@@ -1194,92 +939,66 @@ namespace AasCore.Aas3_0.Tests
                 Our.IEntity that,
                 Our.IClass other)
             {
-                if (!(other is Our.Entity casted))
+                if (!(other is Our.Entity casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.Statements != null && casted.Statements != null)
-                        ? that.Statements.Count == casted.Statements.Count
-                            && (
-                                that.Statements
-                                    .Zip(
-                                        casted.Statements,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISubmodelElement(
+                            that.Statements,
+                            casted.Statements)
                         : that.Statements == null && casted.Statements == null)
                     && that.EntityType == casted.EntityType
-                    && that.GlobalAssetId == casted.GlobalAssetId
+                    && ((that.GlobalAssetId != null && casted.GlobalAssetId != null)
+                        ? that.GlobalAssetId == casted.GlobalAssetId
+                        : that.GlobalAssetId == null && casted.GlobalAssetId == null)
                     && ((that.SpecificAssetIds != null && casted.SpecificAssetIds != null)
-                        ? that.SpecificAssetIds.Count == casted.SpecificAssetIds.Count
-                            && (
-                                that.SpecificAssetIds
-                                    .Zip(
-                                        casted.SpecificAssetIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISpecificAssetId(
+                            that.SpecificAssetIds,
+                            casted.SpecificAssetIds)
                         : that.SpecificAssetIds == null && casted.SpecificAssetIds == null));
             }
 
@@ -1287,7 +1006,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.IEventPayload that,
                 Our.IClass other)
             {
-                if (!(other is Our.EventPayload casted))
+                if (!(other is Our.EventPayload casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1298,213 +1017,173 @@ namespace AasCore.Aas3_0.Tests
                         casted.Source)
                     && ((that.SourceSemanticId != null && casted.SourceSemanticId != null)
                         ? Transform(
-                                that.SourceSemanticId,
-                                casted.SourceSemanticId)
+                            that.SourceSemanticId,
+                            casted.SourceSemanticId)
                         : that.SourceSemanticId == null && casted.SourceSemanticId == null)
                     && Transform(
                         that.ObservableReference,
                         casted.ObservableReference)
                     && ((that.ObservableSemanticId != null && casted.ObservableSemanticId != null)
                         ? Transform(
-                                that.ObservableSemanticId,
-                                casted.ObservableSemanticId)
+                            that.ObservableSemanticId,
+                            casted.ObservableSemanticId)
                         : that.ObservableSemanticId == null && casted.ObservableSemanticId == null)
-                    && that.Topic == casted.Topic
+                    && ((that.Topic != null && casted.Topic != null)
+                        ? that.Topic == casted.Topic
+                        : that.Topic == null && casted.Topic == null)
                     && ((that.SubjectId != null && casted.SubjectId != null)
                         ? Transform(
-                                that.SubjectId,
-                                casted.SubjectId)
+                            that.SubjectId,
+                            casted.SubjectId)
                         : that.SubjectId == null && casted.SubjectId == null)
                     && that.TimeStamp == casted.TimeStamp
-                    && ByteSpansEqual(
-                        that.Payload,
-                        casted.Payload));
+                    && ((that.Payload != null && casted.Payload != null)
+                        ? BytesEqualButDistinct(
+                            that.Payload,
+                            casted.Payload)
+                        : that.Payload == null && casted.Payload == null));
             }
 
             public override bool TransformBasicEventElement(
                 Our.IBasicEventElement that,
                 Our.IClass other)
             {
-                if (!(other is Our.BasicEventElement casted))
+                if (!(other is Our.BasicEventElement casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && Transform(
                         that.Observed,
                         casted.Observed)
                     && that.Direction == casted.Direction
                     && that.State == casted.State
-                    && that.MessageTopic == casted.MessageTopic
+                    && ((that.MessageTopic != null && casted.MessageTopic != null)
+                        ? that.MessageTopic == casted.MessageTopic
+                        : that.MessageTopic == null && casted.MessageTopic == null)
                     && ((that.MessageBroker != null && casted.MessageBroker != null)
                         ? Transform(
-                                that.MessageBroker,
-                                casted.MessageBroker)
+                            that.MessageBroker,
+                            casted.MessageBroker)
                         : that.MessageBroker == null && casted.MessageBroker == null)
-                    && that.LastUpdate == casted.LastUpdate
-                    && that.MinInterval == casted.MinInterval
-                    && that.MaxInterval == casted.MaxInterval);
+                    && ((that.LastUpdate != null && casted.LastUpdate != null)
+                        ? that.LastUpdate == casted.LastUpdate
+                        : that.LastUpdate == null && casted.LastUpdate == null)
+                    && ((that.MinInterval != null && casted.MinInterval != null)
+                        ? that.MinInterval == casted.MinInterval
+                        : that.MinInterval == null && casted.MinInterval == null)
+                    && ((that.MaxInterval != null && casted.MaxInterval != null)
+                        ? that.MaxInterval == casted.MaxInterval
+                        : that.MaxInterval == null && casted.MaxInterval == null));
             }
 
             public override bool TransformOperation(
                 Our.IOperation that,
                 Our.IClass other)
             {
-                if (!(other is Our.Operation casted))
+                if (!(other is Our.Operation casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.InputVariables != null && casted.InputVariables != null)
-                        ? that.InputVariables.Count == casted.InputVariables.Count
-                            && (
-                                that.InputVariables
-                                    .Zip(
-                                        casted.InputVariables,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IOperationVariable(
+                            that.InputVariables,
+                            casted.InputVariables)
                         : that.InputVariables == null && casted.InputVariables == null)
                     && ((that.OutputVariables != null && casted.OutputVariables != null)
-                        ? that.OutputVariables.Count == casted.OutputVariables.Count
-                            && (
-                                that.OutputVariables
-                                    .Zip(
-                                        casted.OutputVariables,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IOperationVariable(
+                            that.OutputVariables,
+                            casted.OutputVariables)
                         : that.OutputVariables == null && casted.OutputVariables == null)
                     && ((that.InoutputVariables != null && casted.InoutputVariables != null)
-                        ? that.InoutputVariables.Count == casted.InoutputVariables.Count
-                            && (
-                                that.InoutputVariables
-                                    .Zip(
-                                        casted.InoutputVariables,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IOperationVariable(
+                            that.InoutputVariables,
+                            casted.InoutputVariables)
                         : that.InoutputVariables == null && casted.InoutputVariables == null));
             }
 
@@ -1512,7 +1191,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.IOperationVariable that,
                 Our.IClass other)
             {
-                if (!(other is Our.OperationVariable casted))
+                if (!(other is Our.OperationVariable casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1527,72 +1206,52 @@ namespace AasCore.Aas3_0.Tests
                 Our.ICapability that,
                 Our.IClass other)
             {
-                if (!(other is Our.Capability casted))
+                if (!(other is Our.Capability casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.SemanticId != null && casted.SemanticId != null)
                         ? Transform(
-                                that.SemanticId,
-                                casted.SemanticId)
+                            that.SemanticId,
+                            casted.SemanticId)
                         : that.SemanticId == null && casted.SemanticId == null)
                     && ((that.SupplementalSemanticIds != null && casted.SupplementalSemanticIds != null)
-                        ? that.SupplementalSemanticIds.Count == casted.SupplementalSemanticIds.Count
-                            && (
-                                that.SupplementalSemanticIds
-                                    .Zip(
-                                        casted.SupplementalSemanticIds,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.SupplementalSemanticIds,
+                            casted.SupplementalSemanticIds)
                         : that.SupplementalSemanticIds == null && casted.SupplementalSemanticIds == null)
                     && ((that.Qualifiers != null && casted.Qualifiers != null)
-                        ? that.Qualifiers.Count == casted.Qualifiers.Count
-                            && (
-                                that.Qualifiers
-                                    .Zip(
-                                        casted.Qualifiers,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IQualifier(
+                            that.Qualifiers,
+                            casted.Qualifiers)
                         : that.Qualifiers == null && casted.Qualifiers == null)
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null));
             }
 
@@ -1600,64 +1259,48 @@ namespace AasCore.Aas3_0.Tests
                 Our.IConceptDescription that,
                 Our.IClass other)
             {
-                if (!(other is Our.ConceptDescription casted))
+                if (!(other is Our.ConceptDescription casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Extensions != null && casted.Extensions != null)
-                        ? that.Extensions.Count == casted.Extensions.Count
-                            && (
-                                that.Extensions
-                                    .Zip(
-                                        casted.Extensions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IExtension(
+                            that.Extensions,
+                            casted.Extensions)
                         : that.Extensions == null && casted.Extensions == null)
-                    && that.Category == casted.Category
-                    && that.IdShort == casted.IdShort
+                    && ((that.Category != null && casted.Category != null)
+                        ? that.Category == casted.Category
+                        : that.Category == null && casted.Category == null)
+                    && ((that.IdShort != null && casted.IdShort != null)
+                        ? that.IdShort == casted.IdShort
+                        : that.IdShort == null && casted.IdShort == null)
                     && ((that.DisplayName != null && casted.DisplayName != null)
-                        ? that.DisplayName.Count == casted.DisplayName.Count
-                            && (
-                                that.DisplayName
-                                    .Zip(
-                                        casted.DisplayName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringNameType(
+                            that.DisplayName,
+                            casted.DisplayName)
                         : that.DisplayName == null && casted.DisplayName == null)
                     && ((that.Description != null && casted.Description != null)
-                        ? that.Description.Count == casted.Description.Count
-                            && (
-                                that.Description
-                                    .Zip(
-                                        casted.Description,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringTextType(
+                            that.Description,
+                            casted.Description)
                         : that.Description == null && casted.Description == null)
                     && ((that.Administration != null && casted.Administration != null)
                         ? Transform(
-                                that.Administration,
-                                casted.Administration)
+                            that.Administration,
+                            casted.Administration)
                         : that.Administration == null && casted.Administration == null)
                     && that.Id == casted.Id
                     && ((that.EmbeddedDataSpecifications != null && casted.EmbeddedDataSpecifications != null)
-                        ? that.EmbeddedDataSpecifications.Count == casted.EmbeddedDataSpecifications.Count
-                            && (
-                                that.EmbeddedDataSpecifications
-                                    .Zip(
-                                        casted.EmbeddedDataSpecifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications,
+                            casted.EmbeddedDataSpecifications)
                         : that.EmbeddedDataSpecifications == null && casted.EmbeddedDataSpecifications == null)
                     && ((that.IsCaseOf != null && casted.IsCaseOf != null)
-                        ? that.IsCaseOf.Count == casted.IsCaseOf.Count
-                            && (
-                                that.IsCaseOf
-                                    .Zip(
-                                        casted.IsCaseOf,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IReference(
+                            that.IsCaseOf,
+                            casted.IsCaseOf)
                         : that.IsCaseOf == null && casted.IsCaseOf == null));
             }
 
@@ -1665,7 +1308,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.IReference that,
                 Our.IClass other)
             {
-                if (!(other is Our.Reference casted))
+                if (!(other is Our.Reference casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1674,23 +1317,19 @@ namespace AasCore.Aas3_0.Tests
                     that.Type == casted.Type
                     && ((that.ReferredSemanticId != null && casted.ReferredSemanticId != null)
                         ? Transform(
-                                that.ReferredSemanticId,
-                                casted.ReferredSemanticId)
+                            that.ReferredSemanticId,
+                            casted.ReferredSemanticId)
                         : that.ReferredSemanticId == null && casted.ReferredSemanticId == null)
-                    && that.Keys.Count == casted.Keys.Count
-                    && (
-                        that.Keys
-                            .Zip(
-                                casted.Keys,
-                                Transform)
-                            .All(item => item)));
+                    && Check_ListOf_IKey(
+                        that.Keys,
+                        casted.Keys));
             }
 
             public override bool TransformKey(
                 Our.IKey that,
                 Our.IClass other)
             {
-                if (!(other is Our.Key casted))
+                if (!(other is Our.Key casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1704,7 +1343,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.ILangStringNameType that,
                 Our.IClass other)
             {
-                if (!(other is Our.LangStringNameType casted))
+                if (!(other is Our.LangStringNameType casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1718,7 +1357,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.ILangStringTextType that,
                 Our.IClass other)
             {
-                if (!(other is Our.LangStringTextType casted))
+                if (!(other is Our.LangStringTextType casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1732,38 +1371,26 @@ namespace AasCore.Aas3_0.Tests
                 Our.IEnvironment that,
                 Our.IClass other)
             {
-                if (!(other is Our.Environment casted))
+                if (!(other is Our.Environment casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.AssetAdministrationShells != null && casted.AssetAdministrationShells != null)
-                        ? that.AssetAdministrationShells.Count == casted.AssetAdministrationShells.Count
-                            && (
-                                that.AssetAdministrationShells
-                                    .Zip(
-                                        casted.AssetAdministrationShells,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IAssetAdministrationShell(
+                            that.AssetAdministrationShells,
+                            casted.AssetAdministrationShells)
                         : that.AssetAdministrationShells == null && casted.AssetAdministrationShells == null)
                     && ((that.Submodels != null && casted.Submodels != null)
-                        ? that.Submodels.Count == casted.Submodels.Count
-                            && (
-                                that.Submodels
-                                    .Zip(
-                                        casted.Submodels,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISubmodel(
+                            that.Submodels,
+                            casted.Submodels)
                         : that.Submodels == null && casted.Submodels == null)
                     && ((that.ConceptDescriptions != null && casted.ConceptDescriptions != null)
-                        ? that.ConceptDescriptions.Count == casted.ConceptDescriptions.Count
-                            && (
-                                that.ConceptDescriptions
-                                    .Zip(
-                                        casted.ConceptDescriptions,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_IConceptDescription(
+                            that.ConceptDescriptions,
+                            casted.ConceptDescriptions)
                         : that.ConceptDescriptions == null && casted.ConceptDescriptions == null));
             }
 
@@ -1771,7 +1398,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.IEmbeddedDataSpecification that,
                 Our.IClass other)
             {
-                if (!(other is Our.EmbeddedDataSpecification casted))
+                if (!(other is Our.EmbeddedDataSpecification casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1789,7 +1416,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.ILevelType that,
                 Our.IClass other)
             {
-                if (!(other is Our.LevelType casted))
+                if (!(other is Our.LevelType casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1805,7 +1432,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.IValueReferencePair that,
                 Our.IClass other)
             {
-                if (!(other is Our.ValueReferencePair casted))
+                if (!(other is Our.ValueReferencePair casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1821,26 +1448,22 @@ namespace AasCore.Aas3_0.Tests
                 Our.IValueList that,
                 Our.IClass other)
             {
-                if (!(other is Our.ValueList casted))
+                if (!(other is Our.ValueList casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.ValueReferencePairs.Count == casted.ValueReferencePairs.Count
-                    && (
-                        that.ValueReferencePairs
-                            .Zip(
-                                casted.ValueReferencePairs,
-                                Transform)
-                            .All(item => item)));
+                    Check_ListOf_IValueReferencePair(
+                        that.ValueReferencePairs,
+                        casted.ValueReferencePairs));
             }
 
             public override bool TransformLangStringPreferredNameTypeIec61360(
                 Our.ILangStringPreferredNameTypeIec61360 that,
                 Our.IClass other)
             {
-                if (!(other is Our.LangStringPreferredNameTypeIec61360 casted))
+                if (!(other is Our.LangStringPreferredNameTypeIec61360 casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1854,7 +1477,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.ILangStringShortNameTypeIec61360 that,
                 Our.IClass other)
             {
-                if (!(other is Our.LangStringShortNameTypeIec61360 casted))
+                if (!(other is Our.LangStringShortNameTypeIec61360 casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1868,7 +1491,7 @@ namespace AasCore.Aas3_0.Tests
                 Our.ILangStringDefinitionTypeIec61360 that,
                 Our.IClass other)
             {
-                if (!(other is Our.LangStringDefinitionTypeIec61360 casted))
+                if (!(other is Our.LangStringDefinitionTypeIec61360 casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -1882,64 +1505,475 @@ namespace AasCore.Aas3_0.Tests
                 Our.IDataSpecificationIec61360 that,
                 Our.IClass other)
             {
-                if (!(other is Our.DataSpecificationIec61360 casted))
+                if (!(other is Our.DataSpecificationIec61360 casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.PreferredName.Count == casted.PreferredName.Count
-                    && (
-                        that.PreferredName
-                            .Zip(
-                                casted.PreferredName,
-                                Transform)
-                            .All(item => item))
+                    Check_ListOf_ILangStringPreferredNameTypeIec61360(
+                        that.PreferredName,
+                        casted.PreferredName)
                     && ((that.ShortName != null && casted.ShortName != null)
-                        ? that.ShortName.Count == casted.ShortName.Count
-                            && (
-                                that.ShortName
-                                    .Zip(
-                                        casted.ShortName,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringShortNameTypeIec61360(
+                            that.ShortName,
+                            casted.ShortName)
                         : that.ShortName == null && casted.ShortName == null)
-                    && that.Unit == casted.Unit
+                    && ((that.Unit != null && casted.Unit != null)
+                        ? that.Unit == casted.Unit
+                        : that.Unit == null && casted.Unit == null)
                     && ((that.UnitId != null && casted.UnitId != null)
                         ? Transform(
-                                that.UnitId,
-                                casted.UnitId)
+                            that.UnitId,
+                            casted.UnitId)
                         : that.UnitId == null && casted.UnitId == null)
-                    && that.SourceOfDefinition == casted.SourceOfDefinition
-                    && that.Symbol == casted.Symbol
-                    && ((that.DataType.HasValue && casted.DataType.HasValue)
-                        ? that.DataType == casted.DataType
-                        : !that.DataType.HasValue && !casted.DataType.HasValue)
+                    && ((that.SourceOfDefinition != null && casted.SourceOfDefinition != null)
+                        ? that.SourceOfDefinition == casted.SourceOfDefinition
+                        : that.SourceOfDefinition == null && casted.SourceOfDefinition == null)
+                    && ((that.Symbol != null && casted.Symbol != null)
+                        ? that.Symbol == casted.Symbol
+                        : that.Symbol == null && casted.Symbol == null)
+                    && that.DataType == casted.DataType
                     && ((that.Definition != null && casted.Definition != null)
-                        ? that.Definition.Count == casted.Definition.Count
-                            && (
-                                that.Definition
-                                    .Zip(
-                                        casted.Definition,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangStringDefinitionTypeIec61360(
+                            that.Definition,
+                            casted.Definition)
                         : that.Definition == null && casted.Definition == null)
-                    && that.ValueFormat == casted.ValueFormat
+                    && ((that.ValueFormat != null && casted.ValueFormat != null)
+                        ? that.ValueFormat == casted.ValueFormat
+                        : that.ValueFormat == null && casted.ValueFormat == null)
                     && ((that.ValueList != null && casted.ValueList != null)
                         ? Transform(
-                                that.ValueList,
-                                casted.ValueList)
+                            that.ValueList,
+                            casted.ValueList)
                         : that.ValueList == null && casted.ValueList == null)
-                    && that.Value == casted.Value
+                    && ((that.Value != null && casted.Value != null)
+                        ? that.Value == casted.Value
+                        : that.Value == null && casted.Value == null)
                     && ((that.LevelType != null && casted.LevelType != null)
                         ? Transform(
-                                that.LevelType,
-                                casted.LevelType)
+                            that.LevelType,
+                            casted.LevelType)
                         : that.LevelType == null && casted.LevelType == null));
             }
-        }  // internal class DeepEqualiser
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+            private bool Check_ListOf_IReference(
+                List<Our.IReference> that,
+                List<Our.IReference> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IEmbeddedDataSpecification(
+                List<Our.IEmbeddedDataSpecification> that,
+                List<Our.IEmbeddedDataSpecification> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IExtension(
+                List<Our.IExtension> that,
+                List<Our.IExtension> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ILangStringNameType(
+                List<Our.ILangStringNameType> that,
+                List<Our.ILangStringNameType> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ILangStringTextType(
+                List<Our.ILangStringTextType> that,
+                List<Our.ILangStringTextType> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ISpecificAssetId(
+                List<Our.ISpecificAssetId> that,
+                List<Our.ISpecificAssetId> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IQualifier(
+                List<Our.IQualifier> that,
+                List<Our.IQualifier> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ISubmodelElement(
+                List<Our.ISubmodelElement> that,
+                List<Our.ISubmodelElement> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IDataElement(
+                List<Our.IDataElement> that,
+                List<Our.IDataElement> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IOperationVariable(
+                List<Our.IOperationVariable> that,
+                List<Our.IOperationVariable> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IKey(
+                List<Our.IKey> that,
+                List<Our.IKey> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IAssetAdministrationShell(
+                List<Our.IAssetAdministrationShell> that,
+                List<Our.IAssetAdministrationShell> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ISubmodel(
+                List<Our.ISubmodel> that,
+                List<Our.ISubmodel> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IConceptDescription(
+                List<Our.IConceptDescription> that,
+                List<Our.IConceptDescription> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_IValueReferencePair(
+                List<Our.IValueReferencePair> that,
+                List<Our.IValueReferencePair> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ILangStringPreferredNameTypeIec61360(
+                List<Our.ILangStringPreferredNameTypeIec61360> that,
+                List<Our.ILangStringPreferredNameTypeIec61360> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ILangStringShortNameTypeIec61360(
+                List<Our.ILangStringShortNameTypeIec61360> that,
+                List<Our.ILangStringShortNameTypeIec61360> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ILangStringDefinitionTypeIec61360(
+                List<Our.ILangStringDefinitionTypeIec61360> that,
+                List<Our.ILangStringDefinitionTypeIec61360> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }  // internal class DeepCopyChecker
+
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool ExtensionShallowEquals(
             Our.Extension that,
@@ -2465,272 +2499,6 @@ namespace AasCore.Aas3_0.Tests
                 && that.LevelType == other.LevelType);
         }
 
-        private static bool ExtensionDeepEquals(
-            Our.Extension that,
-            Our.Extension other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool AdministrativeInformationDeepEquals(
-            Our.AdministrativeInformation that,
-            Our.AdministrativeInformation other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool QualifierDeepEquals(
-            Our.Qualifier that,
-            Our.Qualifier other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool AssetAdministrationShellDeepEquals(
-            Our.AssetAdministrationShell that,
-            Our.AssetAdministrationShell other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool AssetInformationDeepEquals(
-            Our.AssetInformation that,
-            Our.AssetInformation other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ResourceDeepEquals(
-            Our.Resource that,
-            Our.Resource other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SpecificAssetIdDeepEquals(
-            Our.SpecificAssetId that,
-            Our.SpecificAssetId other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SubmodelDeepEquals(
-            Our.Submodel that,
-            Our.Submodel other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool RelationshipElementDeepEquals(
-            Our.RelationshipElement that,
-            Our.RelationshipElement other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SubmodelElementListDeepEquals(
-            Our.SubmodelElementList that,
-            Our.SubmodelElementList other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SubmodelElementCollectionDeepEquals(
-            Our.SubmodelElementCollection that,
-            Our.SubmodelElementCollection other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool PropertyDeepEquals(
-            Our.Property that,
-            Our.Property other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool MultiLanguagePropertyDeepEquals(
-            Our.MultiLanguageProperty that,
-            Our.MultiLanguageProperty other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool RangeDeepEquals(
-            Our.Range that,
-            Our.Range other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ReferenceElementDeepEquals(
-            Our.ReferenceElement that,
-            Our.ReferenceElement other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool BlobDeepEquals(
-            Our.Blob that,
-            Our.Blob other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool FileDeepEquals(
-            Our.File that,
-            Our.File other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool AnnotatedRelationshipElementDeepEquals(
-            Our.AnnotatedRelationshipElement that,
-            Our.AnnotatedRelationshipElement other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool EntityDeepEquals(
-            Our.Entity that,
-            Our.Entity other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool EventPayloadDeepEquals(
-            Our.EventPayload that,
-            Our.EventPayload other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool BasicEventElementDeepEquals(
-            Our.BasicEventElement that,
-            Our.BasicEventElement other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool OperationDeepEquals(
-            Our.Operation that,
-            Our.Operation other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool OperationVariableDeepEquals(
-            Our.OperationVariable that,
-            Our.OperationVariable other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool CapabilityDeepEquals(
-            Our.Capability that,
-            Our.Capability other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ConceptDescriptionDeepEquals(
-            Our.ConceptDescription that,
-            Our.ConceptDescription other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ReferenceDeepEquals(
-            Our.Reference that,
-            Our.Reference other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool KeyDeepEquals(
-            Our.Key that,
-            Our.Key other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LangStringNameTypeDeepEquals(
-            Our.LangStringNameType that,
-            Our.LangStringNameType other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LangStringTextTypeDeepEquals(
-            Our.LangStringTextType that,
-            Our.LangStringTextType other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool EnvironmentDeepEquals(
-            Our.Environment that,
-            Our.Environment other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool EmbeddedDataSpecificationDeepEquals(
-            Our.EmbeddedDataSpecification that,
-            Our.EmbeddedDataSpecification other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LevelTypeDeepEquals(
-            Our.LevelType that,
-            Our.LevelType other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ValueReferencePairDeepEquals(
-            Our.ValueReferencePair that,
-            Our.ValueReferencePair other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ValueListDeepEquals(
-            Our.ValueList that,
-            Our.ValueList other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LangStringPreferredNameTypeIec61360DeepEquals(
-            Our.LangStringPreferredNameTypeIec61360 that,
-            Our.LangStringPreferredNameTypeIec61360 other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LangStringShortNameTypeIec61360DeepEquals(
-            Our.LangStringShortNameTypeIec61360 that,
-            Our.LangStringShortNameTypeIec61360 other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LangStringDefinitionTypeIec61360DeepEquals(
-            Our.LangStringDefinitionTypeIec61360 that,
-            Our.LangStringDefinitionTypeIec61360 other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool DataSpecificationIec61360DeepEquals(
-            Our.DataSpecificationIec61360 that,
-            Our.DataSpecificationIec61360 other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
         [Test]
         public void Test_Extension_shallow_copy()
         {
@@ -2754,7 +2522,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ExtensionDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Extension");
         }  // public void Test_Extension_deep_copy
@@ -2782,7 +2550,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                AdministrativeInformationDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "AdministrativeInformation");
         }  // public void Test_AdministrativeInformation_deep_copy
@@ -2810,7 +2578,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                QualifierDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Qualifier");
         }  // public void Test_Qualifier_deep_copy
@@ -2838,7 +2606,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                AssetAdministrationShellDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "AssetAdministrationShell");
         }  // public void Test_AssetAdministrationShell_deep_copy
@@ -2866,7 +2634,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                AssetInformationDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "AssetInformation");
         }  // public void Test_AssetInformation_deep_copy
@@ -2894,7 +2662,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ResourceDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Resource");
         }  // public void Test_Resource_deep_copy
@@ -2922,7 +2690,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SpecificAssetIdDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "SpecificAssetId");
         }  // public void Test_SpecificAssetId_deep_copy
@@ -2950,7 +2718,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SubmodelDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Submodel");
         }  // public void Test_Submodel_deep_copy
@@ -2978,7 +2746,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                RelationshipElementDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "RelationshipElement");
         }  // public void Test_RelationshipElement_deep_copy
@@ -3006,7 +2774,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SubmodelElementListDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "SubmodelElementList");
         }  // public void Test_SubmodelElementList_deep_copy
@@ -3034,7 +2802,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SubmodelElementCollectionDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "SubmodelElementCollection");
         }  // public void Test_SubmodelElementCollection_deep_copy
@@ -3062,7 +2830,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                PropertyDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Property");
         }  // public void Test_Property_deep_copy
@@ -3090,7 +2858,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                MultiLanguagePropertyDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "MultiLanguageProperty");
         }  // public void Test_MultiLanguageProperty_deep_copy
@@ -3118,7 +2886,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                RangeDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Range");
         }  // public void Test_Range_deep_copy
@@ -3146,7 +2914,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ReferenceElementDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ReferenceElement");
         }  // public void Test_ReferenceElement_deep_copy
@@ -3174,7 +2942,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                BlobDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Blob");
         }  // public void Test_Blob_deep_copy
@@ -3202,7 +2970,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                FileDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "File");
         }  // public void Test_File_deep_copy
@@ -3230,7 +2998,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                AnnotatedRelationshipElementDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "AnnotatedRelationshipElement");
         }  // public void Test_AnnotatedRelationshipElement_deep_copy
@@ -3258,7 +3026,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                EntityDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Entity");
         }  // public void Test_Entity_deep_copy
@@ -3286,7 +3054,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                EventPayloadDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "EventPayload");
         }  // public void Test_EventPayload_deep_copy
@@ -3314,7 +3082,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                BasicEventElementDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "BasicEventElement");
         }  // public void Test_BasicEventElement_deep_copy
@@ -3342,7 +3110,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                OperationDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Operation");
         }  // public void Test_Operation_deep_copy
@@ -3370,7 +3138,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                OperationVariableDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "OperationVariable");
         }  // public void Test_OperationVariable_deep_copy
@@ -3398,7 +3166,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                CapabilityDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Capability");
         }  // public void Test_Capability_deep_copy
@@ -3426,7 +3194,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ConceptDescriptionDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ConceptDescription");
         }  // public void Test_ConceptDescription_deep_copy
@@ -3454,7 +3222,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ReferenceDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Reference");
         }  // public void Test_Reference_deep_copy
@@ -3482,7 +3250,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                KeyDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Key");
         }  // public void Test_Key_deep_copy
@@ -3510,7 +3278,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LangStringNameTypeDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LangStringNameType");
         }  // public void Test_LangStringNameType_deep_copy
@@ -3538,7 +3306,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LangStringTextTypeDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LangStringTextType");
         }  // public void Test_LangStringTextType_deep_copy
@@ -3566,7 +3334,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                EnvironmentDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Environment");
         }  // public void Test_Environment_deep_copy
@@ -3594,7 +3362,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                EmbeddedDataSpecificationDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "EmbeddedDataSpecification");
         }  // public void Test_EmbeddedDataSpecification_deep_copy
@@ -3622,7 +3390,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LevelTypeDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LevelType");
         }  // public void Test_LevelType_deep_copy
@@ -3650,7 +3418,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ValueReferencePairDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ValueReferencePair");
         }  // public void Test_ValueReferencePair_deep_copy
@@ -3678,7 +3446,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ValueListDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "ValueList");
         }  // public void Test_ValueList_deep_copy
@@ -3706,7 +3474,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LangStringPreferredNameTypeIec61360DeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LangStringPreferredNameTypeIec61360");
         }  // public void Test_LangStringPreferredNameTypeIec61360_deep_copy
@@ -3734,7 +3502,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LangStringShortNameTypeIec61360DeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LangStringShortNameTypeIec61360");
         }  // public void Test_LangStringShortNameTypeIec61360_deep_copy
@@ -3762,7 +3530,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LangStringDefinitionTypeIec61360DeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LangStringDefinitionTypeIec61360");
         }  // public void Test_LangStringDefinitionTypeIec61360_deep_copy
@@ -3790,7 +3558,7 @@ namespace AasCore.Aas3_0.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                DataSpecificationIec61360DeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "DataSpecificationIec61360");
         }  // public void Test_DataSpecificationIec61360_deep_copy

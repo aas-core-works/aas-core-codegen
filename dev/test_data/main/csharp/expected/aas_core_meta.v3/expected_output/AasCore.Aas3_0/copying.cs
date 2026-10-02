@@ -44,6 +44,276 @@ namespace AasCore.Aas3_0
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IReference> Deep_ListOf_IReference(
+            List<IReference> that)
+        {
+            var result = new List<IReference>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IEmbeddedDataSpecification> Deep_ListOf_IEmbeddedDataSpecification(
+            List<IEmbeddedDataSpecification> that)
+        {
+            var result = new List<IEmbeddedDataSpecification>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IExtension> Deep_ListOf_IExtension(
+            List<IExtension> that)
+        {
+            var result = new List<IExtension>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ILangStringNameType> Deep_ListOf_ILangStringNameType(
+            List<ILangStringNameType> that)
+        {
+            var result = new List<ILangStringNameType>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ILangStringTextType> Deep_ListOf_ILangStringTextType(
+            List<ILangStringTextType> that)
+        {
+            var result = new List<ILangStringTextType>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ISpecificAssetId> Deep_ListOf_ISpecificAssetId(
+            List<ISpecificAssetId> that)
+        {
+            var result = new List<ISpecificAssetId>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IQualifier> Deep_ListOf_IQualifier(
+            List<IQualifier> that)
+        {
+            var result = new List<IQualifier>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ISubmodelElement> Deep_ListOf_ISubmodelElement(
+            List<ISubmodelElement> that)
+        {
+            var result = new List<ISubmodelElement>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IDataElement> Deep_ListOf_IDataElement(
+            List<IDataElement> that)
+        {
+            var result = new List<IDataElement>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IOperationVariable> Deep_ListOf_IOperationVariable(
+            List<IOperationVariable> that)
+        {
+            var result = new List<IOperationVariable>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IKey> Deep_ListOf_IKey(
+            List<IKey> that)
+        {
+            var result = new List<IKey>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IAssetAdministrationShell> Deep_ListOf_IAssetAdministrationShell(
+            List<IAssetAdministrationShell> that)
+        {
+            var result = new List<IAssetAdministrationShell>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ISubmodel> Deep_ListOf_ISubmodel(
+            List<ISubmodel> that)
+        {
+            var result = new List<ISubmodel>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IConceptDescription> Deep_ListOf_IConceptDescription(
+            List<IConceptDescription> that)
+        {
+            var result = new List<IConceptDescription>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IValueReferencePair> Deep_ListOf_IValueReferencePair(
+            List<IValueReferencePair> that)
+        {
+            var result = new List<IValueReferencePair>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ILangStringPreferredNameTypeIec61360> Deep_ListOf_ILangStringPreferredNameTypeIec61360(
+            List<ILangStringPreferredNameTypeIec61360> that)
+        {
+            var result = new List<ILangStringPreferredNameTypeIec61360>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ILangStringShortNameTypeIec61360> Deep_ListOf_ILangStringShortNameTypeIec61360(
+            List<ILangStringShortNameTypeIec61360> that)
+        {
+            var result = new List<ILangStringShortNameTypeIec61360>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<ILangStringDefinitionTypeIec61360> Deep_ListOf_ILangStringDefinitionTypeIec61360(
+            List<ILangStringDefinitionTypeIec61360> that)
+        {
+            var result = new List<ILangStringDefinitionTypeIec61360>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -580,37 +850,19 @@ namespace AasCore.Aas3_0
                 Our.IExtension that
             )
             {
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theRefersTo = null;
-                if (that.RefersTo != null)
-                {
-                    theRefersTo = new List<IReference>(
-                        that.RefersTo.Count);
-                    foreach (var item in that.RefersTo)
-                    {
-                        theRefersTo.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Extension(
                     that.Name,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
                     that.ValueType,
                     that.Value,
-                    theRefersTo
+                    (that.RefersTo != null)
+                        ? Deep_ListOf_IReference(that.RefersTo)
+                        : null
                 );
             }
 
@@ -618,19 +870,10 @@ namespace AasCore.Aas3_0
                 Our.IAdministrativeInformation that
             )
             {
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.AdministrativeInformation(
-                    theEmbeddedDataSpecifications,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     that.Version,
                     that.Revision,
                     (that.Creator != null)
@@ -644,24 +887,15 @@ namespace AasCore.Aas3_0
                 Our.IQualifier that
             )
             {
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Qualifier(
                     that.Type,
                     that.ValueType,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
                     that.Kind,
                     that.Value,
                     (that.ValueId != null)
@@ -674,77 +908,32 @@ namespace AasCore.Aas3_0
                 Our.IAssetAdministrationShell that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSubmodels = null;
-                if (that.Submodels != null)
-                {
-                    theSubmodels = new List<IReference>(
-                        that.Submodels.Count);
-                    foreach (var item in that.Submodels)
-                    {
-                        theSubmodels.Add(Deep(item));
-                    }
-                }
-
                 return new Our.AssetAdministrationShell(
                     that.Id,
                     Deep(that.AssetInformation),
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.Administration != null)
                         ? Deep(that.Administration)
                         : null,
-                    theEmbeddedDataSpecifications,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     (that.DerivedFrom != null)
                         ? Deep(that.DerivedFrom)
                         : null,
-                    theSubmodels
+                    (that.Submodels != null)
+                        ? Deep_ListOf_IReference(that.Submodels)
+                        : null
                 );
             }
 
@@ -752,21 +941,12 @@ namespace AasCore.Aas3_0
                 Our.IAssetInformation that
             )
             {
-                List<ISpecificAssetId>? theSpecificAssetIds = null;
-                if (that.SpecificAssetIds != null)
-                {
-                    theSpecificAssetIds = new List<ISpecificAssetId>(
-                        that.SpecificAssetIds.Count);
-                    foreach (var item in that.SpecificAssetIds)
-                    {
-                        theSpecificAssetIds.Add(Deep(item));
-                    }
-                }
-
                 return new Our.AssetInformation(
                     that.AssetKind,
                     that.GlobalAssetId,
-                    theSpecificAssetIds,
+                    (that.SpecificAssetIds != null)
+                        ? Deep_ListOf_ISpecificAssetId(that.SpecificAssetIds)
+                        : null,
                     that.AssetType,
                     (that.DefaultThumbnail != null)
                         ? Deep(that.DefaultThumbnail)
@@ -788,24 +968,15 @@ namespace AasCore.Aas3_0
                 Our.ISpecificAssetId that
             )
             {
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
                 return new Our.SpecificAssetId(
                     that.Name,
                     that.Value,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
                     (that.ExternalSubjectId != null)
                         ? Deep(that.ExternalSubjectId)
                         : null
@@ -816,90 +987,19 @@ namespace AasCore.Aas3_0
                 Our.ISubmodel that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<ISubmodelElement>? theSubmodelElements = null;
-                if (that.SubmodelElements != null)
-                {
-                    theSubmodelElements = new List<ISubmodelElement>(
-                        that.SubmodelElements.Count);
-                    foreach (var item in that.SubmodelElements)
-                    {
-                        theSubmodelElements.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Submodel(
                     that.Id,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.Administration != null)
                         ? Deep(that.Administration)
                         : null,
@@ -907,10 +1007,18 @@ namespace AasCore.Aas3_0
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
-                    theSubmodelElements
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.SubmodelElements != null)
+                        ? Deep_ListOf_ISubmodelElement(that.SubmodelElements)
+                        : null
                 );
             }
 
@@ -918,86 +1026,32 @@ namespace AasCore.Aas3_0
                 Our.IRelationshipElement that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.RelationshipElement(
                     Deep(that.First),
                     Deep(that.Second),
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null
                 );
             }
 
@@ -1005,102 +1059,39 @@ namespace AasCore.Aas3_0
                 Our.ISubmodelElementList that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<ISubmodelElement>? theValue = null;
-                if (that.Value != null)
-                {
-                    theValue = new List<ISubmodelElement>(
-                        that.Value.Count);
-                    foreach (var item in that.Value)
-                    {
-                        theValue.Add(Deep(item));
-                    }
-                }
-
                 return new Our.SubmodelElementList(
                     that.TypeValueListElement,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     that.OrderRelevant,
                     (that.SemanticIdListElement != null)
                         ? Deep(that.SemanticIdListElement)
                         : null,
                     that.ValueTypeListElement,
-                    theValue
+                    (that.Value != null)
+                        ? Deep_ListOf_ISubmodelElement(that.Value)
+                        : null
                 );
             }
 
@@ -1108,96 +1099,33 @@ namespace AasCore.Aas3_0
                 Our.ISubmodelElementCollection that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<ISubmodelElement>? theValue = null;
-                if (that.Value != null)
-                {
-                    theValue = new List<ISubmodelElement>(
-                        that.Value.Count);
-                    foreach (var item in that.Value)
-                    {
-                        theValue.Add(Deep(item));
-                    }
-                }
-
                 return new Our.SubmodelElementCollection(
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
-                    theValue
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.Value != null)
+                        ? Deep_ListOf_ISubmodelElement(that.Value)
+                        : null
                 );
             }
 
@@ -1205,85 +1133,31 @@ namespace AasCore.Aas3_0
                 Our.IProperty that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Property(
                     that.ValueType,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     that.Value,
                     (that.ValueId != null)
                         ? Deep(that.ValueId)
@@ -1295,96 +1169,33 @@ namespace AasCore.Aas3_0
                 Our.IMultiLanguageProperty that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theValue = null;
-                if (that.Value != null)
-                {
-                    theValue = new List<ILangStringTextType>(
-                        that.Value.Count);
-                    foreach (var item in that.Value)
-                    {
-                        theValue.Add(Deep(item));
-                    }
-                }
-
                 return new Our.MultiLanguageProperty(
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
-                    theValue,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.Value != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Value)
+                        : null,
                     (that.ValueId != null)
                         ? Deep(that.ValueId)
                         : null
@@ -1395,85 +1206,31 @@ namespace AasCore.Aas3_0
                 Our.IRange that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Range(
                     that.ValueType,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     that.Min,
                     that.Max
                 );
@@ -1483,84 +1240,30 @@ namespace AasCore.Aas3_0
                 Our.IReferenceElement that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.ReferenceElement(
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     (that.Value != null)
                         ? Deep(that.Value)
                         : null
@@ -1571,86 +1274,34 @@ namespace AasCore.Aas3_0
                 Our.IBlob that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Blob(
                     that.ContentType,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
-                    that.Value
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.Value != null)
+                        ? (byte[])that.Value.Clone()
+                        : null
                 );
             }
 
@@ -1658,85 +1309,31 @@ namespace AasCore.Aas3_0
                 Our.IFile that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.File(
                     that.ContentType,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     that.Value
                 );
             }
@@ -1745,98 +1342,35 @@ namespace AasCore.Aas3_0
                 Our.IAnnotatedRelationshipElement that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<IDataElement>? theAnnotations = null;
-                if (that.Annotations != null)
-                {
-                    theAnnotations = new List<IDataElement>(
-                        that.Annotations.Count);
-                    foreach (var item in that.Annotations)
-                    {
-                        theAnnotations.Add(Deep(item));
-                    }
-                }
-
                 return new Our.AnnotatedRelationshipElement(
                     Deep(that.First),
                     Deep(that.Second),
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
-                    theAnnotations
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.Annotations != null)
+                        ? Deep_ListOf_IDataElement(that.Annotations)
+                        : null
                 );
             }
 
@@ -1844,110 +1378,38 @@ namespace AasCore.Aas3_0
                 Our.IEntity that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<ISubmodelElement>? theStatements = null;
-                if (that.Statements != null)
-                {
-                    theStatements = new List<ISubmodelElement>(
-                        that.Statements.Count);
-                    foreach (var item in that.Statements)
-                    {
-                        theStatements.Add(Deep(item));
-                    }
-                }
-
-                List<ISpecificAssetId>? theSpecificAssetIds = null;
-                if (that.SpecificAssetIds != null)
-                {
-                    theSpecificAssetIds = new List<ISpecificAssetId>(
-                        that.SpecificAssetIds.Count);
-                    foreach (var item in that.SpecificAssetIds)
-                    {
-                        theSpecificAssetIds.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Entity(
                     that.EntityType,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
-                    theStatements,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.Statements != null)
+                        ? Deep_ListOf_ISubmodelElement(that.Statements)
+                        : null,
                     that.GlobalAssetId,
-                    theSpecificAssetIds
+                    (that.SpecificAssetIds != null)
+                        ? Deep_ListOf_ISpecificAssetId(that.SpecificAssetIds)
+                        : null
                 );
             }
 
@@ -1969,7 +1431,9 @@ namespace AasCore.Aas3_0
                     (that.SubjectId != null)
                         ? Deep(that.SubjectId)
                         : null,
-                    that.Payload
+                    (that.Payload != null)
+                        ? (byte[])that.Payload.Clone()
+                        : null
                 );
             }
 
@@ -1977,87 +1441,33 @@ namespace AasCore.Aas3_0
                 Our.IBasicEventElement that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.BasicEventElement(
                     Deep(that.Observed),
                     that.Direction,
                     that.State,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
                     that.MessageTopic,
                     (that.MessageBroker != null)
                         ? Deep(that.MessageBroker)
@@ -2072,120 +1482,39 @@ namespace AasCore.Aas3_0
                 Our.IOperation that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<IOperationVariable>? theInputVariables = null;
-                if (that.InputVariables != null)
-                {
-                    theInputVariables = new List<IOperationVariable>(
-                        that.InputVariables.Count);
-                    foreach (var item in that.InputVariables)
-                    {
-                        theInputVariables.Add(Deep(item));
-                    }
-                }
-
-                List<IOperationVariable>? theOutputVariables = null;
-                if (that.OutputVariables != null)
-                {
-                    theOutputVariables = new List<IOperationVariable>(
-                        that.OutputVariables.Count);
-                    foreach (var item in that.OutputVariables)
-                    {
-                        theOutputVariables.Add(Deep(item));
-                    }
-                }
-
-                List<IOperationVariable>? theInoutputVariables = null;
-                if (that.InoutputVariables != null)
-                {
-                    theInoutputVariables = new List<IOperationVariable>(
-                        that.InoutputVariables.Count);
-                    foreach (var item in that.InoutputVariables)
-                    {
-                        theInoutputVariables.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Operation(
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications,
-                    theInputVariables,
-                    theOutputVariables,
-                    theInoutputVariables
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.InputVariables != null)
+                        ? Deep_ListOf_IOperationVariable(that.InputVariables)
+                        : null,
+                    (that.OutputVariables != null)
+                        ? Deep_ListOf_IOperationVariable(that.OutputVariables)
+                        : null,
+                    (that.InoutputVariables != null)
+                        ? Deep_ListOf_IOperationVariable(that.InoutputVariables)
+                        : null
                 );
             }
 
@@ -2202,84 +1531,30 @@ namespace AasCore.Aas3_0
                 Our.ICapability that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theSupplementalSemanticIds = null;
-                if (that.SupplementalSemanticIds != null)
-                {
-                    theSupplementalSemanticIds = new List<IReference>(
-                        that.SupplementalSemanticIds.Count);
-                    foreach (var item in that.SupplementalSemanticIds)
-                    {
-                        theSupplementalSemanticIds.Add(Deep(item));
-                    }
-                }
-
-                List<IQualifier>? theQualifiers = null;
-                if (that.Qualifiers != null)
-                {
-                    theQualifiers = new List<IQualifier>(
-                        that.Qualifiers.Count);
-                    foreach (var item in that.Qualifiers)
-                    {
-                        theQualifiers.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Capability(
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.SemanticId != null)
                         ? Deep(that.SemanticId)
                         : null,
-                    theSupplementalSemanticIds,
-                    theQualifiers,
-                    theEmbeddedDataSpecifications
+                    (that.SupplementalSemanticIds != null)
+                        ? Deep_ListOf_IReference(that.SupplementalSemanticIds)
+                        : null,
+                    (that.Qualifiers != null)
+                        ? Deep_ListOf_IQualifier(that.Qualifiers)
+                        : null,
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null
                 );
             }
 
@@ -2287,73 +1562,28 @@ namespace AasCore.Aas3_0
                 Our.IConceptDescription that
             )
             {
-                List<IExtension>? theExtensions = null;
-                if (that.Extensions != null)
-                {
-                    theExtensions = new List<IExtension>(
-                        that.Extensions.Count);
-                    foreach (var item in that.Extensions)
-                    {
-                        theExtensions.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringNameType>? theDisplayName = null;
-                if (that.DisplayName != null)
-                {
-                    theDisplayName = new List<ILangStringNameType>(
-                        that.DisplayName.Count);
-                    foreach (var item in that.DisplayName)
-                    {
-                        theDisplayName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringTextType>? theDescription = null;
-                if (that.Description != null)
-                {
-                    theDescription = new List<ILangStringTextType>(
-                        that.Description.Count);
-                    foreach (var item in that.Description)
-                    {
-                        theDescription.Add(Deep(item));
-                    }
-                }
-
-                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                if (that.EmbeddedDataSpecifications != null)
-                {
-                    theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
-                        that.EmbeddedDataSpecifications.Count);
-                    foreach (var item in that.EmbeddedDataSpecifications)
-                    {
-                        theEmbeddedDataSpecifications.Add(Deep(item));
-                    }
-                }
-
-                List<IReference>? theIsCaseOf = null;
-                if (that.IsCaseOf != null)
-                {
-                    theIsCaseOf = new List<IReference>(
-                        that.IsCaseOf.Count);
-                    foreach (var item in that.IsCaseOf)
-                    {
-                        theIsCaseOf.Add(Deep(item));
-                    }
-                }
-
                 return new Our.ConceptDescription(
                     that.Id,
-                    theExtensions,
+                    (that.Extensions != null)
+                        ? Deep_ListOf_IExtension(that.Extensions)
+                        : null,
                     that.Category,
                     that.IdShort,
-                    theDisplayName,
-                    theDescription,
+                    (that.DisplayName != null)
+                        ? Deep_ListOf_ILangStringNameType(that.DisplayName)
+                        : null,
+                    (that.Description != null)
+                        ? Deep_ListOf_ILangStringTextType(that.Description)
+                        : null,
                     (that.Administration != null)
                         ? Deep(that.Administration)
                         : null,
-                    theEmbeddedDataSpecifications,
-                    theIsCaseOf
+                    (that.EmbeddedDataSpecifications != null)
+                        ? Deep_ListOf_IEmbeddedDataSpecification(that.EmbeddedDataSpecifications)
+                        : null,
+                    (that.IsCaseOf != null)
+                        ? Deep_ListOf_IReference(that.IsCaseOf)
+                        : null
                 );
             }
 
@@ -2361,16 +1591,9 @@ namespace AasCore.Aas3_0
                 Our.IReference that
             )
             {
-                var theKeys = new List<IKey>(
-                    that.Keys.Count);
-                foreach (var item in that.Keys)
-                {
-                    theKeys.Add(Deep(item));
-                }
-
                 return new Our.Reference(
                     that.Type,
-                    theKeys,
+                    Deep_ListOf_IKey(that.Keys),
                     (that.ReferredSemanticId != null)
                         ? Deep(that.ReferredSemanticId)
                         : null
@@ -2411,43 +1634,16 @@ namespace AasCore.Aas3_0
                 Our.IEnvironment that
             )
             {
-                List<IAssetAdministrationShell>? theAssetAdministrationShells = null;
-                if (that.AssetAdministrationShells != null)
-                {
-                    theAssetAdministrationShells = new List<IAssetAdministrationShell>(
-                        that.AssetAdministrationShells.Count);
-                    foreach (var item in that.AssetAdministrationShells)
-                    {
-                        theAssetAdministrationShells.Add(Deep(item));
-                    }
-                }
-
-                List<ISubmodel>? theSubmodels = null;
-                if (that.Submodels != null)
-                {
-                    theSubmodels = new List<ISubmodel>(
-                        that.Submodels.Count);
-                    foreach (var item in that.Submodels)
-                    {
-                        theSubmodels.Add(Deep(item));
-                    }
-                }
-
-                List<IConceptDescription>? theConceptDescriptions = null;
-                if (that.ConceptDescriptions != null)
-                {
-                    theConceptDescriptions = new List<IConceptDescription>(
-                        that.ConceptDescriptions.Count);
-                    foreach (var item in that.ConceptDescriptions)
-                    {
-                        theConceptDescriptions.Add(Deep(item));
-                    }
-                }
-
                 return new Our.Environment(
-                    theAssetAdministrationShells,
-                    theSubmodels,
-                    theConceptDescriptions
+                    (that.AssetAdministrationShells != null)
+                        ? Deep_ListOf_IAssetAdministrationShell(that.AssetAdministrationShells)
+                        : null,
+                    (that.Submodels != null)
+                        ? Deep_ListOf_ISubmodel(that.Submodels)
+                        : null,
+                    (that.ConceptDescriptions != null)
+                        ? Deep_ListOf_IConceptDescription(that.ConceptDescriptions)
+                        : null
                 );
             }
 
@@ -2487,15 +1683,8 @@ namespace AasCore.Aas3_0
                 Our.IValueList that
             )
             {
-                var theValueReferencePairs = new List<IValueReferencePair>(
-                    that.ValueReferencePairs.Count);
-                foreach (var item in that.ValueReferencePairs)
-                {
-                    theValueReferencePairs.Add(Deep(item));
-                }
-
                 return new Our.ValueList(
-                    theValueReferencePairs
+                    Deep_ListOf_IValueReferencePair(that.ValueReferencePairs)
                 );
             }
 
@@ -2533,38 +1722,11 @@ namespace AasCore.Aas3_0
                 Our.IDataSpecificationIec61360 that
             )
             {
-                var thePreferredName = new List<ILangStringPreferredNameTypeIec61360>(
-                    that.PreferredName.Count);
-                foreach (var item in that.PreferredName)
-                {
-                    thePreferredName.Add(Deep(item));
-                }
-
-                List<ILangStringShortNameTypeIec61360>? theShortName = null;
-                if (that.ShortName != null)
-                {
-                    theShortName = new List<ILangStringShortNameTypeIec61360>(
-                        that.ShortName.Count);
-                    foreach (var item in that.ShortName)
-                    {
-                        theShortName.Add(Deep(item));
-                    }
-                }
-
-                List<ILangStringDefinitionTypeIec61360>? theDefinition = null;
-                if (that.Definition != null)
-                {
-                    theDefinition = new List<ILangStringDefinitionTypeIec61360>(
-                        that.Definition.Count);
-                    foreach (var item in that.Definition)
-                    {
-                        theDefinition.Add(Deep(item));
-                    }
-                }
-
                 return new Our.DataSpecificationIec61360(
-                    thePreferredName,
-                    theShortName,
+                    Deep_ListOf_ILangStringPreferredNameTypeIec61360(that.PreferredName),
+                    (that.ShortName != null)
+                        ? Deep_ListOf_ILangStringShortNameTypeIec61360(that.ShortName)
+                        : null,
                     that.Unit,
                     (that.UnitId != null)
                         ? Deep(that.UnitId)
@@ -2572,7 +1734,9 @@ namespace AasCore.Aas3_0
                     that.SourceOfDefinition,
                     that.Symbol,
                     that.DataType,
-                    theDefinition,
+                    (that.Definition != null)
+                        ? Deep_ListOf_ILangStringDefinitionTypeIec61360(that.Definition)
+                        : null,
                     that.ValueFormat,
                     (that.ValueList != null)
                         ? Deep(that.ValueList)

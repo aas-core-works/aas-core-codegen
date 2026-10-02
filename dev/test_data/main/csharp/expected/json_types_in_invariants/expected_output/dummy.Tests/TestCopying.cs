@@ -7,7 +7,9 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
+
+using Nodes = System.Text.Json.Nodes;
 
 using NUnit.Framework;  // can't alias
 
@@ -15,40 +17,66 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
+            }
+
+            private static bool JsonNodesEqualButDistinct(
+                Nodes.JsonNode that,
+                Nodes.JsonNode other)
+            {
+                // NOTE (mristin):
+                // A JsonNode compares only by reference, so we compare the canonical
+                // JSON text.
+                return (
+                    !ReferenceEquals(that, other)
+                    && that.ToJsonString() == other.ToJsonString());
             }
 
             public override bool TransformSomething(
                 Our.ISomething that,
                 Our.IClass other)
             {
-                if (!(other is Our.Something casted))
+                if (!(other is Our.Something casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.Mapping.ToJsonString() == casted.Mapping.ToJsonString()
-                    && that.Values.ToJsonString() == casted.Values.ToJsonString()
+                    JsonNodesEqualButDistinct(
+                        that.Mapping,
+                        casted.Mapping)
+                    && JsonNodesEqualButDistinct(
+                        that.Values,
+                        casted.Values)
                     && ((that.OptionalMapping != null && casted.OptionalMapping != null)
-                        ? that.OptionalMapping.ToJsonString() == casted.OptionalMapping.ToJsonString()
+                        ? JsonNodesEqualButDistinct(
+                            that.OptionalMapping,
+                            casted.OptionalMapping)
                         : that.OptionalMapping == null && casted.OptionalMapping == null));
             }
-        }  // internal class DeepEqualiser
+        }  // internal class DeepCopyChecker
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool SomethingShallowEquals(
             Our.Something that,
@@ -58,13 +86,6 @@ namespace dummy.Tests
                 that.Mapping == other.Mapping
                 && that.Values == other.Values
                 && that.OptionalMapping == other.OptionalMapping);
-        }
-
-        private static bool SomethingDeepEquals(
-            Our.Something that,
-            Our.Something other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
         }
 
         [Test]
@@ -90,7 +111,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SomethingDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy

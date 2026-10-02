@@ -65,15 +65,9 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theNumbers = new List<long>(
-                    that.Numbers);
-
-                var theTexts = new List<string>(
-                    that.Texts);
-
                 return new Our.Something(
-                    theNumbers,
-                    theTexts,
+                    new List<long>(that.Numbers),
+                    new List<string>(that.Texts),
                     that.Count,
                     that.MaybeCount
                 );

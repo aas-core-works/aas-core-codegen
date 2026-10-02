@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,26 +15,33 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformBranch(
                 Our.IBranch that,
                 Our.IClass other)
             {
-                if (!(other is Our.Branch casted))
+                if (!(other is Our.Branch casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -48,7 +55,7 @@ namespace dummy.Tests
                 Our.ILeaf that,
                 Our.IClass other)
             {
-                if (!(other is Our.Leaf casted))
+                if (!(other is Our.Leaf casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -63,7 +70,7 @@ namespace dummy.Tests
                 Our.IBlossom that,
                 Our.IClass other)
             {
-                if (!(other is Our.Blossom casted))
+                if (!(other is Our.Blossom casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -79,7 +86,7 @@ namespace dummy.Tests
                 Our.ISomething that,
                 Our.IClass other)
             {
-                if (!(other is Our.Something casted))
+                if (!(other is Our.Something casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -97,7 +104,7 @@ namespace dummy.Tests
                 Our.IContainer that,
                 Our.IClass other)
             {
-                if (!(other is Our.Container casted))
+                if (!(other is Our.Container casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -110,9 +117,10 @@ namespace dummy.Tests
                         that.Something,
                         casted.Something));
             }
-        }  // internal class DeepEqualiser
+        }  // internal class DeepCopyChecker
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool BranchShallowEquals(
             Our.Branch that,
@@ -160,41 +168,6 @@ namespace dummy.Tests
             return that.Node == other.Node && that.Something == other.Something;
         }
 
-        private static bool BranchDeepEquals(
-            Our.Branch that,
-            Our.Branch other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LeafDeepEquals(
-            Our.Leaf that,
-            Our.Leaf other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool BlossomDeepEquals(
-            Our.Blossom that,
-            Our.Blossom other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SomethingDeepEquals(
-            Our.Something that,
-            Our.Something other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool ContainerDeepEquals(
-            Our.Container that,
-            Our.Container other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
         [Test]
         public void Test_Branch_shallow_copy()
         {
@@ -218,7 +191,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                BranchDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Branch");
         }  // public void Test_Branch_deep_copy
@@ -246,7 +219,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LeafDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Leaf");
         }  // public void Test_Leaf_deep_copy
@@ -274,7 +247,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                BlossomDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Blossom");
         }  // public void Test_Blossom_deep_copy
@@ -302,7 +275,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SomethingDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy
@@ -330,7 +303,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                ContainerDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Container");
         }  // public void Test_Container_deep_copy

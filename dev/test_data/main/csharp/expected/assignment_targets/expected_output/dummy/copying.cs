@@ -44,6 +44,21 @@ namespace dummy
             return (T)DeepCopierInstance.Transform(that);
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IItem> Deep_ListOf_IItem(
+            List<IItem> that)
+        {
+            var result = new List<IItem>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -73,22 +88,14 @@ namespace dummy
                 Our.IItem that
             )
             {
-                var theTexts = new List<string>(
-                    that.Texts);
-
-                List<string>? theMaybeTexts = null;
-                if (that.MaybeTexts != null)
-                {
-                    theMaybeTexts = new List<string>(
-                        that.MaybeTexts);
-                }
-
                 return new Our.Item(
                     that.Text,
-                    theTexts,
+                    new List<string>(that.Texts),
                     that.MaybeText,
                     that.MaybeKind,
-                    theMaybeTexts
+                    (that.MaybeTexts != null)
+                        ? new List<string>(that.MaybeTexts)
+                        : null
                 );
             }
 
@@ -96,15 +103,8 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theItems = new List<IItem>(
-                    that.Items.Count);
-                foreach (var item in that.Items)
-                {
-                    theItems.Add(Deep(item));
-                }
-
                 return new Our.Something(
-                    theItems,
+                    Deep_ListOf_IItem(that.Items),
                     (that.MaybeItem != null)
                         ? Deep(that.MaybeItem)
                         : null

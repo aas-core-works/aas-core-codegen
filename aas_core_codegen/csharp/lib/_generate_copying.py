@@ -2,9 +2,9 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Set
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -157,14 +157,12 @@ internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
 
 
 def _json_deep_copy_expr(
-    type_anno: intermediate.TypeAnnotationUnion, source_expr: str, what: str
+    type_anno: intermediate.TypeAnnotationUnion, source_expr: str
 ) -> Stripped:
     """
     Generate the expression deep-copying the JSON-able ``source_expr``.
 
-    Every other value in a deep copy is copied by sharing it: a primitive,
-    an enumeration literal and a class instance are all safe to hand to
-    the copy as they are. A ``System.Text.Json.Nodes.JsonNode`` is not,
+    A ``System.Text.Json.Nodes.JsonNode`` can not be shared by the deep copy,
     because it remembers its parent, and attaching a node which already has
     one throws "System.InvalidOperationException: The node already has
     a parent". Sharing it would therefore make the deep copy and the original
@@ -181,8 +179,6 @@ def _json_deep_copy_expr(
     nullable only because it serializes an arbitrary value, and a null one
     gives a null node; ``source_expr`` is known not to be null here, so
     the ``throw`` can not be reached.
-
-    The ``what`` names the copied thing in that unreachable message.
     """
     item_type = csharp_common.generate_type(type_anno)
     return Stripped(
@@ -191,8 +187,175 @@ def _json_deep_copy_expr(
 {I}System.Text.Json.JsonSerializer.SerializeToNode(
 {II}{source_expr})
 {I}?? throw new System.InvalidOperationException(
-{II}"Expected SerializeToNode to copy the non-null {what}, "
+{II}"Expected SerializeToNode to copy a non-null value, "
 {III}+ "but it returned null"))"""
+    )
+
+
+def _copied_by_sharing(type_anno: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether the deep copy can share a value of ``type_anno`` with the original.
+
+    A string, a number, a boolean and an enumeration literal are immutable,
+    and a value tuple of them is copied by value. A byte array is mutable, and
+    hence has to be cloned.
+    """
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return all(_copied_by_sharing(item) for item in type_anno.items)
+
+    primitive_type = intermediate.try_primitive_type(type_anno)
+    if primitive_type is not None:
+        return primitive_type is not intermediate.PrimitiveType.BYTEARRAY
+
+    return isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type, intermediate.Enumeration
+    )
+
+
+def _deep_copied_by_method(type_anno: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether ``type_anno`` is deep-copied by its own method in ``Copying``.
+
+    A list or a set of values shared by the deep copy is copied in-line by
+    the copy constructor of the collection.
+    """
+    if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return False
+
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        return not _copied_by_sharing(type_anno.items)
+
+    return not _copied_by_sharing(type_anno)
+
+
+def _deep_copy_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the method of the static class ``Copying`` deep-copying ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.csharp.common.type_moniker`), so two different
+    containers never share a method.
+    """
+    return Identifier(f"Deep_{csharp_common.type_moniker(type_anno)}")
+
+
+@require(
+    lambda type_anno: not isinstance(type_anno, intermediate.OptionalTypeAnnotation),
+    "The optionals are unwrapped at the properties, and nested optionals "
+    "have been refused in intermediate._translate._verify_only_simple_type_patterns",
+)
+def _generate_deep_copy_expr(
+    expr: str, type_anno: intermediate.TypeAnnotationUnion
+) -> Stripped:
+    """
+    Generate the expression deep-copying the value at ``expr``.
+
+    A container is delegated to its method in the static class ``Copying``,
+    which copies only one level and calls the methods of its items by name.
+    This way the deep copy is composed of plain functions, to any depth.
+    """
+    if _copied_by_sharing(type_anno):
+        return Stripped(expr)
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type,
+        (
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+            intermediate.NamedUnion,
+        ),
+    ):
+        # NOTE (mristin):
+        # A named union has its own ``Deep`` overload (see
+        # :py:func:`_generate_union_deep_copy_helper`), so it can be deep-copied
+        # exactly like a class instance.
+        return Stripped(f"Deep({expr})")
+
+    if isinstance(
+        type_anno,
+        (
+            intermediate.JsonValueTypeAnnotation,
+            intermediate.JsonArrayTypeAnnotation,
+            intermediate.JsonObjectTypeAnnotation,
+        ),
+    ):
+        return _json_deep_copy_expr(type_anno=type_anno, source_expr=expr)
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        if _deep_copied_by_method(type_anno):
+            return Stripped(f"{_deep_copy_container_name(type_anno)}({expr})")
+
+        return Stripped(f"new {csharp_common.generate_type(type_anno)}({expr})")
+
+    assert (
+        intermediate.try_primitive_type(type_anno)
+        is intermediate.PrimitiveType.BYTEARRAY
+    ), (
+        f"Only a byte array is expected to be left to be deep-copied, "
+        f"but got: {type_anno}"
+    )
+    return Stripped(f"(byte[]){expr}.Clone()")
+
+
+@require(lambda type_anno: _deep_copied_by_method(type_anno))
+def _generate_deep_copy_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the method of the static class ``Copying`` for ``type_anno``."""
+    value_type = csharp_common.generate_type(type_anno)
+
+    body: Stripped
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        item_copy_expr = _generate_deep_copy_expr(
+            expr="item", type_anno=type_anno.items
+        )
+
+        add_stmt = f"result.Add({item_copy_expr});"
+        if "\n" in item_copy_expr:
+            add_stmt = f"""\
+result.Add(
+{I}{indent_but_first_line(item_copy_expr, I)});"""
+
+        body = Stripped(
+            f"""\
+var result = new {value_type}(that.Count);
+foreach (var item in that)
+{{
+{I}{indent_but_first_line(add_stmt, I)}
+}}
+
+return result;"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        tuple_literal = csharp_common.generate_tuple_literal(
+            [
+                _generate_deep_copy_expr(expr=f"that.Item{i + 1}", type_anno=item)
+                for i, item in enumerate(type_anno.items)
+            ]
+        )
+
+        body = Stripped(f"return {tuple_literal};")
+
+    else:
+        assert_never(type_anno)
+
+    return Stripped(
+        f"""\
+/// <summary>
+/// Make a deep copy of <paramref name="that" />.
+/// </summary>
+private static {value_type} {_deep_copy_container_name(type_anno)}(
+{I}{value_type} that)
+{{
+{I}{indent_but_first_line(body, I)}
+}}"""
     )
 
 
@@ -214,395 +377,65 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
 
     cls_name = csharp_naming.class_name(cls.name)
 
-    body_blocks = []  # type: List[Stripped]
-
+    return_statement: Stripped
     if len(cls.constructor.arguments) == 0:
-        body_blocks.append(Stripped(f"return new Our.{cls_name}();"))
+        return_statement = Stripped(f"return new Our.{cls_name}();")
     else:
-        # NOTE (mristin):
-        # We handle first the case of properties containing lists, and make copies of
-        # the lists to separate variables. The variables are finally passed to
-        # the constructor (see below, after this code of block).
-        #
-        # We could use LINQ to make deep copies of lists in expressions which are
-        # directly passed to the constructor. This indeed makes sense if we wrote
-        # the code manually, and would also be a more elegant solution. However,
-        # LINQ comes with a certain overhead (for example, the memory for the new list
-        # can not be pre-reserved ahead of time). That is why we make these copies in
-        # separate variables and pass on the variables to the constructor.
-
-        for arg in cls.constructor.arguments:
-            prop_name = csharp_naming.property_name(arg.name)
-            optional = isinstance(
-                arg.type_annotation, intermediate.OptionalTypeAnnotation
-            )
-
-            type_anno = intermediate.beneath_optional(arg.type_annotation)
-
-            if not isinstance(type_anno, intermediate.ListTypeAnnotation):
-                continue
-
-            # NOTE (mristin):
-            # We need to prefix to avoid any possible naming conflicts.
-            variable_name = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
-
-            variable_type = csharp_common.generate_type(type_anno)
-
-            # NOTE (mristin):
-            # We can make much simpler copies for lists of primitives and enums, so
-            # we optimize the generated code here.
-
-            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation) or (
-                isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-                )
-            ):
-                primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-                # NOTE (mristin):
-                # Byte arrays need deep copies -- all other lists can be simply copied.
-                if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                    if not optional:
-                        body_blocks.append(
-                            Stripped(
-                                f"""\
-var {variable_name} = new {variable_type}(
-{I}that.{prop_name}.Count);
-foreach (var item in that.{prop_name})
-{{
-{I}{variable_name}.Add((byte[])item.Clone());
-}}"""
-                            )
-                        )
-                    else:
-                        body_blocks.append(
-                            Stripped(
-                                f"""\
-{variable_type}? {variable_name} = null;
-if (that.{prop_name} != null)
-{{
-{I}{variable_name} = new {variable_type}(
-{II}that.{prop_name}.Count);
-{I}foreach (var item in that.{prop_name})
-{I}{{
-{II}{variable_name}.Add((byte[])item.Clone());
-{I}}}
-}}"""
-                            )
-                        )
-                else:
-                    # NOTE (mristin):
-                    # We add the assertion here to force the developer to change
-                    # the code in case that our assumption that the list items
-                    # are copied by value does not hold anymore. For example, if another
-                    # primitive type is introduced.
-
-                    assert primitive_type in (
-                        intermediate.PrimitiveType.BOOL,
-                        intermediate.PrimitiveType.INT,
-                        intermediate.PrimitiveType.FLOAT,
-                        intermediate.PrimitiveType.STR,
-                    ) or (
-                        isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                        and isinstance(
-                            type_anno.items.our_type, intermediate.Enumeration
-                        )
-                    )
-
-                    if not optional:
-                        body_blocks.append(
-                            Stripped(
-                                f"""\
-var {variable_name} = new {variable_type}(
-{I}that.{prop_name});"""
-                            )
-                        )
-                    else:
-                        body_blocks.append(
-                            Stripped(
-                                f"""\
-{variable_type}? {variable_name} = null;
-if (that.{prop_name} != null)
-{{
-{I}{variable_name} = new {variable_type}(
-{II}that.{prop_name});
-}}"""
-                            )
-                        )
-
-            elif isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (
-                    intermediate.AbstractClass,
-                    intermediate.ConcreteClass,
-                    intermediate.NamedUnion,
-                ),
-            ):
-                # A named union has its own ``Deep`` overload (see
-                # :py:func:`_generate_union_deep_copy_helper`), so it
-                # can be deep-copied exactly like a class instance here.
-                if not optional:
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-var {variable_name} = new {variable_type}(
-{I}that.{prop_name}.Count);
-foreach (var item in that.{prop_name})
-{{
-{I}{variable_name}.Add(Deep(item));
-}}"""
-                        )
-                    )
-                else:
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type}? {variable_name} = null;
-if (that.{prop_name} != null)
-{{
-{I}{variable_name} = new {variable_type}(
-{II}that.{prop_name}.Count);
-{I}foreach (var item in that.{prop_name})
-{I}{{
-{II}{variable_name}.Add(Deep(item));
-{I}}}
-}}"""
-                        )
-                    )
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                item_copy_expr = _json_deep_copy_expr(
-                    type_anno=type_anno.items,
-                    source_expr="item",
-                    what="item of the property " + prop_name,
-                )
-
-                if not optional:
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-var {variable_name} = new {variable_type}(
-{I}that.{prop_name}.Count);
-foreach (var item in that.{prop_name})
-{{
-{I}{variable_name}.Add(
-{II}{indent_but_first_line(item_copy_expr, II)});
-}}"""
-                        )
-                    )
-                else:
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type}? {variable_name} = null;
-if (that.{prop_name} != null)
-{{
-{I}{variable_name} = new {variable_type}(
-{II}that.{prop_name}.Count);
-{I}foreach (var item in that.{prop_name})
-{I}{{
-{II}{variable_name}.Add(
-{III}{indent_but_first_line(item_copy_expr, III)});
-{I}}}
-}}"""
-                        )
-                    )
-
-            else:
-                raise NotImplementedError(
-                    "(mristin) We handle only lists of atomic values in the deep "
-                    "copies at the moment. The meta-model does not contain "
-                    "any other lists, so we wanted to keep the code as simple as "
-                    "possible, and avoid unrolling. Please contact the developers "
-                    "if you need this feature."
-                )
-
         constructor_arg_exprs = []  # type: List[str]
         for arg in cls.constructor.arguments:
             prop_name = csharp_naming.property_name(arg.name)
 
-            type_anno = intermediate.beneath_optional(arg.type_annotation)
+            if not isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
+                constructor_arg_exprs.append(
+                    _generate_deep_copy_expr(
+                        expr=f"that.{prop_name}", type_anno=arg.type_annotation
+                    )
+                )
+                continue
 
-            optional = isinstance(
-                arg.type_annotation, intermediate.OptionalTypeAnnotation
-            )
+            type_anno = arg.type_annotation.value
 
-            if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
+            if _copied_by_sharing(type_anno):
                 constructor_arg_exprs.append(f"that.{prop_name}")
 
-            elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-                if isinstance(type_anno.our_type, intermediate.Enumeration):
-                    constructor_arg_exprs.append(f"that.{prop_name}")
-
-                elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                    constructor_arg_exprs.append(f"that.{prop_name}")
-
-                elif isinstance(
-                    type_anno.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ):
-                    # A named union has its own ``Deep`` overload (see
-                    # :py:func:`_generate_union_deep_copy_helper`), so
-                    # it can be deep-copied exactly like a class instance
-                    # here.
-                    if optional:
-                        constructor_arg_exprs.append(
-                            f"""\
-(that.{prop_name} != null)
-{I}? Deep(that.{prop_name})
-{I}: null"""
-                        )
-                    else:
-                        constructor_arg_exprs.append(f"Deep(that.{prop_name})")
-
-                else:
-                    # noinspection PyTypeChecker
-                    assert_never(type_anno.our_type)
-
-            elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+            elif csharp_common.is_value_type(type_anno):
                 # NOTE (mristin):
-                # See how this variable is computed above in the generated code.
+                # An optional of a value type, such as a tuple, is
+                # a ``System.Nullable`` which has to be unwrapped. The ``null`` has
+                # to be cast explicitly. Otherwise, the C# compiler can not find
+                # a common type of the two branches unless the language version is
+                # 9.0 or above, which we do not want to require.
+                copy_expr = _generate_deep_copy_expr(
+                    expr=f"that.{prop_name}.Value", type_anno=type_anno
+                )
+                nullable_type = csharp_common.generate_type(arg.type_annotation)
+
                 constructor_arg_exprs.append(
-                    csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
-                )
-
-            elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-                # NOTE (mristin):
-                # Tuples are fixed-length and heterogeneous, so, unlike lists, we can
-                # construct the copy directly in-line without a pre-sized collection.
-
-                # NOTE (mristin):
-                # A tuple is a ``System.ValueTuple``, so an optional tuple is
-                # a ``System.Nullable`` which has to be unwrapped before we can
-                # access its items.
-                access_expr = (
-                    f"that.{prop_name}.Value" if optional else f"that.{prop_name}"
-                )
-
-                item_exprs = []  # type: List[Stripped]
-                for i, item_type_anno in enumerate(type_anno.items):
-                    item_expr = f"{access_expr}.Item{i + 1}"
-
-                    if isinstance(
-                        item_type_anno, intermediate.OurTypeAnnotation
-                    ) and isinstance(
-                        item_type_anno.our_type,
-                        (
-                            intermediate.AbstractClass,
-                            intermediate.ConcreteClass,
-                            intermediate.NamedUnion,
-                        ),
-                    ):
-                        # A named union has its own ``Deep`` overload (see
-                        # :py:func:`_generate_union_deep_copy_helper`),
-                        # so it can be deep-copied exactly like a class
-                        # instance here.
-                        item_expr = f"Deep({item_expr})"
-
-                    item_exprs.append(Stripped(item_expr))
-
-                tuple_literal = csharp_common.generate_tuple_literal(item_exprs)
-
-                if optional:
-                    condition = f"that.{prop_name}.HasValue"
-
-                    # NOTE (mristin):
-                    # The ``null`` has to be cast explicitly. Otherwise, the C#
-                    # compiler can not find a common type of the two branches --
-                    # a ``System.ValueTuple`` and a ``null`` -- unless the language
-                    # version is 9.0 or above, which we do not want to require.
-                    nullable_type = csharp_common.generate_type(arg.type_annotation)
-
-                    constructor_arg_exprs.append(
-                        f"""\
-({condition})
-{I}? {indent_but_first_line(tuple_literal, I)}
+                    f"""\
+(that.{prop_name}.HasValue)
+{I}? {indent_but_first_line(copy_expr, I)}
 {I}: ({nullable_type})null"""
-                    )
-                else:
-                    constructor_arg_exprs.append(tuple_literal)
-
-            elif isinstance(
-                type_anno,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                deep_copy_expr = _json_deep_copy_expr(
-                    type_anno=type_anno,
-                    source_expr=f"that.{prop_name}",
-                    what="property " + prop_name,
                 )
 
-                if optional:
-                    constructor_arg_exprs.append(
-                        f"""\
-(that.{prop_name} != null)
-{I}? {indent_but_first_line(deep_copy_expr, I)}
-{I}: null"""
-                    )
-                else:
-                    constructor_arg_exprs.append(deep_copy_expr)
-
-            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-                # NOTE (mristin):
-                # A set holds only primitives, constrained primitives and
-                # enumeration literals, which are all immutable, so copying
-                # the set itself makes a deep copy.
-                set_type = csharp_common.generate_type(type_anno)
-
-                if optional:
-                    constructor_arg_exprs.append(
-                        f"""\
-(that.{prop_name} != null)
-{I}? new {set_type}(that.{prop_name})
-{I}: null"""
-                    )
-                else:
-                    constructor_arg_exprs.append(f"new {set_type}(that.{prop_name})")
-
             else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno)
+                copy_expr = _generate_deep_copy_expr(
+                    expr=f"that.{prop_name}", type_anno=type_anno
+                )
 
-        return_statement_writer = io.StringIO()
+                constructor_arg_exprs.append(
+                    f"""\
+(that.{prop_name} != null)
+{I}? {indent_but_first_line(copy_expr, I)}
+{I}: null"""
+                )
 
-        return_statement_writer.write(f"return new Our.{cls_name}(\n")
-
-        for i, arg_expr in enumerate(constructor_arg_exprs):
-            return_statement_writer.write(textwrap.indent(arg_expr, I))
-
-            if i < len(constructor_arg_exprs) - 1:
-                return_statement_writer.write(",\n")
-            else:
-                return_statement_writer.write("\n")
-
-        return_statement_writer.write(");")
-
-        body_blocks.append(Stripped(return_statement_writer.getvalue()))
-
-    body_writer = io.StringIO()
-    for i, body_block in enumerate(body_blocks):
-        if i > 0:
-            body_writer.write("\n\n")
-
-        body_writer.write(body_block)
+        args_joined = ",\n".join(constructor_arg_exprs)
+        return_statement = Stripped(
+            f"""\
+return new Our.{cls_name}(
+{I}{indent_but_first_line(args_joined, I)}
+);"""
+        )
 
     interface_name = csharp_naming.interface_name(cls.name)
     transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
@@ -613,7 +446,7 @@ public override Our.IClass {transform_name}(
 {I}Our.{interface_name} that
 )
 {{
-{I}{indent_but_first_line(body_writer.getvalue(), I)}
+{I}{indent_but_first_line(return_statement, I)}
 }}"""
     )
 
@@ -730,6 +563,29 @@ public static T Deep<T>(T that) where T : Our.IClass
 
     if len(symbol_table.named_unions) > 0:
         copy_blocks.append(_generate_union_deep_copy_helper())
+
+    observed_monikers = set()  # type: Set[str]
+    for cls in symbol_table.concrete_classes:
+        for arg in cls.constructor.arguments:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                arg.type_annotation
+            ):
+                if not _deep_copied_by_method(type_anno):
+                    continue
+
+                assert isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                )
+
+                moniker = csharp_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                copy_blocks.append(_generate_deep_copy_container(type_anno))
 
     shallow_copier_block, shallow_errors = _generate_shallow_copier(
         symbol_table=symbol_table

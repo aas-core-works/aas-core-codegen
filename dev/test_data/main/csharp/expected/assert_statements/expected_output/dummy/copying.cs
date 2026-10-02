@@ -99,13 +99,10 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theTexts = new List<string>(
-                    that.Texts);
-
                 return new Our.Something(
                     that.Number,
                     that.Text,
-                    theTexts,
+                    new List<string>(that.Texts),
                     Deep(that.Parent),
                     that.OptionalText
                 );

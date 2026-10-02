@@ -50,6 +50,36 @@ namespace dummy
                 Deep(that.Underlying));
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<IElement> Deep_ListOf_IElement(
+            List<IElement> that)
+        {
+            var result = new List<IElement>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<Value> Deep_ListOf_Value(
+            List<Value> that)
+        {
+            var result = new List<Value>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -140,16 +170,9 @@ namespace dummy
                 Our.IOrderedContainer that
             )
             {
-                var theChildren = new List<IElement>(
-                    that.Children.Count);
-                foreach (var item in that.Children)
-                {
-                    theChildren.Add(Deep(item));
-                }
-
                 return new Our.OrderedContainer(
                     that.Identifier,
-                    theChildren,
+                    Deep_ListOf_IElement(that.Children),
                     that.IsSorted
                 );
             }
@@ -158,16 +181,9 @@ namespace dummy
                 Our.IUnorderedContainer that
             )
             {
-                var theChildren = new List<IElement>(
-                    that.Children.Count);
-                foreach (var item in that.Children)
-                {
-                    theChildren.Add(Deep(item));
-                }
-
                 return new Our.UnorderedContainer(
                     that.Identifier,
-                    theChildren
+                    Deep_ListOf_IElement(that.Children)
                 );
             }
 
@@ -220,17 +236,10 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theValues = new List<Value>(
-                    that.Values.Count);
-                foreach (var item in that.Values)
-                {
-                    theValues.Add(Deep(item));
-                }
-
                 return new Our.Something(
                     Deep(that.Root),
                     Deep(that.Value),
-                    theValues,
+                    Deep_ListOf_Value(that.Values),
                     (that.OptionalElement != null)
                         ? Deep(that.OptionalElement)
                         : null

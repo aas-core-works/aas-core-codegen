@@ -7,7 +7,7 @@ using Our = dummy;  // renamed
 
 // We need to use System.MemoryExtension.SequenceEqual.
 using System;  // can't alias
-using System.Linq;  // can't alias
+using System.Collections.Generic;  // can't alias
 
 using NUnit.Framework;  // can't alias
 
@@ -15,26 +15,33 @@ namespace dummy.Tests
 {
     public class TestCopying
     {
-        internal class DeepEqualiser
+        /// <summary>
+        /// Check that the context is a deep copy of the visited instance.
+        /// </summary>
+        /// <remarks>
+        /// The copy has to equal the original by value, while it must share none
+        /// of the mutable objects with it.
+        /// </remarks>
+        internal class DeepCopyChecker
             : Our.Visitation.AbstractTransformerWithContext<Our.IClass, bool>
         {
-            /// <summary>Compare two byte spans for equal content.</summary>
-            /// <remarks>
-            /// <c>byte[]</c> implicitly converts to <c>ReadOnlySpan</c>.
-            /// See: https://stackoverflow.com/a/48599119/1600678
-            /// </remarks>
-            private static bool ByteSpansEqual(
-                System.ReadOnlySpan<byte> that,
-                System.ReadOnlySpan<byte> other)
+            private static bool BytesEqualButDistinct(
+                byte[] that,
+                byte[] other)
             {
-                return that.SequenceEqual(other);
+                // NOTE (mristin):
+                // A byte[] implicitly converts to a ReadOnlySpan, which compares by content.
+                // See: https://stackoverflow.com/a/48599119/1600678
+                return (
+                    !ReferenceEquals(that, other)
+                    && ((System.ReadOnlySpan<byte>)that).SequenceEqual(other));
             }
 
             public override bool TransformLangString(
                 Our.ILangString that,
                 Our.IClass other)
             {
-                if (!(other is Our.LangString casted))
+                if (!(other is Our.LangString casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -48,39 +55,31 @@ namespace dummy.Tests
                 Our.ILangStringSet that,
                 Our.IClass other)
             {
-                if (!(other is Our.LangStringSet casted))
+                if (!(other is Our.LangStringSet casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
-                    that.LangStrings.Count == casted.LangStrings.Count
-                    && (
-                        that.LangStrings
-                            .Zip(
-                                casted.LangStrings,
-                                Transform)
-                            .All(item => item)));
+                    Check_ListOf_ILangString(
+                        that.LangStrings,
+                        casted.LangStrings));
             }
 
             public override bool TransformIecContent(
                 Our.IIecContent that,
                 Our.IClass other)
             {
-                if (!(other is Our.IecContent casted))
+                if (!(other is Our.IecContent casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     ((that.Definition != null && casted.Definition != null)
-                        ? that.Definition.Count == casted.Definition.Count
-                            && (
-                                that.Definition
-                                    .Zip(
-                                        casted.Definition,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ILangString(
+                            that.Definition,
+                            casted.Definition)
                         : that.Definition == null && casted.Definition == null));
             }
 
@@ -88,7 +87,7 @@ namespace dummy.Tests
                 Our.IOtherContent that,
                 Our.IClass other)
             {
-                if (!(other is Our.OtherContent casted))
+                if (!(other is Our.OtherContent casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -100,7 +99,7 @@ namespace dummy.Tests
                 Our.ISpecification that,
                 Our.IClass other)
             {
-                if (!(other is Our.Specification casted))
+                if (!(other is Our.Specification casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
@@ -115,33 +114,95 @@ namespace dummy.Tests
                 Our.ISomething that,
                 Our.IClass other)
             {
-                if (!(other is Our.Something casted))
+                if (!(other is Our.Something casted) || ReferenceEquals(that, other))
                 {
                     return false;
                 }
 
                 return (
                     that.DefaultLanguage == casted.DefaultLanguage
-                    && that.LangStringSets.Count == casted.LangStringSets.Count
-                    && (
-                        that.LangStringSets
-                            .Zip(
-                                casted.LangStringSets,
-                                Transform)
-                            .All(item => item))
+                    && Check_ListOf_ILangStringSet(
+                        that.LangStringSets,
+                        casted.LangStringSets)
                     && ((that.Specifications != null && casted.Specifications != null)
-                        ? that.Specifications.Count == casted.Specifications.Count
-                            && (
-                                that.Specifications
-                                    .Zip(
-                                        casted.Specifications,
-                                        Transform)
-                                    .All(item => item))
+                        ? Check_ListOf_ISpecification(
+                            that.Specifications,
+                            casted.Specifications)
                         : that.Specifications == null && casted.Specifications == null));
             }
-        }  // internal class DeepEqualiser
 
-        private static readonly DeepEqualiser DeepEqualiserInstance = new DeepEqualiser();
+            private bool Check_ListOf_ILangString(
+                List<Our.ILangString> that,
+                List<Our.ILangString> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ILangStringSet(
+                List<Our.ILangStringSet> that,
+                List<Our.ILangStringSet> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ISpecification(
+                List<Our.ISpecification> that,
+                List<Our.ISpecification> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Transform(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }  // internal class DeepCopyChecker
+
+        private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
+            new DeepCopyChecker());
 
         private static bool LangStringShallowEquals(
             Our.LangString that,
@@ -188,48 +249,6 @@ namespace dummy.Tests
                 && that.Specifications == other.Specifications);
         }
 
-        private static bool LangStringDeepEquals(
-            Our.LangString that,
-            Our.LangString other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool LangStringSetDeepEquals(
-            Our.LangStringSet that,
-            Our.LangStringSet other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool IecContentDeepEquals(
-            Our.IecContent that,
-            Our.IecContent other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool OtherContentDeepEquals(
-            Our.OtherContent that,
-            Our.OtherContent other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SpecificationDeepEquals(
-            Our.Specification that,
-            Our.Specification other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
-        private static bool SomethingDeepEquals(
-            Our.Something that,
-            Our.Something other)
-        {
-            return DeepEqualiserInstance.Transform(that, other);
-        }
-
         [Test]
         public void Test_LangString_shallow_copy()
         {
@@ -253,7 +272,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LangStringDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LangString");
         }  // public void Test_LangString_deep_copy
@@ -281,7 +300,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                LangStringSetDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "LangStringSet");
         }  // public void Test_LangStringSet_deep_copy
@@ -309,7 +328,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                IecContentDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "IecContent");
         }  // public void Test_IecContent_deep_copy
@@ -337,7 +356,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                OtherContentDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "OtherContent");
         }  // public void Test_OtherContent_deep_copy
@@ -365,7 +384,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SpecificationDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Specification");
         }  // public void Test_Specification_deep_copy
@@ -393,7 +412,7 @@ namespace dummy.Tests
             var instanceCopy = Our.Copying.Deep(instance);
 
             Assert.IsTrue(
-                SomethingDeepEquals(
+                DeepCopyCheckerInstance.Transform(
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy

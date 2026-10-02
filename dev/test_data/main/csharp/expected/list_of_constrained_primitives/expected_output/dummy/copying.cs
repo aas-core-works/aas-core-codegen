@@ -61,11 +61,8 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                var theSomeNames = new List<string>(
-                    that.SomeNames);
-
                 return new Our.Something(
-                    theSomeNames
+                    new List<string>(that.SomeNames)
                 );
             }
         }  // internal class DeepCopier
