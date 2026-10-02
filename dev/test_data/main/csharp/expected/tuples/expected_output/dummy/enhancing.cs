@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -283,83 +282,16 @@ namespace dummy
                     );
                 }
 
-                var transformedItems0 = Transform(
-                    that.Items.Item1
-                );
-                var castedItems0 = (
-                    transformedItems0 as Our.IAbstractItem
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IAbstractItem, " +
-                    $"but got: {transformedItems0}"
-                );
+                that.Items = Wrap_TupleOf2_IAbstractItem_IAbstractItem(
+                    that.Items);
 
-                var transformedItems1 = Transform(
-                    that.Items.Item2
-                );
-                var castedItems1 = (
-                    transformedItems1 as Our.IAbstractItem
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IAbstractItem, " +
-                    $"but got: {transformedItems1}"
-                );
-                that.Items = (
-                    castedItems0,
-                    castedItems1
-                );
-
-                var transformedTricky1 = Transform(
-                    that.Tricky.Item2
-                );
-                var castedTricky1 = (
-                    transformedTricky1 as Our.ISomeItem
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a ISomeItem, " +
-                    $"but got: {transformedTricky1}"
-                );
-
-                var transformedTricky2 = Transform(
-                    that.Tricky.Item3
-                );
-                var castedTricky2 = (
-                    transformedTricky2 as Our.IAbstractItem
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IAbstractItem, " +
-                    $"but got: {transformedTricky2}"
-                );
-
-                var transformedTricky3 = Transform(
-                    that.Tricky.Item4
-                );
-                var castedTricky3 = (
-                    transformedTricky3 as Our.ISomeItem
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a ISomeItem, " +
-                    $"but got: {transformedTricky3}"
-                );
-                that.Tricky = (
-                    that.Tricky.Item1,
-                    castedTricky1,
-                    castedTricky2,
-                    castedTricky3,
-                    that.Tricky.Item5,
-                    that.Tricky.Item6
-                );
+                that.Tricky = Wrap_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+                    that.Tricky);
 
                 if (that.OptionalPair.HasValue)
                 {
-                    var transformedOptionalPair1 = Transform(
-                        that.OptionalPair.Value.Item2
-                    );
-                    var castedOptionalPair1 = (
-                        transformedOptionalPair1 as Our.IAbstractItem
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IAbstractItem, " +
-                        $"but got: {transformedOptionalPair1}"
-                    );
-                    that.OptionalPair = (
-                        that.OptionalPair.Value.Item1,
-                        castedOptionalPair1
-                    );
+                    that.OptionalPair = Wrap_TupleOf2_string_IAbstractItem(
+                        that.OptionalPair.Value);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -369,6 +301,60 @@ namespace dummy
                         that,
                         enhancement
                     );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private (Our.IAbstractItem, Our.IAbstractItem) Wrap_TupleOf2_IAbstractItem_IAbstractItem(
+                (Our.IAbstractItem, Our.IAbstractItem) that)
+            {
+                return (
+                    Wrap(that.Item1),
+                    Wrap(that.Item2)
+                );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private (long, Our.ISomeItem, Our.IAbstractItem, Our.ISomeItem, long, Our.Result) Wrap_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+                (long, Our.ISomeItem, Our.IAbstractItem, Our.ISomeItem, long, Our.Result) that)
+            {
+                return (
+                    that.Item1,
+                    Wrap(that.Item2),
+                    Wrap(that.Item3),
+                    Wrap(that.Item4),
+                    that.Item5,
+                    that.Item6
+                );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private (string, Our.IAbstractItem) Wrap_TupleOf2_string_IAbstractItem(
+                (string, Our.IAbstractItem) that)
+            {
+                return (
+                    that.Item1,
+                    Wrap(that.Item2)
+                );
             }
         }
 

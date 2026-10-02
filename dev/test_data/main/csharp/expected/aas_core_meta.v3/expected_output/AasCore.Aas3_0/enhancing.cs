@@ -5,7 +5,6 @@
 
 using Our = AasCore.Aas3_0;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace AasCore.Aas3_0
 {
@@ -4305,52 +4304,17 @@ namespace AasCore.Aas3_0
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.RefersTo != null)
                 {
-                    that.RefersTo = (
-                        that.RefersTo
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.RefersTo = Wrap_ListOf_IReference(that.RefersTo);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -4375,34 +4339,13 @@ namespace AasCore.Aas3_0
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.Creator != null)
                 {
-                    var transformedCreator = Transform(
-                        that.Creator
-                    );
-                    var castedCreator = (
-                        transformedCreator as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedCreator}"
-                    );
-                    that.Creator = castedCreator;
+                    that.Creator = Wrap(that.Creator);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -4427,48 +4370,17 @@ namespace AasCore.Aas3_0
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.ValueId != null)
                 {
-                    var transformedValueId = Transform(
-                        that.ValueId
-                    );
-                    var castedValueId = (
-                        transformedValueId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedValueId}"
-                    );
-                    that.ValueId = castedValueId;
+                    that.ValueId = Wrap(that.ValueId);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -4493,131 +4405,40 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.Administration != null)
                 {
-                    var transformedAdministration = Transform(
-                        that.Administration
-                    );
-                    var castedAdministration = (
-                        transformedAdministration as Our.IAdministrativeInformation
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IAdministrativeInformation, " +
-                        $"but got: {transformedAdministration}"
-                    );
-                    that.Administration = castedAdministration;
+                    that.Administration = Wrap(that.Administration);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.DerivedFrom != null)
                 {
-                    var transformedDerivedFrom = Transform(
-                        that.DerivedFrom
-                    );
-                    var castedDerivedFrom = (
-                        transformedDerivedFrom as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedDerivedFrom}"
-                    );
-                    that.DerivedFrom = castedDerivedFrom;
+                    that.DerivedFrom = Wrap(that.DerivedFrom);
                 }
 
-                var transformedAssetInformation = Transform(
-                    that.AssetInformation
-                );
-                var castedAssetInformation = (
-                    transformedAssetInformation as Our.IAssetInformation
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IAssetInformation, " +
-                    $"but got: {transformedAssetInformation}"
-                );
-                that.AssetInformation = castedAssetInformation;
+                that.AssetInformation = Wrap(that.AssetInformation);
 
                 if (that.Submodels != null)
                 {
-                    that.Submodels = (
-                        that.Submodels
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Submodels = Wrap_ListOf_IReference(that.Submodels);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -4642,34 +4463,12 @@ namespace AasCore.Aas3_0
 
                 if (that.SpecificAssetIds != null)
                 {
-                    that.SpecificAssetIds = (
-                        that.SpecificAssetIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISpecificAssetId
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISpecificAssetId, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SpecificAssetIds = Wrap_ListOf_ISpecificAssetId(that.SpecificAssetIds);
                 }
 
                 if (that.DefaultThumbnail != null)
                 {
-                    var transformedDefaultThumbnail = Transform(
-                        that.DefaultThumbnail
-                    );
-                    var castedDefaultThumbnail = (
-                        transformedDefaultThumbnail as Our.IResource
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IResource, " +
-                        $"but got: {transformedDefaultThumbnail}"
-                    );
-                    that.DefaultThumbnail = castedDefaultThumbnail;
+                    that.DefaultThumbnail = Wrap(that.DefaultThumbnail);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -4714,48 +4513,17 @@ namespace AasCore.Aas3_0
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.ExternalSubjectId != null)
                 {
-                    var transformedExternalSubjectId = Transform(
-                        that.ExternalSubjectId
-                    );
-                    var castedExternalSubjectId = (
-                        transformedExternalSubjectId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedExternalSubjectId}"
-                    );
-                    that.ExternalSubjectId = castedExternalSubjectId;
+                    that.ExternalSubjectId = Wrap(that.ExternalSubjectId);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -4780,156 +4548,48 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.Administration != null)
                 {
-                    var transformedAdministration = Transform(
-                        that.Administration
-                    );
-                    var castedAdministration = (
-                        transformedAdministration as Our.IAdministrativeInformation
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IAdministrativeInformation, " +
-                        $"but got: {transformedAdministration}"
-                    );
-                    that.Administration = castedAdministration;
+                    that.Administration = Wrap(that.Administration);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.SubmodelElements != null)
                 {
-                    that.SubmodelElements = (
-                        that.SubmodelElements
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISubmodelElement
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISubmodelElement, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SubmodelElements = Wrap_ListOf_ISubmodelElement(that.SubmodelElements);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -4954,147 +4614,43 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
-                var transformedFirst = Transform(
-                    that.First
-                );
-                var castedFirst = (
-                    transformedFirst as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedFirst}"
-                );
-                that.First = castedFirst;
+                that.First = Wrap(that.First);
 
-                var transformedSecond = Transform(
-                    that.Second
-                );
-                var castedSecond = (
-                    transformedSecond as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedSecond}"
-                );
-                that.Second = castedSecond;
+                that.Second = Wrap(that.Second);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -5118,156 +4674,48 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.SemanticIdListElement != null)
                 {
-                    var transformedSemanticIdListElement = Transform(
-                        that.SemanticIdListElement
-                    );
-                    var castedSemanticIdListElement = (
-                        transformedSemanticIdListElement as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticIdListElement}"
-                    );
-                    that.SemanticIdListElement = castedSemanticIdListElement;
+                    that.SemanticIdListElement = Wrap(that.SemanticIdListElement);
                 }
 
                 if (that.Value != null)
                 {
-                    that.Value = (
-                        that.Value
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISubmodelElement
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISubmodelElement, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Value = Wrap_ListOf_ISubmodelElement(that.Value);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -5292,142 +4740,43 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.Value != null)
                 {
-                    that.Value = (
-                        that.Value
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISubmodelElement
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISubmodelElement, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Value = Wrap_ListOf_ISubmodelElement(that.Value);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -5452,138 +4801,43 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.ValueId != null)
                 {
-                    var transformedValueId = Transform(
-                        that.ValueId
-                    );
-                    var castedValueId = (
-                        transformedValueId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedValueId}"
-                    );
-                    that.ValueId = castedValueId;
+                    that.ValueId = Wrap(that.ValueId);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -5608,156 +4862,48 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.Value != null)
                 {
-                    that.Value = (
-                        that.Value
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Value = Wrap_ListOf_ILangStringTextType(that.Value);
                 }
 
                 if (that.ValueId != null)
                 {
-                    var transformedValueId = Transform(
-                        that.ValueId
-                    );
-                    var castedValueId = (
-                        transformedValueId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedValueId}"
-                    );
-                    that.ValueId = castedValueId;
+                    that.ValueId = Wrap(that.ValueId);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -5782,124 +4928,38 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -5924,138 +4984,43 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.Value != null)
                 {
-                    var transformedValue = Transform(
-                        that.Value
-                    );
-                    var castedValue = (
-                        transformedValue as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedValue}"
-                    );
-                    that.Value = castedValue;
+                    that.Value = Wrap(that.Value);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -6080,124 +5045,38 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -6222,124 +5101,38 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -6364,164 +5157,47 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
-                var transformedFirst = Transform(
-                    that.First
-                );
-                var castedFirst = (
-                    transformedFirst as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedFirst}"
-                );
-                that.First = castedFirst;
+                that.First = Wrap(that.First);
 
-                var transformedSecond = Transform(
-                    that.Second
-                );
-                var castedSecond = (
-                    transformedSecond as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedSecond}"
-                );
-                that.Second = castedSecond;
+                that.Second = Wrap(that.Second);
 
                 if (that.Annotations != null)
                 {
-                    that.Annotations = (
-                        that.Annotations
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IDataElement
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IDataElement, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Annotations = Wrap_ListOf_IDataElement(that.Annotations);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -6546,160 +5222,48 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.Statements != null)
                 {
-                    that.Statements = (
-                        that.Statements
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISubmodelElement
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISubmodelElement, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Statements = Wrap_ListOf_ISubmodelElement(that.Statements);
                 }
 
                 if (that.SpecificAssetIds != null)
                 {
-                    that.SpecificAssetIds = (
-                        that.SpecificAssetIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISpecificAssetId
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISpecificAssetId, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SpecificAssetIds = Wrap_ListOf_ISpecificAssetId(that.SpecificAssetIds);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -6722,68 +5286,23 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                var transformedSource = Transform(
-                    that.Source
-                );
-                var castedSource = (
-                    transformedSource as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedSource}"
-                );
-                that.Source = castedSource;
+                that.Source = Wrap(that.Source);
 
                 if (that.SourceSemanticId != null)
                 {
-                    var transformedSourceSemanticId = Transform(
-                        that.SourceSemanticId
-                    );
-                    var castedSourceSemanticId = (
-                        transformedSourceSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSourceSemanticId}"
-                    );
-                    that.SourceSemanticId = castedSourceSemanticId;
+                    that.SourceSemanticId = Wrap(that.SourceSemanticId);
                 }
 
-                var transformedObservableReference = Transform(
-                    that.ObservableReference
-                );
-                var castedObservableReference = (
-                    transformedObservableReference as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedObservableReference}"
-                );
-                that.ObservableReference = castedObservableReference;
+                that.ObservableReference = Wrap(that.ObservableReference);
 
                 if (that.ObservableSemanticId != null)
                 {
-                    var transformedObservableSemanticId = Transform(
-                        that.ObservableSemanticId
-                    );
-                    var castedObservableSemanticId = (
-                        transformedObservableSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedObservableSemanticId}"
-                    );
-                    that.ObservableSemanticId = castedObservableSemanticId;
+                    that.ObservableSemanticId = Wrap(that.ObservableSemanticId);
                 }
 
                 if (that.SubjectId != null)
                 {
-                    var transformedSubjectId = Transform(
-                        that.SubjectId
-                    );
-                    var castedSubjectId = (
-                        transformedSubjectId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSubjectId}"
-                    );
-                    that.SubjectId = castedSubjectId;
+                    that.SubjectId = Wrap(that.SubjectId);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -6808,149 +5327,45 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
-                var transformedObserved = Transform(
-                    that.Observed
-                );
-                var castedObserved = (
-                    transformedObserved as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedObserved}"
-                );
-                that.Observed = castedObserved;
+                that.Observed = Wrap(that.Observed);
 
                 if (that.MessageBroker != null)
                 {
-                    var transformedMessageBroker = Transform(
-                        that.MessageBroker
-                    );
-                    var castedMessageBroker = (
-                        transformedMessageBroker as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedMessageBroker}"
-                    );
-                    that.MessageBroker = castedMessageBroker;
+                    that.MessageBroker = Wrap(that.MessageBroker);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -6975,178 +5390,54 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.InputVariables != null)
                 {
-                    that.InputVariables = (
-                        that.InputVariables
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IOperationVariable
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IOperationVariable, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.InputVariables = Wrap_ListOf_IOperationVariable(that.InputVariables);
                 }
 
                 if (that.OutputVariables != null)
                 {
-                    that.OutputVariables = (
-                        that.OutputVariables
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IOperationVariable
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IOperationVariable, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.OutputVariables = Wrap_ListOf_IOperationVariable(that.OutputVariables);
                 }
 
                 if (that.InoutputVariables != null)
                 {
-                    that.InoutputVariables = (
-                        that.InoutputVariables
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IOperationVariable
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IOperationVariable, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.InoutputVariables = Wrap_ListOf_IOperationVariable(
+                        that.InoutputVariables);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -7169,16 +5460,7 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                var transformedValue = Transform(
-                    that.Value
-                );
-                var castedValue = (
-                    transformedValue as Our.ISubmodelElement
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a ISubmodelElement, " +
-                    $"but got: {transformedValue}"
-                );
-                that.Value = castedValue;
+                that.Value = Wrap(that.Value);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -7202,124 +5484,38 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.SemanticId != null)
                 {
-                    var transformedSemanticId = Transform(
-                        that.SemanticId
-                    );
-                    var castedSemanticId = (
-                        transformedSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedSemanticId}"
-                    );
-                    that.SemanticId = castedSemanticId;
+                    that.SemanticId = Wrap(that.SemanticId);
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    that.SupplementalSemanticIds = (
-                        that.SupplementalSemanticIds
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.SupplementalSemanticIds = Wrap_ListOf_IReference(that.SupplementalSemanticIds);
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    that.Qualifiers = (
-                        that.Qualifiers
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IQualifier
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IQualifier, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Qualifiers = Wrap_ListOf_IQualifier(that.Qualifiers);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -7344,106 +5540,33 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    that.Extensions = (
-                        that.Extensions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IExtension
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IExtension, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Extensions = Wrap_ListOf_IExtension(that.Extensions);
                 }
 
                 if (that.DisplayName != null)
                 {
-                    that.DisplayName = (
-                        that.DisplayName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringNameType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringNameType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.DisplayName = Wrap_ListOf_ILangStringNameType(that.DisplayName);
                 }
 
                 if (that.Description != null)
                 {
-                    that.Description = (
-                        that.Description
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringTextType
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringTextType, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Description = Wrap_ListOf_ILangStringTextType(that.Description);
                 }
 
                 if (that.Administration != null)
                 {
-                    var transformedAdministration = Transform(
-                        that.Administration
-                    );
-                    var castedAdministration = (
-                        transformedAdministration as Our.IAdministrativeInformation
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IAdministrativeInformation, " +
-                        $"but got: {transformedAdministration}"
-                    );
-                    that.Administration = castedAdministration;
+                    that.Administration = Wrap(that.Administration);
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    that.EmbeddedDataSpecifications = (
-                        that.EmbeddedDataSpecifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IEmbeddedDataSpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IEmbeddedDataSpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.EmbeddedDataSpecifications = Wrap_ListOf_IEmbeddedDataSpecification(
+                        that.EmbeddedDataSpecifications);
                 }
 
                 if (that.IsCaseOf != null)
                 {
-                    that.IsCaseOf = (
-                        that.IsCaseOf
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IReference
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IReference, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.IsCaseOf = Wrap_ListOf_IReference(that.IsCaseOf);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -7468,32 +5591,10 @@ namespace AasCore.Aas3_0
 
                 if (that.ReferredSemanticId != null)
                 {
-                    var transformedReferredSemanticId = Transform(
-                        that.ReferredSemanticId
-                    );
-                    var castedReferredSemanticId = (
-                        transformedReferredSemanticId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedReferredSemanticId}"
-                    );
-                    that.ReferredSemanticId = castedReferredSemanticId;
+                    that.ReferredSemanticId = Wrap(that.ReferredSemanticId);
                 }
 
-                that.Keys = (
-                    that.Keys
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.IKey
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a IKey, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.Keys = Wrap_ListOf_IKey(that.Keys);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -7577,56 +5678,19 @@ namespace AasCore.Aas3_0
 
                 if (that.AssetAdministrationShells != null)
                 {
-                    that.AssetAdministrationShells = (
-                        that.AssetAdministrationShells
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IAssetAdministrationShell
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IAssetAdministrationShell, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.AssetAdministrationShells = Wrap_ListOf_IAssetAdministrationShell(
+                        that.AssetAdministrationShells);
                 }
 
                 if (that.Submodels != null)
                 {
-                    that.Submodels = (
-                        that.Submodels
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISubmodel
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISubmodel, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Submodels = Wrap_ListOf_ISubmodel(that.Submodels);
                 }
 
                 if (that.ConceptDescriptions != null)
                 {
-                    that.ConceptDescriptions = (
-                        that.ConceptDescriptions
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.IConceptDescription
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a IConceptDescription, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.ConceptDescriptions = Wrap_ListOf_IConceptDescription(
+                        that.ConceptDescriptions);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -7649,27 +5713,9 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                var transformedDataSpecification = Transform(
-                    that.DataSpecification
-                );
-                var castedDataSpecification = (
-                    transformedDataSpecification as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedDataSpecification}"
-                );
-                that.DataSpecification = castedDataSpecification;
+                that.DataSpecification = Wrap(that.DataSpecification);
 
-                var transformedDataSpecificationContent = Transform(
-                    that.DataSpecificationContent
-                );
-                var castedDataSpecificationContent = (
-                    transformedDataSpecificationContent as Our.IDataSpecificationContent
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IDataSpecificationContent, " +
-                    $"but got: {transformedDataSpecificationContent}"
-                );
-                that.DataSpecificationContent = castedDataSpecificationContent;
+                that.DataSpecificationContent = Wrap(that.DataSpecificationContent);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -7711,16 +5757,7 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                var transformedValueId = Transform(
-                    that.ValueId
-                );
-                var castedValueId = (
-                    transformedValueId as Our.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedValueId}"
-                );
-                that.ValueId = castedValueId;
+                that.ValueId = Wrap(that.ValueId);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -7742,20 +5779,8 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                that.ValueReferencePairs = (
-                    that.ValueReferencePairs
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.IValueReferencePair
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a IValueReferencePair, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.ValueReferencePairs = Wrap_ListOf_IValueReferencePair(
+                    that.ValueReferencePairs);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -7837,97 +5862,34 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                that.PreferredName = (
-                    that.PreferredName
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.ILangStringPreferredNameTypeIec61360
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a ILangStringPreferredNameTypeIec61360, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.PreferredName = Wrap_ListOf_ILangStringPreferredNameTypeIec61360(
+                    that.PreferredName);
 
                 if (that.ShortName != null)
                 {
-                    that.ShortName = (
-                        that.ShortName
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringShortNameTypeIec61360
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringShortNameTypeIec61360, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.ShortName = Wrap_ListOf_ILangStringShortNameTypeIec61360(
+                        that.ShortName);
                 }
 
                 if (that.UnitId != null)
                 {
-                    var transformedUnitId = Transform(
-                        that.UnitId
-                    );
-                    var castedUnitId = (
-                        transformedUnitId as Our.IReference
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IReference, " +
-                        $"but got: {transformedUnitId}"
-                    );
-                    that.UnitId = castedUnitId;
+                    that.UnitId = Wrap(that.UnitId);
                 }
 
                 if (that.Definition != null)
                 {
-                    that.Definition = (
-                        that.Definition
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangStringDefinitionTypeIec61360
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangStringDefinitionTypeIec61360, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Definition = Wrap_ListOf_ILangStringDefinitionTypeIec61360(
+                        that.Definition);
                 }
 
                 if (that.ValueList != null)
                 {
-                    var transformedValueList = Transform(
-                        that.ValueList
-                    );
-                    var castedValueList = (
-                        transformedValueList as Our.IValueList
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IValueList, " +
-                        $"but got: {transformedValueList}"
-                    );
-                    that.ValueList = castedValueList;
+                    that.ValueList = Wrap(that.ValueList);
                 }
 
                 if (that.LevelType != null)
                 {
-                    var transformedLevelType = Transform(
-                        that.LevelType
-                    );
-                    var castedLevelType = (
-                        transformedLevelType as Our.ILevelType
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a ILevelType, " +
-                        $"but got: {transformedLevelType}"
-                    );
-                    that.LevelType = castedLevelType;
+                    that.LevelType = Wrap(that.LevelType);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -7937,6 +5899,290 @@ namespace AasCore.Aas3_0
                         that,
                         enhancement
                     );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IReference> Wrap_ListOf_IReference(
+                List<Our.IReference> that)
+            {
+                var result = new List<Our.IReference>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IEmbeddedDataSpecification> Wrap_ListOf_IEmbeddedDataSpecification(
+                List<Our.IEmbeddedDataSpecification> that)
+            {
+                var result = new List<Our.IEmbeddedDataSpecification>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IExtension> Wrap_ListOf_IExtension(
+                List<Our.IExtension> that)
+            {
+                var result = new List<Our.IExtension>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ILangStringNameType> Wrap_ListOf_ILangStringNameType(
+                List<Our.ILangStringNameType> that)
+            {
+                var result = new List<Our.ILangStringNameType>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ILangStringTextType> Wrap_ListOf_ILangStringTextType(
+                List<Our.ILangStringTextType> that)
+            {
+                var result = new List<Our.ILangStringTextType>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ISpecificAssetId> Wrap_ListOf_ISpecificAssetId(
+                List<Our.ISpecificAssetId> that)
+            {
+                var result = new List<Our.ISpecificAssetId>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IQualifier> Wrap_ListOf_IQualifier(
+                List<Our.IQualifier> that)
+            {
+                var result = new List<Our.IQualifier>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ISubmodelElement> Wrap_ListOf_ISubmodelElement(
+                List<Our.ISubmodelElement> that)
+            {
+                var result = new List<Our.ISubmodelElement>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IDataElement> Wrap_ListOf_IDataElement(
+                List<Our.IDataElement> that)
+            {
+                var result = new List<Our.IDataElement>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IOperationVariable> Wrap_ListOf_IOperationVariable(
+                List<Our.IOperationVariable> that)
+            {
+                var result = new List<Our.IOperationVariable>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IKey> Wrap_ListOf_IKey(
+                List<Our.IKey> that)
+            {
+                var result = new List<Our.IKey>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IAssetAdministrationShell> Wrap_ListOf_IAssetAdministrationShell(
+                List<Our.IAssetAdministrationShell> that)
+            {
+                var result = new List<Our.IAssetAdministrationShell>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ISubmodel> Wrap_ListOf_ISubmodel(
+                List<Our.ISubmodel> that)
+            {
+                var result = new List<Our.ISubmodel>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IConceptDescription> Wrap_ListOf_IConceptDescription(
+                List<Our.IConceptDescription> that)
+            {
+                var result = new List<Our.IConceptDescription>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IValueReferencePair> Wrap_ListOf_IValueReferencePair(
+                List<Our.IValueReferencePair> that)
+            {
+                var result = new List<Our.IValueReferencePair>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ILangStringPreferredNameTypeIec61360> Wrap_ListOf_ILangStringPreferredNameTypeIec61360(
+                List<Our.ILangStringPreferredNameTypeIec61360> that)
+            {
+                var result = new List<Our.ILangStringPreferredNameTypeIec61360>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ILangStringShortNameTypeIec61360> Wrap_ListOf_ILangStringShortNameTypeIec61360(
+                List<Our.ILangStringShortNameTypeIec61360> that)
+            {
+                var result = new List<Our.ILangStringShortNameTypeIec61360>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ILangStringDefinitionTypeIec61360> Wrap_ListOf_ILangStringDefinitionTypeIec61360(
+                List<Our.ILangStringDefinitionTypeIec61360> that)
+            {
+                var result = new List<Our.ILangStringDefinitionTypeIec61360>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
             }
         }
 

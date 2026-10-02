@@ -2,9 +2,9 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Mapping, Set
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -19,7 +19,6 @@ from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
-    INDENT4 as IIII,
 )
 from aas_core_codegen.intermediate import uses as intermediate_uses
 
@@ -223,64 +222,165 @@ public class {enhanced_name}<TEnhancement>
     return Stripped(writer.getvalue()), None
 
 
-def _generate_union_transform_helper() -> Stripped:
+def _generate_union_wrap_helper() -> Stripped:
     """
-    Generate a single ``Transform`` overload shared by every named union.
+    Generate a single ``Wrap`` overload shared by every named union.
 
-    A named union is not itself an ``Our.IClass``, so it can not be dispatched
-    by the inherited, ``IClass``-typed ``Transform`` overload, and its
-    underlying instance has to be unwrapped, enhanced and wrapped back up.
-    We add this overload, single-purpose, next to the per-class ``Transform``
-    overrides, so that call sites can keep passing ``Transform`` around as
-    a plain method group or calling it directly, regardless of whether the
-    value at hand is a class instance or a named union.
+    A named union is not itself an ``Our.IClass``, so it can not be passed
+    to the generic ``Wrap<T>() where T : Our.IClass``. We add this second
+    generic overload, next to it, so that call sites can keep calling
+    ``Wrap`` directly, regardless of whether the value at hand is a class
+    instance or a named union.
 
     ``T`` is bounded by ``Our.IUnion<T>`` (see ``generate()`` in
     ``_generate_types.py``) instead of by the union's own type, so we need
-    only this one overload for *all* named unions, not one per union.
-    Unlike the per-class ``Transform(Our.IClass that)`` (non-generic, plain
-    ``IClass``-typed, inherited from ``AbstractTransformer<Our.IClass>``),
-    this overload returns ``T`` itself, since re-wrapping with
-    ``WithUnderlying`` already recovers the caller's own concrete union type
-    exactly -- so call sites need no downcast.
+    only this one overload for *all* named unions, not one per union --
+    while ``T.WithUnderlying(...)`` still lets the result come back as the
+    caller's own concrete union type, with no downcast needed at the call site.
 
     .. note::
 
-        The parameter is typed as ``Our.IUnion<T>``, not bare ``T`` --
-        confirmed with a real, minimal ``dotnet build`` reproduction that a
-        bare-``T`` signature here breaks the recursive call inside this
-        very method's own body (``Transform(that.Underlying)``, where
-        ``that.Underlying`` is plain ``Our.IClass``): C# resolves that call
-        against *this* generic method itself (inferring ``T = Our.IClass``)
-        rather than falling back to the inherited, non-generic
-        ``Transform(Our.IClass that)``, and only then fails the ``where T :
-        Our.IUnion<T>`` constraint (CS0311) -- a tie in "exactness" between
-        a generic method (post-substitution) and a non-generic one is
-        broken in favor of the generic one, so the non-generic overload is
-        effectively unreachable by unqualified calls from inside a
-        bare-``T`` version of this method. Typing the parameter as ``Our.
-        IUnion<T>`` removes ``Our.IClass`` from the generic overload's
-        applicable argument types entirely (``Our.IClass`` does not
-        implement ``Our.IUnion<T>`` for any ``T``), so
-        ``Transform(that.Underlying)`` has only the non-generic overload to
-        choose from -- no ambiguity. (Copying's ``Deep<T>`` needed the same
-        ``Our.IUnion<T>`` parameter shape, but for the different reason of
-        avoiding a duplicate-signature clash with its sibling
-        ``Deep<T>(T that) where T : Our.IClass``, since both of *its*
-        overloads are generic -- see
-        :py:func:`_generate_union_deep_copy_helper` in
-        ``_generate_copying.py``.)
-
-    Should a named union ever be allowed to flatten primitive or enumeration
-    alternatives, only the body of this method has to change (to dispatch on
-    the underlying value's kind) -- every call site stays the same.
+        The parameter is typed as ``Our.IUnion<T>``, not bare ``T``, since C#
+        does not allow overloading a generic method solely by its type
+        parameter's constraint (CS0111), see
+        :py:func:`_generate_union_deep_copy_helper` in ``_generate_copying.py``.
     """
     return Stripped(
         f"""\
-private T Transform<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
+private T Wrap<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
 {{
 {I}return that.WithUnderlying(
 {II}Transform(that.Underlying));
+}}"""
+    )
+
+
+def _wrap_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the method of the ``Wrapper`` wrapping the instances held by ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.csharp.common.type_moniker`), so two different
+    containers never share a method.
+    """
+    return Identifier(f"Wrap_{csharp_common.type_moniker(type_anno)}")
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_wrap_expr(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the expression wrapping the instances held by the value at ``expr``.
+
+    An instance is wrapped by the generic ``Wrap``. A container is delegated to
+    its method in the ``Wrapper``, which wraps only one level and calls
+    the methods of its items by name. This way the wrapping is composed of
+    plain functions, to any depth.
+    """
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # A named union has its own ``Wrap`` overload (see
+        # :py:func:`_generate_union_wrap_helper`), so it can be wrapped exactly
+        # like a class instance.
+        return Stripped(f"Wrap({expr})")
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        name = _wrap_container_name(type_anno)
+
+        # Heuristic to break the lines, very rudimentary
+        if len(name) + len(expr) > 50:
+            return Stripped(
+                f"""\
+{name}(
+{I}{expr})"""
+            )
+
+        return Stripped(f"{name}({expr})")
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_wrap_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the method of the ``Wrapper`` for ``type_anno``.
+
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    value_type = csharp_common.generate_type(
+        type_anno, our_type_qualifier=Stripped("Our")
+    )
+
+    body: Stripped
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        item_wrap_expr = _generate_wrap_expr(
+            expr="item", type_anno=type_anno.items, descendability=descendability
+        )
+
+        body = Stripped(
+            f"""\
+var result = new {value_type}(that.Count);
+foreach (var item in that)
+{{
+{I}result.Add({item_wrap_expr});
+}}
+
+return result;"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        tuple_literal = csharp_common.generate_tuple_literal(
+            [
+                (
+                    _generate_wrap_expr(
+                        expr=f"that.Item{i + 1}",
+                        type_anno=item,
+                        descendability=descendability,
+                    )
+                    if descendability[item]
+                    else Stripped(f"that.Item{i + 1}")
+                )
+                for i, item in enumerate(type_anno.items)
+            ]
+        )
+
+        body = Stripped(f"return {tuple_literal};")
+
+    else:
+        assert_never(type_anno)
+
+    return Stripped(
+        f"""\
+/// <summary>
+/// Wrap recursively the instances held by <paramref name="that" />.
+/// </summary>
+private {value_type} {_wrap_container_name(type_anno)}(
+{I}{value_type} that)
+{{
+{I}{indent_but_first_line(body, I)}
 }}"""
     )
 
@@ -300,246 +400,30 @@ if (that is Enhanced<TEnhancement>)
     ]  # type: List[Stripped]
 
     for prop in cls.properties:
+        descendability = intermediate.map_descendability(prop.type_annotation)
+
+        if not descendability[prop.type_annotation]:
+            # We can not enhance anything held by this property; nothing to do here.
+            continue
+
         type_anno = intermediate.beneath_optional(prop.type_annotation)
         prop_name = csharp_naming.property_name(prop.name)
 
-        wrap_stmt: Stripped
+        # NOTE (mristin):
+        # An optional of a value type, such as a tuple, is a ``System.Nullable``
+        # which has to be unwrapped. The assignment back needs no wrapping as
+        # the value is implicitly converted.
+        access_expr = f"that.{prop_name}"
+        if isinstance(
+            prop.type_annotation, intermediate.OptionalTypeAnnotation
+        ) and csharp_common.is_value_type(type_anno):
+            access_expr = f"that.{prop_name}.Value"
 
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            # We can not enhance primitive types; nothing to do here.
-            continue
+        wrap_expr = _generate_wrap_expr(
+            expr=access_expr, type_anno=type_anno, descendability=descendability
+        )
 
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                # We can not enhance enumerations; nothing to do here.
-                continue
-
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                # We can not enhance primitive types; nothing to do here.
-                continue
-
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                value_interface_name = csharp_naming.interface_name(
-                    type_anno.our_type.name
-                )
-                transformed_name = csharp_naming.variable_name(
-                    Identifier(f"transformed_{prop.name}")
-                )
-                casted_name = csharp_naming.variable_name(
-                    Identifier(f"casted_{prop.name}")
-                )
-                wrap_stmt = Stripped(
-                    f"""\
-var {transformed_name} = Transform(
-{I}that.{prop_name}
-);
-var {casted_name} = (
-{I}{transformed_name} as Our.{value_interface_name}
-) ?? throw new System.InvalidOperationException(
-{I}"Expected the transformed value to be a {value_interface_name}, " +
-{I}$"but got: {{{transformed_name}}}"
-);
-that.{prop_name} = {casted_name};"""
-                )
-
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                # A named union has its own ``Transform`` overload (see
-                # :py:func:`_generate_union_transform_helper`), which
-                # already returns the union's own type, so no downcast is
-                # needed here (unlike the class branch above).
-                wrap_stmt = Stripped(f"that.{prop_name} = Transform(that.{prop_name});")
-
-            else:
-                assert_never(type_anno.our_type)
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-                # We can not enhance primitive types; nothing to do here.
-                continue
-
-            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-                if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                    # We can not enhance enumerations; nothing to do here.
-                    continue
-
-                elif isinstance(
-                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
-                ):
-                    # We can not enhance primitive types; nothing to do here.
-                    continue
-
-                elif isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    item_interface_name = csharp_naming.interface_name(
-                        type_anno.items.our_type.name
-                    )
-
-                    wrap_stmt = Stripped(
-                        f"""\
-that.{prop_name} = (
-{I}that.{prop_name}
-{I}.Select(
-{II}(item) => {{
-{III}var transformed = Transform(item);
-{III}return (
-{IIII}transformed as Our.{item_interface_name}
-{III}) ?? throw new System.InvalidOperationException(
-{IIII}"Expected the transformed item to be a {item_interface_name}, " +
-{IIII}$"but got: {{transformed}}"
-{III});
-{II}}}
-{I})
-).ToList();"""
-                    )
-
-                elif isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                    # A named union has its own ``Transform`` overload (see
-                    # :py:func:`_generate_union_transform_helper`),
-                    # which already returns the union's own type, so it can
-                    # be passed on as a bare method group with no wrapping
-                    # lambda (unlike the class branch above, which needs one
-                    # to downcast).
-                    wrap_stmt = Stripped(
-                        f"""\
-that.{prop_name} = (
-{I}that.{prop_name}
-{I}.Select(Transform)
-).ToList();"""
-                    )
-
-                else:
-                    assert_never(type_anno.items.our_type)
-
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # A JSON-able value is plain data, never one of our model
-                # classes, so there is nothing to enhance; the same holds for
-                # a JSON-able property, see the branch further below.
-                continue
-
-            else:
-                raise NotImplementedError(
-                    f"(mristin) We handle only lists of classes and named unions "
-                    f"in the enhancing at the moment. The meta-model does not "
-                    f"contain any other lists, so we wanted to keep the code as "
-                    f"simple as possible, and avoid unrolling. However, you desire "
-                    f"a list of type {type_anno} to be enhanced. "
-                    f"Please contact the developers if you need this feature."
-                )
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            pre_stmts = []  # type: List[Stripped]
-            item_exprs = []  # type: List[Stripped]
-            any_transformable_item = False
-
-            # NOTE (mristin):
-            # A tuple is a ``System.ValueTuple``, so an optional tuple is
-            # a ``System.Nullable`` which has to be unwrapped before we can access
-            # its items. The assignment back needs no wrapping as the tuple literal
-            # is implicitly converted.
-            access_expr = Stripped(f"that.{prop_name}")
-            if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-                access_expr = Stripped(f"that.{prop_name}.Value")
-
-            for i, item_type_anno in enumerate(type_anno.items):
-                item_access = Stripped(f"{access_expr}.Item{i + 1}")
-
-                if isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(
-                    item_type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    any_transformable_item = True
-
-                    item_interface_name = csharp_naming.interface_name(
-                        item_type_anno.our_type.name
-                    )
-                    transformed_name = csharp_naming.variable_name(
-                        Identifier(f"transformed_{prop.name}_{i}")
-                    )
-                    casted_name = csharp_naming.variable_name(
-                        Identifier(f"casted_{prop.name}_{i}")
-                    )
-
-                    pre_stmts.append(
-                        Stripped(
-                            f"""\
-var {transformed_name} = Transform(
-{I}{item_access}
-);
-var {casted_name} = (
-{I}{transformed_name} as Our.{item_interface_name}
-) ?? throw new System.InvalidOperationException(
-{I}"Expected the transformed value to be a {item_interface_name}, " +
-{I}$"but got: {{{transformed_name}}}"
-);"""
-                        )
-                    )
-
-                    item_exprs.append(Stripped(casted_name))
-
-                elif isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                    # A named union has its own ``Transform`` overload (see
-                    # :py:func:`_generate_union_transform_helper`),
-                    # which already returns the union's own type, so no
-                    # downcast (and hence no pre-statement) is needed here,
-                    # unlike the class branch above.
-                    any_transformable_item = True
-
-                    item_exprs.append(Stripped(f"Transform({item_access})"))
-
-                else:
-                    item_exprs.append(item_access)
-
-            if not any_transformable_item:
-                # We can not enhance any of the tuple items; nothing to do here.
-                continue
-
-            tuple_literal = csharp_common.generate_tuple_literal(item_exprs)
-
-            if len(pre_stmts) == 0:
-                wrap_stmt = Stripped(f"that.{prop_name} = {tuple_literal};")
-            else:
-                joined_pre_stmts = "\n\n".join(pre_stmts)
-                wrap_stmt = Stripped(
-                    f"""\
-{joined_pre_stmts}
-that.{prop_name} = {tuple_literal};"""
-                )
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # We can not enhance a JSON-able value; nothing to do here.
-            continue
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives, constrained primitives and enumeration
-            # literals, so we can not enhance any of its items; nothing to do here.
-            continue
-
-        else:
-            assert_never(type_anno)
+        wrap_stmt = Stripped(f"that.{prop_name} = {wrap_expr};")
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             condition = (
@@ -613,8 +497,69 @@ internal Wrapper(
     for cls in symbol_table.concrete_classes:
         blocks.append(_generate_transform(cls=cls))
 
+    container_blocks = []  # type: List[Stripped]
+    wraps_classes = False
+
+    observed_monikers = set()  # type: Set[str]
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+                    type_anno.our_type, intermediate.Class
+                ):
+                    wraps_classes = True
+                    continue
+
+                if (
+                    not isinstance(
+                        type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                    )
+                    or not descendability[type_anno]
+                ):
+                    continue
+
+                moniker = csharp_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                container_blocks.append(
+                    _generate_wrap_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
+
+    if wraps_classes:
+        blocks.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Wrap recursively <paramref name="that" /> and keep its static type.
+/// </summary>
+private T Wrap<T>(T that) where T : Our.IClass
+{{
+{I}var transformed = Transform(that);
+{I}return (transformed is T casted)
+{II}? casted
+{II}: throw new System.InvalidOperationException(
+{III}$"Expected the transformed value to be a {{typeof(T).Name}}, " +
+{III}$"but got: {{transformed}}"
+{II});
+}}"""
+            )
+        )
+
     if len(symbol_table.named_unions) > 0:
-        blocks.append(_generate_union_transform_helper())
+        blocks.append(_generate_union_wrap_helper())
+
+    blocks.extend(container_blocks)
 
     writer = io.StringIO()
     writer.write(
@@ -808,8 +753,7 @@ public class Enhancer<TEnhancement>
     using_directives.append(
         Stripped(
             """\
-using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias"""
+using System.Collections.Generic;  // can't alias"""
         )
     )
 

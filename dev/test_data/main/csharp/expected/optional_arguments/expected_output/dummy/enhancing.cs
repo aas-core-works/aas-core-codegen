@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -229,29 +228,11 @@ namespace dummy
                     );
                 }
 
-                var transformedItem = Transform(
-                    that.Item
-                );
-                var castedItem = (
-                    transformedItem as Our.IItem
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IItem, " +
-                    $"but got: {transformedItem}"
-                );
-                that.Item = castedItem;
+                that.Item = Wrap(that.Item);
 
                 if (that.OptionalItem != null)
                 {
-                    var transformedOptionalItem = Transform(
-                        that.OptionalItem
-                    );
-                    var castedOptionalItem = (
-                        transformedOptionalItem as Our.IItem
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IItem, " +
-                        $"but got: {transformedOptionalItem}"
-                    );
-                    that.OptionalItem = castedOptionalItem;
+                    that.OptionalItem = Wrap(that.OptionalItem);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -260,6 +241,20 @@ namespace dummy
                     : new EnhancedSomething<TEnhancement>(
                         that,
                         enhancement
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
                     );
             }
         }

@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -438,20 +437,7 @@ namespace dummy
                     );
                 }
 
-                that.LangStrings = (
-                    that.LangStrings
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.ILangString
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a ILangString, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.LangStrings = Wrap_ListOf_ILangString(that.LangStrings);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -475,20 +461,7 @@ namespace dummy
 
                 if (that.Definition != null)
                 {
-                    that.Definition = (
-                        that.Definition
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ILangString
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ILangString, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Definition = Wrap_ListOf_ILangString(that.Definition);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -531,16 +504,7 @@ namespace dummy
                     );
                 }
 
-                var transformedContent = Transform(
-                    that.Content
-                );
-                var castedContent = (
-                    transformedContent as Our.IContent
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IContent, " +
-                    $"but got: {transformedContent}"
-                );
-                that.Content = castedContent;
+                that.Content = Wrap(that.Content);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -562,37 +526,11 @@ namespace dummy
                     );
                 }
 
-                that.LangStringSets = (
-                    that.LangStringSets
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.ILangStringSet
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a ILangStringSet, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.LangStringSets = Wrap_ListOf_ILangStringSet(that.LangStringSets);
 
                 if (that.Specifications != null)
                 {
-                    that.Specifications = (
-                        that.Specifications
-                        .Select(
-                            (item) => {
-                                var transformed = Transform(item);
-                                return (
-                                    transformed as Our.ISpecification
-                                ) ?? throw new System.InvalidOperationException(
-                                    "Expected the transformed item to be a ISpecification, " +
-                                    $"but got: {transformed}"
-                                );
-                            }
-                        )
-                    ).ToList();
+                    that.Specifications = Wrap_ListOf_ISpecification(that.Specifications);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -602,6 +540,65 @@ namespace dummy
                         that,
                         enhancement
                     );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ILangString> Wrap_ListOf_ILangString(
+                List<Our.ILangString> that)
+            {
+                var result = new List<Our.ILangString>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ILangStringSet> Wrap_ListOf_ILangStringSet(
+                List<Our.ILangStringSet> that)
+            {
+                var result = new List<Our.ILangStringSet>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ISpecification> Wrap_ListOf_ISpecification(
+                List<Our.ISpecification> that)
+            {
+                var result = new List<Our.ISpecification>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
             }
         }
 
