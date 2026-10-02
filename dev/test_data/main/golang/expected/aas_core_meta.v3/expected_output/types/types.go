@@ -150,7 +150,7 @@ type IClass interface {
 	// Apply the action on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// We do not recurse into the referenced instances.
 	//
@@ -160,7 +160,7 @@ type IClass interface {
 	// Apply the action recursively on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// The action is not applied on this instance.
 	Descend(action func(IClass) bool) (abort bool)
@@ -393,7 +393,7 @@ func (e *Extension) ValueTypeOrDefault() DataTypeDefXSD {
 // Apply the action on the instances referenced from e.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -401,89 +401,70 @@ func (e *Extension) ValueTypeOrDefault() DataTypeDefXSD {
 func (e *Extension) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if e.semanticID != nil {
-		abort = action(
-			e.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if e.supplementalSemanticIDs != nil {
-		for _, v := range e.supplementalSemanticIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.refersTo != nil {
-		for _, v1 := range e.refersTo {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Extension(e, action, false)
 }
 
 // Apply the action recursively on the instances referenced from e.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on e.
 func (e *Extension) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if e.semanticID != nil {
+	return descend_Extension(e, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Extension(
+	that *Extension,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.semanticID != nil {
 		abort = action(
-			e.semanticID,
+			that.semanticID,
 		)
 		if abort {
 			return
 		}
-		abort = e.semanticID.Descend(
+
+		if recurse {
+			abort = that.semanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if e.supplementalSemanticIDs != nil {
-		for _, v := range e.supplementalSemanticIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
-
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.refersTo != nil {
-		for _, v1 := range e.refersTo {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.refersTo != nil {
+		abort = descend_ListOf_IReference(
+			that.refersTo,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -970,7 +951,7 @@ func (ai *AdministrativeInformation) ModelType(
 // Apply the action on the instances referenced from ai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -978,64 +959,59 @@ func (ai *AdministrativeInformation) ModelType(
 func (ai *AdministrativeInformation) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if ai.embeddedDataSpecifications != nil {
-		for _, v := range ai.embeddedDataSpecifications {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if ai.creator != nil {
-		abort = action(
-			ai.creator,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_AdministrativeInformation(ai, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ai.
 func (ai *AdministrativeInformation) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if ai.embeddedDataSpecifications != nil {
-		for _, v := range ai.embeddedDataSpecifications {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_AdministrativeInformation(ai, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_AdministrativeInformation(
+	that *AdministrativeInformation,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if ai.creator != nil {
+	if that.creator != nil {
 		abort = action(
-			ai.creator,
+			that.creator,
 		)
 		if abort {
 			return
 		}
-		abort = ai.creator.Descend(
-			action,
-		)
-		if abort {
-			return
+
+		if recurse {
+			abort = that.creator.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -1332,7 +1308,7 @@ func (q *Qualifier) KindOrDefault() QualifierKind {
 // Apply the action on the instances referenced from q.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -1340,88 +1316,77 @@ func (q *Qualifier) KindOrDefault() QualifierKind {
 func (q *Qualifier) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if q.semanticID != nil {
-		abort = action(
-			q.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if q.supplementalSemanticIDs != nil {
-		for _, v := range q.supplementalSemanticIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if q.valueID != nil {
-		abort = action(
-			q.valueID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_Qualifier(q, action, false)
 }
 
 // Apply the action recursively on the instances referenced from q.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on q.
 func (q *Qualifier) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if q.semanticID != nil {
+	return descend_Qualifier(q, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Qualifier(
+	that *Qualifier,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.semanticID != nil {
 		abort = action(
-			q.semanticID,
+			that.semanticID,
 		)
 		if abort {
 			return
 		}
-		abort = q.semanticID.Descend(
-			action,
-		)
-		if abort {
-			return
-		}
-	}
 
-	if q.supplementalSemanticIDs != nil {
-		for _, v := range q.supplementalSemanticIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
-
-			abort = v.Descend(
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if q.valueID != nil {
-		abort = action(
-			q.valueID,
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
-		abort = q.valueID.Descend(
-			action,
+	}
+
+	if that.valueID != nil {
+		abort = action(
+			that.valueID,
 		)
 		if abort {
 			return
+		}
+
+		if recurse {
+			abort = that.valueID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -1635,7 +1600,7 @@ func (aas *AssetAdministrationShell) ModelType(
 // Apply the action on the instances referenced from aas.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -1643,208 +1608,137 @@ func (aas *AssetAdministrationShell) ModelType(
 func (aas *AssetAdministrationShell) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if aas.extensions != nil {
-		for _, v := range aas.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.displayName != nil {
-		for _, v1 := range aas.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.description != nil {
-		for _, v2 := range aas.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.administration != nil {
-		abort = action(
-			aas.administration,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if aas.embeddedDataSpecifications != nil {
-		for _, v3 := range aas.embeddedDataSpecifications {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.derivedFrom != nil {
-		abort = action(
-			aas.derivedFrom,
-		)
-		if abort {
-			return
-		}
-	}
-
-	abort = action(
-		aas.assetInformation,
-	)
-	if abort {
-		return
-	}
-
-	if aas.submodels != nil {
-		for _, v4 := range aas.submodels {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_AssetAdministrationShell(aas, action, false)
 }
 
 // Apply the action recursively on the instances referenced from aas.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on aas.
 func (aas *AssetAdministrationShell) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if aas.extensions != nil {
-		for _, v := range aas.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_AssetAdministrationShell(aas, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.displayName != nil {
-		for _, v1 := range aas.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.description != nil {
-		for _, v2 := range aas.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.administration != nil {
-		abort = action(
-			aas.administration,
-		)
-		if abort {
-			return
-		}
-		abort = aas.administration.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_AssetAdministrationShell(
+	that *AssetAdministrationShell,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if aas.embeddedDataSpecifications != nil {
-		for _, v3 := range aas.embeddedDataSpecifications {
-			abort = action(v3);
-			if abort {
-				return
-			}
-
-			abort = v3.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if aas.derivedFrom != nil {
-		abort = action(
-			aas.derivedFrom,
-		)
-		if abort {
-			return
-		}
-		abort = aas.derivedFrom.Descend(
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
 			action,
+			recurse,
 		)
 		if abort {
 			return
+		}
+	}
+
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.administration != nil {
+		abort = action(
+			that.administration,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.administration.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.derivedFrom != nil {
+		abort = action(
+			that.derivedFrom,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.derivedFrom.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
 	abort = action(
-		aas.assetInformation,
-	)
-	if abort {
-		return
-	}
-	abort = aas.assetInformation.Descend(
-		action,
+		that.assetInformation,
 	)
 	if abort {
 		return
 	}
 
-	if aas.submodels != nil {
-		for _, v4 := range aas.submodels {
-			abort = action(v4);
-			if abort {
-				return
-			}
+	if recurse {
+		abort = that.assetInformation.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.submodels != nil {
+		abort = descend_ListOf_IReference(
+			that.submodels,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -2043,7 +1937,7 @@ func (ai *AssetInformation) ModelType(
 // Apply the action on the instances referenced from ai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -2051,64 +1945,59 @@ func (ai *AssetInformation) ModelType(
 func (ai *AssetInformation) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if ai.specificAssetIDs != nil {
-		for _, v := range ai.specificAssetIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if ai.defaultThumbnail != nil {
-		abort = action(
-			ai.defaultThumbnail,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_AssetInformation(ai, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ai.
 func (ai *AssetInformation) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if ai.specificAssetIDs != nil {
-		for _, v := range ai.specificAssetIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_AssetInformation(ai, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_AssetInformation(
+	that *AssetInformation,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.specificAssetIDs != nil {
+		abort = descend_ListOf_ISpecificAssetID(
+			that.specificAssetIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if ai.defaultThumbnail != nil {
+	if that.defaultThumbnail != nil {
 		abort = action(
-			ai.defaultThumbnail,
+			that.defaultThumbnail,
 		)
 		if abort {
 			return
 		}
-		abort = ai.defaultThumbnail.Descend(
-			action,
-		)
-		if abort {
-			return
+
+		if recurse {
+			abort = that.defaultThumbnail.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -2201,7 +2090,7 @@ func (r *Resource) ModelType(
 // Apply the action on the instances referenced from r.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -2209,19 +2098,32 @@ func (r *Resource) ModelType(
 func (r *Resource) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_Resource(r, action, false)
 }
 
 // Apply the action recursively on the instances referenced from r.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on r.
 func (r *Resource) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_Resource(r, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Resource(
+	that *Resource,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -2380,7 +2282,7 @@ func (sai *SpecificAssetID) ModelType(
 // Apply the action on the instances referenced from sai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -2388,88 +2290,77 @@ func (sai *SpecificAssetID) ModelType(
 func (sai *SpecificAssetID) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if sai.semanticID != nil {
-		abort = action(
-			sai.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if sai.supplementalSemanticIDs != nil {
-		for _, v := range sai.supplementalSemanticIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sai.externalSubjectID != nil {
-		abort = action(
-			sai.externalSubjectID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_SpecificAssetID(sai, action, false)
 }
 
 // Apply the action recursively on the instances referenced from sai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on sai.
 func (sai *SpecificAssetID) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if sai.semanticID != nil {
+	return descend_SpecificAssetID(sai, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_SpecificAssetID(
+	that *SpecificAssetID,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.semanticID != nil {
 		abort = action(
-			sai.semanticID,
+			that.semanticID,
 		)
 		if abort {
 			return
 		}
-		abort = sai.semanticID.Descend(
-			action,
-		)
-		if abort {
-			return
-		}
-	}
 
-	if sai.supplementalSemanticIDs != nil {
-		for _, v := range sai.supplementalSemanticIDs {
-			abort = action(v);
-			if abort {
-				return
-			}
-
-			abort = v.Descend(
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if sai.externalSubjectID != nil {
-		abort = action(
-			sai.externalSubjectID,
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
-		abort = sai.externalSubjectID.Descend(
-			action,
+	}
+
+	if that.externalSubjectID != nil {
+		abort = action(
+			that.externalSubjectID,
 		)
 		if abort {
 			return
+		}
+
+		if recurse {
+			abort = that.externalSubjectID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -2709,7 +2600,7 @@ func (s *Submodel) KindOrDefault() ModellingKind {
 // Apply the action on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -2717,238 +2608,143 @@ func (s *Submodel) KindOrDefault() ModellingKind {
 func (s *Submodel) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if s.extensions != nil {
-		for _, v := range s.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.displayName != nil {
-		for _, v1 := range s.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.description != nil {
-		for _, v2 := range s.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.administration != nil {
-		abort = action(
-			s.administration,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if s.semanticID != nil {
-		abort = action(
-			s.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if s.supplementalSemanticIDs != nil {
-		for _, v3 := range s.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.qualifiers != nil {
-		for _, v4 := range s.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.embeddedDataSpecifications != nil {
-		for _, v5 := range s.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.submodelElements != nil {
-		for _, v6 := range s.submodelElements {
-			abort = action(v6);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Submodel(s, action, false)
 }
 
 // Apply the action recursively on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on s.
 func (s *Submodel) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if s.extensions != nil {
-		for _, v := range s.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Submodel(s, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.displayName != nil {
-		for _, v1 := range s.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.description != nil {
-		for _, v2 := range s.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if s.administration != nil {
-		abort = action(
-			s.administration,
-		)
-		if abort {
-			return
-		}
-		abort = s.administration.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Submodel(
+	that *Submodel,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if s.semanticID != nil {
-		abort = action(
-			s.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = s.semanticID.Descend(
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if s.supplementalSemanticIDs != nil {
-		for _, v3 := range s.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.administration != nil {
+		abort = action(
+			that.administration,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.administration.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if s.qualifiers != nil {
-		for _, v4 := range s.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
 
-			abort = v4.Descend(
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if s.embeddedDataSpecifications != nil {
-		for _, v5 := range s.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if s.submodelElements != nil {
-		for _, v6 := range s.submodelElements {
-			abort = action(v6);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v6.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.submodelElements != nil {
+		abort = descend_ListOf_ISubmodelElement(
+			that.submodelElements,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -3220,7 +3016,7 @@ func (re *RelationshipElement) ModelType(
 // Apply the action on the instances referenced from re.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -3228,151 +3024,126 @@ func (re *RelationshipElement) ModelType(
 func (re *RelationshipElement) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if re.extensions != nil {
-		for _, v := range re.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.displayName != nil {
-		for _, v1 := range re.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.description != nil {
-		for _, v2 := range re.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.semanticID != nil {
-		abort = action(
-			re.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if re.supplementalSemanticIDs != nil {
-		for _, v3 := range re.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.qualifiers != nil {
-		for _, v4 := range re.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.embeddedDataSpecifications != nil {
-		for _, v5 := range re.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	abort = action(
-		re.first,
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
-		re.second,
-	)
-	if abort {
-		return
-	}
-
-	return
+	return descend_RelationshipElement(re, action, false)
 }
 
 // Apply the action recursively on the instances referenced from re.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on re.
 func (re *RelationshipElement) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if re.extensions != nil {
-		for _, v := range re.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_RelationshipElement(re, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.displayName != nil {
-		for _, v1 := range re.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.description != nil {
-		for _, v2 := range re.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.semanticID != nil {
-		abort = action(
-			re.semanticID,
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_RelationshipElement(
+	that *RelationshipElement,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
+			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
-		abort = re.semanticID.Descend(
+	}
+
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	abort = action(
+		that.first,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.first.Descend(
 			action,
 		)
 		if abort {
@@ -3380,78 +3151,20 @@ func (re *RelationshipElement) Descend(
 		}
 	}
 
-	if re.supplementalSemanticIDs != nil {
-		for _, v3 := range re.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-
-			abort = v3.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.qualifiers != nil {
-		for _, v4 := range re.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.embeddedDataSpecifications != nil {
-		for _, v5 := range re.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
 	abort = action(
-		re.first,
-	)
-	if abort {
-		return
-	}
-	abort = re.first.Descend(
-		action,
+		that.second,
 	)
 	if abort {
 		return
 	}
 
-	abort = action(
-		re.second,
-	)
-	if abort {
-		return
-	}
-	abort = re.second.Descend(
-		action,
-	)
-	if abort {
-		return
+	if recurse {
+		abort = that.second.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
 	}
 
 	return
@@ -3809,7 +3522,7 @@ func (sel *SubmodelElementList) OrderRelevantOrDefault() bool {
 // Apply the action on the instances referenced from sel.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -3817,238 +3530,143 @@ func (sel *SubmodelElementList) OrderRelevantOrDefault() bool {
 func (sel *SubmodelElementList) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if sel.extensions != nil {
-		for _, v := range sel.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.displayName != nil {
-		for _, v1 := range sel.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.description != nil {
-		for _, v2 := range sel.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.semanticID != nil {
-		abort = action(
-			sel.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if sel.supplementalSemanticIDs != nil {
-		for _, v3 := range sel.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.qualifiers != nil {
-		for _, v4 := range sel.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.embeddedDataSpecifications != nil {
-		for _, v5 := range sel.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.semanticIDListElement != nil {
-		abort = action(
-			sel.semanticIDListElement,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if sel.value != nil {
-		for _, v6 := range sel.value {
-			abort = action(v6);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_SubmodelElementList(sel, action, false)
 }
 
 // Apply the action recursively on the instances referenced from sel.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on sel.
 func (sel *SubmodelElementList) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if sel.extensions != nil {
-		for _, v := range sel.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_SubmodelElementList(sel, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.displayName != nil {
-		for _, v1 := range sel.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.description != nil {
-		for _, v2 := range sel.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.semanticID != nil {
-		abort = action(
-			sel.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = sel.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_SubmodelElementList(
+	that *SubmodelElementList,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if sel.supplementalSemanticIDs != nil {
-		for _, v3 := range sel.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-
-			abort = v3.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.qualifiers != nil {
-		for _, v4 := range sel.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.embeddedDataSpecifications != nil {
-		for _, v5 := range sel.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sel.semanticIDListElement != nil {
-		abort = action(
-			sel.semanticIDListElement,
-		)
-		if abort {
-			return
-		}
-		abort = sel.semanticIDListElement.Descend(
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if sel.value != nil {
-		for _, v6 := range sel.value {
-			abort = action(v6);
-			if abort {
-				return
-			}
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v6.Descend(
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
+		}
+	}
+
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticIDListElement != nil {
+		abort = action(
+			that.semanticIDListElement,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticIDListElement.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.value != nil {
+		abort = descend_ListOf_ISubmodelElement(
+			that.value,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4235,7 +3853,7 @@ func (sec *SubmodelElementCollection) ModelType(
 // Apply the action on the instances referenced from sec.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -4243,214 +3861,125 @@ func (sec *SubmodelElementCollection) ModelType(
 func (sec *SubmodelElementCollection) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if sec.extensions != nil {
-		for _, v := range sec.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.displayName != nil {
-		for _, v1 := range sec.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.description != nil {
-		for _, v2 := range sec.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.semanticID != nil {
-		abort = action(
-			sec.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if sec.supplementalSemanticIDs != nil {
-		for _, v3 := range sec.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.qualifiers != nil {
-		for _, v4 := range sec.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.embeddedDataSpecifications != nil {
-		for _, v5 := range sec.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.value != nil {
-		for _, v6 := range sec.value {
-			abort = action(v6);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_SubmodelElementCollection(sec, action, false)
 }
 
 // Apply the action recursively on the instances referenced from sec.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on sec.
 func (sec *SubmodelElementCollection) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if sec.extensions != nil {
-		for _, v := range sec.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_SubmodelElementCollection(sec, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.displayName != nil {
-		for _, v1 := range sec.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.description != nil {
-		for _, v2 := range sec.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if sec.semanticID != nil {
-		abort = action(
-			sec.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = sec.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_SubmodelElementCollection(
+	that *SubmodelElementCollection,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if sec.supplementalSemanticIDs != nil {
-		for _, v3 := range sec.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if sec.qualifiers != nil {
-		for _, v4 := range sec.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if sec.embeddedDataSpecifications != nil {
-		for _, v5 := range sec.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if sec.value != nil {
-		for _, v6 := range sec.value {
-			abort = action(v6);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v6.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.value != nil {
+		abort = descend_ListOf_ISubmodelElement(
+			that.value,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -4730,7 +4259,7 @@ func (p *Property) CategoryOrDefault() string {
 // Apply the action on the instances referenced from p.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -4738,213 +4267,132 @@ func (p *Property) CategoryOrDefault() string {
 func (p *Property) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if p.extensions != nil {
-		for _, v := range p.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.displayName != nil {
-		for _, v1 := range p.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.description != nil {
-		for _, v2 := range p.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.semanticID != nil {
-		abort = action(
-			p.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if p.supplementalSemanticIDs != nil {
-		for _, v3 := range p.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.qualifiers != nil {
-		for _, v4 := range p.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.embeddedDataSpecifications != nil {
-		for _, v5 := range p.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.valueID != nil {
-		abort = action(
-			p.valueID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_Property(p, action, false)
 }
 
 // Apply the action recursively on the instances referenced from p.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on p.
 func (p *Property) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if p.extensions != nil {
-		for _, v := range p.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Property(p, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.displayName != nil {
-		for _, v1 := range p.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.description != nil {
-		for _, v2 := range p.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.semanticID != nil {
-		abort = action(
-			p.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = p.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Property(
+	that *Property,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if p.supplementalSemanticIDs != nil {
-		for _, v3 := range p.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-
-			abort = v3.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.qualifiers != nil {
-		for _, v4 := range p.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.embeddedDataSpecifications != nil {
-		for _, v5 := range p.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if p.valueID != nil {
-		abort = action(
-			p.valueID,
-		)
-		if abort {
-			return
-		}
-		abort = p.valueID.Descend(
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
 			action,
+			recurse,
 		)
 		if abort {
 			return
+		}
+	}
+
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.valueID != nil {
+		abort = action(
+			that.valueID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.valueID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -5167,7 +4615,7 @@ func (mlp *MultiLanguageProperty) CategoryOrDefault() string {
 // Apply the action on the instances referenced from mlp.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -5175,238 +4623,143 @@ func (mlp *MultiLanguageProperty) CategoryOrDefault() string {
 func (mlp *MultiLanguageProperty) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if mlp.extensions != nil {
-		for _, v := range mlp.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.displayName != nil {
-		for _, v1 := range mlp.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.description != nil {
-		for _, v2 := range mlp.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.semanticID != nil {
-		abort = action(
-			mlp.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if mlp.supplementalSemanticIDs != nil {
-		for _, v3 := range mlp.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.qualifiers != nil {
-		for _, v4 := range mlp.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.embeddedDataSpecifications != nil {
-		for _, v5 := range mlp.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.value != nil {
-		for _, v6 := range mlp.value {
-			abort = action(v6);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.valueID != nil {
-		abort = action(
-			mlp.valueID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_MultiLanguageProperty(mlp, action, false)
 }
 
 // Apply the action recursively on the instances referenced from mlp.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on mlp.
 func (mlp *MultiLanguageProperty) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if mlp.extensions != nil {
-		for _, v := range mlp.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_MultiLanguageProperty(mlp, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.displayName != nil {
-		for _, v1 := range mlp.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.description != nil {
-		for _, v2 := range mlp.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.semanticID != nil {
-		abort = action(
-			mlp.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = mlp.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_MultiLanguageProperty(
+	that *MultiLanguageProperty,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if mlp.supplementalSemanticIDs != nil {
-		for _, v3 := range mlp.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-
-			abort = v3.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.qualifiers != nil {
-		for _, v4 := range mlp.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.embeddedDataSpecifications != nil {
-		for _, v5 := range mlp.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.value != nil {
-		for _, v6 := range mlp.value {
-			abort = action(v6);
-			if abort {
-				return
-			}
-
-			abort = v6.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if mlp.valueID != nil {
-		abort = action(
-			mlp.valueID,
-		)
-		if abort {
-			return
-		}
-		abort = mlp.valueID.Descend(
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
 			action,
+			recurse,
 		)
 		if abort {
 			return
+		}
+	}
+
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.value != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.value,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.valueID != nil {
+		abort = action(
+			that.valueID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.valueID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -5642,7 +4995,7 @@ func (r *Range) CategoryOrDefault() string {
 // Apply the action on the instances referenced from r.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -5650,189 +5003,114 @@ func (r *Range) CategoryOrDefault() string {
 func (r *Range) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if r.extensions != nil {
-		for _, v := range r.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.displayName != nil {
-		for _, v1 := range r.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.description != nil {
-		for _, v2 := range r.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.semanticID != nil {
-		abort = action(
-			r.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if r.supplementalSemanticIDs != nil {
-		for _, v3 := range r.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.qualifiers != nil {
-		for _, v4 := range r.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.embeddedDataSpecifications != nil {
-		for _, v5 := range r.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Range(r, action, false)
 }
 
 // Apply the action recursively on the instances referenced from r.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on r.
 func (r *Range) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if r.extensions != nil {
-		for _, v := range r.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Range(r, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.displayName != nil {
-		for _, v1 := range r.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.description != nil {
-		for _, v2 := range r.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if r.semanticID != nil {
-		abort = action(
-			r.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = r.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Range(
+	that *Range,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if r.supplementalSemanticIDs != nil {
-		for _, v3 := range r.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if r.qualifiers != nil {
-		for _, v4 := range r.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if r.embeddedDataSpecifications != nil {
-		for _, v5 := range r.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6033,7 +5311,7 @@ func (re *ReferenceElement) CategoryOrDefault() string {
 // Apply the action on the instances referenced from re.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -6041,213 +5319,132 @@ func (re *ReferenceElement) CategoryOrDefault() string {
 func (re *ReferenceElement) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if re.extensions != nil {
-		for _, v := range re.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.displayName != nil {
-		for _, v1 := range re.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.description != nil {
-		for _, v2 := range re.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.semanticID != nil {
-		abort = action(
-			re.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if re.supplementalSemanticIDs != nil {
-		for _, v3 := range re.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.qualifiers != nil {
-		for _, v4 := range re.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.embeddedDataSpecifications != nil {
-		for _, v5 := range re.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.value != nil {
-		abort = action(
-			re.value,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_ReferenceElement(re, action, false)
 }
 
 // Apply the action recursively on the instances referenced from re.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on re.
 func (re *ReferenceElement) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if re.extensions != nil {
-		for _, v := range re.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_ReferenceElement(re, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.displayName != nil {
-		for _, v1 := range re.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.description != nil {
-		for _, v2 := range re.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.semanticID != nil {
-		abort = action(
-			re.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = re.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_ReferenceElement(
+	that *ReferenceElement,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if re.supplementalSemanticIDs != nil {
-		for _, v3 := range re.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-
-			abort = v3.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.qualifiers != nil {
-		for _, v4 := range re.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.embeddedDataSpecifications != nil {
-		for _, v5 := range re.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if re.value != nil {
-		abort = action(
-			re.value,
-		)
-		if abort {
-			return
-		}
-		abort = re.value.Descend(
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
 			action,
+			recurse,
 		)
 		if abort {
 			return
+		}
+	}
+
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.value != nil {
+		abort = action(
+			that.value,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.value.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -6470,7 +5667,7 @@ func (b *Blob) CategoryOrDefault() string {
 // Apply the action on the instances referenced from b.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -6478,189 +5675,114 @@ func (b *Blob) CategoryOrDefault() string {
 func (b *Blob) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if b.extensions != nil {
-		for _, v := range b.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.displayName != nil {
-		for _, v1 := range b.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.description != nil {
-		for _, v2 := range b.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.semanticID != nil {
-		abort = action(
-			b.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if b.supplementalSemanticIDs != nil {
-		for _, v3 := range b.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.qualifiers != nil {
-		for _, v4 := range b.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.embeddedDataSpecifications != nil {
-		for _, v5 := range b.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Blob(b, action, false)
 }
 
 // Apply the action recursively on the instances referenced from b.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on b.
 func (b *Blob) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if b.extensions != nil {
-		for _, v := range b.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Blob(b, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.displayName != nil {
-		for _, v1 := range b.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.description != nil {
-		for _, v2 := range b.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if b.semanticID != nil {
-		abort = action(
-			b.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = b.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Blob(
+	that *Blob,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if b.supplementalSemanticIDs != nil {
-		for _, v3 := range b.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if b.qualifiers != nil {
-		for _, v4 := range b.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if b.embeddedDataSpecifications != nil {
-		for _, v5 := range b.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -6881,7 +6003,7 @@ func (f *File) CategoryOrDefault() string {
 // Apply the action on the instances referenced from f.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -6889,189 +6011,114 @@ func (f *File) CategoryOrDefault() string {
 func (f *File) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if f.extensions != nil {
-		for _, v := range f.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.displayName != nil {
-		for _, v1 := range f.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.description != nil {
-		for _, v2 := range f.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.semanticID != nil {
-		abort = action(
-			f.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if f.supplementalSemanticIDs != nil {
-		for _, v3 := range f.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.qualifiers != nil {
-		for _, v4 := range f.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.embeddedDataSpecifications != nil {
-		for _, v5 := range f.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_File(f, action, false)
 }
 
 // Apply the action recursively on the instances referenced from f.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on f.
 func (f *File) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if f.extensions != nil {
-		for _, v := range f.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_File(f, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.displayName != nil {
-		for _, v1 := range f.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.description != nil {
-		for _, v2 := range f.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if f.semanticID != nil {
-		abort = action(
-			f.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = f.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_File(
+	that *File,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if f.supplementalSemanticIDs != nil {
-		for _, v3 := range f.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if f.qualifiers != nil {
-		for _, v4 := range f.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if f.embeddedDataSpecifications != nil {
-		for _, v5 := range f.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7280,7 +6327,7 @@ func (are *AnnotatedRelationshipElement) ModelType(
 // Apply the action on the instances referenced from are.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -7288,160 +6335,126 @@ func (are *AnnotatedRelationshipElement) ModelType(
 func (are *AnnotatedRelationshipElement) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if are.extensions != nil {
-		for _, v := range are.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.displayName != nil {
-		for _, v1 := range are.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.description != nil {
-		for _, v2 := range are.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.semanticID != nil {
-		abort = action(
-			are.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if are.supplementalSemanticIDs != nil {
-		for _, v3 := range are.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.qualifiers != nil {
-		for _, v4 := range are.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.embeddedDataSpecifications != nil {
-		for _, v5 := range are.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	abort = action(
-		are.first,
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
-		are.second,
-	)
-	if abort {
-		return
-	}
-
-	if are.annotations != nil {
-		for _, v6 := range are.annotations {
-			abort = action(v6);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_AnnotatedRelationshipElement(are, action, false)
 }
 
 // Apply the action recursively on the instances referenced from are.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on are.
 func (are *AnnotatedRelationshipElement) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if are.extensions != nil {
-		for _, v := range are.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_AnnotatedRelationshipElement(are, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.displayName != nil {
-		for _, v1 := range are.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.description != nil {
-		for _, v2 := range are.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.semanticID != nil {
-		abort = action(
-			are.semanticID,
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_AnnotatedRelationshipElement(
+	that *AnnotatedRelationshipElement,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
+			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
-		abort = are.semanticID.Descend(
+	}
+
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	abort = action(
+		that.first,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.first.Descend(
 			action,
 		)
 		if abort {
@@ -7449,93 +6462,30 @@ func (are *AnnotatedRelationshipElement) Descend(
 		}
 	}
 
-	if are.supplementalSemanticIDs != nil {
-		for _, v3 := range are.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-
-			abort = v3.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.qualifiers != nil {
-		for _, v4 := range are.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if are.embeddedDataSpecifications != nil {
-		for _, v5 := range are.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
 	abort = action(
-		are.first,
-	)
-	if abort {
-		return
-	}
-	abort = are.first.Descend(
-		action,
+		that.second,
 	)
 	if abort {
 		return
 	}
 
-	abort = action(
-		are.second,
-	)
-	if abort {
-		return
-	}
-	abort = are.second.Descend(
-		action,
-	)
-	if abort {
-		return
+	if recurse {
+		abort = that.second.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
 	}
 
-	if are.annotations != nil {
-		for _, v6 := range are.annotations {
-			abort = action(v6);
-			if abort {
-				return
-			}
-
-			abort = v6.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.annotations != nil {
+		abort = descend_ListOf_IDataElement(
+			that.annotations,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -7786,7 +6736,7 @@ func (e *Entity) ModelType(
 // Apply the action on the instances referenced from e.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -7794,239 +6744,136 @@ func (e *Entity) ModelType(
 func (e *Entity) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if e.extensions != nil {
-		for _, v := range e.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.displayName != nil {
-		for _, v1 := range e.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.description != nil {
-		for _, v2 := range e.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.semanticID != nil {
-		abort = action(
-			e.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if e.supplementalSemanticIDs != nil {
-		for _, v3 := range e.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.qualifiers != nil {
-		for _, v4 := range e.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.embeddedDataSpecifications != nil {
-		for _, v5 := range e.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.statements != nil {
-		for _, v6 := range e.statements {
-			abort = action(v6);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.specificAssetIDs != nil {
-		for _, v7 := range e.specificAssetIDs {
-			abort = action(v7);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Entity(e, action, false)
 }
 
 // Apply the action recursively on the instances referenced from e.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on e.
 func (e *Entity) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if e.extensions != nil {
-		for _, v := range e.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Entity(e, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.displayName != nil {
-		for _, v1 := range e.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.description != nil {
-		for _, v2 := range e.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.semanticID != nil {
-		abort = action(
-			e.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = e.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Entity(
+	that *Entity,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if e.supplementalSemanticIDs != nil {
-		for _, v3 := range e.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if e.qualifiers != nil {
-		for _, v4 := range e.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if e.embeddedDataSpecifications != nil {
-		for _, v5 := range e.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if e.statements != nil {
-		for _, v6 := range e.statements {
-			abort = action(v6);
-			if abort {
-				return
-			}
-
-			abort = v6.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if e.specificAssetIDs != nil {
-		for _, v7 := range e.specificAssetIDs {
-			abort = action(v7);
-			if abort {
-				return
-			}
+	if that.statements != nil {
+		abort = descend_ListOf_ISubmodelElement(
+			that.statements,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v7.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.specificAssetIDs != nil {
+		abort = descend_ListOf_ISpecificAssetID(
+			that.specificAssetIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -8320,7 +7167,7 @@ func (ep *EventPayload) ModelType(
 // Apply the action on the instances referenced from ep.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -8328,108 +7175,76 @@ func (ep *EventPayload) ModelType(
 func (ep *EventPayload) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		ep.source,
-	)
-	if abort {
-		return
-	}
-
-	if ep.sourceSemanticID != nil {
-		abort = action(
-			ep.sourceSemanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	abort = action(
-		ep.observableReference,
-	)
-	if abort {
-		return
-	}
-
-	if ep.observableSemanticID != nil {
-		abort = action(
-			ep.observableSemanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if ep.subjectID != nil {
-		abort = action(
-			ep.subjectID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_EventPayload(ep, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ep.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ep.
 func (ep *EventPayload) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
+	return descend_EventPayload(ep, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_EventPayload(
+	that *EventPayload,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
 	abort = action(
-		ep.source,
-	)
-	if abort {
-		return
-	}
-	abort = ep.source.Descend(
-		action,
+		that.source,
 	)
 	if abort {
 		return
 	}
 
-	if ep.sourceSemanticID != nil {
-		abort = action(
-			ep.sourceSemanticID,
-		)
-		if abort {
-			return
-		}
-		abort = ep.sourceSemanticID.Descend(
+	if recurse {
+		abort = that.source.Descend(
 			action,
 		)
 		if abort {
 			return
+		}
+	}
+
+	if that.sourceSemanticID != nil {
+		abort = action(
+			that.sourceSemanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.sourceSemanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
 	abort = action(
-		ep.observableReference,
-	)
-	if abort {
-		return
-	}
-	abort = ep.observableReference.Descend(
-		action,
+		that.observableReference,
 	)
 	if abort {
 		return
 	}
 
-	if ep.observableSemanticID != nil {
-		abort = action(
-			ep.observableSemanticID,
-		)
-		if abort {
-			return
-		}
-		abort = ep.observableSemanticID.Descend(
+	if recurse {
+		abort = that.observableReference.Descend(
 			action,
 		)
 		if abort {
@@ -8437,18 +7252,39 @@ func (ep *EventPayload) Descend(
 		}
 	}
 
-	if ep.subjectID != nil {
+	if that.observableSemanticID != nil {
 		abort = action(
-			ep.subjectID,
+			that.observableSemanticID,
 		)
 		if abort {
 			return
 		}
-		abort = ep.subjectID.Descend(
-			action,
+
+		if recurse {
+			abort = that.observableSemanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.subjectID != nil {
+		abort = action(
+			that.subjectID,
 		)
 		if abort {
 			return
+		}
+
+		if recurse {
+			abort = that.subjectID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -8819,7 +7655,7 @@ func (bee *BasicEventElement) ModelType(
 // Apply the action on the instances referenced from bee.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -8827,233 +7663,148 @@ func (bee *BasicEventElement) ModelType(
 func (bee *BasicEventElement) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if bee.extensions != nil {
-		for _, v := range bee.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.displayName != nil {
-		for _, v1 := range bee.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.description != nil {
-		for _, v2 := range bee.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.semanticID != nil {
-		abort = action(
-			bee.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if bee.supplementalSemanticIDs != nil {
-		for _, v3 := range bee.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.qualifiers != nil {
-		for _, v4 := range bee.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.embeddedDataSpecifications != nil {
-		for _, v5 := range bee.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	abort = action(
-		bee.observed,
-	)
-	if abort {
-		return
-	}
-
-	if bee.messageBroker != nil {
-		abort = action(
-			bee.messageBroker,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_BasicEventElement(bee, action, false)
 }
 
 // Apply the action recursively on the instances referenced from bee.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on bee.
 func (bee *BasicEventElement) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if bee.extensions != nil {
-		for _, v := range bee.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_BasicEventElement(bee, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.displayName != nil {
-		for _, v1 := range bee.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.description != nil {
-		for _, v2 := range bee.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if bee.semanticID != nil {
-		abort = action(
-			bee.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = bee.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_BasicEventElement(
+	that *BasicEventElement,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if bee.supplementalSemanticIDs != nil {
-		for _, v3 := range bee.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if bee.qualifiers != nil {
-		for _, v4 := range bee.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if bee.embeddedDataSpecifications != nil {
-		for _, v5 := range bee.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
 	abort = action(
-		bee.observed,
-	)
-	if abort {
-		return
-	}
-	abort = bee.observed.Descend(
-		action,
+		that.observed,
 	)
 	if abort {
 		return
 	}
 
-	if bee.messageBroker != nil {
-		abort = action(
-			bee.messageBroker,
-		)
-		if abort {
-			return
-		}
-		abort = bee.messageBroker.Descend(
+	if recurse {
+		abort = that.observed.Descend(
 			action,
 		)
 		if abort {
 			return
+		}
+	}
+
+	if that.messageBroker != nil {
+		abort = action(
+			that.messageBroker,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.messageBroker.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -9288,7 +8039,7 @@ func (o *Operation) ModelType(
 // Apply the action on the instances referenced from o.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -9296,264 +8047,147 @@ func (o *Operation) ModelType(
 func (o *Operation) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if o.extensions != nil {
-		for _, v := range o.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.displayName != nil {
-		for _, v1 := range o.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.description != nil {
-		for _, v2 := range o.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.semanticID != nil {
-		abort = action(
-			o.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if o.supplementalSemanticIDs != nil {
-		for _, v3 := range o.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.qualifiers != nil {
-		for _, v4 := range o.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.embeddedDataSpecifications != nil {
-		for _, v5 := range o.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.inputVariables != nil {
-		for _, v6 := range o.inputVariables {
-			abort = action(v6);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.outputVariables != nil {
-		for _, v7 := range o.outputVariables {
-			abort = action(v7);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.inoutputVariables != nil {
-		for _, v8 := range o.inoutputVariables {
-			abort = action(v8);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Operation(o, action, false)
 }
 
 // Apply the action recursively on the instances referenced from o.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on o.
 func (o *Operation) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if o.extensions != nil {
-		for _, v := range o.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Operation(o, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.displayName != nil {
-		for _, v1 := range o.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.description != nil {
-		for _, v2 := range o.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if o.semanticID != nil {
-		abort = action(
-			o.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = o.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Operation(
+	that *Operation,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if o.supplementalSemanticIDs != nil {
-		for _, v3 := range o.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if o.qualifiers != nil {
-		for _, v4 := range o.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if o.embeddedDataSpecifications != nil {
-		for _, v5 := range o.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if o.inputVariables != nil {
-		for _, v6 := range o.inputVariables {
-			abort = action(v6);
-			if abort {
-				return
-			}
-
-			abort = v6.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if o.outputVariables != nil {
-		for _, v7 := range o.outputVariables {
-			abort = action(v7);
-			if abort {
-				return
-			}
-
-			abort = v7.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.inputVariables != nil {
+		abort = descend_ListOf_IOperationVariable(
+			that.inputVariables,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if o.inoutputVariables != nil {
-		for _, v8 := range o.inoutputVariables {
-			abort = action(v8);
-			if abort {
-				return
-			}
+	if that.outputVariables != nil {
+		abort = descend_ListOf_IOperationVariable(
+			that.outputVariables,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v8.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.inoutputVariables != nil {
+		abort = descend_ListOf_IOperationVariable(
+			that.inoutputVariables,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -9628,7 +8262,7 @@ func (ov *OperationVariable) ModelType(
 // Apply the action on the instances referenced from ov.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -9636,36 +8270,47 @@ func (ov *OperationVariable) ModelType(
 func (ov *OperationVariable) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		ov.value,
-	)
-	if abort {
-		return
-	}
-
-	return
+	return descend_OperationVariable(ov, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ov.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ov.
 func (ov *OperationVariable) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
+	return descend_OperationVariable(ov, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_OperationVariable(
+	that *OperationVariable,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
 	abort = action(
-		ov.value,
+		that.value,
 	)
 	if abort {
 		return
 	}
-	abort = ov.value.Descend(
-		action,
-	)
-	if abort {
-		return
+
+	if recurse {
+		abort = that.value.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
 	}
 
 	return
@@ -9822,7 +8467,7 @@ func (c *Capability) ModelType(
 // Apply the action on the instances referenced from c.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -9830,189 +8475,114 @@ func (c *Capability) ModelType(
 func (c *Capability) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if c.extensions != nil {
-		for _, v := range c.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.displayName != nil {
-		for _, v1 := range c.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.description != nil {
-		for _, v2 := range c.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.semanticID != nil {
-		abort = action(
-			c.semanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if c.supplementalSemanticIDs != nil {
-		for _, v3 := range c.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.qualifiers != nil {
-		for _, v4 := range c.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.embeddedDataSpecifications != nil {
-		for _, v5 := range c.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Capability(c, action, false)
 }
 
 // Apply the action recursively on the instances referenced from c.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on c.
 func (c *Capability) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if c.extensions != nil {
-		for _, v := range c.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Capability(c, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.displayName != nil {
-		for _, v1 := range c.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.description != nil {
-		for _, v2 := range c.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if c.semanticID != nil {
-		abort = action(
-			c.semanticID,
-		)
-		if abort {
-			return
-		}
-		abort = c.semanticID.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Capability(
+	that *Capability,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if c.supplementalSemanticIDs != nil {
-		for _, v3 := range c.supplementalSemanticIDs {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.semanticID != nil {
+		abort = action(
+			that.semanticID,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.semanticID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if c.qualifiers != nil {
-		for _, v4 := range c.qualifiers {
-			abort = action(v4);
-			if abort {
-				return
-			}
-
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.supplementalSemanticIDs != nil {
+		abort = descend_ListOf_IReference(
+			that.supplementalSemanticIDs,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if c.embeddedDataSpecifications != nil {
-		for _, v5 := range c.embeddedDataSpecifications {
-			abort = action(v5);
-			if abort {
-				return
-			}
+	if that.qualifiers != nil {
+		abort = descend_ListOf_IQualifier(
+			that.qualifiers,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v5.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -10243,7 +8813,7 @@ func (cd *ConceptDescription) ModelType(
 // Apply the action on the instances referenced from cd.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -10251,164 +8821,103 @@ func (cd *ConceptDescription) ModelType(
 func (cd *ConceptDescription) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if cd.extensions != nil {
-		for _, v := range cd.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if cd.displayName != nil {
-		for _, v1 := range cd.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if cd.description != nil {
-		for _, v2 := range cd.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if cd.administration != nil {
-		abort = action(
-			cd.administration,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if cd.embeddedDataSpecifications != nil {
-		for _, v3 := range cd.embeddedDataSpecifications {
-			abort = action(v3);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if cd.isCaseOf != nil {
-		for _, v4 := range cd.isCaseOf {
-			abort = action(v4);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_ConceptDescription(cd, action, false)
 }
 
 // Apply the action recursively on the instances referenced from cd.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on cd.
 func (cd *ConceptDescription) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if cd.extensions != nil {
-		for _, v := range cd.extensions {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_ConceptDescription(cd, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if cd.displayName != nil {
-		for _, v1 := range cd.displayName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if cd.description != nil {
-		for _, v2 := range cd.description {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if cd.administration != nil {
-		abort = action(
-			cd.administration,
-		)
-		if abort {
-			return
-		}
-		abort = cd.administration.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_ConceptDescription(
+	that *ConceptDescription,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.extensions != nil {
+		abort = descend_ListOf_IExtension(
+			that.extensions,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if cd.embeddedDataSpecifications != nil {
-		for _, v3 := range cd.embeddedDataSpecifications {
-			abort = action(v3);
-			if abort {
-				return
-			}
+	if that.displayName != nil {
+		abort = descend_ListOf_ILangStringNameType(
+			that.displayName,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v3.Descend(
+	if that.description != nil {
+		abort = descend_ListOf_ILangStringTextType(
+			that.description,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.administration != nil {
+		abort = action(
+			that.administration,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.administration.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if cd.isCaseOf != nil {
-		for _, v4 := range cd.isCaseOf {
-			abort = action(v4);
-			if abort {
-				return
-			}
+	if that.embeddedDataSpecifications != nil {
+		abort = descend_ListOf_IEmbeddedDataSpecification(
+			that.embeddedDataSpecifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
+		}
+	}
 
-			abort = v4.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.isCaseOf != nil {
+		abort = descend_ListOf_IReference(
+			that.isCaseOf,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -10614,7 +9123,7 @@ func (r *Reference) ModelType(
 // Apply the action on the instances referenced from r.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -10622,61 +9131,58 @@ func (r *Reference) ModelType(
 func (r *Reference) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if r.referredSemanticID != nil {
-		abort = action(
-			r.referredSemanticID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	for _, v := range r.keys {
-		abort = action(v);
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_Reference(r, action, false)
 }
 
 // Apply the action recursively on the instances referenced from r.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on r.
 func (r *Reference) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if r.referredSemanticID != nil {
+	return descend_Reference(r, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Reference(
+	that *Reference,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.referredSemanticID != nil {
 		abort = action(
-			r.referredSemanticID,
+			that.referredSemanticID,
 		)
 		if abort {
 			return
 		}
-		abort = r.referredSemanticID.Descend(
-			action,
-		)
-		if abort {
-			return
+
+		if recurse {
+			abort = that.referredSemanticID.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
-	for _, v := range r.keys {
-		abort = action(v);
-		if abort {
-			return
-		}
-
-		abort = v.Descend(
-			action,
-		);
-		if abort {
-			return
-		}
+	abort = descend_ListOf_IKey(
+		that.keys,
+		action,
+		recurse,
+	)
+	if abort {
+		return
 	}
 
 	return
@@ -10772,7 +9278,7 @@ func (k *Key) ModelType(
 // Apply the action on the instances referenced from k.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -10780,19 +9286,32 @@ func (k *Key) ModelType(
 func (k *Key) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_Key(k, action, false)
 }
 
 // Apply the action recursively on the instances referenced from k.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on k.
 func (k *Key) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_Key(k, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Key(
+	that *Key,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -11063,7 +9582,7 @@ func (lsnt *LangStringNameType) ModelType(
 // Apply the action on the instances referenced from lsnt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -11071,19 +9590,32 @@ func (lsnt *LangStringNameType) ModelType(
 func (lsnt *LangStringNameType) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_LangStringNameType(lsnt, action, false)
 }
 
 // Apply the action recursively on the instances referenced from lsnt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on lsnt.
 func (lsnt *LangStringNameType) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_LangStringNameType(lsnt, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LangStringNameType(
+	that *LangStringNameType,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -11155,7 +9687,7 @@ func (lstt *LangStringTextType) ModelType(
 // Apply the action on the instances referenced from lstt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -11163,19 +9695,32 @@ func (lstt *LangStringTextType) ModelType(
 func (lstt *LangStringTextType) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_LangStringTextType(lstt, action, false)
 }
 
 // Apply the action recursively on the instances referenced from lstt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on lstt.
 func (lstt *LangStringTextType) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_LangStringTextType(lstt, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LangStringTextType(
+	that *LangStringTextType,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -11284,7 +9829,7 @@ func (e *Environment) ModelType(
 // Apply the action on the instances referenced from e.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -11292,90 +9837,63 @@ func (e *Environment) ModelType(
 func (e *Environment) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if e.assetAdministrationShells != nil {
-		for _, v := range e.assetAdministrationShells {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.submodels != nil {
-		for _, v1 := range e.submodels {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if e.conceptDescriptions != nil {
-		for _, v2 := range e.conceptDescriptions {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Environment(e, action, false)
 }
 
 // Apply the action recursively on the instances referenced from e.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on e.
 func (e *Environment) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if e.assetAdministrationShells != nil {
-		for _, v := range e.assetAdministrationShells {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_Environment(e, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Environment(
+	that *Environment,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.assetAdministrationShells != nil {
+		abort = descend_ListOf_IAssetAdministrationShell(
+			that.assetAdministrationShells,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if e.submodels != nil {
-		for _, v1 := range e.submodels {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.submodels != nil {
+		abort = descend_ListOf_ISubmodel(
+			that.submodels,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
-	if e.conceptDescriptions != nil {
-		for _, v2 := range e.conceptDescriptions {
-			abort = action(v2);
-			if abort {
-				return
-			}
-
-			abort = v2.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.conceptDescriptions != nil {
+		abort = descend_ListOf_IConceptDescription(
+			that.conceptDescriptions,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -11489,7 +10007,7 @@ func (eds *EmbeddedDataSpecification) ModelType(
 // Apply the action on the instances referenced from eds.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -11497,56 +10015,63 @@ func (eds *EmbeddedDataSpecification) ModelType(
 func (eds *EmbeddedDataSpecification) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		eds.dataSpecification,
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
-		eds.dataSpecificationContent,
-	)
-	if abort {
-		return
-	}
-
-	return
+	return descend_EmbeddedDataSpecification(eds, action, false)
 }
 
 // Apply the action recursively on the instances referenced from eds.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on eds.
 func (eds *EmbeddedDataSpecification) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
+	return descend_EmbeddedDataSpecification(eds, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_EmbeddedDataSpecification(
+	that *EmbeddedDataSpecification,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
 	abort = action(
-		eds.dataSpecification,
-	)
-	if abort {
-		return
-	}
-	abort = eds.dataSpecification.Descend(
-		action,
+		that.dataSpecification,
 	)
 	if abort {
 		return
 	}
 
+	if recurse {
+		abort = that.dataSpecification.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
 	abort = action(
-		eds.dataSpecificationContent,
+		that.dataSpecificationContent,
 	)
 	if abort {
 		return
 	}
-	abort = eds.dataSpecificationContent.Descend(
-		action,
-	)
-	if abort {
-		return
+
+	if recurse {
+		abort = that.dataSpecificationContent.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
 	}
 
 	return
@@ -11807,7 +10332,7 @@ func (lt *LevelType) ModelType(
 // Apply the action on the instances referenced from lt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -11815,19 +10340,32 @@ func (lt *LevelType) ModelType(
 func (lt *LevelType) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_LevelType(lt, action, false)
 }
 
 // Apply the action recursively on the instances referenced from lt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on lt.
 func (lt *LevelType) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_LevelType(lt, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LevelType(
+	that *LevelType,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -11920,7 +10458,7 @@ func (vrp *ValueReferencePair) ModelType(
 // Apply the action on the instances referenced from vrp.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -11928,36 +10466,47 @@ func (vrp *ValueReferencePair) ModelType(
 func (vrp *ValueReferencePair) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		vrp.valueID,
-	)
-	if abort {
-		return
-	}
-
-	return
+	return descend_ValueReferencePair(vrp, action, false)
 }
 
 // Apply the action recursively on the instances referenced from vrp.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on vrp.
 func (vrp *ValueReferencePair) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
+	return descend_ValueReferencePair(vrp, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_ValueReferencePair(
+	that *ValueReferencePair,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
 	abort = action(
-		vrp.valueID,
+		that.valueID,
 	)
 	if abort {
 		return
 	}
-	abort = vrp.valueID.Descend(
-		action,
-	)
-	if abort {
-		return
+
+	if recurse {
+		abort = that.valueID.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
 	}
 
 	return
@@ -12023,7 +10572,7 @@ func (vl *ValueList) ModelType(
 // Apply the action on the instances referenced from vl.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -12031,37 +10580,40 @@ func (vl *ValueList) ModelType(
 func (vl *ValueList) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range vl.valueReferencePairs {
-		abort = action(v);
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_ValueList(vl, action, false)
 }
 
 // Apply the action recursively on the instances referenced from vl.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on vl.
 func (vl *ValueList) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range vl.valueReferencePairs {
-		abort = action(v);
-		if abort {
-			return
-		}
+	return descend_ValueList(vl, action, true)
+}
 
-		abort = v.Descend(
-			action,
-		);
-		if abort {
-			return
-		}
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_ValueList(
+	that *ValueList,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = descend_ListOf_IValueReferencePair(
+		that.valueReferencePairs,
+		action,
+		recurse,
+	)
+	if abort {
+		return
 	}
 
 	return
@@ -12132,7 +10684,7 @@ func (lspnti6 *LangStringPreferredNameTypeIEC61360) ModelType(
 // Apply the action on the instances referenced from lspnti6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -12140,19 +10692,32 @@ func (lspnti6 *LangStringPreferredNameTypeIEC61360) ModelType(
 func (lspnti6 *LangStringPreferredNameTypeIEC61360) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_LangStringPreferredNameTypeIEC61360(lspnti6, action, false)
 }
 
 // Apply the action recursively on the instances referenced from lspnti6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on lspnti6.
 func (lspnti6 *LangStringPreferredNameTypeIEC61360) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_LangStringPreferredNameTypeIEC61360(lspnti6, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LangStringPreferredNameTypeIEC61360(
+	that *LangStringPreferredNameTypeIEC61360,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -12224,7 +10789,7 @@ func (lssnti6 *LangStringShortNameTypeIEC61360) ModelType(
 // Apply the action on the instances referenced from lssnti6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -12232,19 +10797,32 @@ func (lssnti6 *LangStringShortNameTypeIEC61360) ModelType(
 func (lssnti6 *LangStringShortNameTypeIEC61360) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_LangStringShortNameTypeIEC61360(lssnti6, action, false)
 }
 
 // Apply the action recursively on the instances referenced from lssnti6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on lssnti6.
 func (lssnti6 *LangStringShortNameTypeIEC61360) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_LangStringShortNameTypeIEC61360(lssnti6, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LangStringShortNameTypeIEC61360(
+	that *LangStringShortNameTypeIEC61360,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -12316,7 +10894,7 @@ func (lsdti6 *LangStringDefinitionTypeIEC61360) ModelType(
 // Apply the action on the instances referenced from lsdti6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -12324,19 +10902,32 @@ func (lsdti6 *LangStringDefinitionTypeIEC61360) ModelType(
 func (lsdti6 *LangStringDefinitionTypeIEC61360) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_LangStringDefinitionTypeIEC61360(lsdti6, action, false)
 }
 
 // Apply the action recursively on the instances referenced from lsdti6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on lsdti6.
 func (lsdti6 *LangStringDefinitionTypeIEC61360) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_LangStringDefinitionTypeIEC61360(lsdti6, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LangStringDefinitionTypeIEC61360(
+	that *LangStringDefinitionTypeIEC61360,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -12662,7 +11253,7 @@ func (dsi6 *DataSpecificationIEC61360) ModelType(
 // Apply the action on the instances referenced from dsi6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -12670,158 +11261,115 @@ func (dsi6 *DataSpecificationIEC61360) ModelType(
 func (dsi6 *DataSpecificationIEC61360) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range dsi6.preferredName {
-		abort = action(v);
-		if abort {
-			return
-		}
-	}
-
-	if dsi6.shortName != nil {
-		for _, v1 := range dsi6.shortName {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if dsi6.unitID != nil {
-		abort = action(
-			dsi6.unitID,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if dsi6.definition != nil {
-		for _, v2 := range dsi6.definition {
-			abort = action(v2);
-			if abort {
-				return
-			}
-		}
-	}
-
-	if dsi6.valueList != nil {
-		abort = action(
-			dsi6.valueList,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if dsi6.levelType != nil {
-		abort = action(
-			dsi6.levelType,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_DataSpecificationIEC61360(dsi6, action, false)
 }
 
 // Apply the action recursively on the instances referenced from dsi6.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on dsi6.
 func (dsi6 *DataSpecificationIEC61360) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range dsi6.preferredName {
-		abort = action(v);
-		if abort {
-			return
-		}
+	return descend_DataSpecificationIEC61360(dsi6, action, true)
+}
 
-		abort = v.Descend(
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_DataSpecificationIEC61360(
+	that *DataSpecificationIEC61360,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = descend_ListOf_ILangStringPreferredNameTypeIEC61360(
+		that.preferredName,
+		action,
+		recurse,
+	)
+	if abort {
+		return
+	}
+
+	if that.shortName != nil {
+		abort = descend_ListOf_ILangStringShortNameTypeIEC61360(
+			that.shortName,
 			action,
-		);
+			recurse,
+		)
 		if abort {
 			return
 		}
 	}
 
-	if dsi6.shortName != nil {
-		for _, v1 := range dsi6.shortName {
-			abort = action(v1);
-			if abort {
-				return
-			}
+	if that.unitID != nil {
+		abort = action(
+			that.unitID,
+		)
+		if abort {
+			return
+		}
 
-			abort = v1.Descend(
+		if recurse {
+			abort = that.unitID.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if dsi6.unitID != nil {
-		abort = action(
-			dsi6.unitID,
-		)
-		if abort {
-			return
-		}
-		abort = dsi6.unitID.Descend(
+	if that.definition != nil {
+		abort = descend_ListOf_ILangStringDefinitionTypeIEC61360(
+			that.definition,
 			action,
+			recurse,
 		)
 		if abort {
 			return
 		}
 	}
 
-	if dsi6.definition != nil {
-		for _, v2 := range dsi6.definition {
-			abort = action(v2);
-			if abort {
-				return
-			}
+	if that.valueList != nil {
+		abort = action(
+			that.valueList,
+		)
+		if abort {
+			return
+		}
 
-			abort = v2.Descend(
+		if recurse {
+			abort = that.valueList.Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
 		}
 	}
 
-	if dsi6.valueList != nil {
+	if that.levelType != nil {
 		abort = action(
-			dsi6.valueList,
+			that.levelType,
 		)
 		if abort {
 			return
 		}
-		abort = dsi6.valueList.Descend(
-			action,
-		)
-		if abort {
-			return
-		}
-	}
 
-	if dsi6.levelType != nil {
-		abort = action(
-			dsi6.levelType,
-		)
-		if abort {
-			return
-		}
-		abort = dsi6.levelType.Descend(
-			action,
-		)
-		if abort {
-			return
+		if recurse {
+			abort = that.levelType.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
 		}
 	}
 
@@ -12847,6 +11395,564 @@ func NewDataSpecificationIEC61360(
 		value: nil,
 		levelType: nil,
 	}
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IReference(
+	that []IReference,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IEmbeddedDataSpecification(
+	that []IEmbeddedDataSpecification,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IExtension(
+	that []IExtension,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ILangStringNameType(
+	that []ILangStringNameType,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ILangStringTextType(
+	that []ILangStringTextType,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ISpecificAssetID(
+	that []ISpecificAssetID,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IQualifier(
+	that []IQualifier,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ISubmodelElement(
+	that []ISubmodelElement,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IDataElement(
+	that []IDataElement,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IOperationVariable(
+	that []IOperationVariable,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IKey(
+	that []IKey,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IAssetAdministrationShell(
+	that []IAssetAdministrationShell,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ISubmodel(
+	that []ISubmodel,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IConceptDescription(
+	that []IConceptDescription,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_IValueReferencePair(
+	that []IValueReferencePair,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ILangStringPreferredNameTypeIEC61360(
+	that []ILangStringPreferredNameTypeIEC61360,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ILangStringShortNameTypeIEC61360(
+	that []ILangStringShortNameTypeIEC61360,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ILangStringDefinitionTypeIEC61360(
+	that []ILangStringDefinitionTypeIEC61360,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
 }
 
 // This code has been automatically generated by aas-core-codegen.

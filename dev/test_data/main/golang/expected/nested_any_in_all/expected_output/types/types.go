@@ -30,7 +30,7 @@ type IClass interface {
 	// Apply the action on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// We do not recurse into the referenced instances.
 	//
@@ -40,7 +40,7 @@ type IClass interface {
 	// Apply the action recursively on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// The action is not applied on this instance.
 	Descend(action func(IClass) bool) (abort bool)
@@ -110,7 +110,7 @@ func (ls *LangString) ModelType(
 // Apply the action on the instances referenced from ls.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -118,19 +118,32 @@ func (ls *LangString) ModelType(
 func (ls *LangString) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_LangString(ls, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ls.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ls.
 func (ls *LangString) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_LangString(ls, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LangString(
+	that *LangString,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -195,7 +208,7 @@ func (lss *LangStringSet) ModelType(
 // Apply the action on the instances referenced from lss.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -203,37 +216,40 @@ func (lss *LangStringSet) ModelType(
 func (lss *LangStringSet) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range lss.langStrings {
-		abort = action(v);
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_LangStringSet(lss, action, false)
 }
 
 // Apply the action recursively on the instances referenced from lss.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on lss.
 func (lss *LangStringSet) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range lss.langStrings {
-		abort = action(v);
-		if abort {
-			return
-		}
+	return descend_LangStringSet(lss, action, true)
+}
 
-		abort = v.Descend(
-			action,
-		);
-		if abort {
-			return
-		}
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_LangStringSet(
+	that *LangStringSet,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = descend_ListOf_ILangString(
+		that.langStrings,
+		action,
+		recurse,
+	)
+	if abort {
+		return
 	}
 
 	return
@@ -316,7 +332,7 @@ func (ic *IecContent) ModelType(
 // Apply the action on the instances referenced from ic.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -324,40 +340,41 @@ func (ic *IecContent) ModelType(
 func (ic *IecContent) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	if ic.definition != nil {
-		for _, v := range ic.definition {
-			abort = action(v);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_IecContent(ic, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ic.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ic.
 func (ic *IecContent) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	if ic.definition != nil {
-		for _, v := range ic.definition {
-			abort = action(v);
-			if abort {
-				return
-			}
+	return descend_IecContent(ic, action, true)
+}
 
-			abort = v.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_IecContent(
+	that *IecContent,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	if that.definition != nil {
+		abort = descend_ListOf_ILangString(
+			that.definition,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -401,7 +418,7 @@ func (oc *OtherContent) ModelType(
 // Apply the action on the instances referenced from oc.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -409,19 +426,32 @@ func (oc *OtherContent) ModelType(
 func (oc *OtherContent) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_OtherContent(oc, action, false)
 }
 
 // Apply the action recursively on the instances referenced from oc.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on oc.
 func (oc *OtherContent) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_OtherContent(oc, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_OtherContent(
+	that *OtherContent,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -481,7 +511,7 @@ func (s *Specification) ModelType(
 // Apply the action on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -489,36 +519,47 @@ func (s *Specification) ModelType(
 func (s *Specification) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		s.content,
-	)
-	if abort {
-		return
-	}
-
-	return
+	return descend_Specification(s, action, false)
 }
 
 // Apply the action recursively on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on s.
 func (s *Specification) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
+	return descend_Specification(s, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Specification(
+	that *Specification,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
 	abort = action(
-		s.content,
+		that.content,
 	)
 	if abort {
 		return
 	}
-	abort = s.content.Descend(
-		action,
-	)
-	if abort {
-		return
+
+	if recurse {
+		abort = that.content.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
 	}
 
 	return
@@ -616,7 +657,7 @@ func (s *Something) ModelType(
 // Apply the action on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -624,61 +665,50 @@ func (s *Something) ModelType(
 func (s *Something) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range s.langStringSets {
-		abort = action(v);
-		if abort {
-			return
-		}
-	}
-
-	if s.specifications != nil {
-		for _, v1 := range s.specifications {
-			abort = action(v1);
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Something(s, action, false)
 }
 
 // Apply the action recursively on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on s.
 func (s *Something) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	for _, v := range s.langStringSets {
-		abort = action(v);
-		if abort {
-			return
-		}
+	return descend_Something(s, action, true)
+}
 
-		abort = v.Descend(
-			action,
-		);
-		if abort {
-			return
-		}
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Something(
+	that *Something,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = descend_ListOf_ILangStringSet(
+		that.langStringSets,
+		action,
+		recurse,
+	)
+	if abort {
+		return
 	}
 
-	if s.specifications != nil {
-		for _, v1 := range s.specifications {
-			abort = action(v1);
-			if abort {
-				return
-			}
-
-			abort = v1.Descend(
-				action,
-			);
-			if abort {
-				return
-			}
+	if that.specifications != nil {
+		abort = descend_ListOf_ISpecification(
+			that.specifications,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -696,6 +726,99 @@ func NewSomething(
 		langStringSets: langStringSets,
 		specifications: nil,
 	}
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ILangString(
+	that []ILangString,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ILangStringSet(
+	that []ILangStringSet,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ISpecification(
+	that []ISpecification,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item,
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
 }
 
 // This code has been automatically generated by aas-core-codegen.

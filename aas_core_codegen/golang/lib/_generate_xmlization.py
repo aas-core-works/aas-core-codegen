@@ -31,79 +31,6 @@ from aas_core_codegen.intermediate import uses as intermediate_uses
 # region Shared between the de-serialization and the serialization
 
 
-# NOTE (mristin):
-# A Golang primitive is not usable as a part of an identifier as it is spelled
-# (``[]byte``), so the primitives need monikers of their own. The monikers are
-# *lower-case* on purpose: every one of our types is named through
-# :py:func:`aas_core_codegen.naming.capitalized_camel_case`, which always yields
-# an upper-case initial, so a primitive moniker can never be confused for one of
-# our types -- not even for an enumeration which somebody named ``String``. They
-# are keyed by the meta-model primitive rather than by the Golang spelling, so that
-# the mapping is total by construction.
-_PRIMITIVE_TYPE_TO_MONIKER = {
-    intermediate.PrimitiveType.BOOL: "bool",
-    intermediate.PrimitiveType.INT: "long",
-    intermediate.PrimitiveType.FLOAT: "double",
-    intermediate.PrimitiveType.STR: "string",
-    intermediate.PrimitiveType.BYTEARRAY: "bytes",
-}
-assert all(
-    literal in _PRIMITIVE_TYPE_TO_MONIKER for literal in intermediate.PrimitiveType
-)
-assert all(
-    moniker.islower() for moniker in _PRIMITIVE_TYPE_TO_MONIKER.values()
-), "The primitive monikers have to be lower-case, see the note above"
-
-
-@ensure(lambda result: "_" not in result)
-def _leaf_moniker(type_anno: intermediate.AtomicTypeAnnotation) -> str:
-    """
-    Name the type of ``type_anno`` as a part of an identifier.
-
-    Everything which is not a primitive is named as the Golang type is, so that
-    the name of a function can not drift apart from the type it operates on.
-
-    The result must not contain an underscore, since the underscore is what
-    separates a moniker from the rest of a composed name -- see the note above
-    :py:func:`_scalar_item_reader_name`.
-    """
-    primitive_type = intermediate.try_primitive_type(type_anno)
-    if primitive_type is not None:
-        return _PRIMITIVE_TYPE_TO_MONIKER[primitive_type]
-
-    # NOTE (mristin):
-    # A JSON-able type is no type of the meta-model, so it needs a moniker of
-    # its own, for the same reason as a primitive above. The initial is
-    # *lower-case* so that it can never be confused for one of our types, which
-    # all go through ``capitalized_camel_case``.
-    if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
-        return "jsonValue"
-
-    if isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
-        return "jsonArray"
-
-    if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
-        return "jsonObject"
-
-    assert isinstance(
-        type_anno, intermediate.OurTypeAnnotation
-    ), f"Unexpected type annotation for a moniker: {type_anno}"
-
-    our_type = type_anno.our_type
-
-    if isinstance(our_type, intermediate.Enumeration):
-        return golang_naming.enum_name(our_type.name)
-
-    if isinstance(our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-        return golang_naming.interface_name(our_type.name)
-
-    assert isinstance(
-        our_type, intermediate.NamedUnion
-    ), f"Unexpected our type for a moniker: {our_type}"
-
-    return golang_naming.union_name(our_type.name)
-
-
 class _ScalarItem:
     """
     Specify a scalar value wrapped in an element of a fixed name.
@@ -132,7 +59,7 @@ class _ScalarItem:
 # ``writeTupleOf{N}_{M}_{M}...`` and their duals. A tuple states its arity and
 # separates its items, so these names are a Polish notation over ``_``-separated
 # tokens. Since a leaf moniker never contains an underscore (see
-# :py:func:`_leaf_moniker`), the encoding is injective -- two different types can
+# :py:func:`aas_core_codegen.golang.common.leaf_moniker`), the encoding is injective -- two different types can
 # not be given the same moniker, and hence two different functions can not be
 # given the same name.
 #
@@ -147,7 +74,9 @@ def _scalar_item_reader_name(
     type_anno: intermediate.AtomicTypeAnnotation, element_name: str
 ) -> Identifier:
     """Name the function reading a scalar ``type_anno`` in ``element_name``."""
-    return Identifier(f"readAtV{element_name[1:]}_{_leaf_moniker(type_anno)}")
+    return Identifier(
+        f"readAtV{element_name[1:]}_{golang_common.leaf_moniker(type_anno)}"
+    )
 
 
 @require(lambda element_name: element_name.startswith("v"))
@@ -155,7 +84,9 @@ def _scalar_item_writer_name(
     type_anno: intermediate.AtomicTypeAnnotation, element_name: str
 ) -> Identifier:
     """Name the function writing a scalar ``type_anno`` in ``element_name``."""
-    return Identifier(f"writeAtV{element_name[1:]}_{_leaf_moniker(type_anno)}")
+    return Identifier(
+        f"writeAtV{element_name[1:]}_{golang_common.leaf_moniker(type_anno)}"
+    )
 
 
 def _enum_text_reader_name(enumeration: intermediate.Enumeration) -> Identifier:
@@ -172,7 +103,7 @@ def _list_content_writer_name(
     items_type_anno: intermediate.AtomicTypeAnnotation,
 ) -> Stripped:
     """Name the function which writes the content of a list of ``items_type_anno``."""
-    return Stripped(f"writeListOf_{_leaf_moniker(items_type_anno)}")
+    return Stripped(f"writeListOf_{golang_common.leaf_moniker(items_type_anno)}")
 
 
 def _tuple_content_writer_name(type_anno: intermediate.TupleTypeAnnotation) -> Stripped:
@@ -180,7 +111,7 @@ def _tuple_content_writer_name(type_anno: intermediate.TupleTypeAnnotation) -> S
     monikers = []  # type: List[str]
     for item_type_anno in type_anno.items:
         assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple)
-        monikers.append(_leaf_moniker(item_type_anno))
+        monikers.append(golang_common.leaf_moniker(item_type_anno))
 
     joined = "_".join(monikers)
 
@@ -270,7 +201,7 @@ def _collect_requirements(
             dispatched_type_ids.add(intermediate.runtime_id(item_type_anno.our_type))
             return
 
-        key = (_leaf_moniker(item_type_anno), element_name)
+        key = (golang_common.leaf_moniker(item_type_anno), element_name)
         if key not in observed_scalar_items:
             observed_scalar_items.add(key)
             scalar_items.append(

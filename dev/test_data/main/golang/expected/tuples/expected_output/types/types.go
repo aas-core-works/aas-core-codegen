@@ -31,7 +31,7 @@ type IClass interface {
 	// Apply the action on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// We do not recurse into the referenced instances.
 	//
@@ -41,7 +41,7 @@ type IClass interface {
 	// Apply the action recursively on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// The action is not applied on this instance.
 	Descend(action func(IClass) bool) (abort bool)
@@ -130,7 +130,7 @@ func (si *SomeItem) ModelType(
 // Apply the action on the instances referenced from si.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -138,19 +138,32 @@ func (si *SomeItem) ModelType(
 func (si *SomeItem) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_SomeItem(si, action, false)
 }
 
 // Apply the action recursively on the instances referenced from si.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on si.
 func (si *SomeItem) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_SomeItem(si, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_SomeItem(
+	that *SomeItem,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -213,7 +226,7 @@ func (ai *AnotherItem) ModelType(
 // Apply the action on the instances referenced from ai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -221,19 +234,32 @@ func (ai *AnotherItem) ModelType(
 func (ai *AnotherItem) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_AnotherItem(ai, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ai.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ai.
 func (ai *AnotherItem) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_AnotherItem(ai, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_AnotherItem(
+	that *AnotherItem,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -350,7 +376,7 @@ func (s *Something) ModelType(
 // Apply the action on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -358,130 +384,56 @@ func (s *Something) ModelType(
 func (s *Something) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		s.items.Item1,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.items.Item2,
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
-		s.tricky.Item2,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tricky.Item3,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tricky.Item4,
-	)
-	if abort {
-		return
-	}
-
-	if s.optionalPair != nil {
-		abort = action(
-			s.optionalPair.Item2,
-		)
-		if abort {
-			return
-		}
-	}
-
-	return
+	return descend_Something(s, action, false)
 }
 
 // Apply the action recursively on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on s.
 func (s *Something) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		s.items.Item1,
-	)
-	if abort {
-		return
-	}
-	abort = s.items.Item1.Descend(
+	return descend_Something(s, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Something(
+	that *Something,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = descend_TupleOf2_IAbstractItem_IAbstractItem(
+		that.items,
 		action,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.items.Item2,
-	)
-	if abort {
-		return
-	}
-	abort = s.items.Item2.Descend(
-		action,
+		recurse,
 	)
 	if abort {
 		return
 	}
 
-	abort = action(
-		s.tricky.Item2,
-	)
-	if abort {
-		return
-	}
-	abort = s.tricky.Item2.Descend(
+	abort = descend_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+		that.tricky,
 		action,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tricky.Item3,
-	)
-	if abort {
-		return
-	}
-	abort = s.tricky.Item3.Descend(
-		action,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tricky.Item4,
-	)
-	if abort {
-		return
-	}
-	abort = s.tricky.Item4.Descend(
-		action,
+		recurse,
 	)
 	if abort {
 		return
 	}
 
-	if s.optionalPair != nil {
-		abort = action(
-			s.optionalPair.Item2,
-		)
-		if abort {
-			return
-		}
-		abort = s.optionalPair.Item2.Descend(
+	if that.optionalPair != nil {
+		abort = descend_TupleOf2_string_IAbstractItem(
+			*that.optionalPair,
 			action,
+			recurse,
 		)
 		if abort {
 			return
@@ -504,6 +456,141 @@ func NewSomething(
 		tricky: tricky,
 		optionalPair: nil,
 	}
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_TupleOf2_IAbstractItem_IAbstractItem(
+	that ourcommon.Tuple2[IAbstractItem, IAbstractItem],
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = action(
+		that.Item1,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item1.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	abort = action(
+		that.Item2,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item2.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+	that ourcommon.Tuple6[int64, ISomeItem, IAbstractItem, ISomeItem, int64, Result],
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = action(
+		that.Item2,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item2.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	abort = action(
+		that.Item3,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item3.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	abort = action(
+		that.Item4,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item4.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_TupleOf2_string_IAbstractItem(
+	that ourcommon.Tuple2[string, IAbstractItem],
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = action(
+		that.Item2,
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item2.Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
 }
 
 // This code has been automatically generated by aas-core-codegen.
