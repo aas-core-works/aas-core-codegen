@@ -9,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dummy.common.*;
 import dummy.copying.Copying;
+import dummy.types.enums.*;
 import dummy.types.impl.*;
 import dummy.types.model.*;
 import dummy.types.model.IClass;
 import dummy.visitation.AbstractTransformerWithContext;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class TestCopying {
@@ -31,7 +27,7 @@ public class TestCopying {
         return false;
       }
 
-      SomeItem casted = (SomeItem) that;
+      SomeItem casted = (SomeItem) other;
 
       return (
         that.getName().equals(casted.getName()));
@@ -43,7 +39,7 @@ public class TestCopying {
         return false;
       }
 
-      AnotherItem casted = (AnotherItem) that;
+      AnotherItem casted = (AnotherItem) other;
 
       return (
         that.getSerialNumber().equals(casted.getSerialNumber()));
@@ -55,98 +51,60 @@ public class TestCopying {
         return false;
       }
 
-      Something casted = (Something) that;
+      Something casted = (Something) other;
 
       return (
-        (that.getPair().item1().equals(casted.getPair().item1())
-          && that.getPair().item2().equals(casted.getPair().item2()))
-        && (transform(
-            that.getItems().item1(),
-            casted.getItems().item1())
-          && transform(
-            that.getItems().item2(),
-            casted.getItems().item2()))
-        && (that.getTricky().item1().equals(casted.getTricky().item1())
-          && transform(
-            that.getTricky().item2(),
-            casted.getTricky().item2())
-          && transform(
-            that.getTricky().item3(),
-            casted.getTricky().item3())
-          && transform(
-            that.getTricky().item4(),
-            casted.getTricky().item4())
-          && that.getTricky().item5().equals(casted.getTricky().item5())
-          && that.getTricky().item6().equals(casted.getTricky().item6()))
+        that.getPair().equals(casted.getPair())
+        && deepEqualsTupleOf2_IAbstractItem_IAbstractItem(that.getItems(), casted.getItems())
+        && deepEqualsTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(that.getTricky(), casted.getTricky())
         && (that.getOptionalPair().isPresent()
           ? casted.getOptionalPair().isPresent()
-          && (that.getOptionalPair().get().item1().equals(casted.getOptionalPair().get().item1())
-            && transform(
-              that.getOptionalPair().get().item2(),
-              casted.getOptionalPair().get().item2()))
-          : ! casted.getOptionalPair().isPresent()));
+            && deepEqualsTupleOf2_string_IAbstractItem(that.getOptionalPair().get(), casted.getOptionalPair().get())
+          : !casted.getOptionalPair().isPresent()));
+    }
+
+    private Boolean deepEqualsTupleOf2_IAbstractItem_IAbstractItem(
+      Tuple2<IAbstractItem, IAbstractItem> that,
+      Tuple2<IAbstractItem, IAbstractItem> other) {
+      return (
+        transform(that.item1(), other.item1())
+        && transform(that.item2(), other.item2()));
+    }
+
+    private Boolean deepEqualsTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+      Tuple6<
+        Long,
+        ISomeItem,
+        IAbstractItem,
+        ISomeItem,
+        Long,
+        Result> that,
+      Tuple6<
+        Long,
+        ISomeItem,
+        IAbstractItem,
+        ISomeItem,
+        Long,
+        Result> other) {
+      return (
+        that.item1().equals(other.item1())
+        && transform(that.item2(), other.item2())
+        && transform(that.item3(), other.item3())
+        && transform(that.item4(), other.item4())
+        && that.item5().equals(other.item5())
+        && that.item6().equals(other.item6()));
+    }
+
+    private Boolean deepEqualsTupleOf2_string_IAbstractItem(
+      Tuple2<String, IAbstractItem> that,
+      Tuple2<String, IAbstractItem> other) {
+      return (
+        that.item1().equals(other.item1())
+        && transform(that.item2(), other.item2()));
     }
   } // class _DeepEqualiser
 
   private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();
-
-  /**
-   * Compare two byte spans for equal content.
-   */
-  private static Boolean byteSpansEqual(byte[] that, byte[] other) {
-    return that.equals(other);
-  }
-
-  private static class _Pair<A, B> {
-    private final A first;
-    private final B second;
-    
-    public _Pair(A first, B second) {
-      this.first = first;
-      this.second = second;
-    }
-    
-    public A getFirst() {
-      return first;
-    }
-    
-    public B getSecond() {
-      return second;
-    }
-  }
-
-  // Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
-  // Adapted from: https://stackoverflow.com/a/23529010
-  private static <A, B> Stream<_Pair<A, B>> zip(
-    Stream<? extends A> a,
-    Stream<? extends B> b) {
-    Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
-    Spliterator<? extends B> bSplit = Objects.requireNonNull(b).spliterator();
-    
-    int characteristics = aSplit.characteristics() & bSplit.characteristics() &
-      ~(Spliterator.DISTINCT | Spliterator.SORTED);
-    
-    long zipSize = ((characteristics & Spliterator.SIZED) != 0)
-      ? Math.min(aSplit.getExactSizeIfKnown(), bSplit.getExactSizeIfKnown())
-      : -1;
-    
-    Iterator<A> aIter = Spliterators.iterator(aSplit);
-    Iterator<B> bIter = Spliterators.iterator(bSplit);
-    Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {
-      @Override
-      public boolean hasNext() {
-        return aIter.hasNext() && bIter.hasNext();
-      }
-      
-      @Override
-      public _Pair<A, B> next() {
-        return new _Pair<>(aIter.next(), bIter.next());
-      }
-    };
-    
-    Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
-    return StreamSupport.stream(split, false);
-  }
 
   private static Boolean SomeItemShallowEquals(
     SomeItem that,

@@ -9,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dummy.common.*;
 import dummy.copying.Copying;
+import dummy.types.enums.*;
 import dummy.types.impl.*;
 import dummy.types.model.*;
 import dummy.types.model.IClass;
 import dummy.visitation.AbstractTransformerWithContext;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class TestCopying {
@@ -31,7 +27,7 @@ public class TestCopying {
         return false;
       }
 
-      Something casted = (Something) that;
+      Something casted = (Something) other;
 
       return (
         that.getInterface().equals(casted.getInterface())
@@ -42,64 +38,6 @@ public class TestCopying {
   } // class _DeepEqualiser
 
   private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();
-
-  /**
-   * Compare two byte spans for equal content.
-   */
-  private static Boolean byteSpansEqual(byte[] that, byte[] other) {
-    return that.equals(other);
-  }
-
-  private static class _Pair<A, B> {
-    private final A first;
-    private final B second;
-    
-    public _Pair(A first, B second) {
-      this.first = first;
-      this.second = second;
-    }
-    
-    public A getFirst() {
-      return first;
-    }
-    
-    public B getSecond() {
-      return second;
-    }
-  }
-
-  // Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
-  // Adapted from: https://stackoverflow.com/a/23529010
-  private static <A, B> Stream<_Pair<A, B>> zip(
-    Stream<? extends A> a,
-    Stream<? extends B> b) {
-    Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
-    Spliterator<? extends B> bSplit = Objects.requireNonNull(b).spliterator();
-    
-    int characteristics = aSplit.characteristics() & bSplit.characteristics() &
-      ~(Spliterator.DISTINCT | Spliterator.SORTED);
-    
-    long zipSize = ((characteristics & Spliterator.SIZED) != 0)
-      ? Math.min(aSplit.getExactSizeIfKnown(), bSplit.getExactSizeIfKnown())
-      : -1;
-    
-    Iterator<A> aIter = Spliterators.iterator(aSplit);
-    Iterator<B> bIter = Spliterators.iterator(bSplit);
-    Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {
-      @Override
-      public boolean hasNext() {
-        return aIter.hasNext() && bIter.hasNext();
-      }
-      
-      @Override
-      public _Pair<A, B> next() {
-        return new _Pair<>(aIter.next(), bIter.next());
-      }
-    };
-    
-    Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
-    return StreamSupport.stream(split, false);
-  }
 
   private static Boolean SomethingShallowEquals(
     Something that,

@@ -2,9 +2,12 @@
 
 import io
 import textwrap
-from typing import List, Optional
+from typing import List, Set
+
+from icontract import require
 
 from aas_core_codegen import intermediate
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.common import (
     Stripped,
     indent_but_first_line,
@@ -12,7 +15,7 @@ from aas_core_codegen.common import (
     Identifier,
 )
 from aas_core_codegen.java import common as java_common, naming as java_naming
-from aas_core_codegen.java.common import INDENT as I, INDENT2 as II, INDENT3 as III
+from aas_core_codegen.java.common import INDENT as I, INDENT2 as II
 
 
 def _generate_shallow_equals(cls: intermediate.ConcreteClass) -> Stripped:
@@ -51,6 +54,163 @@ private static Boolean {cls_name_java}ShallowEquals(
     )
 
 
+def _compares_by_equals(type_anno: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether the ``equals`` of a value of ``type_anno`` compares it deeply.
+
+    The primitives, the constrained primitives and the enumeration literals
+    compare by value -- except for the byte arrays, which compare by reference.
+    Jackson's nodes compare by value all the way down. ``List.equals``,
+    ``Set.equals`` and the ``equals`` of a tuple record compare their items with
+    the items' own ``equals``, so they compare deeply as long as their items do.
+    """
+    primitive_type = intermediate.try_primitive_type(type_anno)
+    if primitive_type is not None:
+        return primitive_type is not intermediate.PrimitiveType.BYTEARRAY
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        return isinstance(type_anno.our_type, intermediate.Enumeration)
+
+    if isinstance(
+        type_anno,
+        (
+            intermediate.JsonValueTypeAnnotation,
+            intermediate.JsonArrayTypeAnnotation,
+            intermediate.JsonObjectTypeAnnotation,
+        ),
+    ):
+        return True
+
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        return _compares_by_equals(type_anno.items)
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return all(_compares_by_equals(item) for item in type_anno.items)
+
+    return False
+
+
+def _deep_equals_method_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the method of ``_DeepEqualiser`` comparing deeply ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.java.common.type_moniker`), so two different
+    containers never share a method.
+    """
+    return Identifier(f"deepEquals{java_common.type_moniker(type_anno)}")
+
+
+def _generate_deep_equals_expr(
+    that: str, other: str, type_anno: intermediate.TypeAnnotationUnion
+) -> Stripped:
+    """
+    Generate the expression comparing deeply the values at ``that`` and ``other``.
+
+    A container which can not be compared by ``equals`` is delegated to a method
+    of its own, which compares only one level and calls the method of its items
+    by name. This way the deep equality is composed of plain functions, to any
+    depth.
+    """
+    if _compares_by_equals(type_anno):
+        return Stripped(f"{that}.equals({other})")
+
+    if intermediate.try_primitive_type(type_anno) is not None:
+        # NOTE (mristin):
+        # Only a byte array is a primitive which is not compared by ``equals``.
+        return Stripped(f"Arrays.equals({that}, {other})")
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        assert isinstance(
+            type_anno.our_type, (intermediate.Class, intermediate.NamedUnion)
+        ), f"Unexpected our type not compared by equals: {type_anno}"
+
+        # NOTE (mristin):
+        # A named union has its own ``transform`` overload (see
+        # :py:func:`_generate_union_transform_helper`), so it is compared
+        # exactly like a class instance.
+        return Stripped(f"transform({that}, {other})")
+
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation)
+    ):
+        return Stripped(f"{_deep_equals_method_name(type_anno)}({that}, {other})")
+
+    raise AssertionError(
+        f"Unexpected type annotation to be compared deeply: {type_anno}. "
+        f"The sets hold only values compared by ``equals``, and the optionals "
+        f"nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(
+    lambda type_anno: isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation)
+    )
+    and not _compares_by_equals(type_anno)
+)
+def _generate_deep_equals_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the method of ``_DeepEqualiser`` comparing deeply ``type_anno``."""
+    value_type = java_common.generate_type(type_anno)
+
+    body: Stripped
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_equals = _generate_deep_equals_expr(
+            "that.get(i)", "other.get(i)", type_anno.items
+        )
+
+        body = Stripped(
+            f"""\
+if (that.size() != other.size()) {{
+{I}return false;
+}}
+
+for (int i = 0; i < that.size(); i++) {{
+{I}if (!{indent_but_first_line(item_equals, I)}) {{
+{II}return false;
+{I}}}
+}}
+
+return true;"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        item_equals_joined = "\n&& ".join(
+            _generate_deep_equals_expr(
+                f"that.item{i + 1}()", f"other.item{i + 1}()", item_type_anno
+            )
+            for i, item_type_anno in enumerate(type_anno.items)
+        )
+
+        body = Stripped(
+            f"""\
+return (
+{I}{indent_but_first_line(item_equals_joined, I)});"""
+        )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(f"Unexpected set not compared by equals: {type_anno}")
+
+    else:
+        assert_never(type_anno)
+
+    return Stripped(
+        f"""\
+private Boolean {_deep_equals_method_name(type_anno)}(
+{I}{indent_but_first_line(value_type, I)} that,
+{I}{indent_but_first_line(value_type, I)} other) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 def _generate_transform_as_deep_equals(cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the transform method that checks for deep equality."""
     cls_name = java_naming.class_name(cls.name)
@@ -58,268 +218,50 @@ def _generate_transform_as_deep_equals(cls: intermediate.ConcreteClass) -> Strip
     exprs = []  # type: List[Stripped]
 
     for prop in cls.properties:
-        optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
         getter_name = java_naming.getter_name(prop.name)
-        primitive_type = intermediate.try_primitive_type(type_anno)
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        expr = None  # type: Optional[Stripped]
-
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
-            isinstance(type_anno, intermediate.OurTypeAnnotation)
-            and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
-        ):
-            assert primitive_type is not None
-            if (
-                primitive_type is intermediate.PrimitiveType.BOOL
-                or primitive_type is intermediate.PrimitiveType.INT
-                or primitive_type is intermediate.PrimitiveType.FLOAT
-                or primitive_type is intermediate.PrimitiveType.STR
-            ):
-                expr = Stripped(
-                    f"""\
-that.{getter_name}().equals(casted.{getter_name}())"""
-                )
-            elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                if optional:
-                    expr = Stripped(
-                        f"""\
-Arrays.equals(
-{I}that.{getter_name}().get(),
-{I}casted.{getter_name}().get())"""
-                    )
-                else:
-                    expr = Stripped(
-                        f"""\
-Arrays.equals(
-{I}that.{getter_name}(),
-{I}casted.{getter_name}())"""
-                    )
-            else:
-                assert_never(primitive_type)
-
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                expr = Stripped(
-                    f"""\
-that.{getter_name}().equals(casted.{getter_name}())"""
-                )
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                raise AssertionError("Expected to handle this case above")
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                if optional:
-                    expr = Stripped(
-                        f"""\
-(that.{getter_name}().isPresent()
-{I}? casted.{getter_name}().isPresent()
-{I}&& transform( that.{getter_name}().get(), casted.{getter_name}().get())
-{I}: ! casted.{getter_name}().isPresent())"""
-                    )
-                else:
-                    expr = Stripped(
-                        f"""\
-transform(
-{I}that.{getter_name}(),
-{I}casted.{getter_name}())"""
-                    )
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union has its own ``transform`` overload in the
-                # ``_DeepEqualiser`` (see
-                # :py:func:`_generate_union_transform_helper`), so it
-                # can be compared exactly like a class instance here.
-                if optional:
-                    expr = Stripped(
-                        f"""\
-(that.{getter_name}().isPresent()
-{I}? casted.{getter_name}().isPresent()
-{I}&& transform( that.{getter_name}().get(), casted.{getter_name}().get())
-{I}: ! casted.{getter_name}().isPresent())"""
-                    )
-                else:
-                    expr = Stripped(
-                        f"""\
-transform(
-{I}that.{getter_name}(),
-{I}casted.{getter_name}())"""
-                    )
-            else:
-                assert_never(type_anno.our_type)
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert not isinstance(
-                type_anno.items,
-                (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
-            ), (
-                f"(mristin): We handle only lists of atomic values (primitives, "
-                f"constrained primitives, enumeration literals) or lists of "
-                f"classes in the deep equality checks at the moment. Lists of "
-                f"lists or lists of optionals are not supported. Please contact "
-                f"the developers if you need this feature. The class in "
-                f"question was {cls.name!r} and the property {prop.name!r}."
-            )
-
-            item_primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-            if item_primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                # NOTE (mristin):
-                # ``byte[]`` does not override ``equals`` to compare content, so
-                # ``List.equals`` would compare the arrays by reference. We zip
-                # the two lists and compare each pair of byte arrays with
-                # ``Arrays.equals`` instead.
-                expr = Stripped(
-                    f"""\
-(that.{getter_name}().size() == casted.{getter_name}().size()
-{I}&& zip(that.{getter_name}().stream(), casted.{getter_name}().stream())
-{II}.allMatch(pair -> Arrays.equals(pair.getFirst(), pair.getSecond())))"""
-                )
-            else:
-                # NOTE (mristin):
-                # For lists of other primitives, constrained primitives or
-                # enumeration literals, the items are compared by value with
-                # their own ``equals`` method, so ``List.equals`` is sufficient.
-                expr = Stripped(
-                    f"""\
-that.{getter_name}().equals(casted.{getter_name}())"""
-                )
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            item_exprs = []  # type: List[Stripped]
-
-            for i, item_type_anno in enumerate(type_anno.items):
-                that_item = f"that.{getter_name}().item{i + 1}()"
-                casted_item = f"casted.{getter_name}().item{i + 1}()"
-
-                if optional:
-                    that_item = f"that.{getter_name}().get().item{i + 1}()"
-                    casted_item = f"casted.{getter_name}().get().item{i + 1}()"
-
-                item_primitive_type = intermediate.try_primitive_type(item_type_anno)
-
-                if isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(
-                    item_type_anno.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ):
-                    # NOTE (mristin):
-                    # A named union has its own ``transform`` overload in the
-                    # ``_DeepEqualiser`` (see
-                    # :py:func:`_generate_union_transform_helper`), so
-                    # it can be compared exactly like a class instance here.
-                    item_exprs.append(
-                        Stripped(
-                            f"""\
-transform(
-{I}{that_item},
-{I}{casted_item})"""
-                        )
-                    )
-                elif item_primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                    item_exprs.append(
-                        Stripped(
-                            f"""\
-Arrays.equals(
-{I}{that_item},
-{I}{casted_item})"""
-                        )
-                    )
-                else:
-                    item_exprs.append(Stripped(f"{that_item}.equals({casted_item})"))
-
-            items_joined = "\n&& ".join(item_exprs)
-
-            tuple_expr = Stripped(
-                f"""\
-({indent_but_first_line(items_joined, I)})"""
-            )
-
-            if optional:
-                expr = Stripped(
-                    f"""\
-(that.{getter_name}().isPresent()
-{I}? casted.{getter_name}().isPresent()
-{I}&& {indent_but_first_line(tuple_expr, I)}
-{I}: ! casted.{getter_name}().isPresent())"""
-                )
-            else:
-                expr = tuple_expr
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
+        if not isinstance(
+            prop.type_annotation, intermediate.OptionalTypeAnnotation
+        ) or _compares_by_equals(type_anno):
             # NOTE (mristin):
-            # Jackson's own ``equals`` compares a node by value, all the way
-            # down, so a JSON-able value needs nothing of its own here.
-            if optional:
-                expr = Stripped(
-                    f"""\
-(that.{getter_name}().isPresent()
-{I}? casted.{getter_name}().isPresent()
-{II}&& that.{getter_name}().get().equals(
-{III}casted.{getter_name}().get())
-{I}: ! casted.{getter_name}().isPresent())"""
+            # ``Optional.equals`` compares the values with their own ``equals``,
+            # so the optionals compared by ``equals`` need no unwrapping.
+            exprs.append(
+                _generate_deep_equals_expr(
+                    f"that.{getter_name}()", f"casted.{getter_name}()", type_anno
                 )
-            else:
-                expr = Stripped(
-                    f"""\
-that.{getter_name}().equals(
-{I}casted.{getter_name}())"""
-                )
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives, constrained primitives and enumeration
-            # literals, which all override ``equals`` to compare by value, so
-            # ``Set.equals`` compares the sets by value as well.
-            if optional:
-                expr = Stripped(
-                    f"""\
-(that.{getter_name}().isPresent()
-{I}? casted.{getter_name}().isPresent()
-{II}&& that.{getter_name}().get().equals(
-{III}casted.{getter_name}().get())
-{I}: ! casted.{getter_name}().isPresent())"""
-                )
-            else:
-                expr = Stripped(
-                    f"""\
-that.{getter_name}().equals(
-{I}casted.{getter_name}())"""
-                )
-
+            )
         else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
+            value_equals = _generate_deep_equals_expr(
+                f"that.{getter_name}().get()",
+                f"casted.{getter_name}().get()",
+                type_anno,
+            )
+            exprs.append(
+                Stripped(
+                    f"""\
+(that.{getter_name}().isPresent()
+{I}? casted.{getter_name}().isPresent()
+{II}&& {indent_but_first_line(value_equals, II)}
+{I}: !casted.{getter_name}().isPresent())"""
+                )
+            )
 
-        exprs.append(expr)
-
-    body_writer = io.StringIO()
+    body: Stripped
     if len(exprs) == 0:
         # NOTE (mristin):
         # There are no properties to compare, so the instances are trivially
         # deeply equal as soon as we know ``other`` is of the expected concrete
         # type (which we already checked above).
-        body_writer.write("return true;")
+        body = Stripped("return true;")
     else:
-        body_writer.write("return (")
-        for i, expr in enumerate(exprs):
-            body_writer.write("\n")
-            if i > 0:
-                body_writer.write(f"{I}&& {indent_but_first_line(expr, I)}")
-            else:
-                body_writer.write(f"{I}{indent_but_first_line(expr, I)}")
-
-        body_writer.write(");")
+        exprs_joined = "\n&& ".join(exprs)
+        body = Stripped(
+            f"""\
+return (
+{I}{indent_but_first_line(exprs_joined, I)});"""
+        )
 
     interface_name = java_naming.interface_name(cls.name)
     transform_name = java_naming.method_name(Identifier(f"transform_{cls.name}"))
@@ -332,9 +274,9 @@ public Boolean {transform_name}({interface_name} that, IClass other) {{
 {II}return false;
 {I}}}
 
-{I}{cls_name} casted = ({cls_name}) that;
+{I}{cls_name} casted = ({cls_name}) other;
 
-{I}{indent_but_first_line(body_writer.getvalue(), I)}
+{I}{indent_but_first_line(body, I)}
 }}"""
     )
 
@@ -377,6 +319,31 @@ def _generate_deep_equals_transformer(
 
     if len(symbol_table.named_unions) > 0:
         blocks.append(_generate_union_transform_helper())
+
+    # NOTE (mristin):
+    # We compare deeply the containers through methods of their own, one per
+    # type moniker.
+    observed_monikers = set()  # type: Set[str]
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno,
+                    (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+                ) or _compares_by_equals(type_anno):
+                    continue
+
+                moniker = java_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                blocks.append(_generate_deep_equals_container(type_anno=type_anno))
 
     writer = io.StringIO()
     writer.write(
@@ -421,70 +388,6 @@ def generate(
             """\
 private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();"""
         ),
-        Stripped(
-            f"""\
-/**
- * Compare two byte spans for equal content.
- */
-private static Boolean byteSpansEqual(byte[] that, byte[] other) {{
-{I}return that.equals(other);
-}}"""
-        ),
-        Stripped(
-            f"""\
-private static class _Pair<A, B> {{
-{I}private final A first;
-{I}private final B second;
-{I}
-{I}public _Pair(A first, B second) {{
-{II}this.first = first;
-{II}this.second = second;
-{I}}}
-{I}
-{I}public A getFirst() {{
-{II}return first;
-{I}}}
-{I}
-{I}public B getSecond() {{
-{II}return second;
-{I}}}
-}}"""
-        ),
-        Stripped(
-            f"""\
-// Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
-// Adapted from: https://stackoverflow.com/a/23529010
-private static <A, B> Stream<_Pair<A, B>> zip(
-{I}Stream<? extends A> a,
-{I}Stream<? extends B> b) {{
-{I}Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
-{I}Spliterator<? extends B> bSplit = Objects.requireNonNull(b).spliterator();
-{I}
-{I}int characteristics = aSplit.characteristics() & bSplit.characteristics() &
-{II}~(Spliterator.DISTINCT | Spliterator.SORTED);
-{I}
-{I}long zipSize = ((characteristics & Spliterator.SIZED) != 0)
-{II}? Math.min(aSplit.getExactSizeIfKnown(), bSplit.getExactSizeIfKnown())
-{II}: -1;
-{I}
-{I}Iterator<A> aIter = Spliterators.iterator(aSplit);
-{I}Iterator<B> bIter = Spliterators.iterator(bSplit);
-{I}Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {{
-{II}@Override
-{II}public boolean hasNext() {{
-{III}return aIter.hasNext() && bIter.hasNext();
-{II}}}
-{II}
-{II}@Override
-{II}public _Pair<A, B> next() {{
-{III}return new _Pair<>(aIter.next(), bIter.next());
-{II}}}
-{I}}};
-{I}
-{I}Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
-{I}return StreamSupport.stream(split, false);
-}}"""
-        ),
     ]  # type: List[Stripped]
 
     for concrete_cls in symbol_table.concrete_classes:
@@ -528,6 +431,31 @@ public void test{cls_name}DeepCopy() throws IOException {{
 
     blocks_joined = "\n\n".join(blocks)
 
+    imports = [
+        Stripped(f"import {package}.common.*;"),
+        Stripped(f"import {package}.copying.Copying;"),
+        Stripped(f"import {package}.types.enums.*;"),
+        Stripped(f"import {package}.types.impl.*;"),
+        Stripped(f"import {package}.types.model.*;"),
+        Stripped(f"import {package}.types.model.IClass;"),
+        Stripped(f"import {package}.visitation.AbstractTransformerWithContext;"),
+        Stripped("import java.io.IOException;"),
+        Stripped("import java.util.Arrays;"),
+        Stripped("import java.util.List;"),
+        Stripped("import org.junit.jupiter.api.Test;"),
+    ]  # type: List[Stripped]
+
+    # NOTE (mristin):
+    # The methods comparing the containers spell out the Jackson nodes in their
+    # signatures, and only the models which use one pay for the import.
+    if intermediate_uses.json_types(symbol_table):
+        imports.extend(
+            Stripped(f"import {json_import};")
+            for json_import in java_common.JSON_IMPORTS
+        )
+
+    imports_joined = "\n".join(imports)
+
     writer = io.StringIO()
     writer.write(
         f"""\
@@ -537,21 +465,7 @@ package {package}.tests;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import {package}.common.*;
-import {package}.copying.Copying;
-import {package}.types.impl.*;
-import {package}.types.model.*;
-import {package}.types.model.IClass;
-import {package}.visitation.AbstractTransformerWithContext;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import org.junit.jupiter.api.Test;
+{imports_joined}
 
 public class TestCopying {{
 {I}{indent_but_first_line(blocks_joined, I)}
