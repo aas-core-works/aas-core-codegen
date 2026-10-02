@@ -153,14 +153,7 @@ func wrapLangStringSet[E any](
 		result = that
 	}
 
-	theLangStrings := that.LangStrings()
-	for i, v := range theLangStrings {
-		// Update in-situ
-		theLangStrings[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.ILangString)
-	}
+	wrap_ListOf_ILangString_inPlace[E](that.LangStrings(), factory)
 
 	return
 }
@@ -228,13 +221,7 @@ func wrapIecContent[E any](
 
 	theDefinition := that.Definition()
 	if theDefinition != nil {
-		for i, v := range theDefinition {
-			// Update in-situ
-			theDefinition[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangString)
-		}
+		wrap_ListOf_ILangString_inPlace[E](theDefinition, factory)
 	}
 
 	return
@@ -354,12 +341,8 @@ func wrapSpecification[E any](
 		result = that
 	}
 
-	theContent := that.Content()
 	that.SetContent(
-		Wrap[E](
-			theContent,
-			factory,
-		).(ourtypes.IContent),
+		wrapClass[E](that.Content(), factory),
 	)
 
 	return
@@ -448,27 +431,59 @@ func wrapSomething[E any](
 		result = that
 	}
 
-	theLangStringSets := that.LangStringSets()
-	for i, v := range theLangStringSets {
-		// Update in-situ
-		theLangStringSets[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.ILangStringSet)
-	}
+	wrap_ListOf_ILangStringSet_inPlace[E](
+		that.LangStringSets(),
+		factory,
+	)
 
 	theSpecifications := that.Specifications()
 	if theSpecifications != nil {
-		for i, v := range theSpecifications {
-			// Update in-situ
-			theSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISpecification)
-		}
+		wrap_ListOf_ISpecification_inPlace[E](
+			theSpecifications,
+			factory,
+		)
 	}
 
 	return
+}
+
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return Wrap[E](that, factory).(T)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ILangString_inPlace[E any](
+	that []ourtypes.ILangString,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ILangStringSet_inPlace[E any](
+	that []ourtypes.ILangStringSet,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ISpecification_inPlace[E any](
+	that []ourtypes.ISpecification,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.

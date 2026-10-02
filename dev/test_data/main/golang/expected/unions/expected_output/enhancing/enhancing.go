@@ -18,30 +18,6 @@ type enhanced[E any] interface {
 	setEnhancement(E)
 }
 
-// Constrain a generic type parameter to a named union whose underlying
-// instance can be re-wrapped into the same concrete union type, needed for
-// a generic helper that both unwraps and re-wraps without knowing the
-// concrete union type.
-type selfUnion[T any] interface {
-	Underlying() ourtypes.IClass
-	WithUnderlying(ourtypes.IClass) T
-}
-
-// Wrap the underlying instance of `that` union recursively with the
-// enhancement produced by `factory`, and re-wrap the result back into the
-// same concrete union type as `that`.
-func wrapUnion[E any, T selfUnion[T]](
-	that T,
-	factory func(ourtypes.IClass) (E, bool),
-) T {
-	return that.WithUnderlying(
-		Wrap[E](
-			that.Underlying(),
-			factory,
-		),
-	)
-}
-
 type enhancedStructuralFirst[E any] struct {
 	instance ourtypes.IStructuralFirst
 	enhancement E
@@ -800,52 +776,38 @@ func wrapSomething[E any](
 		result = that
 	}
 
-	theStructuralProperty := that.StructuralProperty()
 	that.SetStructuralProperty(
-		wrapUnion[E](
-			theStructuralProperty,
-			factory,
-		),
+		wrapUnion[E](that.StructuralProperty(), factory),
 	)
 
-	theMixedProperty := that.MixedProperty()
 	that.SetMixedProperty(
-		wrapUnion[E](
-			theMixedProperty,
-			factory,
-		),
+		wrapUnion[E](that.MixedProperty(), factory),
 	)
 
-	theModelTypedProperty := that.ModelTypedProperty()
 	that.SetModelTypedProperty(
-		wrapUnion[E](
-			theModelTypedProperty,
-			factory,
-		),
+		wrapUnion[E](that.ModelTypedProperty(), factory),
 	)
 
-	theListStructuralProperty := that.ListStructuralProperty()
-	for i, v := range theListStructuralProperty {
-		// Update in-situ
-		theListStructuralProperty[i] = wrapUnion[E](v, factory)
-	}
+	wrap_ListOf_StructuralUnion_inPlace[E](
+		that.ListStructuralProperty(),
+		factory,
+	)
 
-	theListMixedProperty := that.ListMixedProperty()
-	for i, v := range theListMixedProperty {
-		// Update in-situ
-		theListMixedProperty[i] = wrapUnion[E](v, factory)
-	}
+	wrap_ListOf_MixedUnion_inPlace[E](
+		that.ListMixedProperty(),
+		factory,
+	)
 
-	theListModelTypedProperty := that.ListModelTypedProperty()
-	for i, v := range theListModelTypedProperty {
-		// Update in-situ
-		theListModelTypedProperty[i] = wrapUnion[E](v, factory)
-	}
+	wrap_ListOf_ModelTypedUnion_inPlace[E](
+		that.ListModelTypedProperty(),
+		factory,
+	)
 
 	theTupleProperty := that.TupleProperty()
-	theTupleProperty.Item1 = wrapUnion[E](theTupleProperty.Item1, factory)
-	theTupleProperty.Item2 = wrapUnion[E](theTupleProperty.Item2, factory)
-	theTupleProperty.Item3 = wrapUnion[E](theTupleProperty.Item3, factory)
+	wrap_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion_inPlace[E](
+		&theTupleProperty,
+		factory,
+	)
 	that.SetTupleProperty(
 		theTupleProperty,
 	)
@@ -853,42 +815,107 @@ func wrapSomething[E any](
 	theOptionalStructuralProperty := that.OptionalStructuralProperty()
 	if theOptionalStructuralProperty != nil {
 		that.SetOptionalStructuralProperty(
-			wrapUnion[E](
-				theOptionalStructuralProperty,
-				factory,
-			),
+			wrapUnion[E](theOptionalStructuralProperty, factory),
 		)
 	}
 
 	theOptionalMixedProperty := that.OptionalMixedProperty()
 	if theOptionalMixedProperty != nil {
 		that.SetOptionalMixedProperty(
-			wrapUnion[E](
-				theOptionalMixedProperty,
-				factory,
-			),
+			wrapUnion[E](theOptionalMixedProperty, factory),
 		)
 	}
 
 	theOptionalModelTypedProperty := that.OptionalModelTypedProperty()
 	if theOptionalModelTypedProperty != nil {
 		that.SetOptionalModelTypedProperty(
-			wrapUnion[E](
-				theOptionalModelTypedProperty,
-				factory,
-			),
+			wrapUnion[E](theOptionalModelTypedProperty, factory),
 		)
 	}
 
 	theOptionalListOverlappingProperty := that.OptionalListOverlappingProperty()
 	if theOptionalListOverlappingProperty != nil {
-		for i, v := range theOptionalListOverlappingProperty {
-			// Update in-situ
-			theOptionalListOverlappingProperty[i] = wrapUnion[E](v, factory)
-		}
+		wrap_ListOf_OverlappingUnion_inPlace[E](
+			theOptionalListOverlappingProperty,
+			factory,
+		)
 	}
 
 	return
+}
+
+// Constrain a generic type parameter to a named union whose underlying
+// instance can be re-wrapped into the same concrete union type, needed for
+// a generic helper that both unwraps and re-wraps without knowing the
+// concrete union type.
+type selfUnion[T any] interface {
+	Underlying() ourtypes.IClass
+	WithUnderlying(ourtypes.IClass) T
+}
+
+// Wrap the underlying instance of `that` union recursively with the
+// enhancement produced by `factory`, and re-wrap the result back into the
+// same concrete union type as `that`.
+func wrapUnion[E any, T selfUnion[T]](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return that.WithUnderlying(
+		Wrap[E](
+			that.Underlying(),
+			factory,
+		),
+	)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_StructuralUnion_inPlace[E any](
+	that []*ourtypes.StructuralUnion,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapUnion[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_MixedUnion_inPlace[E any](
+	that []*ourtypes.MixedUnion,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapUnion[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ModelTypedUnion_inPlace[E any](
+	that []*ourtypes.ModelTypedUnion,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapUnion[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion_inPlace[E any](
+	that *ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion],
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	that.Item1 = wrapUnion[E](that.Item1, factory)
+	that.Item2 = wrapUnion[E](that.Item2, factory)
+	that.Item3 = wrapUnion[E](that.Item3, factory)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_OverlappingUnion_inPlace[E any](
+	that []*ourtypes.OverlappingUnion,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapUnion[E](that[i], factory)
+	}
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.

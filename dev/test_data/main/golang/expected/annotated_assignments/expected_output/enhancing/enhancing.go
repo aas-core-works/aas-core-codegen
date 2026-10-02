@@ -17,30 +17,6 @@ type enhanced[E any] interface {
 	setEnhancement(E)
 }
 
-// Constrain a generic type parameter to a named union whose underlying
-// instance can be re-wrapped into the same concrete union type, needed for
-// a generic helper that both unwraps and re-wraps without knowing the
-// concrete union type.
-type selfUnion[T any] interface {
-	Underlying() ourtypes.IClass
-	WithUnderlying(ourtypes.IClass) T
-}
-
-// Wrap the underlying instance of `that` union recursively with the
-// enhancement produced by `factory`, and re-wrap the result back into the
-// same concrete union type as `that`.
-func wrapUnion[E any, T selfUnion[T]](
-	that T,
-	factory func(ourtypes.IClass) (E, bool),
-) T {
-	return that.WithUnderlying(
-		Wrap[E](
-			that.Underlying(),
-			factory,
-		),
-	)
-}
-
 type enhancedItem[E any] struct {
 	instance ourtypes.IItem
 	enhancement E
@@ -526,52 +502,74 @@ func wrapSomething[E any](
 		result = that
 	}
 
-	theItem := that.Item()
 	that.SetItem(
-		Wrap[E](
-			theItem,
-			factory,
-		).(ourtypes.IItem),
+		wrapClass[E](that.Item(), factory),
 	)
 
-	theParent := that.Parent()
 	that.SetParent(
-		Wrap[E](
-			theParent,
-			factory,
-		).(ourtypes.IParent),
+		wrapClass[E](that.Parent(), factory),
 	)
 
-	theParents := that.Parents()
-	for i, v := range theParents {
-		// Update in-situ
-		theParents[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.IParent)
-	}
+	wrap_ListOf_IParent_inPlace[E](that.Parents(), factory)
 
 	theOptionalParent := that.OptionalParent()
 	if theOptionalParent != nil {
 		that.SetOptionalParent(
-			Wrap[E](
-				theOptionalParent,
-				factory,
-			).(ourtypes.IParent),
+			wrapClass[E](theOptionalParent, factory),
 		)
 	}
 
 	theOptionalMember := that.OptionalMember()
 	if theOptionalMember != nil {
 		that.SetOptionalMember(
-			wrapUnion[E](
-				theOptionalMember,
-				factory,
-			),
+			wrapUnion[E](theOptionalMember, factory),
 		)
 	}
 
 	return
+}
+
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return Wrap[E](that, factory).(T)
+}
+
+// Constrain a generic type parameter to a named union whose underlying
+// instance can be re-wrapped into the same concrete union type, needed for
+// a generic helper that both unwraps and re-wraps without knowing the
+// concrete union type.
+type selfUnion[T any] interface {
+	Underlying() ourtypes.IClass
+	WithUnderlying(ourtypes.IClass) T
+}
+
+// Wrap the underlying instance of `that` union recursively with the
+// enhancement produced by `factory`, and re-wrap the result back into the
+// same concrete union type as `that`.
+func wrapUnion[E any, T selfUnion[T]](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return that.WithUnderlying(
+		Wrap[E](
+			that.Underlying(),
+			factory,
+		),
+	)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IParent_inPlace[E any](
+	that []ourtypes.IParent,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.

@@ -1,7 +1,7 @@
 """Generate code for enhancing model classes."""
 
 import io
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Mapping, Set
 
 from icontract import ensure, require
 
@@ -13,7 +13,11 @@ from aas_core_codegen.common import (
     assert_never,
     indent_but_first_line,
 )
-from aas_core_codegen.golang import common as golang_common, naming as golang_naming
+from aas_core_codegen.golang import (
+    common as golang_common,
+    naming as golang_naming,
+    pointering as golang_pointering,
+)
 from aas_core_codegen.golang.common import (
     INDENT as I,
     INDENT2 as II,
@@ -187,6 +191,160 @@ func ({receiver} *{enhanced_struct_name}[E]) setEnhancement(
     return result
 
 
+def _wrap_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the function wrapping in-situ the instances held by ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.golang.common.type_moniker`), so two different
+    containers never share a function. The other functions of the package never
+    contain an underscore, so they can not collide with it either. No leaf moniker
+    is ``inPlace``, so the suffix keeps the names injective.
+    """
+    return Identifier(f"wrap_{golang_common.type_moniker(type_anno)}_inPlace")
+
+
+def _generate_wrap_call(name: str, arg: str) -> Stripped:
+    """Generate the call of the wrapping function ``name`` on ``arg``."""
+    # Heuristic to break the lines, very rudimentary
+    if len(name) + len(arg) > 50:
+        return Stripped(
+            f"""\
+{name}[E](
+{I}{arg},
+{I}factory,
+)"""
+        )
+
+    return Stripped(f"{name}[E]({arg}, factory)")
+
+
+def _wrap_instance_name(type_anno: intermediate.OurTypeAnnotation) -> str:
+    """Name the helper wrapping the class instance or the named union."""
+    if isinstance(type_anno.our_type, intermediate.NamedUnion):
+        return "wrapUnion"
+
+    return "wrapClass"
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_wrap_stmt(
+    target: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the statement wrapping the instances held by the variable ``target``.
+
+    An instance is replaced by its wrapper. A container is delegated to its
+    function, which wraps only one level in-situ and calls the functions of its
+    items by name. This way the wrapping is composed of plain functions, to any
+    depth, and no container is ever copied.
+    """
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        wrap_call = _generate_wrap_call(_wrap_instance_name(type_anno), target)
+        return Stripped(f"{target} = {wrap_call}")
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return _generate_wrap_call(_wrap_container_name(type_anno), target)
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        # NOTE (mristin):
+        # A tuple is a struct passed by value, so we pass a pointer to it.
+        return _generate_wrap_call(_wrap_container_name(type_anno), f"&{target}")
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns, and the sets "
+        f"never hold instances."
+    )
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_wrap_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the function wrapping in-situ the instances held by ``type_anno``.
+
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    body: Stripped
+    that_type: str
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_stmt = _generate_wrap_stmt(
+            target="that[i]", type_anno=type_anno.items, descendability=descendability
+        )
+
+        body = Stripped(
+            f"""\
+for i := range that {{
+{I}{indent_but_first_line(item_stmt, I)}
+}}"""
+        )
+
+        that_type = golang_common.generate_type(
+            type_anno, types_package=Identifier("ourtypes")
+        )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # A set is a Golang map, and its keys can not be replaced while we iterate
+        # over it. Since no set holds instances at the moment, we refuse to
+        # generate the wrapping for now.
+        raise AssertionError(
+            f"Unexpected set holding instances: {type_anno}. We do not generate "
+            f"the wrapping of sets, since the keys of a Golang map can not be "
+            f"replaced in-situ. Please contact the developers if you need "
+            f"this feature."
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = Stripped(
+            "\n".join(
+                _generate_wrap_stmt(
+                    target=f"that.Item{i + 1}",
+                    type_anno=item,
+                    descendability=descendability,
+                )
+                for i, item in enumerate(type_anno.items)
+                if descendability[item]
+            )
+        )
+
+        that_type = "*" + golang_common.generate_type(
+            type_anno, types_package=Identifier("ourtypes")
+        )
+
+    else:
+        assert_never(type_anno)
+
+    return Stripped(
+        f"""\
+// Wrap recursively the instances held by `that` in-situ.
+func {_wrap_container_name(type_anno)}[E any](
+{I}that {that_type},
+{I}factory func(ourtypes.IClass) (E, bool),
+) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 def _generate_wrap_for_cls(cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the wrapping function for the concrete class."""
     interface_name = golang_naming.interface_name(cls.name)
@@ -195,259 +353,6 @@ def _generate_wrap_for_cls(cls: intermediate.ConcreteClass) -> Stripped:
     enhanced_struct_name = golang_naming.private_struct_name(
         Identifier(f"enhanced_{cls.name}")
     )
-
-    recurse_blocks = []  # type: List[Stripped]
-    for prop in cls.properties:
-        recurse_block: Stripped
-
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-        prop_getter_name = golang_naming.getter_name(prop.name)
-        prop_setter_name = golang_naming.setter_name(prop.name)
-
-        prop_var = golang_naming.variable_name(Identifier(f"the_{prop.name}"))
-
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            # Nothing to recurse into.
-            continue
-
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                # Nothing to recurse into.
-                continue
-
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                # Nothing to recurse into.
-                continue
-
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                prop_interface_name = golang_naming.interface_name(
-                    type_anno.our_type.name
-                )
-                recurse_block = Stripped(
-                    f"""\
-that.{prop_setter_name}(
-{I}Wrap[E](
-{II}{prop_var},
-{II}factory,
-{I}).(ourtypes.{prop_interface_name}),
-)"""
-                )
-
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union has its own ``wrapUnion`` generic helper
-                # (see :py:func:`_generate_self_union_and_wrap_union`), which
-                # already returns the union's own concrete type, so no type
-                # assertion is needed here, unlike the class branch above.
-                recurse_block = Stripped(
-                    f"""\
-that.{prop_setter_name}(
-{I}wrapUnion[E](
-{II}{prop_var},
-{II}factory,
-{I}),
-)"""
-                )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.our_type)
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-                # Nothing to recurse into.
-                continue
-
-            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-                if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                    # Nothing to recurse into.
-                    continue
-
-                elif isinstance(
-                    type_anno.items.our_type, intermediate.ConstrainedPrimitive
-                ):
-                    # Nothing to recurse into.
-                    continue
-
-                elif isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    items_interface_name = golang_naming.interface_name(
-                        type_anno.items.our_type.name
-                    )
-
-                    recurse_block = Stripped(
-                        f"""\
-for i, v := range {prop_var} {{
-{I}// Update in-situ
-{I}{prop_var}[i] = Wrap[E](
-{II}v,
-{II}factory,
-{I}).(ourtypes.{items_interface_name})
-}}"""
-                    )
-
-                elif isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union has its own ``wrapUnion`` generic helper
-                    # (see :py:func:`_generate_self_union_and_wrap_union`),
-                    # which already returns the union's own concrete type,
-                    # so no type assertion is needed here, unlike the class
-                    # branch above.
-                    recurse_block = Stripped(
-                        f"""\
-for i, v := range {prop_var} {{
-{I}// Update in-situ
-{I}{prop_var}[i] = wrapUnion[E](v, factory)
-}}"""
-                    )
-
-                else:
-                    assert_never(type_anno.items.our_type)
-
-            elif isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
-                raise NotImplementedError(
-                    f"NOTE (mristin): We do not currently support "
-                    f"the generation of enhancing code for lists of optionals, "
-                    f"but you specified {type_anno}. Please contact the developers if "
-                    f"you need this feature."
-                )
-
-            elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
-                raise NotImplementedError(
-                    f"NOTE (mristin): We do not currently support "
-                    f"the generation of enhancing code for lists of lists, "
-                    f"but you specified {type_anno}. Please contact the developers if "
-                    f"you need this feature."
-                )
-
-            elif isinstance(type_anno.items, intermediate.TupleTypeAnnotation):
-                raise NotImplementedError(
-                    f"NOTE (mristin): We do not currently support "
-                    f"the generation of enhancing code for lists of tuples, "
-                    f"but you specified {type_anno}. Please contact the developers if "
-                    f"you need this feature."
-                )
-
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # NOTE (mristin):
-                # A JSON-able value is plain data, never one of our own
-                # classes, so there is nothing to enhance.
-                continue
-
-            elif isinstance(type_anno.items, intermediate.SetTypeAnnotation):
-                raise AssertionError(
-                    f"Unexpected set nested in a list, as the parser refuses "
-                    f"the nested sets: {type_anno}"
-                )
-
-            else:
-                assert_never(type_anno.items)
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            item_assignments = []  # type: List[Stripped]
-            for i, item_type_anno in enumerate(type_anno.items):
-                if not isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                    continue
-
-                if isinstance(
-                    item_type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    item_interface_name = golang_naming.interface_name(
-                        item_type_anno.our_type.name
-                    )
-
-                    item_assignments.append(
-                        Stripped(
-                            f"""\
-{prop_var}.Item{i + 1} = Wrap[E](
-{I}{prop_var}.Item{i + 1},
-{I}factory,
-).(ourtypes.{item_interface_name})"""
-                        )
-                    )
-
-                elif isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union has its own ``wrapUnion`` generic helper
-                    # (see :py:func:`_generate_self_union_and_wrap_union`),
-                    # which already returns the union's own concrete type,
-                    # so no type assertion is needed here, unlike the class
-                    # branch above.
-                    item_assignments.append(
-                        Stripped(
-                            f"""\
-{prop_var}.Item{i + 1} = wrapUnion[E]({prop_var}.Item{i + 1}, factory)"""
-                        )
-                    )
-
-                else:
-                    continue
-
-            if len(item_assignments) == 0:
-                continue
-
-            item_assignments_joined = "\n".join(item_assignments)
-            recurse_block = Stripped(
-                f"""\
-{item_assignments_joined}
-that.{prop_setter_name}(
-{I}{prop_var},
-)"""
-            )
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able value is plain data, never one of our own classes, so
-            # there is nothing to enhance.
-            continue
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives and enumeration literals, never one of
-            # our own classes, so there is nothing to enhance.
-            continue
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            recurse_block = Stripped(
-                f"""\
-{prop_var} := that.{prop_getter_name}()
-if {prop_var} != nil {{
-{I}{indent_but_first_line(recurse_block, I)}
-}}"""
-            )
-        else:
-            recurse_block = Stripped(
-                f"""\
-{prop_var} := that.{prop_getter_name}()
-{recurse_block}"""
-            )
-
-        recurse_blocks.append(recurse_block)
 
     blocks = [
         Stripped(
@@ -469,8 +374,85 @@ if shouldEnhance {{
         ),
     ]
 
-    if len(recurse_blocks) > 0:
-        blocks.extend(recurse_blocks)
+    for prop in cls.properties:
+        descendability = intermediate.map_descendability(prop.type_annotation)
+
+        if not descendability[prop.type_annotation]:
+            # We can not enhance anything held by this property; nothing to do here.
+            continue
+
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+        prop_getter_name = golang_naming.getter_name(prop.name)
+        prop_setter_name = golang_naming.setter_name(prop.name)
+
+        is_optional = isinstance(
+            prop.type_annotation, intermediate.OptionalTypeAnnotation
+        )
+
+        prop_var = golang_naming.variable_name(Identifier(f"the_{prop.name}"))
+
+        stmt: Stripped
+        if isinstance(type_anno, intermediate.OurTypeAnnotation):
+            wrap_call = _generate_wrap_call(
+                _wrap_instance_name(type_anno),
+                prop_var if is_optional else f"that.{prop_getter_name}()",
+            )
+
+            stmt = Stripped(
+                f"""\
+that.{prop_setter_name}(
+{I}{indent_but_first_line(wrap_call, I)},
+)"""
+            )
+
+        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+            # NOTE (mristin):
+            # The list is wrapped in-situ, so there is nothing to set.
+            stmt = _generate_wrap_call(
+                _wrap_container_name(type_anno),
+                prop_var if is_optional else f"that.{prop_getter_name}()",
+            )
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            if is_optional:
+                # NOTE (mristin):
+                # An optional tuple is a pointer, so it is wrapped in-situ and
+                # there is nothing to set.
+                assert golang_pointering.is_pointer_type(prop.type_annotation)
+
+                stmt = _generate_wrap_call(_wrap_container_name(type_anno), prop_var)
+            else:
+                # NOTE (mristin):
+                # The getter returns the tuple by value, so we have to set it back.
+                wrap_call = _generate_wrap_call(
+                    _wrap_container_name(type_anno), f"&{prop_var}"
+                )
+
+                stmt = Stripped(
+                    f"""\
+{prop_var} := that.{prop_getter_name}()
+{wrap_call}
+that.{prop_setter_name}(
+{I}{prop_var},
+)"""
+                )
+
+        else:
+            raise AssertionError(
+                f"Unexpected type annotation holding instances: {type_anno}"
+            )
+
+        if is_optional:
+            stmt = Stripped(
+                f"""\
+{prop_var} := that.{prop_getter_name}()
+if {prop_var} != nil {{
+{I}{indent_but_first_line(stmt, I)}
+}}"""
+            )
+
+        blocks.append(stmt)
 
     blocks.append(Stripped("return"))
 
@@ -492,22 +474,12 @@ def _generate_self_union_and_wrap_union() -> Stripped:
     Generate the ``selfUnion`` constraint and the ``wrapUnion`` helper.
 
     A named union is not itself an ``ourtypes.IClass``, so it can not be
-    passed to ``Wrap[E]`` directly, and its underlying instance has to be
-    unwrapped, enhanced and re-wrapped. Go has no method overloading (unlike
-    C#/Java), so this can not be a same-named overload of ``Wrap`` -- but,
-    unlike C#/Java, Go also has no inheritance-based visitor dispatch to
-    special-case here in the first place, so a single small generic helper
-    covers every named union directly, with ``T`` self-bounded via
-    ``selfUnion[T]`` so the result comes back as the caller's own concrete
-    union type (e.g. ``*ourtypes.StructuralUnion``), with no type assertion
-    needed at any property/list-item/tuple-item call site -- unlike the
-    class-typed sibling call sites, which do need a ``.(ourtypes.IXxx)``
-    type assertion, since ``Wrap[E]`` itself is generic only over ``E`` and
-    always returns the common ``ourtypes.IClass``.
-
-    Should a named union ever be allowed to flatten primitive or enumeration
-    alternatives, only the body of ``wrapUnion`` has to change (to dispatch
-    on the underlying value's kind) -- every call site stays the same.
+    passed to ``wrapClass[E]``, and its underlying instance has to be
+    unwrapped, enhanced and re-wrapped. Go has no method overloading, so this
+    is a sibling helper rather than an overload. ``T`` is self-bounded via
+    ``selfUnion[T]``, so that we need only this one helper for *all* named
+    unions, while the result still comes back as the caller's own concrete
+    union type (*e.g.*, ``*ourtypes.StructuralUnion``).
     """
     return Stripped(
         f"""\
@@ -666,12 +638,69 @@ type enhanced[E any] interface {{
         ),
     ]  # type: List[Stripped]
 
-    if len(symbol_table.named_unions) > 0:
-        blocks.append(_generate_self_union_and_wrap_union())
-
     for cls in symbol_table.concrete_classes:
         blocks.extend(_generate_enhanced_struct_and_its_methods(cls=cls))
         blocks.append(_generate_wrap_for_cls(cls=cls))
+
+    container_blocks = []  # type: List[Stripped]
+    wraps_classes = False
+
+    observed_monikers = set()  # type: Set[str]
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+                    type_anno.our_type, intermediate.Class
+                ):
+                    wraps_classes = True
+                    continue
+
+                if (
+                    not isinstance(
+                        type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                    )
+                    or not descendability[type_anno]
+                ):
+                    continue
+
+                moniker = golang_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                container_blocks.append(
+                    _generate_wrap_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
+
+    if wraps_classes:
+        blocks.append(
+            Stripped(
+                f"""\
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+{I}that T,
+{I}factory func(ourtypes.IClass) (E, bool),
+) T {{
+{I}return Wrap[E](that, factory).(T)
+}}"""
+            )
+        )
+
+    if len(symbol_table.named_unions) > 0:
+        blocks.append(_generate_self_union_and_wrap_union())
+
+    blocks.extend(container_blocks)
+
     blocks.append(_generate_wrap(symbol_table=symbol_table))
     blocks.extend(
         [

@@ -241,47 +241,68 @@ func wrapSomething[E any](
 	}
 
 	theItems := that.Items()
-	theItems.Item1 = Wrap[E](
-		theItems.Item1,
+	wrap_TupleOf2_IAbstractItem_IAbstractItem_inPlace[E](
+		&theItems,
 		factory,
-	).(ourtypes.IAbstractItem)
-	theItems.Item2 = Wrap[E](
-		theItems.Item2,
-		factory,
-	).(ourtypes.IAbstractItem)
+	)
 	that.SetItems(
 		theItems,
 	)
 
 	theTricky := that.Tricky()
-	theTricky.Item2 = Wrap[E](
-		theTricky.Item2,
+	wrap_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result_inPlace[E](
+		&theTricky,
 		factory,
-	).(ourtypes.ISomeItem)
-	theTricky.Item3 = Wrap[E](
-		theTricky.Item3,
-		factory,
-	).(ourtypes.IAbstractItem)
-	theTricky.Item4 = Wrap[E](
-		theTricky.Item4,
-		factory,
-	).(ourtypes.ISomeItem)
+	)
 	that.SetTricky(
 		theTricky,
 	)
 
 	theOptionalPair := that.OptionalPair()
 	if theOptionalPair != nil {
-		theOptionalPair.Item2 = Wrap[E](
-			theOptionalPair.Item2,
-			factory,
-		).(ourtypes.IAbstractItem)
-		that.SetOptionalPair(
+		wrap_TupleOf2_string_IAbstractItem_inPlace[E](
 			theOptionalPair,
+			factory,
 		)
 	}
 
 	return
+}
+
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return Wrap[E](that, factory).(T)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_TupleOf2_IAbstractItem_IAbstractItem_inPlace[E any](
+	that *ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem],
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	that.Item1 = wrapClass[E](that.Item1, factory)
+	that.Item2 = wrapClass[E](that.Item2, factory)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result_inPlace[E any](
+	that *ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result],
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	that.Item2 = wrapClass[E](that.Item2, factory)
+	that.Item3 = wrapClass[E](that.Item3, factory)
+	that.Item4 = wrapClass[E](that.Item4, factory)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_TupleOf2_string_IAbstractItem_inPlace[E any](
+	that *ourcommon.Tuple2[string, ourtypes.IAbstractItem],
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	that.Item2 = wrapClass[E](that.Item2, factory)
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.

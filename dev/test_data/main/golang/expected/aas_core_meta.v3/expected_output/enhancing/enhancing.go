@@ -140,33 +140,21 @@ func wrapExtension[E any](
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theRefersTo := that.RefersTo()
 	if theRefersTo != nil {
-		for i, v := range theRefersTo {
-			// Update in-situ
-			theRefersTo[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](theRefersTo, factory)
 	}
 
 	return
@@ -279,22 +267,16 @@ func wrapAdministrativeInformation[E any](
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theCreator := that.Creator()
 	if theCreator != nil {
 		that.SetCreator(
-			Wrap[E](
-				theCreator,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theCreator, factory),
 		)
 	}
 
@@ -435,31 +417,22 @@ func wrapQualifier[E any](
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theValueID := that.ValueID()
 	if theValueID != nil {
 		that.SetValueID(
-			Wrap[E](
-				theValueID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theValueID, factory),
 		)
 	}
 
@@ -639,85 +612,54 @@ func wrapAssetAdministrationShell[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theAdministration := that.Administration()
 	if theAdministration != nil {
 		that.SetAdministration(
-			Wrap[E](
-				theAdministration,
-				factory,
-			).(ourtypes.IAdministrativeInformation),
+			wrapClass[E](theAdministration, factory),
 		)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theDerivedFrom := that.DerivedFrom()
 	if theDerivedFrom != nil {
 		that.SetDerivedFrom(
-			Wrap[E](
-				theDerivedFrom,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theDerivedFrom, factory),
 		)
 	}
 
-	theAssetInformation := that.AssetInformation()
 	that.SetAssetInformation(
-		Wrap[E](
-			theAssetInformation,
-			factory,
-		).(ourtypes.IAssetInformation),
+		wrapClass[E](that.AssetInformation(), factory),
 	)
 
 	theSubmodels := that.Submodels()
 	if theSubmodels != nil {
-		for i, v := range theSubmodels {
-			// Update in-situ
-			theSubmodels[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](theSubmodels, factory)
 	}
 
 	return
@@ -830,22 +772,16 @@ func wrapAssetInformation[E any](
 
 	theSpecificAssetIDs := that.SpecificAssetIDs()
 	if theSpecificAssetIDs != nil {
-		for i, v := range theSpecificAssetIDs {
-			// Update in-situ
-			theSpecificAssetIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISpecificAssetID)
-		}
+		wrap_ListOf_ISpecificAssetID_inPlace[E](
+			theSpecificAssetIDs,
+			factory,
+		)
 	}
 
 	theDefaultThumbnail := that.DefaultThumbnail()
 	if theDefaultThumbnail != nil {
 		that.SetDefaultThumbnail(
-			Wrap[E](
-				theDefaultThumbnail,
-				factory,
-			).(ourtypes.IResource),
+			wrapClass[E](theDefaultThumbnail, factory),
 		)
 	}
 
@@ -1035,31 +971,22 @@ func wrapSpecificAssetID[E any](
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theExternalSubjectID := that.ExternalSubjectID()
 	if theExternalSubjectID != nil {
 		that.SetExternalSubjectID(
-			Wrap[E](
-				theExternalSubjectID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theExternalSubjectID, factory),
 		)
 	}
 
@@ -1265,99 +1192,66 @@ func wrapSubmodel[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theAdministration := that.Administration()
 	if theAdministration != nil {
 		that.SetAdministration(
-			Wrap[E](
-				theAdministration,
-				factory,
-			).(ourtypes.IAdministrativeInformation),
+			wrapClass[E](theAdministration, factory),
 		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theSubmodelElements := that.SubmodelElements()
 	if theSubmodelElements != nil {
-		for i, v := range theSubmodelElements {
-			// Update in-situ
-			theSubmodelElements[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISubmodelElement)
-		}
+		wrap_ListOf_ISubmodelElement_inPlace[E](
+			theSubmodelElements,
+			factory,
+		)
 	}
 
 	return
@@ -1536,94 +1430,59 @@ func wrapRelationshipElement[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
-	theFirst := that.First()
 	that.SetFirst(
-		Wrap[E](
-			theFirst,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.First(), factory),
 	)
 
-	theSecond := that.Second()
 	that.SetSecond(
-		Wrap[E](
-			theSecond,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.Second(), factory),
 	)
 
 	return
@@ -1839,99 +1698,63 @@ func wrapSubmodelElementList[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theSemanticIDListElement := that.SemanticIDListElement()
 	if theSemanticIDListElement != nil {
 		that.SetSemanticIDListElement(
-			Wrap[E](
-				theSemanticIDListElement,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticIDListElement, factory),
 		)
 	}
 
 	theValue := that.Value()
 	if theValue != nil {
-		for i, v := range theValue {
-			// Update in-situ
-			theValue[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISubmodelElement)
-		}
+		wrap_ListOf_ISubmodelElement_inPlace[E](theValue, factory)
 	}
 
 	return
@@ -2099,89 +1922,56 @@ func wrapSubmodelElementCollection[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theValue := that.Value()
 	if theValue != nil {
-		for i, v := range theValue {
-			// Update in-situ
-			theValue[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISubmodelElement)
-		}
+		wrap_ListOf_ISubmodelElement_inPlace[E](theValue, factory)
 	}
 
 	return
@@ -2375,87 +2165,57 @@ func wrapProperty[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theValueID := that.ValueID()
 	if theValueID != nil {
 		that.SetValueID(
-			Wrap[E](
-				theValueID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theValueID, factory),
 		)
 	}
 
@@ -2639,98 +2399,62 @@ func wrapMultiLanguageProperty[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theValue := that.Value()
 	if theValue != nil {
-		for i, v := range theValue {
-			// Update in-situ
-			theValue[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](theValue, factory)
 	}
 
 	theValueID := that.ValueID()
 	if theValueID != nil {
 		that.SetValueID(
-			Wrap[E](
-				theValueID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theValueID, factory),
 		)
 	}
 
@@ -2925,78 +2649,51 @@ func wrapRange[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	return
@@ -3168,87 +2865,57 @@ func wrapReferenceElement[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theValue := that.Value()
 	if theValue != nil {
 		that.SetValue(
-			Wrap[E](
-				theValue,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theValue, factory),
 		)
 	}
 
@@ -3432,78 +3099,51 @@ func wrapBlob[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	return
@@ -3686,78 +3326,51 @@ func wrapFile[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	return
@@ -3947,105 +3560,64 @@ func wrapAnnotatedRelationshipElement[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
-	theFirst := that.First()
 	that.SetFirst(
-		Wrap[E](
-			theFirst,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.First(), factory),
 	)
 
-	theSecond := that.Second()
 	that.SetSecond(
-		Wrap[E](
-			theSecond,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.Second(), factory),
 	)
 
 	theAnnotations := that.Annotations()
 	if theAnnotations != nil {
-		for i, v := range theAnnotations {
-			// Update in-situ
-			theAnnotations[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IDataElement)
-		}
+		wrap_ListOf_IDataElement_inPlace[E](theAnnotations, factory)
 	}
 
 	return
@@ -4246,100 +3818,64 @@ func wrapEntity[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theStatements := that.Statements()
 	if theStatements != nil {
-		for i, v := range theStatements {
-			// Update in-situ
-			theStatements[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISubmodelElement)
-		}
+		wrap_ListOf_ISubmodelElement_inPlace[E](theStatements, factory)
 	}
 
 	theSpecificAssetIDs := that.SpecificAssetIDs()
 	if theSpecificAssetIDs != nil {
-		for i, v := range theSpecificAssetIDs {
-			// Update in-situ
-			theSpecificAssetIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISpecificAssetID)
-		}
+		wrap_ListOf_ISpecificAssetID_inPlace[E](
+			theSpecificAssetIDs,
+			factory,
+		)
 	}
 
 	return
@@ -4483,49 +4019,32 @@ func wrapEventPayload[E any](
 		result = that
 	}
 
-	theSource := that.Source()
 	that.SetSource(
-		Wrap[E](
-			theSource,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.Source(), factory),
 	)
 
 	theSourceSemanticID := that.SourceSemanticID()
 	if theSourceSemanticID != nil {
 		that.SetSourceSemanticID(
-			Wrap[E](
-				theSourceSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSourceSemanticID, factory),
 		)
 	}
 
-	theObservableReference := that.ObservableReference()
 	that.SetObservableReference(
-		Wrap[E](
-			theObservableReference,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.ObservableReference(), factory),
 	)
 
 	theObservableSemanticID := that.ObservableSemanticID()
 	if theObservableSemanticID != nil {
 		that.SetObservableSemanticID(
-			Wrap[E](
-				theObservableSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theObservableSemanticID, factory),
 		)
 	}
 
 	theSubjectID := that.SubjectID()
 	if theSubjectID != nil {
 		that.SetSubjectID(
-			Wrap[E](
-				theSubjectID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSubjectID, factory),
 		)
 	}
 
@@ -4771,95 +4290,61 @@ func wrapBasicEventElement[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
-	theObserved := that.Observed()
 	that.SetObserved(
-		Wrap[E](
-			theObserved,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.Observed(), factory),
 	)
 
 	theMessageBroker := that.MessageBroker()
 	if theMessageBroker != nil {
 		that.SetMessageBroker(
-			Wrap[E](
-				theMessageBroker,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theMessageBroker, factory),
 		)
 	}
 
@@ -5050,111 +4535,75 @@ func wrapOperation[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theInputVariables := that.InputVariables()
 	if theInputVariables != nil {
-		for i, v := range theInputVariables {
-			// Update in-situ
-			theInputVariables[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IOperationVariable)
-		}
+		wrap_ListOf_IOperationVariable_inPlace[E](
+			theInputVariables,
+			factory,
+		)
 	}
 
 	theOutputVariables := that.OutputVariables()
 	if theOutputVariables != nil {
-		for i, v := range theOutputVariables {
-			// Update in-situ
-			theOutputVariables[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IOperationVariable)
-		}
+		wrap_ListOf_IOperationVariable_inPlace[E](
+			theOutputVariables,
+			factory,
+		)
 	}
 
 	theInoutputVariables := that.InoutputVariables()
 	if theInoutputVariables != nil {
-		for i, v := range theInoutputVariables {
-			// Update in-situ
-			theInoutputVariables[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IOperationVariable)
-		}
+		wrap_ListOf_IOperationVariable_inPlace[E](
+			theInoutputVariables,
+			factory,
+		)
 	}
 
 	return
@@ -5221,12 +4670,8 @@ func wrapOperationVariable[E any](
 		result = that
 	}
 
-	theValue := that.Value()
 	that.SetValue(
-		Wrap[E](
-			theValue,
-			factory,
-		).(ourtypes.ISubmodelElement),
+		wrapClass[E](that.Value(), factory),
 	)
 
 	return
@@ -5383,78 +4828,51 @@ func wrapCapability[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theSemanticID := that.SemanticID()
 	if theSemanticID != nil {
 		that.SetSemanticID(
-			Wrap[E](
-				theSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theSemanticID, factory),
 		)
 	}
 
 	theSupplementalSemanticIDs := that.SupplementalSemanticIDs()
 	if theSupplementalSemanticIDs != nil {
-		for i, v := range theSupplementalSemanticIDs {
-			// Update in-situ
-			theSupplementalSemanticIDs[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](
+			theSupplementalSemanticIDs,
+			factory,
+		)
 	}
 
 	theQualifiers := that.Qualifiers()
 	if theQualifiers != nil {
-		for i, v := range theQualifiers {
-			// Update in-situ
-			theQualifiers[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IQualifier)
-		}
+		wrap_ListOf_IQualifier_inPlace[E](theQualifiers, factory)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	return
@@ -5611,67 +5029,43 @@ func wrapConceptDescription[E any](
 
 	theExtensions := that.Extensions()
 	if theExtensions != nil {
-		for i, v := range theExtensions {
-			// Update in-situ
-			theExtensions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IExtension)
-		}
+		wrap_ListOf_IExtension_inPlace[E](theExtensions, factory)
 	}
 
 	theDisplayName := that.DisplayName()
 	if theDisplayName != nil {
-		for i, v := range theDisplayName {
-			// Update in-situ
-			theDisplayName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringNameType)
-		}
+		wrap_ListOf_ILangStringNameType_inPlace[E](
+			theDisplayName,
+			factory,
+		)
 	}
 
 	theDescription := that.Description()
 	if theDescription != nil {
-		for i, v := range theDescription {
-			// Update in-situ
-			theDescription[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringTextType)
-		}
+		wrap_ListOf_ILangStringTextType_inPlace[E](
+			theDescription,
+			factory,
+		)
 	}
 
 	theAdministration := that.Administration()
 	if theAdministration != nil {
 		that.SetAdministration(
-			Wrap[E](
-				theAdministration,
-				factory,
-			).(ourtypes.IAdministrativeInformation),
+			wrapClass[E](theAdministration, factory),
 		)
 	}
 
 	theEmbeddedDataSpecifications := that.EmbeddedDataSpecifications()
 	if theEmbeddedDataSpecifications != nil {
-		for i, v := range theEmbeddedDataSpecifications {
-			// Update in-situ
-			theEmbeddedDataSpecifications[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IEmbeddedDataSpecification)
-		}
+		wrap_ListOf_IEmbeddedDataSpecification_inPlace[E](
+			theEmbeddedDataSpecifications,
+			factory,
+		)
 	}
 
 	theIsCaseOf := that.IsCaseOf()
 	if theIsCaseOf != nil {
-		for i, v := range theIsCaseOf {
-			// Update in-situ
-			theIsCaseOf[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IReference)
-		}
+		wrap_ListOf_IReference_inPlace[E](theIsCaseOf, factory)
 	}
 
 	return
@@ -5763,21 +5157,11 @@ func wrapReference[E any](
 	theReferredSemanticID := that.ReferredSemanticID()
 	if theReferredSemanticID != nil {
 		that.SetReferredSemanticID(
-			Wrap[E](
-				theReferredSemanticID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theReferredSemanticID, factory),
 		)
 	}
 
-	theKeys := that.Keys()
-	for i, v := range theKeys {
-		// Update in-situ
-		theKeys[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.IKey)
-	}
+	wrap_ListOf_IKey_inPlace[E](that.Keys(), factory)
 
 	return
 }
@@ -6092,35 +5476,23 @@ func wrapEnvironment[E any](
 
 	theAssetAdministrationShells := that.AssetAdministrationShells()
 	if theAssetAdministrationShells != nil {
-		for i, v := range theAssetAdministrationShells {
-			// Update in-situ
-			theAssetAdministrationShells[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IAssetAdministrationShell)
-		}
+		wrap_ListOf_IAssetAdministrationShell_inPlace[E](
+			theAssetAdministrationShells,
+			factory,
+		)
 	}
 
 	theSubmodels := that.Submodels()
 	if theSubmodels != nil {
-		for i, v := range theSubmodels {
-			// Update in-situ
-			theSubmodels[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ISubmodel)
-		}
+		wrap_ListOf_ISubmodel_inPlace[E](theSubmodels, factory)
 	}
 
 	theConceptDescriptions := that.ConceptDescriptions()
 	if theConceptDescriptions != nil {
-		for i, v := range theConceptDescriptions {
-			// Update in-situ
-			theConceptDescriptions[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.IConceptDescription)
-		}
+		wrap_ListOf_IConceptDescription_inPlace[E](
+			theConceptDescriptions,
+			factory,
+		)
 	}
 
 	return
@@ -6198,20 +5570,12 @@ func wrapEmbeddedDataSpecification[E any](
 		result = that
 	}
 
-	theDataSpecification := that.DataSpecification()
 	that.SetDataSpecification(
-		Wrap[E](
-			theDataSpecification,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.DataSpecification(), factory),
 	)
 
-	theDataSpecificationContent := that.DataSpecificationContent()
 	that.SetDataSpecificationContent(
-		Wrap[E](
-			theDataSpecificationContent,
-			factory,
-		).(ourtypes.IDataSpecificationContent),
+		wrapClass[E](that.DataSpecificationContent(), factory),
 	)
 
 	return
@@ -6386,12 +5750,8 @@ func wrapValueReferencePair[E any](
 		result = that
 	}
 
-	theValueID := that.ValueID()
 	that.SetValueID(
-		Wrap[E](
-			theValueID,
-			factory,
-		).(ourtypes.IReference),
+		wrapClass[E](that.ValueID(), factory),
 	)
 
 	return
@@ -6458,14 +5818,10 @@ func wrapValueList[E any](
 		result = that
 	}
 
-	theValueReferencePairs := that.ValueReferencePairs()
-	for i, v := range theValueReferencePairs {
-		// Update in-situ
-		theValueReferencePairs[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.IValueReferencePair)
-	}
+	wrap_ListOf_IValueReferencePair_inPlace[E](
+		that.ValueReferencePairs(),
+		factory,
+	)
 
 	return
 }
@@ -6877,68 +6233,238 @@ func wrapDataSpecificationIEC61360[E any](
 		result = that
 	}
 
-	thePreferredName := that.PreferredName()
-	for i, v := range thePreferredName {
-		// Update in-situ
-		thePreferredName[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.ILangStringPreferredNameTypeIEC61360)
-	}
+	wrap_ListOf_ILangStringPreferredNameTypeIEC61360_inPlace[E](
+		that.PreferredName(),
+		factory,
+	)
 
 	theShortName := that.ShortName()
 	if theShortName != nil {
-		for i, v := range theShortName {
-			// Update in-situ
-			theShortName[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringShortNameTypeIEC61360)
-		}
+		wrap_ListOf_ILangStringShortNameTypeIEC61360_inPlace[E](
+			theShortName,
+			factory,
+		)
 	}
 
 	theUnitID := that.UnitID()
 	if theUnitID != nil {
 		that.SetUnitID(
-			Wrap[E](
-				theUnitID,
-				factory,
-			).(ourtypes.IReference),
+			wrapClass[E](theUnitID, factory),
 		)
 	}
 
 	theDefinition := that.Definition()
 	if theDefinition != nil {
-		for i, v := range theDefinition {
-			// Update in-situ
-			theDefinition[i] = Wrap[E](
-				v,
-				factory,
-			).(ourtypes.ILangStringDefinitionTypeIEC61360)
-		}
+		wrap_ListOf_ILangStringDefinitionTypeIEC61360_inPlace[E](
+			theDefinition,
+			factory,
+		)
 	}
 
 	theValueList := that.ValueList()
 	if theValueList != nil {
 		that.SetValueList(
-			Wrap[E](
-				theValueList,
-				factory,
-			).(ourtypes.IValueList),
+			wrapClass[E](theValueList, factory),
 		)
 	}
 
 	theLevelType := that.LevelType()
 	if theLevelType != nil {
 		that.SetLevelType(
-			Wrap[E](
-				theLevelType,
-				factory,
-			).(ourtypes.ILevelType),
+			wrapClass[E](theLevelType, factory),
 		)
 	}
 
 	return
+}
+
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return Wrap[E](that, factory).(T)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IReference_inPlace[E any](
+	that []ourtypes.IReference,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IEmbeddedDataSpecification_inPlace[E any](
+	that []ourtypes.IEmbeddedDataSpecification,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IExtension_inPlace[E any](
+	that []ourtypes.IExtension,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ILangStringNameType_inPlace[E any](
+	that []ourtypes.ILangStringNameType,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ILangStringTextType_inPlace[E any](
+	that []ourtypes.ILangStringTextType,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ISpecificAssetID_inPlace[E any](
+	that []ourtypes.ISpecificAssetID,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IQualifier_inPlace[E any](
+	that []ourtypes.IQualifier,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ISubmodelElement_inPlace[E any](
+	that []ourtypes.ISubmodelElement,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IDataElement_inPlace[E any](
+	that []ourtypes.IDataElement,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IOperationVariable_inPlace[E any](
+	that []ourtypes.IOperationVariable,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IKey_inPlace[E any](
+	that []ourtypes.IKey,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IAssetAdministrationShell_inPlace[E any](
+	that []ourtypes.IAssetAdministrationShell,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ISubmodel_inPlace[E any](
+	that []ourtypes.ISubmodel,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IConceptDescription_inPlace[E any](
+	that []ourtypes.IConceptDescription,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IValueReferencePair_inPlace[E any](
+	that []ourtypes.IValueReferencePair,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ILangStringPreferredNameTypeIEC61360_inPlace[E any](
+	that []ourtypes.ILangStringPreferredNameTypeIEC61360,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ILangStringShortNameTypeIEC61360_inPlace[E any](
+	that []ourtypes.ILangStringShortNameTypeIEC61360,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ILangStringDefinitionTypeIEC61360_inPlace[E any](
+	that []ourtypes.ILangStringDefinitionTypeIEC61360,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.
