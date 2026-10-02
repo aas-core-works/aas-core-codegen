@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -300,16 +299,7 @@ namespace dummy
                     );
                 }
 
-                var transformedParent = Transform(
-                    that.Parent
-                );
-                var castedParent = (
-                    transformedParent as Our.IParent
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IParent, " +
-                    $"but got: {transformedParent}"
-                );
-                that.Parent = castedParent;
+                that.Parent = Wrap(that.Parent);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -317,6 +307,20 @@ namespace dummy
                     : new EnhancedSomething<TEnhancement>(
                         that,
                         enhancement
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
                     );
             }
         }

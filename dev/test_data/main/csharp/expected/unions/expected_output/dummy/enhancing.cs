@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -875,54 +874,42 @@ namespace dummy
                     );
                 }
 
-                that.StructuralProperty = Transform(that.StructuralProperty);
+                that.StructuralProperty = Wrap(that.StructuralProperty);
 
-                that.MixedProperty = Transform(that.MixedProperty);
+                that.MixedProperty = Wrap(that.MixedProperty);
 
-                that.ModelTypedProperty = Transform(that.ModelTypedProperty);
+                that.ModelTypedProperty = Wrap(that.ModelTypedProperty);
 
-                that.ListStructuralProperty = (
-                    that.ListStructuralProperty
-                    .Select(Transform)
-                ).ToList();
+                that.ListStructuralProperty = Wrap_ListOf_StructuralUnion(
+                    that.ListStructuralProperty);
 
-                that.ListMixedProperty = (
-                    that.ListMixedProperty
-                    .Select(Transform)
-                ).ToList();
+                that.ListMixedProperty = Wrap_ListOf_MixedUnion(that.ListMixedProperty);
 
-                that.ListModelTypedProperty = (
-                    that.ListModelTypedProperty
-                    .Select(Transform)
-                ).ToList();
+                that.ListModelTypedProperty = Wrap_ListOf_ModelTypedUnion(
+                    that.ListModelTypedProperty);
 
-                that.TupleProperty = (
-                    Transform(that.TupleProperty.Item1),
-                    Transform(that.TupleProperty.Item2),
-                    Transform(that.TupleProperty.Item3)
-                );
+                that.TupleProperty = Wrap_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+                    that.TupleProperty);
 
                 if (that.OptionalStructuralProperty != null)
                 {
-                    that.OptionalStructuralProperty = Transform(that.OptionalStructuralProperty);
+                    that.OptionalStructuralProperty = Wrap(that.OptionalStructuralProperty);
                 }
 
                 if (that.OptionalMixedProperty != null)
                 {
-                    that.OptionalMixedProperty = Transform(that.OptionalMixedProperty);
+                    that.OptionalMixedProperty = Wrap(that.OptionalMixedProperty);
                 }
 
                 if (that.OptionalModelTypedProperty != null)
                 {
-                    that.OptionalModelTypedProperty = Transform(that.OptionalModelTypedProperty);
+                    that.OptionalModelTypedProperty = Wrap(that.OptionalModelTypedProperty);
                 }
 
                 if (that.OptionalListOverlappingProperty != null)
                 {
-                    that.OptionalListOverlappingProperty = (
-                        that.OptionalListOverlappingProperty
-                        .Select(Transform)
-                    ).ToList();
+                    that.OptionalListOverlappingProperty = Wrap_ListOf_OverlappingUnion(
+                        that.OptionalListOverlappingProperty);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -934,10 +921,83 @@ namespace dummy
                     );
             }
 
-            private T Transform<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
+            private T Wrap<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
             {
                 return that.WithUnderlying(
                     Transform(that.Underlying));
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.StructuralUnion> Wrap_ListOf_StructuralUnion(
+                List<Our.StructuralUnion> that)
+            {
+                var result = new List<Our.StructuralUnion>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.MixedUnion> Wrap_ListOf_MixedUnion(
+                List<Our.MixedUnion> that)
+            {
+                var result = new List<Our.MixedUnion>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ModelTypedUnion> Wrap_ListOf_ModelTypedUnion(
+                List<Our.ModelTypedUnion> that)
+            {
+                var result = new List<Our.ModelTypedUnion>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private (Our.StructuralUnion, Our.MixedUnion, Our.ModelTypedUnion) Wrap_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+                (Our.StructuralUnion, Our.MixedUnion, Our.ModelTypedUnion) that)
+            {
+                return (
+                    Wrap(that.Item1),
+                    Wrap(that.Item2),
+                    Wrap(that.Item3)
+                );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.OverlappingUnion> Wrap_ListOf_OverlappingUnion(
+                List<Our.OverlappingUnion> that)
+            {
+                var result = new List<Our.OverlappingUnion>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
             }
         }
 

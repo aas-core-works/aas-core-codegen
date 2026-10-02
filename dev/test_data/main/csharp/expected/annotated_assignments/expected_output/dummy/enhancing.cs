@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -508,60 +507,20 @@ namespace dummy
                     );
                 }
 
-                var transformedItem = Transform(
-                    that.Item
-                );
-                var castedItem = (
-                    transformedItem as Our.IItem
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IItem, " +
-                    $"but got: {transformedItem}"
-                );
-                that.Item = castedItem;
+                that.Item = Wrap(that.Item);
 
-                var transformedParent = Transform(
-                    that.Parent
-                );
-                var castedParent = (
-                    transformedParent as Our.IParent
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IParent, " +
-                    $"but got: {transformedParent}"
-                );
-                that.Parent = castedParent;
+                that.Parent = Wrap(that.Parent);
 
-                that.Parents = (
-                    that.Parents
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.IParent
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a IParent, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.Parents = Wrap_ListOf_IParent(that.Parents);
 
                 if (that.OptionalParent != null)
                 {
-                    var transformedOptionalParent = Transform(
-                        that.OptionalParent
-                    );
-                    var castedOptionalParent = (
-                        transformedOptionalParent as Our.IParent
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IParent, " +
-                        $"but got: {transformedOptionalParent}"
-                    );
-                    that.OptionalParent = castedOptionalParent;
+                    that.OptionalParent = Wrap(that.OptionalParent);
                 }
 
                 if (that.OptionalMember != null)
                 {
-                    that.OptionalMember = Transform(that.OptionalMember);
+                    that.OptionalMember = Wrap(that.OptionalMember);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -573,10 +532,39 @@ namespace dummy
                     );
             }
 
-            private T Transform<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
+                    );
+            }
+
+            private T Wrap<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
             {
                 return that.WithUnderlying(
                     Transform(that.Underlying));
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IParent> Wrap_ListOf_IParent(
+                List<Our.IParent> that)
+            {
+                var result = new List<Our.IParent>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
             }
         }
 

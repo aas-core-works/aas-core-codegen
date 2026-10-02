@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {

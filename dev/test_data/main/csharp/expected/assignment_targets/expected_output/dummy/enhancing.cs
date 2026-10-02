@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -223,33 +222,11 @@ namespace dummy
                     );
                 }
 
-                that.Items = (
-                    that.Items
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.IItem
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a IItem, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.Items = Wrap_ListOf_IItem(that.Items);
 
                 if (that.MaybeItem != null)
                 {
-                    var transformedMaybeItem = Transform(
-                        that.MaybeItem
-                    );
-                    var castedMaybeItem = (
-                        transformedMaybeItem as Our.IItem
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IItem, " +
-                        $"but got: {transformedMaybeItem}"
-                    );
-                    that.MaybeItem = castedMaybeItem;
+                    that.MaybeItem = Wrap(that.MaybeItem);
                 }
 
                 var enhancement = _enhancementFactory(that);
@@ -259,6 +236,35 @@ namespace dummy
                         that,
                         enhancement
                     );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IItem> Wrap_ListOf_IItem(
+                List<Our.IItem> that)
+            {
+                var result = new List<Our.IItem>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
             }
         }
 

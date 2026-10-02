@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -447,27 +446,9 @@ namespace dummy
                     );
                 }
 
-                var transformedSomeChoice = Transform(
-                    that.SomeChoice
-                );
-                var castedSomeChoice = (
-                    transformedSomeChoice as Our.INode
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a INode, " +
-                    $"but got: {transformedSomeChoice}"
-                );
-                that.SomeChoice = castedSomeChoice;
+                that.SomeChoice = Wrap(that.SomeChoice);
 
-                var transformedSomethingWithoutChoice = Transform(
-                    that.SomethingWithoutChoice
-                );
-                var castedSomethingWithoutChoice = (
-                    transformedSomethingWithoutChoice as Our.IBranch
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IBranch, " +
-                    $"but got: {transformedSomethingWithoutChoice}"
-                );
-                that.SomethingWithoutChoice = castedSomethingWithoutChoice;
+                that.SomethingWithoutChoice = Wrap(that.SomethingWithoutChoice);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -489,27 +470,9 @@ namespace dummy
                     );
                 }
 
-                var transformedNode = Transform(
-                    that.Node
-                );
-                var castedNode = (
-                    transformedNode as Our.INode
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a INode, " +
-                    $"but got: {transformedNode}"
-                );
-                that.Node = castedNode;
+                that.Node = Wrap(that.Node);
 
-                var transformedSomething = Transform(
-                    that.Something
-                );
-                var castedSomething = (
-                    transformedSomething as Our.ISomething
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a ISomething, " +
-                    $"but got: {transformedSomething}"
-                );
-                that.Something = castedSomething;
+                that.Something = Wrap(that.Something);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -517,6 +480,20 @@ namespace dummy
                     : new EnhancedContainer<TEnhancement>(
                         that,
                         enhancement
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
                     );
             }
         }

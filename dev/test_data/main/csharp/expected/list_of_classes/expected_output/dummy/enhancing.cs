@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -354,46 +353,11 @@ namespace dummy
                     );
                 }
 
-                var transformedItem = Transform(
-                    that.Item
-                );
-                var castedItem = (
-                    transformedItem as Our.ISimple
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a ISimple, " +
-                    $"but got: {transformedItem}"
-                );
-                that.Item = castedItem;
+                that.Item = Wrap(that.Item);
 
-                that.SomeItems = (
-                    that.SomeItems
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.IAbstractItem
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a IAbstractItem, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.SomeItems = Wrap_ListOf_IAbstractItem(that.SomeItems);
 
-                that.SomeSimples = (
-                    that.SomeSimples
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.ISimple
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a ISimple, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.SomeSimples = Wrap_ListOf_ISimple(that.SomeSimples);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -402,6 +366,50 @@ namespace dummy
                         that,
                         enhancement
                     );
+            }
+
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
+                    );
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IAbstractItem> Wrap_ListOf_IAbstractItem(
+                List<Our.IAbstractItem> that)
+            {
+                var result = new List<Our.IAbstractItem>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.ISimple> Wrap_ListOf_ISimple(
+                List<Our.ISimple> that)
+            {
+                var result = new List<Our.ISimple>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
             }
         }
 

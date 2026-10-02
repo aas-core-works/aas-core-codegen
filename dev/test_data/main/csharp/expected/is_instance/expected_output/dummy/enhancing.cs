@@ -5,7 +5,6 @@
 
 using Our = dummy;  // renamed
 using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
 namespace dummy
 {
@@ -629,20 +628,7 @@ namespace dummy
                     );
                 }
 
-                that.Children = (
-                    that.Children
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.IElement
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a IElement, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.Children = Wrap_ListOf_IElement(that.Children);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -664,20 +650,7 @@ namespace dummy
                     );
                 }
 
-                that.Children = (
-                    that.Children
-                    .Select(
-                        (item) => {
-                            var transformed = Transform(item);
-                            return (
-                                transformed as Our.IElement
-                            ) ?? throw new System.InvalidOperationException(
-                                "Expected the transformed item to be a IElement, " +
-                                $"but got: {transformed}"
-                            );
-                        }
-                    )
-                ).ToList();
+                that.Children = Wrap_ListOf_IElement(that.Children);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -739,7 +712,7 @@ namespace dummy
                     );
                 }
 
-                that.Attribute = Transform(that.Attribute);
+                that.Attribute = Wrap(that.Attribute);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -801,37 +774,16 @@ namespace dummy
                     );
                 }
 
-                var transformedRoot = Transform(
-                    that.Root
-                );
-                var castedRoot = (
-                    transformedRoot as Our.IElement
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IElement, " +
-                    $"but got: {transformedRoot}"
-                );
-                that.Root = castedRoot;
+                that.Root = Wrap(that.Root);
 
                 if (that.OptionalElement != null)
                 {
-                    var transformedOptionalElement = Transform(
-                        that.OptionalElement
-                    );
-                    var castedOptionalElement = (
-                        transformedOptionalElement as Our.IElement
-                    ) ?? throw new System.InvalidOperationException(
-                        "Expected the transformed value to be a IElement, " +
-                        $"but got: {transformedOptionalElement}"
-                    );
-                    that.OptionalElement = castedOptionalElement;
+                    that.OptionalElement = Wrap(that.OptionalElement);
                 }
 
-                that.Value = Transform(that.Value);
+                that.Value = Wrap(that.Value);
 
-                that.Values = (
-                    that.Values
-                    .Select(Transform)
-                ).ToList();
+                that.Values = Wrap_ListOf_Value(that.Values);
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)
@@ -842,10 +794,54 @@ namespace dummy
                     );
             }
 
-            private T Transform<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
+            /// <summary>
+            /// Wrap recursively <paramref name="that" /> and keep its static type.
+            /// </summary>
+            private T Wrap<T>(T that) where T : Our.IClass
+            {
+                var transformed = Transform(that);
+                return (transformed is T casted)
+                    ? casted
+                    : throw new System.InvalidOperationException(
+                        $"Expected the transformed value to be a {typeof(T).Name}, " +
+                        $"but got: {transformed}"
+                    );
+            }
+
+            private T Wrap<T>(Our.IUnion<T> that) where T : Our.IUnion<T>
             {
                 return that.WithUnderlying(
                     Transform(that.Underlying));
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.IElement> Wrap_ListOf_IElement(
+                List<Our.IElement> that)
+            {
+                var result = new List<Our.IElement>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private List<Our.Value> Wrap_ListOf_Value(
+                List<Our.Value> that)
+            {
+                var result = new List<Our.Value>(that.Count);
+                foreach (var item in that)
+                {
+                    result.Add(Wrap(item));
+                }
+
+                return result;
             }
         }
 
