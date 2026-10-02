@@ -48,6 +48,18 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IParent> deepListOf_IParent(
+        List<IParent> that) {
+        List<IParent> result = new ArrayList<>(that.size());
+        for (IParent item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -136,21 +148,11 @@ public class Copying
         public IClass transformContainer (
             IContainer that
         ) {
-            List<IParent> thatChildren =
-                that.getChildren().orElse(null);
-            List<IParent> theChildren = null;
-            if (thatChildren != null) {
-                theChildren = new ArrayList<>(
-                    thatChildren.size());
-                for (IParent item : thatChildren)
-                {
-                    theChildren.add(deep(item));
-                }
-            }
-
             return new Container(
                 that.getOptionalText().orElse(null),
-                theChildren
+                that.getChildren().isPresent()
+                    ? deepListOf_IParent(that.getChildren().get())
+                    : null
             );
         }
 
@@ -158,26 +160,18 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<IParent> thatParents =
-                that.getParents().orElse(null);
-            List<IParent> theParents = null;
-            if (thatParents != null) {
-                theParents = new ArrayList<>(
-                    thatParents.size());
-                for (IParent item : thatParents)
-                {
-                    theParents.add(deep(item));
-                }
-            }
-
             return new Something(
                 that.getKind(),
                 that.getText(),
                 that.getNumber(),
                 that.getFlag(),
                 deep(that.getItem()),
-                that.getOptionalParent().orElse(null),
-                theParents
+                that.getOptionalParent().isPresent()
+                    ? deep(that.getOptionalParent().get())
+                    : null,
+                that.getParents().isPresent()
+                    ? deepListOf_IParent(that.getParents().get())
+                    : null
             );
         }
     }

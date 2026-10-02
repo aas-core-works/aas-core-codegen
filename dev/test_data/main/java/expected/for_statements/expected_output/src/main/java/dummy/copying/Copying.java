@@ -48,6 +48,18 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IItem> deepListOf_IItem(
+        List<IItem> that) {
+        List<IItem> result = new ArrayList<>(that.size());
+        for (IItem item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -76,11 +88,8 @@ public class Copying
         public IClass transformItem (
             IItem that
         ) {
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
             return new Item(
-                theTexts
+                new ArrayList<>(that.getTexts())
             );
         }
 
@@ -88,23 +97,11 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<Long> theNumbers = new ArrayList<>(
-                that.getNumbers());
-
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
-            List<IItem> theItems = new ArrayList<>(
-                that.getItems().size());
-            for (IItem item : that.getItems()) {
-                theItems.add(deep(item));
-            }
-
             return new Something(
                 that.getKind(),
-                theNumbers,
-                theTexts,
-                theItems
+                new ArrayList<>(that.getNumbers()),
+                new ArrayList<>(that.getTexts()),
+                deepListOf_IItem(that.getItems())
             );
         }
     }

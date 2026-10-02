@@ -75,7 +75,7 @@ public class Copying
                 that.getSomeInt(),
                 that.getSomeFloat(),
                 that.getSomeString(),
-                that.getSomeBytes()
+                that.getSomeBytes().clone()
             );
         }
     }

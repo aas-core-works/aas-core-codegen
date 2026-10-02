@@ -79,11 +79,8 @@ public class Copying
         public IClass transformFirst (
             IFirst that
         ) {
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
             return new First(
-                theTexts,
+                new ArrayList<>(that.getTexts()),
                 that.getCount(),
                 that.getKind().orElse(null)
             );
@@ -93,11 +90,8 @@ public class Copying
         public IClass transformSecond (
             ISecond that
         ) {
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
             return new Second(
-                theTexts,
+                new ArrayList<>(that.getTexts()),
                 that.getCount(),
                 that.getNote(),
                 that.getKind().orElse(null)

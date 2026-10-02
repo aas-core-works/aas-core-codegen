@@ -51,6 +51,30 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<JsonNode> deepListOf_jsonValue(
+        List<JsonNode> that) {
+        List<JsonNode> result = new ArrayList<>(that.size());
+        for (JsonNode item : that) {
+            result.add(item.deepCopy());
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static Tuple4<String, JsonNode, ArrayNode, ObjectNode> deepTupleOf4_string_jsonValue_jsonArray_jsonObject(
+        Tuple4<String, JsonNode, ArrayNode, ObjectNode> that) {
+        return new Tuple4<>(
+          that.item1(),
+          that.item2().deepCopy(),
+          that.item3().deepCopy(),
+          that.item4().deepCopy());
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -68,12 +92,9 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<JsonNode> theValues = new ArrayList<>(
-                that.getValues());
-
             return new Something(
-                theValues,
-                that.getTupleWithJson()
+                deepListOf_jsonValue(that.getValues()),
+                deepTupleOf4_string_jsonValue_jsonArray_jsonObject(that.getTupleWithJson())
             );
         }
     }

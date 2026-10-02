@@ -88,16 +88,16 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<String> theOptionalTexts = that.getOptionalTexts().isPresent()
-                ? new ArrayList<>(that.getOptionalTexts().get())
-                : null;
-
             return new Something(
                 deep(that.getItem()),
                 that.getOptionalText().orElse(null),
                 that.getOptionalNumber().orElse(null),
-                that.getOptionalItem().orElse(null),
-                theOptionalTexts,
+                that.getOptionalItem().isPresent()
+                    ? deep(that.getOptionalItem().get())
+                    : null,
+                that.getOptionalTexts().isPresent()
+                    ? new ArrayList<>(that.getOptionalTexts().get())
+                    : null,
                 that.getOptionalKind().orElse(null)
             );
         }

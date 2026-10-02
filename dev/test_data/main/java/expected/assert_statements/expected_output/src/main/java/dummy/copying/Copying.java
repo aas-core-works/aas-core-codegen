@@ -103,13 +103,10 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
             return new Something(
                 that.getNumber(),
                 that.getText(),
-                theTexts,
+                new ArrayList<>(that.getTexts()),
                 deep(that.getParent()),
                 that.getOptionalText().orElse(null)
             );

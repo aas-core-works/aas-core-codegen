@@ -2,9 +2,9 @@
 
 import io
 import textwrap
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Set
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -150,6 +150,173 @@ private static class _ShallowCopier extends AbstractTransformer<IClass> {
     return Stripped(writer.getvalue()), None
 
 
+def _copies_by_sharing(type_anno: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether a value of ``type_anno`` is deeply copied by sharing it.
+
+    The primitives, the constrained primitives and the enumeration literals are
+    immutable, and so is a tuple record of them -- except for the byte arrays,
+    which are mutable in Java.
+    """
+    primitive_type = intermediate.try_primitive_type(type_anno)
+    if primitive_type is not None:
+        return primitive_type is not intermediate.PrimitiveType.BYTEARRAY
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        return isinstance(type_anno.our_type, intermediate.Enumeration)
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return all(_copies_by_sharing(item) for item in type_anno.items)
+
+    return False
+
+
+def _has_deep_copy_method(type_anno: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether ``type_anno`` is deeply copied through a method of its own.
+
+    A list or a set of values which are copied by sharing needs only a copy of
+    the container, so it gets no method of its own.
+    """
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        return not _copies_by_sharing(type_anno.items)
+
+    return isinstance(
+        type_anno, intermediate.TupleTypeAnnotation
+    ) and not _copies_by_sharing(type_anno)
+
+
+def _deep_copy_method_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the method of ``Copying`` deeply copying ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.java.common.type_moniker`), so two different
+    containers never share a method. The moniker contains an underscore, so
+    the name never collides with ``deep`` or ``shallow``.
+    """
+    return Identifier(f"deep{java_common.type_moniker(type_anno)}")
+
+
+def _generate_deep_copy_expr(
+    expr: str, type_anno: intermediate.TypeAnnotationUnion
+) -> Stripped:
+    """
+    Generate the expression deeply copying the value at ``expr``.
+
+    A container with a method of its own is delegated to it, which copies only
+    one level and calls the method of its items by name. This way the deep copy
+    is composed of plain functions, to any depth.
+    """
+    if _copies_by_sharing(type_anno):
+        return Stripped(expr)
+
+    if intermediate.try_primitive_type(type_anno) is not None:
+        # NOTE (mristin):
+        # Only a byte array is a primitive which is not copied by sharing.
+        # The ``clone`` of an array gives back the array's own type, so no cast
+        # is needed.
+        return Stripped(f"{expr}.clone()")
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        assert isinstance(
+            type_anno.our_type, (intermediate.Class, intermediate.NamedUnion)
+        ), f"Unexpected our type not copied by sharing: {type_anno}"
+
+        # NOTE (mristin):
+        # A named union has its own ``deep`` overload (see
+        # :py:func:`_generate_union_deep_copy_helper`), so it is deep-copied
+        # exactly like a class instance.
+        return Stripped(f"deep({expr})")
+
+    if isinstance(
+        type_anno,
+        (
+            intermediate.JsonValueTypeAnnotation,
+            intermediate.JsonArrayTypeAnnotation,
+            intermediate.JsonObjectTypeAnnotation,
+        ),
+    ):
+        # NOTE (mristin):
+        # A Jackson node is mutable, unlike the other leaves, so sharing it
+        # would let the copy see every later change to the original's node, and
+        # the other way around. ``deepCopy`` is Jackson's own deep copy.
+        return Stripped(f"{expr}.deepCopy()")
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        if _has_deep_copy_method(type_anno):
+            return Stripped(f"{_deep_copy_method_name(type_anno)}({expr})")
+
+        if isinstance(type_anno, intermediate.ListTypeAnnotation):
+            return Stripped(f"new ArrayList<>({expr})")
+
+        if isinstance(type_anno, intermediate.SetTypeAnnotation):
+            return Stripped(f"new HashSet<>({expr})")
+
+    raise AssertionError(
+        f"Unexpected type annotation to be deeply copied: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(lambda type_anno: _has_deep_copy_method(type_anno))
+def _generate_deep_copy_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the method of ``Copying`` deeply copying ``type_anno``."""
+    value_type = java_common.generate_type(type_anno)
+
+    body: Stripped
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        container_class = (
+            "ArrayList"
+            if isinstance(type_anno, intermediate.ListTypeAnnotation)
+            else "HashSet"
+        )
+        item_type = java_common.generate_type(type_anno.items)
+        item_copy = _generate_deep_copy_expr("item", type_anno.items)
+
+        body = Stripped(
+            f"""\
+{value_type} result = new {container_class}<>(that.size());
+for ({item_type} item : that) {{
+{I}result.add({indent_but_first_line(item_copy, I)});
+}}
+return result;"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        tuple_literal = java_common.generate_tuple_literal(
+            item_exprs=[
+                _generate_deep_copy_expr(f"that.item{i + 1}()", item_type_anno)
+                for i, item_type_anno in enumerate(type_anno.items)
+            ]
+        )
+
+        body = Stripped(f"return {tuple_literal};")
+
+    else:
+        assert_never(type_anno)
+
+    return Stripped(
+        f"""\
+/**
+ * Make a deep copy of {{@code that}}, copying its items recursively.
+ */
+private static {value_type} {_deep_copy_method_name(type_anno)}(
+{I}{indent_but_first_line(value_type, I)} that) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the method in the transformer to make a deep copy of ``cls''."""
     property_names = [prop.name for prop in cls.properties]
@@ -168,337 +335,39 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
 
     cls_name = java_naming.class_name(cls.name)
 
-    body_blocks = []  # type: List[Stripped]
-
+    return_statement: Stripped
     if len(cls.constructor.arguments) == 0:
-        body_blocks.append(Stripped(f"return new {cls_name}();"))
+        return_statement = Stripped(f"return new {cls_name}();")
     else:
-        for arg in cls.constructor.arguments:
-            getter_name = java_naming.getter_name(arg.name)
-            optional = isinstance(
-                arg.type_annotation, intermediate.OptionalTypeAnnotation
-            )
-
-            type_anno = intermediate.beneath_optional(arg.type_annotation)
-
-            if isinstance(type_anno, intermediate.TupleTypeAnnotation):
-                if not any(
-                    isinstance(item, intermediate.OurTypeAnnotation)
-                    and isinstance(
-                        item.our_type, (intermediate.Class, intermediate.NamedUnion)
-                    )
-                    for item in type_anno.items
-                ):
-                    # NOTE (mristin):
-                    # None of the items is a class or a named union, so a shallow
-                    # copy of the tuple itself already gives us a deep copy, since
-                    # the tuple record is immutable and the remaining items
-                    # (primitives, constrained primitives, enumeration literals)
-                    # are immutable as well.
-                    continue
-
-                variable_name = java_naming.variable_name(Identifier(f"the_{arg.name}"))
-                variable_type = java_common.generate_type(type_anno)
-
-                def _item_expr(
-                    source_expr: str,
-                    i: int,
-                    item_type_anno: intermediate.TypeAnnotationUnion,
-                ) -> Stripped:
-                    """Generate the expression copying the ``i``-th tuple item."""
-                    item_access = f"{source_expr}.item{i + 1}()"
-                    if isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                        if isinstance(
-                            item_type_anno.our_type,
-                            (intermediate.Class, intermediate.NamedUnion),
-                        ):
-                            # NOTE (mristin):
-                            # A named union has its own ``deep`` overload
-                            # (see :py:func:`_generate_union_deep_copy_helper`),
-                            # so it can be deep-copied exactly like a class
-                            # instance here.
-                            return Stripped(f"deep({item_access})")
-
-                    return Stripped(item_access)
-
-                if not optional:
-                    source_expr = f"that.{getter_name}()"
-                    tuple_literal = java_common.generate_tuple_literal(
-                        item_exprs=[
-                            _item_expr(source_expr, i, item_type_anno)
-                            for i, item_type_anno in enumerate(type_anno.items)
-                        ]
-                    )
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type} {variable_name} = {indent_but_first_line(tuple_literal, I)};"""
-                        )
-                    )
-                else:
-                    other_property_name = java_naming.variable_name(
-                        Identifier(f"that_{arg.name}")
-                    )
-                    tuple_literal = java_common.generate_tuple_literal(
-                        item_exprs=[
-                            _item_expr(other_property_name, i, item_type_anno)
-                            for i, item_type_anno in enumerate(type_anno.items)
-                        ]
-                    )
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type} {other_property_name} =
-{I}that.{getter_name}().orElse(null);
-{variable_type} {variable_name} = ({other_property_name} == null)
-{I}? null
-{I}: {indent_but_first_line(tuple_literal, I)};"""
-                        )
-                    )
-
-                continue
-
-            if not isinstance(type_anno, intermediate.ListTypeAnnotation):
-                continue
-
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "We handle only lists of atomic values (primitives, "
-                "constrained primitives, enumeration literals) or lists of "
-                "classes in the deep copies at the moment. Lists of lists "
-                "or lists of optionals are not supported. Please contact "
-                "the developers if you need this feature."
-            )
-
-            # We need to prefix to avoid any possible naming conflicts.
-            variable_name = java_naming.variable_name(Identifier(f"the_{arg.name}"))
-
-            variable_type = java_common.generate_type(type_anno)
-
-            if isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type, (intermediate.Class, intermediate.NamedUnion)
-            ):
-                inner_type = java_common.generate_type(type_anno.items)
-
-                # NOTE (mristin):
-                # A named union has its own ``deep`` overload (see
-                # :py:func:`_generate_union_deep_copy_helper`), so it
-                # can be deep-copied exactly like a class instance here.
-                item_copy_expr = Stripped("deep(item)")
-
-                if not optional:
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type} {variable_name} = new ArrayList<>(
-{I}that.{getter_name}().size());
-for ({inner_type} item : that.{getter_name}()) {{
-{I}{variable_name}.add({item_copy_expr});
-}}"""
-                        )
-                    )
-                else:
-                    other_property_name = java_naming.variable_name(
-                        Identifier(f"that_{arg.name}")
-                    )
-
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type} {other_property_name} =
-{I}that.{getter_name}().orElse(null);
-{variable_type} {variable_name} = null;
-if ({other_property_name} != null) {{
-{I}{variable_name} = new ArrayList<>(
-{II}{other_property_name}.size());
-{I}for ({inner_type} item : {other_property_name})
-{I}{{
-{II}{variable_name}.add({item_copy_expr});
-{I}}}
-}}"""
-                        )
-                    )
-            else:
-                # NOTE (mristin):
-                # The items are atomic values (primitives, constrained
-                # primitives or enumeration literals). They are immutable in
-                # Java (or, in the case of byte arrays, treated as such
-                # elsewhere in this generator), so a shallow copy of the list
-                # container itself already gives us a deep copy.
-                if not optional:
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type} {variable_name} = new ArrayList<>(
-{I}that.{getter_name}());"""
-                        )
-                    )
-                else:
-                    body_blocks.append(
-                        Stripped(
-                            f"""\
-{variable_type} {variable_name} = that.{getter_name}().isPresent()
-{I}? new ArrayList<>(that.{getter_name}().get())
-{I}: null;"""
-                        )
-                    )
-
         constructor_arg_exprs = []  # type: List[str]
         for arg in cls.constructor.arguments:
             getter_name = java_naming.getter_name(arg.name)
-
             type_anno = intermediate.beneath_optional(arg.type_annotation)
 
-            optional = isinstance(
-                arg.type_annotation, intermediate.OptionalTypeAnnotation
-            )
-
-            if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-                if optional:
-                    constructor_arg_exprs.append(
-                        f"""that.{getter_name}().orElse(null)"""
-                    )
-                else:
-                    constructor_arg_exprs.append(f"""that.{getter_name}()""")
-
-            elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-                if isinstance(type_anno.our_type, intermediate.Enumeration):
-                    if optional:
-                        constructor_arg_exprs.append(
-                            f"""that.{getter_name}().orElse(null)"""
-                        )
-                    else:
-                        constructor_arg_exprs.append(f"""that.{getter_name}()""")
-
-                elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                    if optional:
-                        constructor_arg_exprs.append(
-                            f"""that.{getter_name}().orElse(null)"""
-                        )
-                    else:
-                        constructor_arg_exprs.append(f"""that.{getter_name}()""")
-
-                elif isinstance(
-                    type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    if optional:
-                        constructor_arg_exprs.append(
-                            f"""that.{getter_name}().orElse(null)"""
-                        )
-                    else:
-                        constructor_arg_exprs.append(f"deep(that.{getter_name}())")
-
-                elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union has its own ``deep`` overload (see
-                    # :py:func:`_generate_union_deep_copy_helper`), so
-                    # it can be deep-copied exactly like a class instance
-                    # here.
-                    if optional:
-                        constructor_arg_exprs.append(
-                            f"""\
-that.{getter_name}().isPresent()
-{I}? deep(that.{getter_name}().get())
-{I}: null"""
-                        )
-                    else:
-                        constructor_arg_exprs.append(f"deep(that.{getter_name}())")
-                else:
-                    assert_never(type_anno.our_type)
-
-            elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-                # See how this variable is computed above in the generated code.
+            if not isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
                 constructor_arg_exprs.append(
-                    java_naming.variable_name(Identifier(f"the_{arg.name}"))
+                    _generate_deep_copy_expr(f"that.{getter_name}()", type_anno)
                 )
-            elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-                if any(
-                    isinstance(item, intermediate.OurTypeAnnotation)
-                    and isinstance(
-                        item.our_type, (intermediate.Class, intermediate.NamedUnion)
-                    )
-                    for item in type_anno.items
-                ):
-                    # See how this variable is computed above in the generated code.
-                    constructor_arg_exprs.append(
-                        java_naming.variable_name(Identifier(f"the_{arg.name}"))
-                    )
-                elif optional:
-                    constructor_arg_exprs.append(
-                        f"""that.{getter_name}().orElse(null)"""
-                    )
-                else:
-                    constructor_arg_exprs.append(f"""that.{getter_name}()""")
-
-            elif isinstance(
-                type_anno,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # NOTE (mristin):
-                # Every other value in a deep copy is copied by sharing it:
-                # a primitive, an enumeration literal and a string are all
-                # immutable. A Jackson node is not, so the copy would see
-                # every later change to the original's node, and the other way
-                # around. ``deepCopy`` is Jackson's own deep copy, and it
-                # gives back the node's own type, so no cast is needed.
-                if optional:
-                    constructor_arg_exprs.append(
-                        f"""\
-that.{getter_name}().isPresent()
-{I}? that.{getter_name}().get().deepCopy()
-{I}: null"""
-                    )
-                else:
-                    constructor_arg_exprs.append(f"that.{getter_name}().deepCopy()")
-
-            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-                # NOTE (mristin):
-                # A set holds only primitives, constrained primitives and
-                # enumeration literals, which are all immutable, so a copy of
-                # the set container itself already gives us a deep copy.
-                if optional:
-                    constructor_arg_exprs.append(
-                        f"""\
-that.{getter_name}().isPresent()
-{I}? new HashSet<>(that.{getter_name}().get())
-{I}: null"""
-                    )
-                else:
-                    constructor_arg_exprs.append(f"new HashSet<>(that.{getter_name}())")
-
+            elif _copies_by_sharing(type_anno):
+                constructor_arg_exprs.append(f"that.{getter_name}().orElse(null)")
             else:
-                assert_never(type_anno)
+                value_copy = _generate_deep_copy_expr(
+                    f"that.{getter_name}().get()", type_anno
+                )
+                constructor_arg_exprs.append(
+                    f"""\
+that.{getter_name}().isPresent()
+{I}? {indent_but_first_line(value_copy, I)}
+{I}: null"""
+                )
 
-        return_statement_writer = io.StringIO()
-
-        return_statement_writer.write(f"return new {cls_name}(\n")
-
-        for i, arg_expr in enumerate(constructor_arg_exprs):
-            return_statement_writer.write(textwrap.indent(arg_expr, I))
-
-            if i < len(constructor_arg_exprs) - 1:
-                return_statement_writer.write(",\n")
-            else:
-                return_statement_writer.write("\n")
-
-        return_statement_writer.write(");")
-
-        body_blocks.append(Stripped(return_statement_writer.getvalue()))
-
-    body_writer = io.StringIO()
-    for i, body_block in enumerate(body_blocks):
-        if i > 0:
-            body_writer.write("\n\n")
-
-        body_writer.write(body_block)
+        args_joined = ",\n".join(constructor_arg_exprs)
+        return_statement = Stripped(
+            f"""\
+return new {cls_name}(
+{I}{indent_but_first_line(args_joined, I)}
+);"""
+        )
 
     interface_name = java_naming.interface_name(cls.name)
     transform_name = java_naming.method_name(Identifier(f"transform_{cls.name}"))
@@ -509,7 +378,7 @@ that.{getter_name}().isPresent()
 public IClass {transform_name} (
 {I}{interface_name} that
 ) {{
-{I}{indent_but_first_line(body_writer.getvalue(), I)}
+{I}{indent_but_first_line(return_statement, I)}
 }}"""
     )
 
@@ -569,6 +438,36 @@ def generate(
         imports.append(Stripped("import java.util.HashSet;"))
 
     # NOTE (mristin):
+    # We deeply copy the containers through methods of their own, one per
+    # type moniker.
+    deep_copy_container_methods = []  # type: List[Stripped]
+    observed_monikers = set()  # type: Set[str]
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ) or not _has_deep_copy_method(type_anno):
+                    continue
+
+                moniker = java_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                if isinstance(type_anno, intermediate.SetTypeAnnotation):
+                    imports.append(Stripped("import java.util.Set;"))
+
+                deep_copy_container_methods.append(
+                    _generate_deep_copy_container(type_anno=type_anno)
+                )
+
+    # NOTE (mristin):
     # A JSON-able value is a Jackson node, and only the models which use one
     # pay for the import.
     if intermediate_uses.json_types(symbol_table):
@@ -622,6 +521,8 @@ public static <T extends IClass> T deep(T that) {{
 
     if len(symbol_table.named_unions) > 0:
         copy_blocks.append(_generate_union_deep_copy_helper())
+
+    copy_blocks.extend(deep_copy_container_methods)
 
     shallow_copier_block, shallow_errors = _generate_shallow_copier(
         symbol_table=symbol_table

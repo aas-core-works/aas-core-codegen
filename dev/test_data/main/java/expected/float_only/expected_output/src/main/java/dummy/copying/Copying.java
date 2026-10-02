@@ -69,12 +69,9 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<Double> theSomeFloats = new ArrayList<>(
-                that.getSomeFloats());
-
             return new Something(
                 that.getSomeFloat(),
-                theSomeFloats,
+                new ArrayList<>(that.getSomeFloats()),
                 that.getSomePair(),
                 that.getSomeOptionalFloat().orElse(null)
             );

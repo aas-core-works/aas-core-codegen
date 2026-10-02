@@ -58,6 +58,30 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IElement> deepListOf_IElement(
+        List<IElement> that) {
+        List<IElement> result = new ArrayList<>(that.size());
+        for (IElement item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<Value> deepListOf_Value(
+        List<Value> that) {
+        List<Value> result = new ArrayList<>(that.size());
+        for (Value item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -150,15 +174,9 @@ public class Copying
         public IClass transformOrderedContainer (
             IOrderedContainer that
         ) {
-            List<IElement> theChildren = new ArrayList<>(
-                that.getChildren().size());
-            for (IElement item : that.getChildren()) {
-                theChildren.add(deep(item));
-            }
-
             return new OrderedContainer(
                 that.getIdentifier(),
-                theChildren,
+                deepListOf_IElement(that.getChildren()),
                 that.getIsSorted()
             );
         }
@@ -167,15 +185,9 @@ public class Copying
         public IClass transformUnorderedContainer (
             IUnorderedContainer that
         ) {
-            List<IElement> theChildren = new ArrayList<>(
-                that.getChildren().size());
-            for (IElement item : that.getChildren()) {
-                theChildren.add(deep(item));
-            }
-
             return new UnorderedContainer(
                 that.getIdentifier(),
-                theChildren
+                deepListOf_IElement(that.getChildren())
             );
         }
 
@@ -228,17 +240,13 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<Value> theValues = new ArrayList<>(
-                that.getValues().size());
-            for (Value item : that.getValues()) {
-                theValues.add(deep(item));
-            }
-
             return new Something(
                 deep(that.getRoot()),
                 deep(that.getValue()),
-                theValues,
-                that.getOptionalElement().orElse(null)
+                deepListOf_Value(that.getValues()),
+                that.getOptionalElement().isPresent()
+                    ? deep(that.getOptionalElement().get())
+                    : null
             );
         }
     }
