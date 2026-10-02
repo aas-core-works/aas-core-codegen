@@ -606,7 +606,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.item):
+        for error in verify(that.item):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -615,7 +615,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.parent):
+        for error in verify(that.parent):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -624,24 +624,17 @@ class _Transformer(
             )
             yield error
 
-        for i, an_item in enumerate(that.parents):
-            for error in self.transform(an_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.parents,
-                        i
-                    )
+        for error in _verify_list_of__class(that.parents):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'parents'
                 )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'parents'
-                    )
-                )
-                yield error
+            )
+            yield error
 
         if that.optional_parent is not None:
-            for error in self.transform(that.optional_parent):
+            for error in verify(that.optional_parent):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -651,7 +644,7 @@ class _Transformer(
                 yield error
 
         if that.optional_member is not None:
-            for error in self.transform(that.optional_member):
+            for error in verify(that.optional_member):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -674,6 +667,21 @@ def verify(
     :yield: constraint violations
     """
     yield from _TRANSFORMER.transform(that)
+
+
+def _verify_list_of__class(
+        that: Sequence[our_types.Class]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for i, item in enumerate(that):
+        for error in verify(item):
+            error.path._prepend(
+                IndexSegment(
+                    that,
+                    i
+                )
+            )
+            yield error
 
 
 def verify_code(

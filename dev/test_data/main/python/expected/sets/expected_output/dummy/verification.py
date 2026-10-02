@@ -424,21 +424,14 @@ class _Transformer(
                 'Texts must be unique.'
             )
 
-        for i, yet_yet_another_item in enumerate(that.codes):
-            for error in verify_code(yet_yet_another_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.codes,
-                        i
-                    )
+        for error in _verify_list_of__code(that.codes):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'codes'
                 )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'codes'
-                    )
-                )
-                yield error
+            )
+            yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_collection(
@@ -488,22 +481,14 @@ class _Transformer(
                 'Texts must not contain the forbidden text.'
             )
 
-        sorted_codes = sorted(that.codes)
-        for i, an_item in enumerate(sorted_codes):
-            for error in verify_code(an_item):
-                error.path._prepend(
-                    IndexSegment(
-                        sorted_codes,
-                        i
-                    )
+        for error in _verify_set_of__code(that.codes):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'codes'
                 )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'codes'
-                    )
-                )
-                yield error
+            )
+            yield error
 
 
 _TRANSFORMER = _Transformer()
@@ -519,6 +504,37 @@ def verify(
     :yield: constraint violations
     """
     yield from _TRANSFORMER.transform(that)
+
+
+def _verify_list_of__code(
+        that: Sequence[str]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for i, item in enumerate(that):
+        for error in verify_code(item):
+            error.path._prepend(
+                IndexSegment(
+                    that,
+                    i
+                )
+            )
+            yield error
+
+
+def _verify_set_of__code(
+        that: AbstractSet[str]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    sorted_that = sorted(that)
+    for i, item in enumerate(sorted_that):
+        for error in verify_code(item):
+            error.path._prepend(
+                IndexSegment(
+                    sorted_that,
+                    i
+                )
+            )
+            yield error
 
 
 def verify_code(

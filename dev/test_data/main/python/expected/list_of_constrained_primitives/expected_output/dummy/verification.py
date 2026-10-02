@@ -72,21 +72,14 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
-        for i, an_item in enumerate(that.some_names):
-            for error in verify_name(an_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.some_names,
-                        i
-                    )
+        for error in _verify_list_of__name(that.some_names):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'some_names'
                 )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'some_names'
-                    )
-                )
-                yield error
+            )
+            yield error
 
 
 _TRANSFORMER = _Transformer()
@@ -102,6 +95,21 @@ def verify(
     :yield: constraint violations
     """
     yield from _TRANSFORMER.transform(that)
+
+
+def _verify_list_of__name(
+        that: Sequence[str]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for i, item in enumerate(that):
+        for error in verify_name(item):
+            error.path._prepend(
+                IndexSegment(
+                    that,
+                    i
+                )
+            )
+            yield error
 
 
 def verify_name(

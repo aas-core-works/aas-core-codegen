@@ -108,7 +108,7 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
-        for error in self.transform(that.some_choice):
+        for error in verify(that.some_choice):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -117,7 +117,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.something_without_choice):
+        for error in verify(that.something_without_choice):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -131,7 +131,7 @@ class _Transformer(
             self,
             that: our_types.Container
     ) -> Iterator[Error]:
-        for error in self.transform(that.node):
+        for error in verify(that.node):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -140,7 +140,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.something):
+        for error in verify(that.something):
             error.path._prepend(
                 PropertySegment(
                     that,

@@ -73,9 +73,7 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
-        for error in our_json_value_verification.verify_json_value(
-                that.value
-        ):
+        for error in our_json_value_verification.verify_json_value(that.value):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -116,12 +114,13 @@ class _Transformer(
                 )
             )
             yield error
+
         for key in that.mapping_with_constrained_key:
+            # NOTE (mristin):
+            # The key segment names the member whose key is erroneous. The path
+            # thus leads to the member, and the cause says what is wrong with
+            # the key which names it.
             for error in verify_non_empty_string(key):
-                # NOTE (mristin):
-                # The key segment names the member whose key is erroneous. The path
-                # thus leads to the member, and the cause says what is wrong with
-                # the key which names it.
                 error.path._prepend(
                     KeySegment(
                         that.mapping_with_constrained_key,

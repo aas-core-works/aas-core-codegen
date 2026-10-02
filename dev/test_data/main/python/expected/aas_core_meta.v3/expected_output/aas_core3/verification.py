@@ -1876,7 +1876,7 @@ class _Transformer(
             )
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -1886,21 +1886,14 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, an_item in enumerate(that.supplemental_semantic_ids):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         for error in verify_name_type(that.name):
             error.path._prepend(
@@ -1922,21 +1915,14 @@ class _Transformer(
                 yield error
 
         if that.refers_to is not None:
-            for i, another_item in enumerate(that.refers_to):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.refers_to,
-                            i
-                        )
+            for error in _verify_list_of__class(that.refers_to):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'refers_to'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'refers_to'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_administrative_information(
@@ -1964,21 +1950,14 @@ class _Transformer(
             )
 
         if that.embedded_data_specifications is not None:
-            for i, an_item in enumerate(that.embedded_data_specifications):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.version is not None:
             for error in verify_version_type(that.version):
@@ -2001,7 +1980,7 @@ class _Transformer(
                 yield error
 
         if that.creator is not None:
-            for error in self.transform(that.creator):
+            for error in verify(that.creator):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2056,7 +2035,7 @@ class _Transformer(
             )
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2066,21 +2045,14 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, an_item in enumerate(that.supplemental_semantic_ids):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         for error in verify_qualifier_type(that.type):
             error.path._prepend(
@@ -2102,7 +2074,7 @@ class _Transformer(
                 yield error
 
         if that.value_id is not None:
-            for error in self.transform(that.value_id):
+            for error in verify(that.value_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2215,21 +2187,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -2252,41 +2217,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.administration is not None:
-            for error in self.transform(that.administration):
+            for error in verify(that.administration):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2305,26 +2256,17 @@ class _Transformer(
             yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.derived_from is not None:
-            for error in self.transform(that.derived_from):
+            for error in verify(that.derived_from):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2333,7 +2275,7 @@ class _Transformer(
                 )
                 yield error
 
-        for error in self.transform(that.asset_information):
+        for error in verify(that.asset_information):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -2343,21 +2285,14 @@ class _Transformer(
             yield error
 
         if that.submodels is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.submodels):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.submodels,
-                            i
-                        )
+            for error in _verify_list_of__class(that.submodels):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'submodels'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'submodels'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_asset_information(
@@ -2428,21 +2363,14 @@ class _Transformer(
                 yield error
 
         if that.specific_asset_ids is not None:
-            for i, an_item in enumerate(that.specific_asset_ids):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.specific_asset_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.specific_asset_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'specific_asset_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'specific_asset_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.asset_type is not None:
             for error in verify_identifier(that.asset_type):
@@ -2455,7 +2383,7 @@ class _Transformer(
                 yield error
 
         if that.default_thumbnail is not None:
-            for error in self.transform(that.default_thumbnail):
+            for error in verify(that.default_thumbnail):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2521,7 +2449,7 @@ class _Transformer(
             )
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2531,21 +2459,14 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, an_item in enumerate(that.supplemental_semantic_ids):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         for error in verify_label_type(that.name):
             error.path._prepend(
@@ -2566,7 +2487,7 @@ class _Transformer(
             yield error
 
         if that.external_subject_id is not None:
-            for error in self.transform(that.external_subject_id):
+            for error in verify(that.external_subject_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2759,21 +2680,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -2796,41 +2710,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.administration is not None:
-            for error in self.transform(that.administration):
+            for error in verify(that.administration):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2849,7 +2749,7 @@ class _Transformer(
             yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2859,78 +2759,44 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.submodel_elements is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(
-                    that.submodel_elements
-            ):
-                for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.submodel_elements,
-                            i
-                        )
+            for error in _verify_list_of__class(that.submodel_elements):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'submodel_elements'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'submodel_elements'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_relationship_element(
@@ -3035,21 +2901,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -3072,41 +2931,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -3116,61 +2961,36 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
-        for error in self.transform(that.first):
+        for error in verify(that.first):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -3179,7 +2999,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.second):
+        for error in verify(that.second):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -3396,21 +3216,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -3433,41 +3246,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -3477,62 +3276,37 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id_list_element is not None:
-            for error in self.transform(that.semantic_id_list_element):
+            for error in verify(that.semantic_id_list_element):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -3542,21 +3316,14 @@ class _Transformer(
                 yield error
 
         if that.value is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(that.value):
-                for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.value,
-                            i
-                        )
+            for error in _verify_list_of__class(that.value):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'value'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_submodel_element_collection(
@@ -3693,21 +3460,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -3730,41 +3490,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -3774,76 +3520,44 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(that.value):
-                for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.value,
-                            i
-                        )
+            for error in _verify_list_of__class(that.value):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'value'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_property(
@@ -3969,21 +3683,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -4006,41 +3713,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -4050,59 +3743,34 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value is not None:
             for error in verify_value_data_type(that.value):
@@ -4115,7 +3783,7 @@ class _Transformer(
                 yield error
 
         if that.value_id is not None:
-            for error in self.transform(that.value_id):
+            for error in verify(that.value_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -4253,21 +3921,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -4290,41 +3951,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -4334,79 +3981,47 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(that.value):
-                for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.value,
-                            i
-                        )
+            for error in _verify_list_of__class(that.value):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'value'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value_id is not None:
-            for error in self.transform(that.value_id):
+            for error in verify(that.value_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -4550,21 +4165,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -4587,41 +4195,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -4631,59 +4225,34 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.min is not None:
             for error in verify_value_data_type(that.min):
@@ -4818,21 +4387,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -4855,41 +4417,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -4899,62 +4447,37 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value is not None:
-            for error in self.transform(that.value):
+            for error in verify(that.value):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -5076,21 +4599,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -5113,41 +4629,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -5157,59 +4659,34 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value is not None:
             for error in verify_blob_type(that.value):
@@ -5343,21 +4820,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -5380,41 +4850,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -5424,59 +4880,34 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value is not None:
             for error in verify_path_type(that.value):
@@ -5625,21 +5056,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -5662,41 +5086,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -5706,61 +5116,36 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
-        for error in self.transform(that.first):
+        for error in verify(that.first):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -5769,7 +5154,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.second):
+        for error in verify(that.second):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -5779,21 +5164,14 @@ class _Transformer(
             yield error
 
         if that.annotations is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(that.annotations):
-                for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.annotations,
-                            i
-                        )
+            for error in _verify_list_of__class(that.annotations):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'annotations'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'annotations'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_entity(
@@ -5970,21 +5348,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -6007,41 +5378,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -6051,76 +5408,44 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.statements is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(that.statements):
-                for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.statements,
-                            i
-                        )
+            for error in _verify_list_of__class(that.statements):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'statements'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'statements'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.global_asset_id is not None:
             for error in verify_identifier(that.global_asset_id):
@@ -6133,23 +5458,14 @@ class _Transformer(
                 yield error
 
         if that.specific_asset_ids is not None:
-            for i, yet_yet_yet_yet_yet_yet_another_item in enumerate(
-                    that.specific_asset_ids
-            ):
-                for error in self.transform(yet_yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.specific_asset_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.specific_asset_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'specific_asset_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'specific_asset_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_event_payload(
@@ -6182,7 +5498,7 @@ class _Transformer(
                 'a referable.'
             )
 
-        for error in self.transform(that.source):
+        for error in verify(that.source):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -6192,7 +5508,7 @@ class _Transformer(
             yield error
 
         if that.source_semantic_id is not None:
-            for error in self.transform(that.source_semantic_id):
+            for error in verify(that.source_semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -6201,7 +5517,7 @@ class _Transformer(
                 )
                 yield error
 
-        for error in self.transform(that.observable_reference):
+        for error in verify(that.observable_reference):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -6211,7 +5527,7 @@ class _Transformer(
             yield error
 
         if that.observable_semantic_id is not None:
-            for error in self.transform(that.observable_semantic_id):
+            for error in verify(that.observable_semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -6231,7 +5547,7 @@ class _Transformer(
                 yield error
 
         if that.subject_id is not None:
-            for error in self.transform(that.subject_id):
+            for error in verify(that.subject_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -6383,21 +5699,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -6420,41 +5729,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -6464,61 +5759,36 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
-        for error in self.transform(that.observed):
+        for error in verify(that.observed):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -6538,7 +5808,7 @@ class _Transformer(
                 yield error
 
         if that.message_broker is not None:
-            for error in self.transform(that.message_broker):
+            for error in verify(that.message_broker):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -6719,21 +5989,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -6756,41 +6019,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -6800,116 +6049,64 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.input_variables is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(
-                    that.input_variables
-            ):
-                for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.input_variables,
-                            i
-                        )
+            for error in _verify_list_of__class(that.input_variables):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'input_variables'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'input_variables'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.output_variables is not None:
-            for i, yet_yet_yet_yet_yet_yet_another_item in enumerate(
-                    that.output_variables
-            ):
-                for error in self.transform(yet_yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.output_variables,
-                            i
-                        )
+            for error in _verify_list_of__class(that.output_variables):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'output_variables'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'output_variables'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.inoutput_variables is not None:
-            for i, yet_yet_yet_yet_yet_yet_yet_another_item in enumerate(
-                    that.inoutput_variables
-            ):
-                for error in self.transform(yet_yet_yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.inoutput_variables,
-                            i
-                        )
+            for error in _verify_list_of__class(that.inoutput_variables):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'inoutput_variables'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'inoutput_variables'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_operation_variable(
@@ -6924,7 +6121,7 @@ class _Transformer(
                 'specified).'
             )
 
-        for error in self.transform(that.value):
+        for error in verify(that.value):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -7036,21 +6233,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -7073,41 +6263,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.semantic_id is not None:
-            for error in self.transform(that.semantic_id):
+            for error in verify(that.semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -7117,59 +6293,34 @@ class _Transformer(
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.supplemental_semantic_ids
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.supplemental_semantic_ids,
-                            i
-                        )
+            for error in _verify_list_of__class(that.supplemental_semantic_ids):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'supplemental_semantic_ids'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'supplemental_semantic_ids'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.qualifiers is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.qualifiers,
-                            i
-                        )
+            for error in _verify_list_of__class(that.qualifiers):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'qualifiers'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'qualifiers'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_concept_description(
@@ -7351,21 +6502,14 @@ class _Transformer(
             )
 
         if that.extensions is not None:
-            for i, an_item in enumerate(that.extensions):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.extensions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.extensions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'extensions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'extensions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
@@ -7388,41 +6532,27 @@ class _Transformer(
                 yield error
 
         if that.display_name is not None:
-            for i, another_item in enumerate(that.display_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.display_name,
-                            i
-                        )
+            for error in _verify_list_of__class(that.display_name):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'display_name'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'display_name'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.description is not None:
-            for i, yet_another_item in enumerate(that.description):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.description,
-                            i
-                        )
+            for error in _verify_list_of__class(that.description):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'description'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'description'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.administration is not None:
-            for error in self.transform(that.administration):
+            for error in verify(that.administration):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -7441,40 +6571,24 @@ class _Transformer(
             yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_another_item in enumerate(
-                    that.embedded_data_specifications
-            ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.embedded_data_specifications,
-                            i
-                        )
+            for error in _verify_list_of__class(that.embedded_data_specifications):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'embedded_data_specifications'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'embedded_data_specifications'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.is_case_of is not None:
-            for i, yet_yet_yet_another_item in enumerate(that.is_case_of):
-                for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.is_case_of,
-                            i
-                        )
+            for error in _verify_list_of__class(that.is_case_of):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'is_case_of'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'is_case_of'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_reference(
@@ -7643,7 +6757,7 @@ class _Transformer(
             )
 
         if that.referred_semantic_id is not None:
-            for error in self.transform(that.referred_semantic_id):
+            for error in verify(that.referred_semantic_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -7652,21 +6766,14 @@ class _Transformer(
                 )
                 yield error
 
-        for i, an_item in enumerate(that.keys):
-            for error in self.transform(an_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.keys,
-                        i
-                    )
+        for error in _verify_list_of__class(that.keys):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'keys'
                 )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'keys'
-                    )
-                )
-                yield error
+            )
+            yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_key(
@@ -7770,62 +6877,41 @@ class _Transformer(
             )
 
         if that.asset_administration_shells is not None:
-            for i, an_item in enumerate(that.asset_administration_shells):
-                for error in self.transform(an_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.asset_administration_shells,
-                            i
-                        )
+            for error in _verify_list_of__class(that.asset_administration_shells):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'asset_administration_shells'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'asset_administration_shells'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.submodels is not None:
-            for i, another_item in enumerate(that.submodels):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.submodels,
-                            i
-                        )
+            for error in _verify_list_of__class(that.submodels):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'submodels'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'submodels'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.concept_descriptions is not None:
-            for i, yet_another_item in enumerate(that.concept_descriptions):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.concept_descriptions,
-                            i
-                        )
+            for error in _verify_list_of__class(that.concept_descriptions):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'concept_descriptions'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'concept_descriptions'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_embedded_data_specification(
             self,
             that: our_types.EmbeddedDataSpecification
     ) -> Iterator[Error]:
-        for error in self.transform(that.data_specification):
+        for error in verify(that.data_specification):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -7834,7 +6920,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.data_specification_content):
+        for error in verify(that.data_specification_content):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -7869,7 +6955,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.value_id):
+        for error in verify(that.value_id):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -7888,21 +6974,14 @@ class _Transformer(
                 'Value reference pair types must contain at least one item.'
             )
 
-        for i, an_item in enumerate(that.value_reference_pairs):
-            for error in self.transform(an_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.value_reference_pairs,
-                        i
-                    )
+        for error in _verify_list_of__class(that.value_reference_pairs):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'value_reference_pairs'
                 )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'value_reference_pairs'
-                    )
-                )
-                yield error
+            )
+            yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_preferred_name_type_iec_61360(
@@ -8081,38 +7160,24 @@ class _Transformer(
                 'least in English.'
             )
 
-        for i, an_item in enumerate(that.preferred_name):
-            for error in self.transform(an_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.preferred_name,
-                        i
-                    )
+        for error in _verify_list_of__class(that.preferred_name):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'preferred_name'
                 )
+            )
+            yield error
+
+        if that.short_name is not None:
+            for error in _verify_list_of__class(that.short_name):
                 error.path._prepend(
                     PropertySegment(
                         that,
-                        'preferred_name'
+                        'short_name'
                     )
                 )
                 yield error
-
-        if that.short_name is not None:
-            for i, another_item in enumerate(that.short_name):
-                for error in self.transform(another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.short_name,
-                            i
-                        )
-                    )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'short_name'
-                        )
-                    )
-                    yield error
 
         if that.unit is not None:
             for error in verify_non_empty_xml_serializable_string(that.unit):
@@ -8125,7 +7190,7 @@ class _Transformer(
                 yield error
 
         if that.unit_id is not None:
-            for error in self.transform(that.unit_id):
+            for error in verify(that.unit_id):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -8157,21 +7222,14 @@ class _Transformer(
                 yield error
 
         if that.definition is not None:
-            for i, yet_another_item in enumerate(that.definition):
-                for error in self.transform(yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.definition,
-                            i
-                        )
+            for error in _verify_list_of__class(that.definition):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'definition'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'definition'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
         if that.value_format is not None:
             for error in verify_non_empty_xml_serializable_string(
@@ -8186,7 +7244,7 @@ class _Transformer(
                 yield error
 
         if that.value_list is not None:
-            for error in self.transform(that.value_list):
+            for error in verify(that.value_list):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -8206,7 +7264,7 @@ class _Transformer(
                 yield error
 
         if that.level_type is not None:
-            for error in self.transform(that.level_type):
+            for error in verify(that.level_type):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -8229,6 +7287,21 @@ def verify(
     :yield: constraint violations
     """
     yield from _TRANSFORMER.transform(that)
+
+
+def _verify_list_of__class(
+        that: Sequence[our_types.Class]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for i, item in enumerate(that):
+        for error in verify(item):
+            error.path._prepend(
+                IndexSegment(
+                    that,
+                    i
+                )
+            )
+            yield error
 
 
 def verify_xml_serializable_string(

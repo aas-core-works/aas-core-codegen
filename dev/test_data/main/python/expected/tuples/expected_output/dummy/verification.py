@@ -126,27 +126,7 @@ class _Transformer(
                 'The optional pair must have two items'
             )
 
-        for error in self.transform(that.items[0]):
-            error.path._prepend(
-                IndexSegment(
-                    that.items,
-                    0
-                )
-            )
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'items'
-                )
-            )
-            yield error
-        for error in self.transform(that.items[1]):
-            error.path._prepend(
-                IndexSegment(
-                    that.items,
-                    1
-                )
-            )
+        for error in _verify_tuple2_of__class__class(that.items):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -155,55 +135,9 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.tricky[1]):
-            error.path._prepend(
-                IndexSegment(
-                    that.tricky,
-                    1
-                )
-            )
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'tricky'
-                )
-            )
-            yield error
-        for error in self.transform(that.tricky[2]):
-            error.path._prepend(
-                IndexSegment(
-                    that.tricky,
-                    2
-                )
-            )
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'tricky'
-                )
-            )
-            yield error
-        for error in self.transform(that.tricky[3]):
-            error.path._prepend(
-                IndexSegment(
-                    that.tricky,
-                    3
-                )
-            )
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'tricky'
-                )
-            )
-            yield error
-        for error in verify_positive_int(that.tricky[4]):
-            error.path._prepend(
-                IndexSegment(
-                    that.tricky,
-                    4
-                )
-            )
+        for error in _verify_tuple6_of__int__class__class__class__positive_int__result(
+                that.tricky
+        ):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -213,13 +147,7 @@ class _Transformer(
             yield error
 
         if that.optional_pair is not None:
-            for error in self.transform(that.optional_pair[1]):
-                error.path._prepend(
-                    IndexSegment(
-                        that.optional_pair,
-                        1
-                    )
-                )
+            for error in _verify_tuple2_of__str__class(that.optional_pair):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -242,6 +170,91 @@ def verify(
     :yield: constraint violations
     """
     yield from _TRANSFORMER.transform(that)
+
+
+def _verify_tuple2_of__class__class(
+        that: Tuple[our_types.Class, our_types.Class]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for error in verify(that[0]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                0
+            )
+        )
+        yield error
+
+    for error in verify(that[1]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                1
+            )
+        )
+        yield error
+
+
+def _verify_tuple6_of__int__class__class__class__positive_int__result(
+        that: Tuple[
+            int,
+            our_types.Class,
+            our_types.Class,
+            our_types.Class,
+            int,
+            our_types.Result
+        ]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for error in verify(that[1]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                1
+            )
+        )
+        yield error
+
+    for error in verify(that[2]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                2
+            )
+        )
+        yield error
+
+    for error in verify(that[3]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                3
+            )
+        )
+        yield error
+
+    for error in verify_positive_int(that[4]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                4
+            )
+        )
+        yield error
+
+
+def _verify_tuple2_of__str__class(
+        that: Tuple[str, our_types.Class]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for error in verify(that[1]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                1
+            )
+        )
+        yield error
 
 
 def verify_positive_int(
