@@ -66,9 +66,7 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_item
-  Visit(
-    that->mutable_item()
-  );
+  this->Visit(that->mutable_item());
 
   // region mutable_optional_item
   const common::optional<
@@ -77,9 +75,7 @@ void PassThroughVisitor::VisitSomething(
     that->mutable_optional_item()
   );
   if (maybe_optional_item.has_value()) {
-    Visit(
-      maybe_optional_item.value()
-    );
+    this->Visit(maybe_optional_item.value());
   }
   // endregion
 }

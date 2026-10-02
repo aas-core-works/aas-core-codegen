@@ -3,10 +3,12 @@
 import io
 from typing import (
     List,
+    Mapping,
+    Set,
     Tuple,
 )
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -18,6 +20,7 @@ from aas_core_codegen.common import (
 from aas_core_codegen.cpp import (
     common as cpp_common,
     naming as cpp_naming,
+    over as cpp_over,
 )
 from aas_core_codegen.cpp.common import (
     INDENT as I,
@@ -290,7 +293,7 @@ void AbstractVisitor::Visit(
 
 
 def _generate_visit_named_union_switch(
-    union_value_expr: Stripped, named_union: intermediate.NamedUnion
+    union_value_expr: str, named_union: intermediate.NamedUnion, visitor: str
 ) -> Stripped:
     """
     Generate a ``switch`` calling ``Visit`` on whichever alternative is held.
@@ -301,6 +304,8 @@ def _generate_visit_named_union_switch(
     own ``index()`` and call ``Visit`` on the corresponding
     ``common::get<i>(...)`` alternative, which upcasts to ``IClass`` like any
     other class pointer.
+
+    The ``visitor`` is the C++ expression of the pointer to the visitor.
     """
     case_blocks = []  # type: List[Stripped]
     for i in range(len(named_union.roots)):
@@ -308,7 +313,7 @@ def _generate_visit_named_union_switch(
             Stripped(
                 f"""\
 case {i}:
-{I}Visit(
+{I}{visitor}->Visit(
 {II}common::get<{i}>(
 {III}{indent_but_first_line(union_value_expr, III)}
 {II})
@@ -337,236 +342,135 @@ switch (
     )
 
 
-def _generate_recursive_visit_for_property(
-    prop: intermediate.Property, mutating: bool
+def _pass_through_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the function passing a visitor through the instances of ``type_anno``.
+
+    The moniker is unique by construction (see :py:func:`cpp_over.moniker`), so
+    two different containers never share a function.
+    """
+    return Identifier(f"PassThrough_{cpp_over.moniker(type_anno)}")
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_visit(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    visitor: str,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
 ) -> Stripped:
     """
-    Generate the snippet to visit a property recursively.
+    Generate the statements visiting the instances held by the value at ``expr``.
 
-    Empty result means the property can not be descended into.
+    The ``visitor`` is the C++ expression of the pointer to the visitor.
 
-    If ``mutating`` is set, use the mutable getter.
+    An instance and a named union are visited in-line. A container is delegated
+    to its pass-through function, which descends only one level and calls
+    the function of its items by name. This way the pass-through is composed of
+    plain functions, to any depth.
     """
-    type_anno = intermediate.beneath_optional(prop.type_annotation)
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        if isinstance(type_anno.our_type, intermediate.NamedUnion):
+            return _generate_visit_named_union_switch(
+                union_value_expr=expr,
+                named_union=type_anno.our_type,
+                visitor=visitor,
+            )
 
-    getter = (
-        cpp_naming.mutable_getter_name(prop.name)
-        if mutating
-        else cpp_naming.getter_name(prop.name)
+        return Stripped(f"{cpp_over.generate_call(f'{visitor}->Visit', [expr])};")
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        name = _pass_through_container_name(type_anno)
+        return Stripped(f"{cpp_over.generate_call(name, [visitor, expr])};")
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
     )
 
-    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        maybe_var = cpp_naming.variable_name(Identifier(f"maybe_{prop.name}"))
-        get_expr = Stripped(f"{maybe_var}.value()")
-    else:
-        get_expr = Stripped(f"that->{getter}()")
 
-    code: Stripped
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_pass_through_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the function passing a visitor through the instances of ``type_anno``.
 
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        # No visits to primitive values.
-        return Stripped("")
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    body: Stripped
 
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        if isinstance(type_anno.our_type, intermediate.Enumeration):
-            # No visits to enumerations.
-            return Stripped("")
-
-        elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-            # No visits to primitive values.
-            return Stripped("")
-
-        elif isinstance(
-            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            code = Stripped(
-                f"""\
-Visit(
-{I}{get_expr}
-);"""
-            )
-        elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-            code = _generate_visit_named_union_switch(
-                union_value_expr=get_expr, named_union=type_anno.our_type
-            )
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno.our_type)
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "List items are restricted to atomic types (primitives, "
-            "constrained primitives, classes, enumerations and JSON-able "
-            "values), so no nested optionals, lists or tuples are expected "
-            "here."
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        item_type = cpp_common.generate_type_with_const_ref_if_applicable(
+            type_annotation=type_anno.items,
+            types_namespace=cpp_common.TYPES_NAMESPACE,
         )
 
-        if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-            # No visits to primitive values.
-            return Stripped("")
+        item_stmts = _generate_visit(
+            expr="item",
+            type_anno=type_anno.items,
+            visitor="visitor",
+            descendability=descendability,
+        )
 
-        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                # No visits to enumerations.
-                return Stripped("")
-
-            elif isinstance(
-                type_anno.items.our_type, intermediate.ConstrainedPrimitive
-            ):
-                # No visits to primitive values.
-                return Stripped("")
-
-            elif isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-                    type_annotation=type_anno.items,
-                    types_namespace=cpp_common.TYPES_NAMESPACE,
-                )
-
-                code = Stripped(
-                    f"""\
+        body = Stripped(
+            f"""\
 for (
 {I}{indent_but_first_line(item_type, I)} item :
-{I}{indent_but_first_line(get_expr, I)}
+{I}that
 ) {{
-{I}Visit(item);
+{I}{indent_but_first_line(item_stmts, I)}
 }}"""
-                )
-            elif isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-                    type_annotation=type_anno.items,
-                    types_namespace=cpp_common.TYPES_NAMESPACE,
-                )
-
-                visit_switch = _generate_visit_named_union_switch(
-                    union_value_expr=Stripped("item"),
-                    named_union=type_anno.items.our_type,
-                )
-
-                code = Stripped(
-                    f"""\
-for (
-{I}{indent_but_first_line(item_type, I)} item :
-{I}{indent_but_first_line(get_expr, I)}
-) {{
-{I}{indent_but_first_line(visit_switch, I)}
-}}"""
-                )
-            else:
-                assert_never(type_anno.items.our_type)
-
-        elif isinstance(
-            type_anno.items,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # No visits to JSON-able values as they are plain data.
-            return Stripped("")
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno.items)
+        )
 
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        visit_stmts = []  # type: List[Stripped]
-        for i, item_type_anno in enumerate(type_anno.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
+        body = Stripped(
+            "\n\n".join(
+                _generate_visit(
+                    expr=f"std::get<{i}>(that)",
+                    type_anno=item_type_anno,
+                    visitor="visitor",
+                    descendability=descendability,
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if descendability[item_type_anno]
             )
-
-            if isinstance(
-                item_type_anno, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                item_type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                visit_stmts.append(
-                    Stripped(
-                        f"""\
-Visit(
-{I}std::get<{i}>(
-{II}{indent_but_first_line(get_expr, II)}
-{I})
-);"""
-                    )
-                )
-            elif isinstance(
-                item_type_anno, intermediate.OurTypeAnnotation
-            ) and isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                tuple_item_expr = Stripped(
-                    f"""\
-std::get<{i}>(
-{I}{indent_but_first_line(get_expr, I)}
-)"""
-                )
-
-                visit_stmts.append(
-                    _generate_visit_named_union_switch(
-                        union_value_expr=tuple_item_expr,
-                        named_union=item_type_anno.our_type,
-                    )
-                )
-
-        if len(visit_stmts) == 0:
-            # No visits to any of the tuple items.
-            return Stripped("")
-
-        code = Stripped("\n".join(visit_stmts))
-
-    elif isinstance(
-        type_anno,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        # NOTE (mristin):
-        # A JSON-able value is plain data (``nlohmann::json``), never
-        # a reference to one of our own classes, so there is nothing to visit.
-        return Stripped("")
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # A set holds only primitives and enumeration literals, never a reference
-        # to one of our own classes, so there is nothing to visit.
-        return Stripped("")
-
-    else:
-        # noinspection PyTypeChecker
-        assert_never(type_anno)
-
-    if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        return Stripped(
-            f"""\
-// {getter}
-{code}"""
         )
 
-    maybe_var = cpp_naming.variable_name(Identifier(f"maybe_{prop.name}"))
-    maybe_type = cpp_common.generate_type_with_const_ref_if_applicable(
-        type_annotation=prop.type_annotation, types_namespace=cpp_common.TYPES_NAMESPACE
+    else:
+        assert_never(type_anno)
+
+    name = _pass_through_container_name(type_anno)
+    value_type = cpp_common.generate_type(
+        type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
     )
 
     return Stripped(
         f"""\
-// region {getter}
-{maybe_type} {maybe_var}(
-{I}that->{getter}()
-);
-if ({maybe_var}.has_value()) {{
-{I}{indent_but_first_line(code, I)}
-}}
-// endregion"""
+/**
+ * Pass the \\p visitor through the instances held by \\p that.
+ */
+void {name}(
+{I}IVisitor* visitor,
+{I}const {indent_but_first_line(value_type, I)}& that
+) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
     )
 
 
@@ -583,9 +487,62 @@ def _generate_pass_through_visit_body_for_class(
     blocks = []  # type: List[Stripped]
 
     for prop in cls.properties:
-        code = _generate_recursive_visit_for_property(prop=prop, mutating=mutating)
-        if code != "":
-            blocks.append(code)
+        descendability = intermediate.map_descendability(prop.type_annotation)
+
+        if not descendability[prop.type_annotation]:
+            continue
+
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+        getter = (
+            cpp_naming.mutable_getter_name(prop.name)
+            if mutating
+            else cpp_naming.getter_name(prop.name)
+        )
+
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            code = _generate_visit(
+                expr=f"that->{getter}()",
+                type_anno=type_anno,
+                visitor="this",
+                descendability=descendability,
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+// {getter}
+{code}"""
+                )
+            )
+            continue
+
+        maybe_var = cpp_naming.variable_name(Identifier(f"maybe_{prop.name}"))
+        maybe_type = cpp_common.generate_type_with_const_ref_if_applicable(
+            type_annotation=prop.type_annotation,
+            types_namespace=cpp_common.TYPES_NAMESPACE,
+        )
+
+        code = _generate_visit(
+            expr=f"{maybe_var}.value()",
+            type_anno=type_anno,
+            visitor="this",
+            descendability=descendability,
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+// region {getter}
+{maybe_type} {maybe_var}(
+{I}that->{getter}()
+);
+if ({maybe_var}.has_value()) {{
+{I}{indent_but_first_line(code, I)}
+}}
+// endregion"""
+            )
+        )
 
     if len(blocks) == 0:
         return Stripped("// No properties to be passed through."), False
@@ -669,10 +626,53 @@ def generate_implementation(
         ),
         cpp_common.generate_namespace_opening(namespace),
         *_generate_mutating_abstract_visitor_implementation(symbol_table=symbol_table),
-        *_generate_mutating_pass_through_visitor_implementation(
-            symbol_table=symbol_table
-        ),
     ]  # type: List[Stripped]
+
+    # NOTE (mristin):
+    # The descendability maps the nested type annotations before the type
+    # annotations which hold them. Hence, a pass-through function always comes
+    # after the functions it calls, as C++ requires.
+    pass_through_functions = []  # type: List[Stripped]
+    observed_monikers = set()  # type: Set[str]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for type_anno, descendable in descendability.items():
+                if not descendable or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                moniker = cpp_over.moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                pass_through_functions.append(
+                    _generate_pass_through_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
+
+    if len(pass_through_functions) > 0:
+        blocks.extend(
+            [
+                Stripped("namespace {"),
+                Stripped("// region Pass-through over the containers"),
+                *pass_through_functions,
+                Stripped("// endregion Pass-through over the containers"),
+                Stripped("}  // namespace"),
+            ]
+        )
+
+    blocks.extend(
+        _generate_mutating_pass_through_visitor_implementation(
+            symbol_table=symbol_table
+        )
+    )
 
     blocks.extend(
         [

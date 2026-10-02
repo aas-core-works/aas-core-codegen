@@ -79,9 +79,7 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_parent
-  Visit(
-    that->mutable_parent()
-  );
+  this->Visit(that->mutable_parent());
 }
 
 // endregion

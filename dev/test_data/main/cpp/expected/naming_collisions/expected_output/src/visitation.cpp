@@ -75,6 +75,61 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Instance(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IInstance>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IInstance>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_ListOf(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IListOf>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IListOf>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_tupleOf2_ListOf_str(
+  IVisitor* visitor,
+  const std::tuple<
+    std::shared_ptr<types::IListOf>,
+    std::wstring
+  >& that
+) {
+  visitor->Visit(std::get<0>(that));
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitInstance(
@@ -105,37 +160,19 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_instances
-  for (
-    const std::shared_ptr<types::IInstance>& item :
-    that->mutable_instances()
-  ) {
-    Visit(item);
-  }
+  PassThrough_listOf_Instance(this, that->mutable_instances());
 
   // mutable_pointer
-  Visit(
-    that->mutable_pointer()
-  );
+  this->Visit(that->mutable_pointer());
 
   // mutable_json_object_of_name
-  Visit(
-    that->mutable_json_object_of_name()
-  );
+  this->Visit(that->mutable_json_object_of_name());
 
   // mutable_lists
-  for (
-    const std::shared_ptr<types::IListOf>& item :
-    that->mutable_lists()
-  ) {
-    Visit(item);
-  }
+  PassThrough_listOf_ListOf(this, that->mutable_lists());
 
   // mutable_pair
-  Visit(
-    std::get<0>(
-      that->mutable_pair()
-    )
-  );
+  PassThrough_tupleOf2_ListOf_str(this, that->mutable_pair());
 }
 
 // endregion

@@ -68,6 +68,31 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Parent(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IParent>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IParent>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitItem(
@@ -92,22 +117,13 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_item
-  Visit(
-    that->mutable_item()
-  );
+  this->Visit(that->mutable_item());
 
   // mutable_parent
-  Visit(
-    that->mutable_parent()
-  );
+  this->Visit(that->mutable_parent());
 
   // mutable_parents
-  for (
-    const std::shared_ptr<types::IParent>& item :
-    that->mutable_parents()
-  ) {
-    Visit(item);
-  }
+  PassThrough_listOf_Parent(this, that->mutable_parents());
 
   // region mutable_optional_parent
   const common::optional<
@@ -116,9 +132,7 @@ void PassThroughVisitor::VisitSomething(
     that->mutable_optional_parent()
   );
   if (maybe_optional_parent.has_value()) {
-    Visit(
-      maybe_optional_parent.value()
-    );
+    this->Visit(maybe_optional_parent.value());
   }
   // endregion
 
@@ -131,14 +145,14 @@ void PassThroughVisitor::VisitSomething(
       (maybe_optional_member.value()).index()
     ) {
       case 0:
-        Visit(
+        this->Visit(
           common::get<0>(
             maybe_optional_member.value()
           )
         );
         break;
       case 1:
-        Visit(
+        this->Visit(
           common::get<1>(
             maybe_optional_member.value()
           )
