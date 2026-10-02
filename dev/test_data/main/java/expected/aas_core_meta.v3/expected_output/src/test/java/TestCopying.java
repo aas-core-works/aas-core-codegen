@@ -9,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import aas_core.aas3_0.common.*;
 import aas_core.aas3_0.copying.Copying;
+import aas_core.aas3_0.types.enums.*;
 import aas_core.aas3_0.types.impl.*;
 import aas_core.aas3_0.types.model.*;
 import aas_core.aas3_0.types.model.IClass;
 import aas_core.aas3_0.visitation.AbstractTransformerWithContext;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class TestCopying {
@@ -31,18 +27,24 @@ public class TestCopying {
         return false;
       }
 
-      Extension casted = (Extension) that;
+      Extension casted = (Extension) other;
 
       return (
         (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
         && that.getName().equals(casted.getName())
         && that.getValueType().equals(casted.getValueType())
         && that.getValue().equals(casted.getValue())
-        && that.getRefersTo().equals(casted.getRefersTo()));
+        && (that.getRefersTo().isPresent()
+          ? casted.getRefersTo().isPresent()
+            && deepEqualsListOf_IReference(that.getRefersTo().get(), casted.getRefersTo().get())
+          : !casted.getRefersTo().isPresent()));
     }
 
     @Override
@@ -51,16 +53,19 @@ public class TestCopying {
         return false;
       }
 
-      AdministrativeInformation casted = (AdministrativeInformation) that;
+      AdministrativeInformation casted = (AdministrativeInformation) other;
 
       return (
-        that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
+        (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
         && that.getVersion().equals(casted.getVersion())
         && that.getRevision().equals(casted.getRevision())
         && (that.getCreator().isPresent()
           ? casted.getCreator().isPresent()
-          && transform( that.getCreator().get(), casted.getCreator().get())
-          : ! casted.getCreator().isPresent())
+            && transform(that.getCreator().get(), casted.getCreator().get())
+          : !casted.getCreator().isPresent())
         && that.getTemplateId().equals(casted.getTemplateId()));
     }
 
@@ -70,22 +75,25 @@ public class TestCopying {
         return false;
       }
 
-      Qualifier casted = (Qualifier) that;
+      Qualifier casted = (Qualifier) other;
 
       return (
         (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
         && that.getKind().equals(casted.getKind())
         && that.getType().equals(casted.getType())
         && that.getValueType().equals(casted.getValueType())
         && that.getValue().equals(casted.getValue())
         && (that.getValueId().isPresent()
           ? casted.getValueId().isPresent()
-          && transform( that.getValueId().get(), casted.getValueId().get())
-          : ! casted.getValueId().isPresent()));
+            && transform(that.getValueId().get(), casted.getValueId().get())
+          : !casted.getValueId().isPresent()));
     }
 
     @Override
@@ -94,28 +102,41 @@ public class TestCopying {
         return false;
       }
 
-      AssetAdministrationShell casted = (AssetAdministrationShell) that;
+      AssetAdministrationShell casted = (AssetAdministrationShell) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getAdministration().isPresent()
           ? casted.getAdministration().isPresent()
-          && transform( that.getAdministration().get(), casted.getAdministration().get())
-          : ! casted.getAdministration().isPresent())
+            && transform(that.getAdministration().get(), casted.getAdministration().get())
+          : !casted.getAdministration().isPresent())
         && that.getId().equals(casted.getId())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
         && (that.getDerivedFrom().isPresent()
           ? casted.getDerivedFrom().isPresent()
-          && transform( that.getDerivedFrom().get(), casted.getDerivedFrom().get())
-          : ! casted.getDerivedFrom().isPresent())
-        && transform(
-          that.getAssetInformation(),
-          casted.getAssetInformation())
-        && that.getSubmodels().equals(casted.getSubmodels()));
+            && transform(that.getDerivedFrom().get(), casted.getDerivedFrom().get())
+          : !casted.getDerivedFrom().isPresent())
+        && transform(that.getAssetInformation(), casted.getAssetInformation())
+        && (that.getSubmodels().isPresent()
+          ? casted.getSubmodels().isPresent()
+            && deepEqualsListOf_IReference(that.getSubmodels().get(), casted.getSubmodels().get())
+          : !casted.getSubmodels().isPresent()));
     }
 
     @Override
@@ -124,17 +145,20 @@ public class TestCopying {
         return false;
       }
 
-      AssetInformation casted = (AssetInformation) that;
+      AssetInformation casted = (AssetInformation) other;
 
       return (
         that.getAssetKind().equals(casted.getAssetKind())
         && that.getGlobalAssetId().equals(casted.getGlobalAssetId())
-        && that.getSpecificAssetIds().equals(casted.getSpecificAssetIds())
+        && (that.getSpecificAssetIds().isPresent()
+          ? casted.getSpecificAssetIds().isPresent()
+            && deepEqualsListOf_ISpecificAssetId(that.getSpecificAssetIds().get(), casted.getSpecificAssetIds().get())
+          : !casted.getSpecificAssetIds().isPresent())
         && that.getAssetType().equals(casted.getAssetType())
         && (that.getDefaultThumbnail().isPresent()
           ? casted.getDefaultThumbnail().isPresent()
-          && transform( that.getDefaultThumbnail().get(), casted.getDefaultThumbnail().get())
-          : ! casted.getDefaultThumbnail().isPresent()));
+            && transform(that.getDefaultThumbnail().get(), casted.getDefaultThumbnail().get())
+          : !casted.getDefaultThumbnail().isPresent()));
     }
 
     @Override
@@ -143,7 +167,7 @@ public class TestCopying {
         return false;
       }
 
-      Resource casted = (Resource) that;
+      Resource casted = (Resource) other;
 
       return (
         that.getPath().equals(casted.getPath())
@@ -156,20 +180,23 @@ public class TestCopying {
         return false;
       }
 
-      SpecificAssetId casted = (SpecificAssetId) that;
+      SpecificAssetId casted = (SpecificAssetId) other;
 
       return (
         (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
         && that.getName().equals(casted.getName())
         && that.getValue().equals(casted.getValue())
         && (that.getExternalSubjectId().isPresent()
           ? casted.getExternalSubjectId().isPresent()
-          && transform( that.getExternalSubjectId().get(), casted.getExternalSubjectId().get())
-          : ! casted.getExternalSubjectId().isPresent()));
+            && transform(that.getExternalSubjectId().get(), casted.getExternalSubjectId().get())
+          : !casted.getExternalSubjectId().isPresent()));
     }
 
     @Override
@@ -178,28 +205,49 @@ public class TestCopying {
         return false;
       }
 
-      Submodel casted = (Submodel) that;
+      Submodel casted = (Submodel) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getAdministration().isPresent()
           ? casted.getAdministration().isPresent()
-          && transform( that.getAdministration().get(), casted.getAdministration().get())
-          : ! casted.getAdministration().isPresent())
+            && transform(that.getAdministration().get(), casted.getAdministration().get())
+          : !casted.getAdministration().isPresent())
         && that.getId().equals(casted.getId())
         && that.getKind().equals(casted.getKind())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && that.getSubmodelElements().equals(casted.getSubmodelElements()));
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && (that.getSubmodelElements().isPresent()
+          ? casted.getSubmodelElements().isPresent()
+            && deepEqualsListOf_ISubmodelElement(that.getSubmodelElements().get(), casted.getSubmodelElements().get())
+          : !casted.getSubmodelElements().isPresent()));
     }
 
     @Override
@@ -208,27 +256,41 @@ public class TestCopying {
         return false;
       }
 
-      RelationshipElement casted = (RelationshipElement) that;
+      RelationshipElement casted = (RelationshipElement) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && transform(
-          that.getFirst(),
-          casted.getFirst())
-        && transform(
-          that.getSecond(),
-          casted.getSecond()));
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && transform(that.getFirst(), casted.getFirst())
+        && transform(that.getSecond(), casted.getSecond()));
     }
 
     @Override
@@ -237,29 +299,50 @@ public class TestCopying {
         return false;
       }
 
-      SubmodelElementList casted = (SubmodelElementList) that;
+      SubmodelElementList casted = (SubmodelElementList) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
         && that.getOrderRelevant().equals(casted.getOrderRelevant())
         && (that.getSemanticIdListElement().isPresent()
           ? casted.getSemanticIdListElement().isPresent()
-          && transform( that.getSemanticIdListElement().get(), casted.getSemanticIdListElement().get())
-          : ! casted.getSemanticIdListElement().isPresent())
+            && transform(that.getSemanticIdListElement().get(), casted.getSemanticIdListElement().get())
+          : !casted.getSemanticIdListElement().isPresent())
         && that.getTypeValueListElement().equals(casted.getTypeValueListElement())
         && that.getValueTypeListElement().equals(casted.getValueTypeListElement())
-        && that.getValue().equals(casted.getValue()));
+        && (that.getValue().isPresent()
+          ? casted.getValue().isPresent()
+            && deepEqualsListOf_ISubmodelElement(that.getValue().get(), casted.getValue().get())
+          : !casted.getValue().isPresent()));
     }
 
     @Override
@@ -268,22 +351,43 @@ public class TestCopying {
         return false;
       }
 
-      SubmodelElementCollection casted = (SubmodelElementCollection) that;
+      SubmodelElementCollection casted = (SubmodelElementCollection) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && that.getValue().equals(casted.getValue()));
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && (that.getValue().isPresent()
+          ? casted.getValue().isPresent()
+            && deepEqualsListOf_ISubmodelElement(that.getValue().get(), casted.getValue().get())
+          : !casted.getValue().isPresent()));
     }
 
     @Override
@@ -292,27 +396,45 @@ public class TestCopying {
         return false;
       }
 
-      Property casted = (Property) that;
+      Property casted = (Property) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
         && that.getValueType().equals(casted.getValueType())
         && that.getValue().equals(casted.getValue())
         && (that.getValueId().isPresent()
           ? casted.getValueId().isPresent()
-          && transform( that.getValueId().get(), casted.getValueId().get())
-          : ! casted.getValueId().isPresent()));
+            && transform(that.getValueId().get(), casted.getValueId().get())
+          : !casted.getValueId().isPresent()));
     }
 
     @Override
@@ -321,26 +443,47 @@ public class TestCopying {
         return false;
       }
 
-      MultiLanguageProperty casted = (MultiLanguageProperty) that;
+      MultiLanguageProperty casted = (MultiLanguageProperty) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && that.getValue().equals(casted.getValue())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && (that.getValue().isPresent()
+          ? casted.getValue().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getValue().get(), casted.getValue().get())
+          : !casted.getValue().isPresent())
         && (that.getValueId().isPresent()
           ? casted.getValueId().isPresent()
-          && transform( that.getValueId().get(), casted.getValueId().get())
-          : ! casted.getValueId().isPresent()));
+            && transform(that.getValueId().get(), casted.getValueId().get())
+          : !casted.getValueId().isPresent()));
     }
 
     @Override
@@ -349,21 +492,39 @@ public class TestCopying {
         return false;
       }
 
-      Range casted = (Range) that;
+      Range casted = (Range) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
         && that.getValueType().equals(casted.getValueType())
         && that.getMin().equals(casted.getMin())
         && that.getMax().equals(casted.getMax()));
@@ -375,25 +536,43 @@ public class TestCopying {
         return false;
       }
 
-      ReferenceElement casted = (ReferenceElement) that;
+      ReferenceElement casted = (ReferenceElement) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
         && (that.getValue().isPresent()
           ? casted.getValue().isPresent()
-          && transform( that.getValue().get(), casted.getValue().get())
-          : ! casted.getValue().isPresent()));
+            && transform(that.getValue().get(), casted.getValue().get())
+          : !casted.getValue().isPresent()));
     }
 
     @Override
@@ -402,24 +581,43 @@ public class TestCopying {
         return false;
       }
 
-      Blob casted = (Blob) that;
+      Blob casted = (Blob) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && Arrays.equals(
-          that.getValue().get(),
-          casted.getValue().get())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && (that.getValue().isPresent()
+          ? casted.getValue().isPresent()
+            && Arrays.equals(that.getValue().get(), casted.getValue().get())
+          : !casted.getValue().isPresent())
         && that.getContentType().equals(casted.getContentType()));
     }
 
@@ -429,21 +627,39 @@ public class TestCopying {
         return false;
       }
 
-      File casted = (File) that;
+      File casted = (File) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
         && that.getValue().equals(casted.getValue())
         && that.getContentType().equals(casted.getContentType()));
     }
@@ -454,28 +670,45 @@ public class TestCopying {
         return false;
       }
 
-      AnnotatedRelationshipElement casted = (AnnotatedRelationshipElement) that;
+      AnnotatedRelationshipElement casted = (AnnotatedRelationshipElement) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && transform(
-          that.getFirst(),
-          casted.getFirst())
-        && transform(
-          that.getSecond(),
-          casted.getSecond())
-        && that.getAnnotations().equals(casted.getAnnotations()));
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && transform(that.getFirst(), casted.getFirst())
+        && transform(that.getSecond(), casted.getSecond())
+        && (that.getAnnotations().isPresent()
+          ? casted.getAnnotations().isPresent()
+            && deepEqualsListOf_IDataElement(that.getAnnotations().get(), casted.getAnnotations().get())
+          : !casted.getAnnotations().isPresent()));
     }
 
     @Override
@@ -484,25 +717,49 @@ public class TestCopying {
         return false;
       }
 
-      Entity casted = (Entity) that;
+      Entity casted = (Entity) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && that.getStatements().equals(casted.getStatements())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && (that.getStatements().isPresent()
+          ? casted.getStatements().isPresent()
+            && deepEqualsListOf_ISubmodelElement(that.getStatements().get(), casted.getStatements().get())
+          : !casted.getStatements().isPresent())
         && that.getEntityType().equals(casted.getEntityType())
         && that.getGlobalAssetId().equals(casted.getGlobalAssetId())
-        && that.getSpecificAssetIds().equals(casted.getSpecificAssetIds()));
+        && (that.getSpecificAssetIds().isPresent()
+          ? casted.getSpecificAssetIds().isPresent()
+            && deepEqualsListOf_ISpecificAssetId(that.getSpecificAssetIds().get(), casted.getSpecificAssetIds().get())
+          : !casted.getSpecificAssetIds().isPresent()));
     }
 
     @Override
@@ -511,32 +768,29 @@ public class TestCopying {
         return false;
       }
 
-      EventPayload casted = (EventPayload) that;
+      EventPayload casted = (EventPayload) other;
 
       return (
-        transform(
-          that.getSource(),
-          casted.getSource())
+        transform(that.getSource(), casted.getSource())
         && (that.getSourceSemanticId().isPresent()
           ? casted.getSourceSemanticId().isPresent()
-          && transform( that.getSourceSemanticId().get(), casted.getSourceSemanticId().get())
-          : ! casted.getSourceSemanticId().isPresent())
-        && transform(
-          that.getObservableReference(),
-          casted.getObservableReference())
+            && transform(that.getSourceSemanticId().get(), casted.getSourceSemanticId().get())
+          : !casted.getSourceSemanticId().isPresent())
+        && transform(that.getObservableReference(), casted.getObservableReference())
         && (that.getObservableSemanticId().isPresent()
           ? casted.getObservableSemanticId().isPresent()
-          && transform( that.getObservableSemanticId().get(), casted.getObservableSemanticId().get())
-          : ! casted.getObservableSemanticId().isPresent())
+            && transform(that.getObservableSemanticId().get(), casted.getObservableSemanticId().get())
+          : !casted.getObservableSemanticId().isPresent())
         && that.getTopic().equals(casted.getTopic())
         && (that.getSubjectId().isPresent()
           ? casted.getSubjectId().isPresent()
-          && transform( that.getSubjectId().get(), casted.getSubjectId().get())
-          : ! casted.getSubjectId().isPresent())
+            && transform(that.getSubjectId().get(), casted.getSubjectId().get())
+          : !casted.getSubjectId().isPresent())
         && that.getTimeStamp().equals(casted.getTimeStamp())
-        && Arrays.equals(
-          that.getPayload().get(),
-          casted.getPayload().get()));
+        && (that.getPayload().isPresent()
+          ? casted.getPayload().isPresent()
+            && Arrays.equals(that.getPayload().get(), casted.getPayload().get())
+          : !casted.getPayload().isPresent()));
     }
 
     @Override
@@ -545,31 +799,47 @@ public class TestCopying {
         return false;
       }
 
-      BasicEventElement casted = (BasicEventElement) that;
+      BasicEventElement casted = (BasicEventElement) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && transform(
-          that.getObserved(),
-          casted.getObserved())
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && transform(that.getObserved(), casted.getObserved())
         && that.getDirection().equals(casted.getDirection())
         && that.getState().equals(casted.getState())
         && that.getMessageTopic().equals(casted.getMessageTopic())
         && (that.getMessageBroker().isPresent()
           ? casted.getMessageBroker().isPresent()
-          && transform( that.getMessageBroker().get(), casted.getMessageBroker().get())
-          : ! casted.getMessageBroker().isPresent())
+            && transform(that.getMessageBroker().get(), casted.getMessageBroker().get())
+          : !casted.getMessageBroker().isPresent())
         && that.getLastUpdate().equals(casted.getLastUpdate())
         && that.getMinInterval().equals(casted.getMinInterval())
         && that.getMaxInterval().equals(casted.getMaxInterval()));
@@ -581,24 +851,51 @@ public class TestCopying {
         return false;
       }
 
-      Operation casted = (Operation) that;
+      Operation casted = (Operation) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && that.getInputVariables().equals(casted.getInputVariables())
-        && that.getOutputVariables().equals(casted.getOutputVariables())
-        && that.getInoutputVariables().equals(casted.getInoutputVariables()));
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && (that.getInputVariables().isPresent()
+          ? casted.getInputVariables().isPresent()
+            && deepEqualsListOf_IOperationVariable(that.getInputVariables().get(), casted.getInputVariables().get())
+          : !casted.getInputVariables().isPresent())
+        && (that.getOutputVariables().isPresent()
+          ? casted.getOutputVariables().isPresent()
+            && deepEqualsListOf_IOperationVariable(that.getOutputVariables().get(), casted.getOutputVariables().get())
+          : !casted.getOutputVariables().isPresent())
+        && (that.getInoutputVariables().isPresent()
+          ? casted.getInoutputVariables().isPresent()
+            && deepEqualsListOf_IOperationVariable(that.getInoutputVariables().get(), casted.getInoutputVariables().get())
+          : !casted.getInoutputVariables().isPresent()));
     }
 
     @Override
@@ -607,12 +904,10 @@ public class TestCopying {
         return false;
       }
 
-      OperationVariable casted = (OperationVariable) that;
+      OperationVariable casted = (OperationVariable) other;
 
       return (
-        transform(
-          that.getValue(),
-          casted.getValue()));
+        transform(that.getValue(), casted.getValue()));
     }
 
     @Override
@@ -621,21 +916,39 @@ public class TestCopying {
         return false;
       }
 
-      Capability casted = (Capability) that;
+      Capability casted = (Capability) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getSemanticId().isPresent()
           ? casted.getSemanticId().isPresent()
-          && transform( that.getSemanticId().get(), casted.getSemanticId().get())
-          : ! casted.getSemanticId().isPresent())
-        && that.getSupplementalSemanticIds().equals(casted.getSupplementalSemanticIds())
-        && that.getQualifiers().equals(casted.getQualifiers())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications()));
+            && transform(that.getSemanticId().get(), casted.getSemanticId().get())
+          : !casted.getSemanticId().isPresent())
+        && (that.getSupplementalSemanticIds().isPresent()
+          ? casted.getSupplementalSemanticIds().isPresent()
+            && deepEqualsListOf_IReference(that.getSupplementalSemanticIds().get(), casted.getSupplementalSemanticIds().get())
+          : !casted.getSupplementalSemanticIds().isPresent())
+        && (that.getQualifiers().isPresent()
+          ? casted.getQualifiers().isPresent()
+            && deepEqualsListOf_IQualifier(that.getQualifiers().get(), casted.getQualifiers().get())
+          : !casted.getQualifiers().isPresent())
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent()));
     }
 
     @Override
@@ -644,21 +957,36 @@ public class TestCopying {
         return false;
       }
 
-      ConceptDescription casted = (ConceptDescription) that;
+      ConceptDescription casted = (ConceptDescription) other;
 
       return (
-        that.getExtensions().equals(casted.getExtensions())
+        (that.getExtensions().isPresent()
+          ? casted.getExtensions().isPresent()
+            && deepEqualsListOf_IExtension(that.getExtensions().get(), casted.getExtensions().get())
+          : !casted.getExtensions().isPresent())
         && that.getCategory().equals(casted.getCategory())
         && that.getIdShort().equals(casted.getIdShort())
-        && that.getDisplayName().equals(casted.getDisplayName())
-        && that.getDescription().equals(casted.getDescription())
+        && (that.getDisplayName().isPresent()
+          ? casted.getDisplayName().isPresent()
+            && deepEqualsListOf_ILangStringNameType(that.getDisplayName().get(), casted.getDisplayName().get())
+          : !casted.getDisplayName().isPresent())
+        && (that.getDescription().isPresent()
+          ? casted.getDescription().isPresent()
+            && deepEqualsListOf_ILangStringTextType(that.getDescription().get(), casted.getDescription().get())
+          : !casted.getDescription().isPresent())
         && (that.getAdministration().isPresent()
           ? casted.getAdministration().isPresent()
-          && transform( that.getAdministration().get(), casted.getAdministration().get())
-          : ! casted.getAdministration().isPresent())
+            && transform(that.getAdministration().get(), casted.getAdministration().get())
+          : !casted.getAdministration().isPresent())
         && that.getId().equals(casted.getId())
-        && that.getEmbeddedDataSpecifications().equals(casted.getEmbeddedDataSpecifications())
-        && that.getIsCaseOf().equals(casted.getIsCaseOf()));
+        && (that.getEmbeddedDataSpecifications().isPresent()
+          ? casted.getEmbeddedDataSpecifications().isPresent()
+            && deepEqualsListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get(), casted.getEmbeddedDataSpecifications().get())
+          : !casted.getEmbeddedDataSpecifications().isPresent())
+        && (that.getIsCaseOf().isPresent()
+          ? casted.getIsCaseOf().isPresent()
+            && deepEqualsListOf_IReference(that.getIsCaseOf().get(), casted.getIsCaseOf().get())
+          : !casted.getIsCaseOf().isPresent()));
     }
 
     @Override
@@ -667,15 +995,15 @@ public class TestCopying {
         return false;
       }
 
-      Reference casted = (Reference) that;
+      Reference casted = (Reference) other;
 
       return (
         that.getType().equals(casted.getType())
         && (that.getReferredSemanticId().isPresent()
           ? casted.getReferredSemanticId().isPresent()
-          && transform( that.getReferredSemanticId().get(), casted.getReferredSemanticId().get())
-          : ! casted.getReferredSemanticId().isPresent())
-        && that.getKeys().equals(casted.getKeys()));
+            && transform(that.getReferredSemanticId().get(), casted.getReferredSemanticId().get())
+          : !casted.getReferredSemanticId().isPresent())
+        && deepEqualsListOf_IKey(that.getKeys(), casted.getKeys()));
     }
 
     @Override
@@ -684,7 +1012,7 @@ public class TestCopying {
         return false;
       }
 
-      Key casted = (Key) that;
+      Key casted = (Key) other;
 
       return (
         that.getType().equals(casted.getType())
@@ -697,7 +1025,7 @@ public class TestCopying {
         return false;
       }
 
-      LangStringNameType casted = (LangStringNameType) that;
+      LangStringNameType casted = (LangStringNameType) other;
 
       return (
         that.getLanguage().equals(casted.getLanguage())
@@ -710,7 +1038,7 @@ public class TestCopying {
         return false;
       }
 
-      LangStringTextType casted = (LangStringTextType) that;
+      LangStringTextType casted = (LangStringTextType) other;
 
       return (
         that.getLanguage().equals(casted.getLanguage())
@@ -723,12 +1051,21 @@ public class TestCopying {
         return false;
       }
 
-      Environment casted = (Environment) that;
+      Environment casted = (Environment) other;
 
       return (
-        that.getAssetAdministrationShells().equals(casted.getAssetAdministrationShells())
-        && that.getSubmodels().equals(casted.getSubmodels())
-        && that.getConceptDescriptions().equals(casted.getConceptDescriptions()));
+        (that.getAssetAdministrationShells().isPresent()
+          ? casted.getAssetAdministrationShells().isPresent()
+            && deepEqualsListOf_IAssetAdministrationShell(that.getAssetAdministrationShells().get(), casted.getAssetAdministrationShells().get())
+          : !casted.getAssetAdministrationShells().isPresent())
+        && (that.getSubmodels().isPresent()
+          ? casted.getSubmodels().isPresent()
+            && deepEqualsListOf_ISubmodel(that.getSubmodels().get(), casted.getSubmodels().get())
+          : !casted.getSubmodels().isPresent())
+        && (that.getConceptDescriptions().isPresent()
+          ? casted.getConceptDescriptions().isPresent()
+            && deepEqualsListOf_IConceptDescription(that.getConceptDescriptions().get(), casted.getConceptDescriptions().get())
+          : !casted.getConceptDescriptions().isPresent()));
     }
 
     @Override
@@ -737,15 +1074,11 @@ public class TestCopying {
         return false;
       }
 
-      EmbeddedDataSpecification casted = (EmbeddedDataSpecification) that;
+      EmbeddedDataSpecification casted = (EmbeddedDataSpecification) other;
 
       return (
-        transform(
-          that.getDataSpecification(),
-          casted.getDataSpecification())
-        && transform(
-          that.getDataSpecificationContent(),
-          casted.getDataSpecificationContent()));
+        transform(that.getDataSpecification(), casted.getDataSpecification())
+        && transform(that.getDataSpecificationContent(), casted.getDataSpecificationContent()));
     }
 
     @Override
@@ -754,7 +1087,7 @@ public class TestCopying {
         return false;
       }
 
-      LevelType casted = (LevelType) that;
+      LevelType casted = (LevelType) other;
 
       return (
         that.getMin().equals(casted.getMin())
@@ -769,13 +1102,11 @@ public class TestCopying {
         return false;
       }
 
-      ValueReferencePair casted = (ValueReferencePair) that;
+      ValueReferencePair casted = (ValueReferencePair) other;
 
       return (
         that.getValue().equals(casted.getValue())
-        && transform(
-          that.getValueId(),
-          casted.getValueId()));
+        && transform(that.getValueId(), casted.getValueId()));
     }
 
     @Override
@@ -784,10 +1115,10 @@ public class TestCopying {
         return false;
       }
 
-      ValueList casted = (ValueList) that;
+      ValueList casted = (ValueList) other;
 
       return (
-        that.getValueReferencePairs().equals(casted.getValueReferencePairs()));
+        deepEqualsListOf_IValueReferencePair(that.getValueReferencePairs(), casted.getValueReferencePairs()));
     }
 
     @Override
@@ -796,7 +1127,7 @@ public class TestCopying {
         return false;
       }
 
-      LangStringPreferredNameTypeIec61360 casted = (LangStringPreferredNameTypeIec61360) that;
+      LangStringPreferredNameTypeIec61360 casted = (LangStringPreferredNameTypeIec61360) other;
 
       return (
         that.getLanguage().equals(casted.getLanguage())
@@ -809,7 +1140,7 @@ public class TestCopying {
         return false;
       }
 
-      LangStringShortNameTypeIec61360 casted = (LangStringShortNameTypeIec61360) that;
+      LangStringShortNameTypeIec61360 casted = (LangStringShortNameTypeIec61360) other;
 
       return (
         that.getLanguage().equals(casted.getLanguage())
@@ -822,7 +1153,7 @@ public class TestCopying {
         return false;
       }
 
-      LangStringDefinitionTypeIec61360 casted = (LangStringDefinitionTypeIec61360) that;
+      LangStringDefinitionTypeIec61360 casted = (LangStringDefinitionTypeIec61360) other;
 
       return (
         that.getLanguage().equals(casted.getLanguage())
@@ -835,92 +1166,328 @@ public class TestCopying {
         return false;
       }
 
-      DataSpecificationIec61360 casted = (DataSpecificationIec61360) that;
+      DataSpecificationIec61360 casted = (DataSpecificationIec61360) other;
 
       return (
-        that.getPreferredName().equals(casted.getPreferredName())
-        && that.getShortName().equals(casted.getShortName())
+        deepEqualsListOf_ILangStringPreferredNameTypeIec61360(that.getPreferredName(), casted.getPreferredName())
+        && (that.getShortName().isPresent()
+          ? casted.getShortName().isPresent()
+            && deepEqualsListOf_ILangStringShortNameTypeIec61360(that.getShortName().get(), casted.getShortName().get())
+          : !casted.getShortName().isPresent())
         && that.getUnit().equals(casted.getUnit())
         && (that.getUnitId().isPresent()
           ? casted.getUnitId().isPresent()
-          && transform( that.getUnitId().get(), casted.getUnitId().get())
-          : ! casted.getUnitId().isPresent())
+            && transform(that.getUnitId().get(), casted.getUnitId().get())
+          : !casted.getUnitId().isPresent())
         && that.getSourceOfDefinition().equals(casted.getSourceOfDefinition())
         && that.getSymbol().equals(casted.getSymbol())
         && that.getDataType().equals(casted.getDataType())
-        && that.getDefinition().equals(casted.getDefinition())
+        && (that.getDefinition().isPresent()
+          ? casted.getDefinition().isPresent()
+            && deepEqualsListOf_ILangStringDefinitionTypeIec61360(that.getDefinition().get(), casted.getDefinition().get())
+          : !casted.getDefinition().isPresent())
         && that.getValueFormat().equals(casted.getValueFormat())
         && (that.getValueList().isPresent()
           ? casted.getValueList().isPresent()
-          && transform( that.getValueList().get(), casted.getValueList().get())
-          : ! casted.getValueList().isPresent())
+            && transform(that.getValueList().get(), casted.getValueList().get())
+          : !casted.getValueList().isPresent())
         && that.getValue().equals(casted.getValue())
         && (that.getLevelType().isPresent()
           ? casted.getLevelType().isPresent()
-          && transform( that.getLevelType().get(), casted.getLevelType().get())
-          : ! casted.getLevelType().isPresent()));
+            && transform(that.getLevelType().get(), casted.getLevelType().get())
+          : !casted.getLevelType().isPresent()));
+    }
+
+    private Boolean deepEqualsListOf_IReference(
+      List<IReference> that,
+      List<IReference> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IEmbeddedDataSpecification(
+      List<IEmbeddedDataSpecification> that,
+      List<IEmbeddedDataSpecification> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IExtension(
+      List<IExtension> that,
+      List<IExtension> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ILangStringNameType(
+      List<ILangStringNameType> that,
+      List<ILangStringNameType> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ILangStringTextType(
+      List<ILangStringTextType> that,
+      List<ILangStringTextType> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ISpecificAssetId(
+      List<ISpecificAssetId> that,
+      List<ISpecificAssetId> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IQualifier(
+      List<IQualifier> that,
+      List<IQualifier> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ISubmodelElement(
+      List<ISubmodelElement> that,
+      List<ISubmodelElement> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IDataElement(
+      List<IDataElement> that,
+      List<IDataElement> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IOperationVariable(
+      List<IOperationVariable> that,
+      List<IOperationVariable> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IKey(
+      List<IKey> that,
+      List<IKey> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IAssetAdministrationShell(
+      List<IAssetAdministrationShell> that,
+      List<IAssetAdministrationShell> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ISubmodel(
+      List<ISubmodel> that,
+      List<ISubmodel> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IConceptDescription(
+      List<IConceptDescription> that,
+      List<IConceptDescription> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_IValueReferencePair(
+      List<IValueReferencePair> that,
+      List<IValueReferencePair> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ILangStringPreferredNameTypeIec61360(
+      List<ILangStringPreferredNameTypeIec61360> that,
+      List<ILangStringPreferredNameTypeIec61360> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ILangStringShortNameTypeIec61360(
+      List<ILangStringShortNameTypeIec61360> that,
+      List<ILangStringShortNameTypeIec61360> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ILangStringDefinitionTypeIec61360(
+      List<ILangStringDefinitionTypeIec61360> that,
+      List<ILangStringDefinitionTypeIec61360> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
     }
   } // class _DeepEqualiser
 
   private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();
-
-  /**
-   * Compare two byte spans for equal content.
-   */
-  private static Boolean byteSpansEqual(byte[] that, byte[] other) {
-    return that.equals(other);
-  }
-
-  private static class _Pair<A, B> {
-    private final A first;
-    private final B second;
-    
-    public _Pair(A first, B second) {
-      this.first = first;
-      this.second = second;
-    }
-    
-    public A getFirst() {
-      return first;
-    }
-    
-    public B getSecond() {
-      return second;
-    }
-  }
-
-  // Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
-  // Adapted from: https://stackoverflow.com/a/23529010
-  private static <A, B> Stream<_Pair<A, B>> zip(
-    Stream<? extends A> a,
-    Stream<? extends B> b) {
-    Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
-    Spliterator<? extends B> bSplit = Objects.requireNonNull(b).spliterator();
-    
-    int characteristics = aSplit.characteristics() & bSplit.characteristics() &
-      ~(Spliterator.DISTINCT | Spliterator.SORTED);
-    
-    long zipSize = ((characteristics & Spliterator.SIZED) != 0)
-      ? Math.min(aSplit.getExactSizeIfKnown(), bSplit.getExactSizeIfKnown())
-      : -1;
-    
-    Iterator<A> aIter = Spliterators.iterator(aSplit);
-    Iterator<B> bIter = Spliterators.iterator(bSplit);
-    Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {
-      @Override
-      public boolean hasNext() {
-        return aIter.hasNext() && bIter.hasNext();
-      }
-      
-      @Override
-      public _Pair<A, B> next() {
-        return new _Pair<>(aIter.next(), bIter.next());
-      }
-    };
-    
-    Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
-    return StreamSupport.stream(split, false);
-  }
 
   private static Boolean ExtensionShallowEquals(
     Extension that,

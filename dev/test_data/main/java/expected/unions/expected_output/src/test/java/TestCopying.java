@@ -9,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dummy.common.*;
 import dummy.copying.Copying;
+import dummy.types.enums.*;
 import dummy.types.impl.*;
 import dummy.types.model.*;
 import dummy.types.model.IClass;
 import dummy.visitation.AbstractTransformerWithContext;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class TestCopying {
@@ -31,7 +27,7 @@ public class TestCopying {
         return false;
       }
 
-      StructuralFirst casted = (StructuralFirst) that;
+      StructuralFirst casted = (StructuralFirst) other;
 
       return (
         that.getUniqueToFirst().equals(casted.getUniqueToFirst()));
@@ -43,7 +39,7 @@ public class TestCopying {
         return false;
       }
 
-      StructuralSecond casted = (StructuralSecond) that;
+      StructuralSecond casted = (StructuralSecond) other;
 
       return (
         that.getUniqueToSecond().equals(casted.getUniqueToSecond()));
@@ -55,7 +51,7 @@ public class TestCopying {
         return false;
       }
 
-      MixedAbstractDescendantOne casted = (MixedAbstractDescendantOne) that;
+      MixedAbstractDescendantOne casted = (MixedAbstractDescendantOne) other;
 
       return (
         that.getUniqueToAbstractDescendantOne().equals(casted.getUniqueToAbstractDescendantOne()));
@@ -67,7 +63,7 @@ public class TestCopying {
         return false;
       }
 
-      MixedAbstractDescendantTwo casted = (MixedAbstractDescendantTwo) that;
+      MixedAbstractDescendantTwo casted = (MixedAbstractDescendantTwo) other;
 
       return (
         that.getUniqueToAbstractDescendantTwo().equals(casted.getUniqueToAbstractDescendantTwo()));
@@ -79,7 +75,7 @@ public class TestCopying {
         return false;
       }
 
-      MixedConcreteWithDescendants casted = (MixedConcreteWithDescendants) that;
+      MixedConcreteWithDescendants casted = (MixedConcreteWithDescendants) other;
 
       return (
         that.getSomeBaseProperty().equals(casted.getSomeBaseProperty()));
@@ -91,7 +87,7 @@ public class TestCopying {
         return false;
       }
 
-      MixedConcreteWithDescendantsChild casted = (MixedConcreteWithDescendantsChild) that;
+      MixedConcreteWithDescendantsChild casted = (MixedConcreteWithDescendantsChild) other;
 
       return (
         that.getSomeBaseProperty().equals(casted.getSomeBaseProperty())
@@ -104,7 +100,7 @@ public class TestCopying {
         return false;
       }
 
-      MixedConcreteLeaf casted = (MixedConcreteLeaf) that;
+      MixedConcreteLeaf casted = (MixedConcreteLeaf) other;
 
       return (
         that.getUniqueToConcreteLeaf().equals(casted.getUniqueToConcreteLeaf()));
@@ -116,7 +112,7 @@ public class TestCopying {
         return false;
       }
 
-      ModelTypedFirst casted = (ModelTypedFirst) that;
+      ModelTypedFirst casted = (ModelTypedFirst) other;
 
       return (
         that.getSomeProperty().equals(casted.getSomeProperty()));
@@ -128,7 +124,7 @@ public class TestCopying {
         return false;
       }
 
-      ModelTypedSecond casted = (ModelTypedSecond) that;
+      ModelTypedSecond casted = (ModelTypedSecond) other;
 
       return (
         that.getSomeProperty().equals(casted.getSomeProperty()));
@@ -140,109 +136,113 @@ public class TestCopying {
         return false;
       }
 
-      Something casted = (Something) that;
+      Something casted = (Something) other;
 
       return (
-        transform(
-          that.getStructuralProperty(),
-          casted.getStructuralProperty())
-        && transform(
-          that.getMixedProperty(),
-          casted.getMixedProperty())
-        && transform(
-          that.getModelTypedProperty(),
-          casted.getModelTypedProperty())
-        && that.getListStructuralProperty().equals(casted.getListStructuralProperty())
-        && that.getListMixedProperty().equals(casted.getListMixedProperty())
-        && that.getListModelTypedProperty().equals(casted.getListModelTypedProperty())
-        && (transform(
-            that.getTupleProperty().item1(),
-            casted.getTupleProperty().item1())
-          && transform(
-            that.getTupleProperty().item2(),
-            casted.getTupleProperty().item2())
-          && transform(
-            that.getTupleProperty().item3(),
-            casted.getTupleProperty().item3()))
+        transform(that.getStructuralProperty(), casted.getStructuralProperty())
+        && transform(that.getMixedProperty(), casted.getMixedProperty())
+        && transform(that.getModelTypedProperty(), casted.getModelTypedProperty())
+        && deepEqualsListOf_StructuralUnion(that.getListStructuralProperty(), casted.getListStructuralProperty())
+        && deepEqualsListOf_MixedUnion(that.getListMixedProperty(), casted.getListMixedProperty())
+        && deepEqualsListOf_ModelTypedUnion(that.getListModelTypedProperty(), casted.getListModelTypedProperty())
+        && deepEqualsTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(that.getTupleProperty(), casted.getTupleProperty())
         && (that.getOptionalStructuralProperty().isPresent()
           ? casted.getOptionalStructuralProperty().isPresent()
-          && transform( that.getOptionalStructuralProperty().get(), casted.getOptionalStructuralProperty().get())
-          : ! casted.getOptionalStructuralProperty().isPresent())
+            && transform(that.getOptionalStructuralProperty().get(), casted.getOptionalStructuralProperty().get())
+          : !casted.getOptionalStructuralProperty().isPresent())
         && (that.getOptionalMixedProperty().isPresent()
           ? casted.getOptionalMixedProperty().isPresent()
-          && transform( that.getOptionalMixedProperty().get(), casted.getOptionalMixedProperty().get())
-          : ! casted.getOptionalMixedProperty().isPresent())
+            && transform(that.getOptionalMixedProperty().get(), casted.getOptionalMixedProperty().get())
+          : !casted.getOptionalMixedProperty().isPresent())
         && (that.getOptionalModelTypedProperty().isPresent()
           ? casted.getOptionalModelTypedProperty().isPresent()
-          && transform( that.getOptionalModelTypedProperty().get(), casted.getOptionalModelTypedProperty().get())
-          : ! casted.getOptionalModelTypedProperty().isPresent())
-        && that.getOptionalListOverlappingProperty().equals(casted.getOptionalListOverlappingProperty()));
+            && transform(that.getOptionalModelTypedProperty().get(), casted.getOptionalModelTypedProperty().get())
+          : !casted.getOptionalModelTypedProperty().isPresent())
+        && (that.getOptionalListOverlappingProperty().isPresent()
+          ? casted.getOptionalListOverlappingProperty().isPresent()
+            && deepEqualsListOf_OverlappingUnion(that.getOptionalListOverlappingProperty().get(), casted.getOptionalListOverlappingProperty().get())
+          : !casted.getOptionalListOverlappingProperty().isPresent()));
     }
 
     private Boolean transform(IUnion<?> that, IUnion<?> other) {
       return transform(that.getUnderlying(), other.getUnderlying());
     }
+
+    private Boolean deepEqualsListOf_StructuralUnion(
+      List<StructuralUnion> that,
+      List<StructuralUnion> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_MixedUnion(
+      List<MixedUnion> that,
+      List<MixedUnion> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_ModelTypedUnion(
+      List<ModelTypedUnion> that,
+      List<ModelTypedUnion> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+      Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> that,
+      Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> other) {
+      return (
+        transform(that.item1(), other.item1())
+        && transform(that.item2(), other.item2())
+        && transform(that.item3(), other.item3()));
+    }
+
+    private Boolean deepEqualsListOf_OverlappingUnion(
+      List<OverlappingUnion> that,
+      List<OverlappingUnion> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
   } // class _DeepEqualiser
 
   private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();
-
-  /**
-   * Compare two byte spans for equal content.
-   */
-  private static Boolean byteSpansEqual(byte[] that, byte[] other) {
-    return that.equals(other);
-  }
-
-  private static class _Pair<A, B> {
-    private final A first;
-    private final B second;
-    
-    public _Pair(A first, B second) {
-      this.first = first;
-      this.second = second;
-    }
-    
-    public A getFirst() {
-      return first;
-    }
-    
-    public B getSecond() {
-      return second;
-    }
-  }
-
-  // Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
-  // Adapted from: https://stackoverflow.com/a/23529010
-  private static <A, B> Stream<_Pair<A, B>> zip(
-    Stream<? extends A> a,
-    Stream<? extends B> b) {
-    Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
-    Spliterator<? extends B> bSplit = Objects.requireNonNull(b).spliterator();
-    
-    int characteristics = aSplit.characteristics() & bSplit.characteristics() &
-      ~(Spliterator.DISTINCT | Spliterator.SORTED);
-    
-    long zipSize = ((characteristics & Spliterator.SIZED) != 0)
-      ? Math.min(aSplit.getExactSizeIfKnown(), bSplit.getExactSizeIfKnown())
-      : -1;
-    
-    Iterator<A> aIter = Spliterators.iterator(aSplit);
-    Iterator<B> bIter = Spliterators.iterator(bSplit);
-    Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {
-      @Override
-      public boolean hasNext() {
-        return aIter.hasNext() && bIter.hasNext();
-      }
-      
-      @Override
-      public _Pair<A, B> next() {
-        return new _Pair<>(aIter.next(), bIter.next());
-      }
-    };
-    
-    Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
-    return StreamSupport.stream(split, false);
-  }
 
   private static Boolean StructuralFirstShallowEquals(
     StructuralFirst that,

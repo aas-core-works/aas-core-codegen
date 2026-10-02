@@ -9,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dummy.common.*;
 import dummy.copying.Copying;
+import dummy.types.enums.*;
 import dummy.types.impl.*;
 import dummy.types.model.*;
 import dummy.types.model.IClass;
 import dummy.visitation.AbstractTransformerWithContext;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class TestCopying {
@@ -31,7 +27,7 @@ public class TestCopying {
         return false;
       }
 
-      Leaf casted = (Leaf) that;
+      Leaf casted = (Leaf) other;
 
       return (
         that.getIdentifier().equals(casted.getIdentifier())
@@ -44,11 +40,11 @@ public class TestCopying {
         return false;
       }
 
-      OrderedContainer casted = (OrderedContainer) that;
+      OrderedContainer casted = (OrderedContainer) other;
 
       return (
         that.getIdentifier().equals(casted.getIdentifier())
-        && that.getChildren().equals(casted.getChildren())
+        && deepEqualsListOf_IElement(that.getChildren(), casted.getChildren())
         && that.getIsSorted().equals(casted.getIsSorted()));
     }
 
@@ -58,11 +54,11 @@ public class TestCopying {
         return false;
       }
 
-      UnorderedContainer casted = (UnorderedContainer) that;
+      UnorderedContainer casted = (UnorderedContainer) other;
 
       return (
         that.getIdentifier().equals(casted.getIdentifier())
-        && that.getChildren().equals(casted.getChildren()));
+        && deepEqualsListOf_IElement(that.getChildren(), casted.getChildren()));
     }
 
     @Override
@@ -71,7 +67,7 @@ public class TestCopying {
         return false;
       }
 
-      GlobalAttribute casted = (GlobalAttribute) that;
+      GlobalAttribute casted = (GlobalAttribute) other;
 
       return (
         that.getKind().equals(casted.getKind()));
@@ -83,7 +79,7 @@ public class TestCopying {
         return false;
       }
 
-      LocalAttribute casted = (LocalAttribute) that;
+      LocalAttribute casted = (LocalAttribute) other;
 
       return (
         that.getName().equals(casted.getName()));
@@ -95,12 +91,10 @@ public class TestCopying {
         return false;
       }
 
-      AttributeOperand casted = (AttributeOperand) that;
+      AttributeOperand casted = (AttributeOperand) other;
 
       return (
-        transform(
-          that.getAttribute(),
-          casted.getAttribute()));
+        transform(that.getAttribute(), casted.getAttribute()));
     }
 
     @Override
@@ -109,7 +103,7 @@ public class TestCopying {
         return false;
       }
 
-      StringLiteral casted = (StringLiteral) that;
+      StringLiteral casted = (StringLiteral) other;
 
       return (
         that.getText().equals(casted.getText()));
@@ -121,7 +115,7 @@ public class TestCopying {
         return false;
       }
 
-      NumberLiteral casted = (NumberLiteral) that;
+      NumberLiteral casted = (NumberLiteral) other;
 
       return (
         that.getNumber().equals(casted.getNumber()));
@@ -133,86 +127,56 @@ public class TestCopying {
         return false;
       }
 
-      Something casted = (Something) that;
+      Something casted = (Something) other;
 
       return (
-        transform(
-          that.getRoot(),
-          casted.getRoot())
+        transform(that.getRoot(), casted.getRoot())
         && (that.getOptionalElement().isPresent()
           ? casted.getOptionalElement().isPresent()
-          && transform( that.getOptionalElement().get(), casted.getOptionalElement().get())
-          : ! casted.getOptionalElement().isPresent())
-        && transform(
-          that.getValue(),
-          casted.getValue())
-        && that.getValues().equals(casted.getValues()));
+            && transform(that.getOptionalElement().get(), casted.getOptionalElement().get())
+          : !casted.getOptionalElement().isPresent())
+        && transform(that.getValue(), casted.getValue())
+        && deepEqualsListOf_Value(that.getValues(), casted.getValues()));
     }
 
     private Boolean transform(IUnion<?> that, IUnion<?> other) {
       return transform(that.getUnderlying(), other.getUnderlying());
     }
+
+    private Boolean deepEqualsListOf_IElement(
+      List<IElement> that,
+      List<IElement> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsListOf_Value(
+      List<Value> that,
+      List<Value> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (int i = 0; i < that.size(); i++) {
+        if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
   } // class _DeepEqualiser
 
   private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();
-
-  /**
-   * Compare two byte spans for equal content.
-   */
-  private static Boolean byteSpansEqual(byte[] that, byte[] other) {
-    return that.equals(other);
-  }
-
-  private static class _Pair<A, B> {
-    private final A first;
-    private final B second;
-    
-    public _Pair(A first, B second) {
-      this.first = first;
-      this.second = second;
-    }
-    
-    public A getFirst() {
-      return first;
-    }
-    
-    public B getSecond() {
-      return second;
-    }
-  }
-
-  // Java 8 doesn't provide a zip operation out of the box, so we have to ship our own.
-  // Adapted from: https://stackoverflow.com/a/23529010
-  private static <A, B> Stream<_Pair<A, B>> zip(
-    Stream<? extends A> a,
-    Stream<? extends B> b) {
-    Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
-    Spliterator<? extends B> bSplit = Objects.requireNonNull(b).spliterator();
-    
-    int characteristics = aSplit.characteristics() & bSplit.characteristics() &
-      ~(Spliterator.DISTINCT | Spliterator.SORTED);
-    
-    long zipSize = ((characteristics & Spliterator.SIZED) != 0)
-      ? Math.min(aSplit.getExactSizeIfKnown(), bSplit.getExactSizeIfKnown())
-      : -1;
-    
-    Iterator<A> aIter = Spliterators.iterator(aSplit);
-    Iterator<B> bIter = Spliterators.iterator(bSplit);
-    Iterator<_Pair<A, B>> cIter = new Iterator<_Pair<A, B>>() {
-      @Override
-      public boolean hasNext() {
-        return aIter.hasNext() && bIter.hasNext();
-      }
-      
-      @Override
-      public _Pair<A, B> next() {
-        return new _Pair<>(aIter.next(), bIter.next());
-      }
-    };
-    
-    Spliterator<_Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
-    return StreamSupport.stream(split, false);
-  }
 
   private static Boolean LeafShallowEquals(
     Leaf that,
