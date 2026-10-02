@@ -102,18 +102,23 @@ class LangString(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -175,7 +180,7 @@ class LangStringSet(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield from self.lang_strings
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -183,10 +188,17 @@ class LangStringSet(Class):
 
         :yield: instances recursively referenced from this instance
         """
-        for an_item in self.lang_strings:
-            yield an_item
+        return self._descend(recurse=True)
 
-            yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        yield from _descend_list_of__lang_string(self.lang_strings, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -248,8 +260,7 @@ class IecContent(Content):
 
         :yield: instances directly referenced from this instance
         """
-        if self.definition is not None:
-            yield from self.definition
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -257,11 +268,18 @@ class IecContent(Content):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.definition is not None:
-            for an_item in self.definition:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.definition is not None:
+            yield from _descend_list_of__lang_string(self.definition, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -309,18 +327,23 @@ class OtherContent(Content):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -373,7 +396,7 @@ class Specification(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.content
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -381,9 +404,20 @@ class Specification(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         yield self.content
 
-        yield from self.content.descend()
+        if recurse:
+            yield from self.content.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -444,10 +478,7 @@ class Something(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield from self.lang_string_sets
-
-        if self.specifications is not None:
-            yield from self.specifications
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -455,16 +486,20 @@ class Something(Class):
 
         :yield: instances recursively referenced from this instance
         """
-        for an_item in self.lang_string_sets:
-            yield an_item
+        return self._descend(recurse=True)
 
-            yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        yield from _descend_list_of__lang_string_set(self.lang_string_sets, recurse)
 
         if self.specifications is not None:
-            for another_item in self.specifications:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__specification(self.specifications, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -506,6 +541,66 @@ class Something(Class):
         self.default_language = default_language
         self.lang_string_sets = lang_string_sets
         self.specifications = specifications
+
+
+def _descend_list_of__lang_string(
+        that: List['LangString'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__lang_string_set(
+        that: List['LangStringSet'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__specification(
+        that: List['Specification'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
 
 
 class AbstractVisitor:
