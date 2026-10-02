@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -55,20 +54,7 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    List<IElement> children = that.getChildren();
-    List<IElement> transformedChildren = children.stream()
-      .map(childrenItem -> {
-        IClass transformedChildrenItem =
-          transform(childrenItem);
-        if (!(transformedChildrenItem instanceof IElement)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a IElement " +
-            ", but got: " + transformedChildrenItem
-          );
-        }
-        return (IElement) transformedChildrenItem;
-      }).collect(Collectors.toList());
-    that.setChildren(transformedChildren);
+    that.setChildren(wrapListOf_IElement(that.getChildren()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -90,20 +76,7 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    List<IElement> children = that.getChildren();
-    List<IElement> transformedChildren = children.stream()
-      .map(childrenItem -> {
-        IClass transformedChildrenItem =
-          transform(childrenItem);
-        if (!(transformedChildrenItem instanceof IElement)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a IElement " +
-            ", but got: " + transformedChildrenItem
-          );
-        }
-        return (IElement) transformedChildrenItem;
-      }).collect(Collectors.toList());
-    that.setChildren(transformedChildren);
+    that.setChildren(wrapListOf_IElement(that.getChildren()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -165,8 +138,7 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    AttributeItem attribute = that.getAttribute();
-    that.setAttribute(transform(attribute));
+    that.setAttribute(wrap(that.getAttribute()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -228,37 +200,15 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    IElement root = that.getRoot();
-    IClass transformedRoot = transform(root);
-    if (!(transformedRoot instanceof IElement)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IElement " +
-        ", but got: " + transformedRoot
-      );
-    }
-    IElement castedRoot = (IElement) transformedRoot;
-    that.setRoot(castedRoot);
+    that.setRoot(wrap(that.getRoot()));
 
     if (that.getOptionalElement().isPresent()) {
-      IElement optionalElement = that.getOptionalElement().get();
-      IClass transformedOptionalElement = transform(optionalElement);
-      if (!(transformedOptionalElement instanceof IElement)) {
-        throw new UnsupportedOperationException(
-          "Expected the transformed value to be a IElement " +
-          ", but got: " + transformedOptionalElement
-        );
-      }
-      IElement castedOptionalElement = (IElement) transformedOptionalElement;
-      that.setOptionalElement(castedOptionalElement);
+      that.setOptionalElement(wrap(that.getOptionalElement().get()));
     }
 
-    Value value = that.getValue();
-    that.setValue(transform(value));
+    that.setValue(wrap(that.getValue()));
 
-    List<Value> values = that.getValues();
-    List<Value> transformedValues = values.stream()
-      .map(this::transform).collect(Collectors.toList());
-    that.setValues(transformedValues);
+    that.setValues(wrapListOf_Value(that.getValues()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -269,9 +219,38 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
   }
 
-  private <T extends IUnion<T>> T transform(T that) {
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
+  }
+
+  private <T extends IUnion<T>> T wrap(T that) {
     return that.withUnderlying(
-      transform(that.getUnderlying()));
+      wrap(that.getUnderlying()));
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<IElement> wrapListOf_IElement(
+    List<IElement> that) {
+    List<IElement> result = new ArrayList<>(that.size());
+    for (IElement item : that) {
+      result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<Value> wrapListOf_Value(
+    List<Value> that) {
+    List<Value> result = new ArrayList<>(that.size());
+    for (Value item : that) {
+      result.add(wrap(item));
+    }
+    return result;
   }
 }
 

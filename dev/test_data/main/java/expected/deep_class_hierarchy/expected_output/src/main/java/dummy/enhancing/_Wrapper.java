@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -95,27 +94,10 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    INode someChoice = that.getSomeChoice();
-    IClass transformedSomeChoice = transform(someChoice);
-    if (!(transformedSomeChoice instanceof INode)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a INode " +
-        ", but got: " + transformedSomeChoice
-      );
-    }
-    INode castedSomeChoice = (INode) transformedSomeChoice;
-    that.setSomeChoice(castedSomeChoice);
+    that.setSomeChoice(wrap(that.getSomeChoice()));
 
-    IBranch somethingWithoutChoice = that.getSomethingWithoutChoice();
-    IClass transformedSomethingWithoutChoice = transform(somethingWithoutChoice);
-    if (!(transformedSomethingWithoutChoice instanceof IBranch)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IBranch " +
-        ", but got: " + transformedSomethingWithoutChoice
-      );
-    }
-    IBranch castedSomethingWithoutChoice = (IBranch) transformedSomethingWithoutChoice;
-    that.setSomethingWithoutChoice(castedSomethingWithoutChoice);
+    that.setSomethingWithoutChoice(
+      wrap(that.getSomethingWithoutChoice()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -137,27 +119,9 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    INode node = that.getNode();
-    IClass transformedNode = transform(node);
-    if (!(transformedNode instanceof INode)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a INode " +
-        ", but got: " + transformedNode
-      );
-    }
-    INode castedNode = (INode) transformedNode;
-    that.setNode(castedNode);
+    that.setNode(wrap(that.getNode()));
 
-    ISomething something = that.getSomething();
-    IClass transformedSomething = transform(something);
-    if (!(transformedSomething instanceof ISomething)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a ISomething " +
-        ", but got: " + transformedSomething
-      );
-    }
-    ISomething castedSomething = (ISomething) transformedSomething;
-    that.setSomething(castedSomething);
+    that.setSomething(wrap(that.getSomething()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -166,6 +130,11 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         that,
         enhancement.get()
       );
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
   }
 }
 

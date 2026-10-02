@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -75,82 +74,15 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    Tuple2<IAbstractItem, IAbstractItem> items = that.getItems();
-    IClass transformedItems0 = transform(items.item1());
-    if (!(transformedItems0 instanceof IAbstractItem)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IAbstractItem " +
-        ", but got: " + transformedItems0
-      );
-    }
-    IAbstractItem castedItems0 = (IAbstractItem) transformedItems0;
-    IClass transformedItems1 = transform(items.item2());
-    if (!(transformedItems1 instanceof IAbstractItem)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IAbstractItem " +
-        ", but got: " + transformedItems1
-      );
-    }
-    IAbstractItem castedItems1 = (IAbstractItem) transformedItems1;
     that.setItems(
-      new Tuple2<>(
-        castedItems0,
-        castedItems1));
+      wrapTupleOf2_IAbstractItem_IAbstractItem(that.getItems()));
 
-    Tuple6<
-      Long,
-      ISomeItem,
-      IAbstractItem,
-      ISomeItem,
-      Long,
-      Result> tricky = that.getTricky();
-    IClass transformedTricky1 = transform(tricky.item2());
-    if (!(transformedTricky1 instanceof ISomeItem)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a ISomeItem " +
-        ", but got: " + transformedTricky1
-      );
-    }
-    ISomeItem castedTricky1 = (ISomeItem) transformedTricky1;
-    IClass transformedTricky2 = transform(tricky.item3());
-    if (!(transformedTricky2 instanceof IAbstractItem)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IAbstractItem " +
-        ", but got: " + transformedTricky2
-      );
-    }
-    IAbstractItem castedTricky2 = (IAbstractItem) transformedTricky2;
-    IClass transformedTricky3 = transform(tricky.item4());
-    if (!(transformedTricky3 instanceof ISomeItem)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a ISomeItem " +
-        ", but got: " + transformedTricky3
-      );
-    }
-    ISomeItem castedTricky3 = (ISomeItem) transformedTricky3;
     that.setTricky(
-      new Tuple6<>(
-        tricky.item1(),
-        castedTricky1,
-        castedTricky2,
-        castedTricky3,
-        tricky.item5(),
-        tricky.item6()));
+      wrapTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(that.getTricky()));
 
     if (that.getOptionalPair().isPresent()) {
-      Tuple2<String, IAbstractItem> optionalPair = that.getOptionalPair().get();
-      IClass transformedOptionalPair1 = transform(optionalPair.item2());
-      if (!(transformedOptionalPair1 instanceof IAbstractItem)) {
-        throw new UnsupportedOperationException(
-          "Expected the transformed value to be a IAbstractItem " +
-          ", but got: " + transformedOptionalPair1
-        );
-      }
-      IAbstractItem castedOptionalPair1 = (IAbstractItem) transformedOptionalPair1;
       that.setOptionalPair(
-        new Tuple2<>(
-          optionalPair.item1(),
-          castedOptionalPair1));
+        wrapTupleOf2_string_IAbstractItem(that.getOptionalPair().get()));
     }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
@@ -160,6 +92,57 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         that,
         enhancement.get()
       );
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private Tuple2<IAbstractItem, IAbstractItem> wrapTupleOf2_IAbstractItem_IAbstractItem(
+    Tuple2<IAbstractItem, IAbstractItem> that) {
+    return new Tuple2<>(
+      wrap(that.item1()),
+      wrap(that.item2()));
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private Tuple6<
+    Long,
+    ISomeItem,
+    IAbstractItem,
+    ISomeItem,
+    Long,
+    Result> wrapTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+    Tuple6<
+      Long,
+      ISomeItem,
+      IAbstractItem,
+      ISomeItem,
+      Long,
+      Result> that) {
+    return new Tuple6<>(
+      that.item1(),
+      wrap(that.item2()),
+      wrap(that.item3()),
+      wrap(that.item4()),
+      that.item5(),
+      that.item6());
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private Tuple2<String, IAbstractItem> wrapTupleOf2_string_IAbstractItem(
+    Tuple2<String, IAbstractItem> that) {
+    return new Tuple2<>(
+      that.item1(),
+      wrap(that.item2()));
   }
 }
 

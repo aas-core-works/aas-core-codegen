@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -95,59 +94,18 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    IItem item = that.getItem();
-    IClass transformedItem = transform(item);
-    if (!(transformedItem instanceof IItem)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IItem " +
-        ", but got: " + transformedItem
-      );
-    }
-    IItem castedItem = (IItem) transformedItem;
-    that.setItem(castedItem);
+    that.setItem(wrap(that.getItem()));
 
-    IParent parent = that.getParent();
-    IClass transformedParent = transform(parent);
-    if (!(transformedParent instanceof IParent)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a IParent " +
-        ", but got: " + transformedParent
-      );
-    }
-    IParent castedParent = (IParent) transformedParent;
-    that.setParent(castedParent);
+    that.setParent(wrap(that.getParent()));
 
-    List<IParent> parents = that.getParents();
-    List<IParent> transformedParents = parents.stream()
-      .map(parentsItem -> {
-        IClass transformedParentsItem =
-          transform(parentsItem);
-        if (!(transformedParentsItem instanceof IParent)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a IParent " +
-            ", but got: " + transformedParentsItem
-          );
-        }
-        return (IParent) transformedParentsItem;
-      }).collect(Collectors.toList());
-    that.setParents(transformedParents);
+    that.setParents(wrapListOf_IParent(that.getParents()));
 
     if (that.getOptionalParent().isPresent()) {
-      IParent optionalParent = that.getOptionalParent().get();
-      IClass transformedOptionalParent = transform(optionalParent);
-      if (!(transformedOptionalParent instanceof IParent)) {
-        throw new UnsupportedOperationException(
-          "Expected the transformed value to be a IParent " +
-          ", but got: " + transformedOptionalParent
-        );
-      }
-      IParent castedOptionalParent = (IParent) transformedOptionalParent;
-      that.setOptionalParent(castedOptionalParent);
+      that.setOptionalParent(wrap(that.getOptionalParent().get()));
     }
 
     if (that.getOptionalMember().isPresent()) {
-      ParentOrItem optionalMember = that.getOptionalMember().get();
-      that.setOptionalMember(transform(optionalMember));
+      that.setOptionalMember(wrap(that.getOptionalMember().get()));
     }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
@@ -159,9 +117,26 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
   }
 
-  private <T extends IUnion<T>> T transform(T that) {
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
+  }
+
+  private <T extends IUnion<T>> T wrap(T that) {
     return that.withUnderlying(
-      transform(that.getUnderlying()));
+      wrap(that.getUnderlying()));
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<IParent> wrapListOf_IParent(
+    List<IParent> that) {
+    List<IParent> result = new ArrayList<>(that.size());
+    for (IParent item : that) {
+      result.add(wrap(item));
+    }
+    return result;
   }
 }
 

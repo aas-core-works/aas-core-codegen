@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -55,32 +54,10 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    List<IItem> items = that.getItems();
-    List<IItem> transformedItems = items.stream()
-      .map(itemsItem -> {
-        IClass transformedItemsItem =
-          transform(itemsItem);
-        if (!(transformedItemsItem instanceof IItem)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a IItem " +
-            ", but got: " + transformedItemsItem
-          );
-        }
-        return (IItem) transformedItemsItem;
-      }).collect(Collectors.toList());
-    that.setItems(transformedItems);
+    that.setItems(wrapListOf_IItem(that.getItems()));
 
     if (that.getMaybeItem().isPresent()) {
-      IItem maybeItem = that.getMaybeItem().get();
-      IClass transformedMaybeItem = transform(maybeItem);
-      if (!(transformedMaybeItem instanceof IItem)) {
-        throw new UnsupportedOperationException(
-          "Expected the transformed value to be a IItem " +
-          ", but got: " + transformedMaybeItem
-        );
-      }
-      IItem castedMaybeItem = (IItem) transformedMaybeItem;
-      that.setMaybeItem(castedMaybeItem);
+      that.setMaybeItem(wrap(that.getMaybeItem().get()));
     }
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
@@ -90,6 +67,23 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         that,
         enhancement.get()
       );
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<IItem> wrapListOf_IItem(
+    List<IItem> that) {
+    List<IItem> result = new ArrayList<>(that.size());
+    for (IItem item : that) {
+      result.add(wrap(item));
+    }
+    return result;
   }
 }
 

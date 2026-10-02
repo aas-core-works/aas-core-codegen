@@ -5,11 +5,10 @@
 
 package dummy.enhancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
@@ -95,46 +94,11 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
     }
 
-    ISimple item = that.getItem();
-    IClass transformedItem = transform(item);
-    if (!(transformedItem instanceof ISimple)) {
-      throw new UnsupportedOperationException(
-        "Expected the transformed value to be a ISimple " +
-        ", but got: " + transformedItem
-      );
-    }
-    ISimple castedItem = (ISimple) transformedItem;
-    that.setItem(castedItem);
+    that.setItem(wrap(that.getItem()));
 
-    List<IAbstractItem> someItems = that.getSomeItems();
-    List<IAbstractItem> transformedSomeItems = someItems.stream()
-      .map(someItemsItem -> {
-        IClass transformedSomeItemsItem =
-          transform(someItemsItem);
-        if (!(transformedSomeItemsItem instanceof IAbstractItem)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a IAbstractItem " +
-            ", but got: " + transformedSomeItemsItem
-          );
-        }
-        return (IAbstractItem) transformedSomeItemsItem;
-      }).collect(Collectors.toList());
-    that.setSomeItems(transformedSomeItems);
+    that.setSomeItems(wrapListOf_IAbstractItem(that.getSomeItems()));
 
-    List<ISimple> someSimples = that.getSomeSimples();
-    List<ISimple> transformedSomeSimples = someSimples.stream()
-      .map(someSimplesItem -> {
-        IClass transformedSomeSimplesItem =
-          transform(someSimplesItem);
-        if (!(transformedSomeSimplesItem instanceof ISimple)) {
-          throw new UnsupportedOperationException(
-            "Expected the transformed value to be a ISimple " +
-            ", but got: " + transformedSomeSimplesItem
-          );
-        }
-        return (ISimple) transformedSomeSimplesItem;
-      }).collect(Collectors.toList());
-    that.setSomeSimples(transformedSomeSimples);
+    that.setSomeSimples(wrapListOf_ISimple(that.getSomeSimples()));
 
     Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
     return !enhancement.isPresent()
@@ -143,6 +107,35 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
         that,
         enhancement.get()
       );
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T extends IClass> T wrap(T that) {
+    return (T) transform(that);
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<IAbstractItem> wrapListOf_IAbstractItem(
+    List<IAbstractItem> that) {
+    List<IAbstractItem> result = new ArrayList<>(that.size());
+    for (IAbstractItem item : that) {
+      result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private List<ISimple> wrapListOf_ISimple(
+    List<ISimple> that) {
+    List<ISimple> result = new ArrayList<>(that.size());
+    for (ISimple item : that) {
+      result.add(wrap(item));
+    }
+    return result;
   }
 }
 
