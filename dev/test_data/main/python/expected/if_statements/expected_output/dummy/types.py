@@ -112,18 +112,23 @@ class Item(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -195,18 +200,23 @@ class ChildA(Parent):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -271,18 +281,23 @@ class ChildB(Parent):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -354,8 +369,7 @@ class Container(Parent):
 
         :yield: instances directly referenced from this instance
         """
-        if self.children is not None:
-            yield from self.children
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -363,11 +377,18 @@ class Container(Parent):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.children is not None:
-            for an_item in self.children:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.children is not None:
+            yield from _descend_list_of__parent(self.children, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -444,13 +465,7 @@ class Something(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.item
-
-        if self.optional_parent is not None:
-            yield self.optional_parent
-
-        if self.parents is not None:
-            yield from self.parents
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -458,20 +473,29 @@ class Something(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         yield self.item
 
-        yield from self.item.descend()
+        if recurse:
+            yield from self.item.descend()
 
         if self.optional_parent is not None:
             yield self.optional_parent
 
-            yield from self.optional_parent.descend()
+            if recurse:
+                yield from self.optional_parent.descend()
 
         if self.parents is not None:
-            for an_item in self.parents:
-                yield an_item
-
-                yield from an_item.descend()
+            yield from _descend_list_of__parent(self.parents, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -521,6 +545,26 @@ class Something(Class):
         self.item = item
         self.optional_parent = optional_parent
         self.parents = parents
+
+
+def _descend_list_of__parent(
+        that: List['Parent'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
 
 
 class AbstractVisitor:

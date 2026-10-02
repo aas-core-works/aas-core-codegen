@@ -7,6 +7,8 @@ from typing import (
     Optional,
     Dict,
     List,
+    Mapping,
+    Set,
     Tuple,
     cast,
     Union,
@@ -434,200 +436,197 @@ def _generate_enum(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> Stripped:
+def _descend_into_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
     """
-    Generate the body of the ``descend`` and ``descend_once`` methods.
+    Name the module-level function descending into ``type_anno``.
 
-    In the recursive case, we in-line the descent into the directly referenced
-    instances instead of delegating to ``descend_once``, as a simple optimization.
+    We follow the grammar of the monikers of the composed de/serializers, see
+    :py:attr:`aas_core_codegen.python.common.MONIKER_BY_PRIMITIVE_TYPE`, so two
+    different containers never share a function.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return Identifier(
+            f"_descend_list_of__{python_common.atomic_moniker(type_anno.items)}"
+        )
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return Identifier(
+            f"_descend_set_of__{python_common.atomic_moniker(type_anno.items)}"
+        )
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        monikers = [python_common.atomic_moniker(item) for item in type_anno.items]
+
+        return Identifier(
+            f"_descend_tuple{len(type_anno.items)}_of__" + "__".join(monikers)
+        )
+
+    assert_never(type_anno)
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the code yielding the instances held by the value at ``expr``.
+
+    An instance is yielded in-line. A container is delegated to its module-level
+    function, which descends only one level and calls the function of its items
+    by name. This way the descent is composed of plain functions, to any depth.
+
+    The generated code recurses only if the Python variable ``recurse`` is set.
+    """
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # A named union is a plain ``Union[...]`` alias in Python, so its values
+        # are already instances of the member classes, and we descend into them
+        # exactly as we do into the instances of a class.
+        return Stripped(
+            f"""\
+yield {expr}
+
+if recurse:
+{I}yield from {expr}.descend()"""
+        )
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        name = _descend_into_container_name(type_anno)
+
+        call = f"{name}({expr}, recurse)"
+        # Heuristic to break the lines, very rudimentary
+        if len(call) > 70:
+            call = f"""\
+{name}(
+{I}{expr},
+{I}recurse
+)"""
+
+        return Stripped(f"yield from {call}")
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the module-level function descending into ``type_anno``.
+
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    body: Stripped
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            # NOTE (mristin):
+            # We yield the instances directly in the non-recursive case, so that
+            # we do not check the flag for every single item.
+            body = Stripped(
+                f"""\
+if not recurse:
+{I}yield from that
+{I}return
+
+for item in that:
+{I}yield item
+
+{I}yield from item.descend()"""
+            )
+        else:
+            item_code = _generate_descend_into(
+                expr="item", type_anno=type_anno.items, descendability=descendability
+            )
+
+            body = Stripped(
+                f"""\
+for item in that:
+{I}{indent_but_first_line(item_code, I)}"""
+            )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        raise AssertionError(
+            f"A set holds only primitives and enumeration literals, never "
+            f"a reference to one of our own classes, so it can not have been "
+            f"determined descendable: {type_anno}"
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = Stripped(
+            "\n\n".join(
+                _generate_descend_into(
+                    expr=f"that[{i}]",
+                    type_anno=item_type_anno,
+                    descendability=descendability,
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if descendability[item_type_anno]
+            )
+        )
+
+    else:
+        assert_never(type_anno)
+
+    name = _descend_into_container_name(type_anno)
+    value_type = python_common.generate_type(type_anno)
+
+    return Stripped(
+        f"""\
+def {name}(
+{II}that: {indent_but_first_line(value_type, II)},
+{II}recurse: bool
+) -> Iterator[Class]:
+{I}\"\"\"
+{I}Iterate over the instances held by :paramref:`that`.
+
+{I}If :paramref:`recurse` is set, descend recursively into the instances
+{I}as well.
+{I}\"\"\"
+{I}{indent_but_first_line(body, I)}"""
+    )
+
+
+def _generate_descend_methods(cls: intermediate.ConcreteClass) -> List[Stripped]:
+    """
+    Generate the ``descend_once``, ``descend`` and ``_descend`` methods.
+
+    The public methods are thin wrappers around ``_descend``, which recurses
+    only if instructed so at run-time.
     """
     blocks = []  # type: List[Stripped]
 
-    generator_for_loop_variables = python_common.GeneratorForLoopVariables()
-
     for prop in cls.properties:
+        descendability = intermediate.map_descendability(prop.type_annotation)
+
+        if not descendability[prop.type_annotation]:
+            continue
+
         prop_name = python_naming.property_name(prop.name)
 
-        prop_blocks = []  # type: List[Stripped]
-
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            continue
-
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                continue
-
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                continue
-
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                prop_blocks.append(Stripped(f"yield self.{prop_name}"))
-
-                if recurse:
-                    prop_blocks.append(
-                        Stripped(f"yield from self.{prop_name}.descend()")
-                    )
-
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union is a plain ``Union[...]`` alias in Python, so its
-                # values are already instances of the member classes. We keep this
-                # as its own branch, separate from the class branch above, even
-                # though the code is identical at the moment, so that it can
-                # diverge independently, *e.g.*, if primitive alternatives are
-                # ever allowed into a named union.
-                prop_blocks.append(Stripped(f"yield self.{prop_name}"))
-
-                if recurse:
-                    prop_blocks.append(
-                        Stripped(f"yield from self.{prop_name}.descend()")
-                    )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.our_type)
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We currently generate only the code to descend into "
-                f"lists of atomic values, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-                continue
-
-            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-                if isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-                ):
-                    continue
-
-                elif isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    if not recurse:
-                        prop_blocks.append(Stripped(f"yield from self.{prop_name}"))
-                    else:
-                        loop_var = next(generator_for_loop_variables)
-
-                        prop_blocks.append(
-                            Stripped(
-                                f"""\
-for {loop_var} in self.{prop_name}:
-{I}yield {loop_var}
-
-{I}yield from {loop_var}.descend()"""
-                            )
-                        )
-
-                elif isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union is a plain ``Union[...]`` alias in Python, so
-                    # its values are already instances of the member classes. We
-                    # keep this as its own branch, separate from the class branch
-                    # above, even though the code is identical at the moment, so
-                    # that it can diverge independently, *e.g.*, if primitive
-                    # alternatives are ever allowed into a named union.
-                    if not recurse:
-                        prop_blocks.append(Stripped(f"yield from self.{prop_name}"))
-                    else:
-                        loop_var = next(generator_for_loop_variables)
-
-                        prop_blocks.append(
-                            Stripped(
-                                f"""\
-for {loop_var} in self.{prop_name}:
-{I}yield {loop_var}
-
-{I}yield from {loop_var}.descend()"""
-                            )
-                        )
-
-                else:
-                    # noinspection PyTypeChecker
-                    assert_never(type_anno.items.our_type)
-
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # NOTE (mristin):
-                # A JSON-able value is plain data, never a reference to one of
-                # our own classes, so there is nothing to descend into.
-                continue
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.items)
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            for i, item_type_anno in enumerate(type_anno.items):
-                if not isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                    continue
-
-                if isinstance(
-                    item_type_anno.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ):
-                    # NOTE (mristin):
-                    # A named union is a plain ``Union[...]`` alias in Python, so
-                    # we descend into a union-typed tuple item exactly as we do
-                    # into a class-typed one.
-                    item_expr = f"self.{prop_name}[{i}]"
-                else:
-                    continue
-
-                prop_blocks.append(Stripped(f"yield {item_expr}"))
-
-                if recurse:
-                    prop_blocks.append(Stripped(f"yield from {item_expr}.descend()"))
-
-            if len(prop_blocks) == 0:
-                continue
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able value is plain data, never a reference to one of our
-            # own classes, so there is nothing to descend into.
-            continue
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives and enumeration literals, never
-            # a reference to one of our own classes, so there is nothing to
-            # descend into.
-            continue
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
-
-        block = Stripped("\n\n".join(prop_blocks))
+        block = _generate_descend_into(
+            expr=f"self.{prop_name}",
+            type_anno=intermediate.beneath_optional(prop.type_annotation),
+            descendability=descendability,
+        )
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             block = Stripped(
@@ -651,16 +650,11 @@ yield"""
             )
         )
 
-    return Stripped("\n\n".join(blocks))
+    body = Stripped("\n\n".join(blocks))
 
-
-def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the ``descend_once`` method for the concrete class ``cls``."""
-
-    body = _generate_descend_body(cls=cls, recurse=False)
-
-    return Stripped(
-        f"""\
+    return [
+        Stripped(
+            f"""\
 def descend_once(self) -> Iterator[Class]:
 {I}\"\"\"
 {I}Iterate over the instances referenced from this instance.
@@ -669,25 +663,31 @@ def descend_once(self) -> Iterator[Class]:
 
 {I}:yield: instances directly referenced from this instance
 {I}\"\"\"
-{I}{indent_but_first_line(body, I)}"""
-    )
-
-
-def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
-    """Generate the recursive ``descend`` method for the concrete class ``cls``."""
-
-    body = _generate_descend_body(cls=cls, recurse=True)
-
-    return Stripped(
-        f"""\
+{I}return self._descend(recurse=False)"""
+        ),
+        Stripped(
+            f"""\
 def descend(self) -> Iterator[Class]:
 {I}\"\"\"
 {I}Iterate recursively over the instances referenced from this one.
 
 {I}:yield: instances recursively referenced from this instance
 {I}\"\"\"
+{I}return self._descend(recurse=True)"""
+        ),
+        Stripped(
+            f"""\
+def _descend(self, recurse: bool) -> Iterator[Class]:
+{I}\"\"\"
+{I}Iterate over the instances referenced from this one, and recursively
+{I}over their descendants if :paramref:`recurse` is set.
+
+{I}:param recurse: if set, descend recursively into the referenced instances
+{I}:yield: instances referenced from this instance
+{I}\"\"\"
 {I}{indent_but_first_line(body, I)}"""
-    )
+        ),
+    ]
 
 
 def _generate_default_value(default: intermediate.Default) -> Stripped:
@@ -1172,9 +1172,7 @@ def over_{prop_name}_or_empty(
             assert_never(method)
 
     if isinstance(cls, intermediate.ConcreteClass):
-        blocks.append(_generate_descend_once_method(cls=cls))
-
-        blocks.append(_generate_descend_method(cls=cls))
+        blocks.extend(_generate_descend_methods(cls=cls))
 
         visit_name = python_naming.method_name(Identifier(f"visit_{cls.name}"))
 
@@ -2190,6 +2188,30 @@ class Class(abc.ABC):
 
     if len(errors) > 0:
         return None, errors
+
+    observed_container_names = set()  # type: Set[Identifier]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for type_anno, descendable in descendability.items():
+                if not descendable or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                name = _descend_into_container_name(type_anno)
+                if name in observed_container_names:
+                    continue
+
+                observed_container_names.add(name)
+
+                blocks.append(
+                    _generate_descend_into_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
 
     blocks.extend(
         [

@@ -101,18 +101,23 @@ class StructuralFirst(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -169,18 +174,23 @@ class StructuralSecond(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -246,18 +256,23 @@ class MixedAbstractDescendantOne(MixedAbstractMember):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -314,18 +329,23 @@ class MixedAbstractDescendantTwo(MixedAbstractMember):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -382,18 +402,23 @@ class MixedConcreteWithDescendants(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -450,18 +475,23 @@ class MixedConcreteWithDescendantsChild(MixedConcreteWithDescendants):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -526,18 +556,23 @@ class MixedConcreteLeaf(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -602,18 +637,23 @@ class ModelTypedFirst(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -670,18 +710,23 @@ class ModelTypedSecond(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -778,35 +823,7 @@ class Something(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.structural_property
-
-        yield self.mixed_property
-
-        yield self.model_typed_property
-
-        yield from self.list_structural_property
-
-        yield from self.list_mixed_property
-
-        yield from self.list_model_typed_property
-
-        yield self.tuple_property[0]
-
-        yield self.tuple_property[1]
-
-        yield self.tuple_property[2]
-
-        if self.optional_structural_property is not None:
-            yield self.optional_structural_property
-
-        if self.optional_mixed_property is not None:
-            yield self.optional_mixed_property
-
-        if self.optional_model_typed_property is not None:
-            yield self.optional_model_typed_property
-
-        if self.optional_list_overlapping_property is not None:
-            yield from self.optional_list_overlapping_property
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -814,65 +831,71 @@ class Something(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         yield self.structural_property
 
-        yield from self.structural_property.descend()
+        if recurse:
+            yield from self.structural_property.descend()
 
         yield self.mixed_property
 
-        yield from self.mixed_property.descend()
+        if recurse:
+            yield from self.mixed_property.descend()
 
         yield self.model_typed_property
 
-        yield from self.model_typed_property.descend()
+        if recurse:
+            yield from self.model_typed_property.descend()
 
-        for an_item in self.list_structural_property:
-            yield an_item
+        yield from _descend_list_of__structural_union(
+            self.list_structural_property,
+            recurse
+        )
 
-            yield from an_item.descend()
+        yield from _descend_list_of__mixed_union(self.list_mixed_property, recurse)
 
-        for another_item in self.list_mixed_property:
-            yield another_item
+        yield from _descend_list_of__model_typed_union(
+            self.list_model_typed_property,
+            recurse
+        )
 
-            yield from another_item.descend()
-
-        for yet_another_item in self.list_model_typed_property:
-            yield yet_another_item
-
-            yield from yet_another_item.descend()
-
-        yield self.tuple_property[0]
-
-        yield from self.tuple_property[0].descend()
-
-        yield self.tuple_property[1]
-
-        yield from self.tuple_property[1].descend()
-
-        yield self.tuple_property[2]
-
-        yield from self.tuple_property[2].descend()
+        yield from _descend_tuple3_of__structural_union__mixed_union__model_typed_union(
+            self.tuple_property,
+            recurse
+        )
 
         if self.optional_structural_property is not None:
             yield self.optional_structural_property
 
-            yield from self.optional_structural_property.descend()
+            if recurse:
+                yield from self.optional_structural_property.descend()
 
         if self.optional_mixed_property is not None:
             yield self.optional_mixed_property
 
-            yield from self.optional_mixed_property.descend()
+            if recurse:
+                yield from self.optional_mixed_property.descend()
 
         if self.optional_model_typed_property is not None:
             yield self.optional_model_typed_property
 
-            yield from self.optional_model_typed_property.descend()
+            if recurse:
+                yield from self.optional_model_typed_property.descend()
 
         if self.optional_list_overlapping_property is not None:
-            for yet_yet_another_item in self.optional_list_overlapping_property:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__overlapping_union(
+                self.optional_list_overlapping_property,
+                recurse
+            )
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -930,6 +953,112 @@ class Something(Class):
         self.optional_mixed_property = optional_mixed_property
         self.optional_model_typed_property = optional_model_typed_property
         self.optional_list_overlapping_property = optional_list_overlapping_property
+
+
+def _descend_list_of__structural_union(
+        that: List['StructuralUnion'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__mixed_union(
+        that: List['MixedUnion'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__model_typed_union(
+        that: List['ModelTypedUnion'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_tuple3_of__structural_union__mixed_union__model_typed_union(
+        that: Tuple['StructuralUnion', 'MixedUnion', 'ModelTypedUnion'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    yield that[0]
+
+    if recurse:
+        yield from that[0].descend()
+
+    yield that[1]
+
+    if recurse:
+        yield from that[1].descend()
+
+    yield that[2]
+
+    if recurse:
+        yield from that[2].descend()
+
+
+def _descend_list_of__overlapping_union(
+        that: List['OverlappingUnion'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
 
 
 class AbstractVisitor:

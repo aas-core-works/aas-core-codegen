@@ -265,14 +265,7 @@ class Extension(HasSemantics):
 
         :yield: instances directly referenced from this instance
         """
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.refers_to is not None:
-            yield from self.refers_to
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -280,22 +273,27 @@ class Extension(HasSemantics):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for an_item in self.supplemental_semantic_ids:
-                yield an_item
-
-                yield from an_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.refers_to is not None:
-            for another_item in self.refers_to:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__reference(self.refers_to, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -604,11 +602,7 @@ class AdministrativeInformation(HasDataSpecification):
 
         :yield: instances directly referenced from this instance
         """
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.creator is not None:
-            yield self.creator
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -616,16 +610,27 @@ class AdministrativeInformation(HasDataSpecification):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.embedded_data_specifications is not None:
-            for an_item in self.embedded_data_specifications:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.embedded_data_specifications is not None:
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.creator is not None:
             yield self.creator
 
-            yield from self.creator.descend()
+            if recurse:
+                yield from self.creator.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -797,14 +802,7 @@ class Qualifier(HasSemantics):
 
         :yield: instances directly referenced from this instance
         """
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.value_id is not None:
-            yield self.value_id
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -812,21 +810,30 @@ class Qualifier(HasSemantics):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for an_item in self.supplemental_semantic_ids:
-                yield an_item
-
-                yield from an_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.value_id is not None:
             yield self.value_id
 
-            yield from self.value_id.descend()
+            if recurse:
+                yield from self.value_id.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -914,28 +921,7 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.administration is not None:
-            yield self.administration
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.derived_from is not None:
-            yield self.derived_from
-
-        yield self.asset_information
-
-        if self.submodels is not None:
-            yield from self.submodels
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -943,49 +929,50 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.administration is not None:
             yield self.administration
 
-            yield from self.administration.descend()
+            if recurse:
+                yield from self.administration.descend()
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.derived_from is not None:
             yield self.derived_from
 
-            yield from self.derived_from.descend()
+            if recurse:
+                yield from self.derived_from.descend()
 
         yield self.asset_information
 
-        yield from self.asset_information.descend()
+        if recurse:
+            yield from self.asset_information.descend()
 
         if self.submodels is not None:
-            for yet_yet_yet_another_item in self.submodels:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.submodels, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -1145,11 +1132,7 @@ class AssetInformation(Class):
 
         :yield: instances directly referenced from this instance
         """
-        if self.specific_asset_ids is not None:
-            yield from self.specific_asset_ids
-
-        if self.default_thumbnail is not None:
-            yield self.default_thumbnail
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -1157,16 +1140,24 @@ class AssetInformation(Class):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.specific_asset_ids is not None:
-            for an_item in self.specific_asset_ids:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.specific_asset_ids is not None:
+            yield from _descend_list_of__specific_asset_id(self.specific_asset_ids, recurse)
 
         if self.default_thumbnail is not None:
             yield self.default_thumbnail
 
-            yield from self.default_thumbnail.descend()
+            if recurse:
+                yield from self.default_thumbnail.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -1238,18 +1229,23 @@ class Resource(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -1348,14 +1344,7 @@ class SpecificAssetID(HasSemantics):
 
         :yield: instances directly referenced from this instance
         """
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.external_subject_id is not None:
-            yield self.external_subject_id
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -1363,21 +1352,30 @@ class SpecificAssetID(HasSemantics):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for an_item in self.supplemental_semantic_ids:
-                yield an_item
-
-                yield from an_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.external_subject_id is not None:
             yield self.external_subject_id
 
-            yield from self.external_subject_id.descend()
+            if recurse:
+                yield from self.external_subject_id.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -1461,32 +1459,7 @@ class Submodel(
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.administration is not None:
-            yield self.administration
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.submodel_elements is not None:
-            yield from self.submodel_elements
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -1494,57 +1467,51 @@ class Submodel(
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.administration is not None:
             yield self.administration
 
-            yield from self.administration.descend()
+            if recurse:
+                yield from self.administration.descend()
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.submodel_elements is not None:
-            for yet_yet_yet_yet_yet_another_item in self.submodel_elements:
-                yield yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__submodel_element(self.submodel_elements, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -1700,30 +1667,7 @@ class RelationshipElement(SubmodelElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        yield self.first
-
-        yield self.second
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -1731,54 +1675,52 @@ class RelationshipElement(SubmodelElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         yield self.first
 
-        yield from self.first.descend()
+        if recurse:
+            yield from self.first.descend()
 
         yield self.second
 
-        yield from self.second.descend()
+        if recurse:
+            yield from self.second.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -1973,32 +1915,7 @@ class SubmodelElementList(SubmodelElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.semantic_id_list_element is not None:
-            yield self.semantic_id_list_element
-
-        if self.value is not None:
-            yield from self.value
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -2006,57 +1923,51 @@ class SubmodelElementList(SubmodelElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.semantic_id_list_element is not None:
             yield self.semantic_id_list_element
 
-            yield from self.semantic_id_list_element.descend()
+            if recurse:
+                yield from self.semantic_id_list_element.descend()
 
         if self.value is not None:
-            for yet_yet_yet_yet_yet_another_item in self.value:
-                yield yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__submodel_element(self.value, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -2149,29 +2060,7 @@ class SubmodelElementCollection(SubmodelElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.value is not None:
-            yield from self.value
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -2179,52 +2068,45 @@ class SubmodelElementCollection(SubmodelElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.value is not None:
-            for yet_yet_yet_yet_yet_another_item in self.value:
-                yield yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__submodel_element(self.value, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -2366,29 +2248,7 @@ class Property(DataElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.value_id is not None:
-            yield self.value_id
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -2396,51 +2256,48 @@ class Property(DataElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.value_id is not None:
             yield self.value_id
 
-            yield from self.value_id.descend()
+            if recurse:
+                yield from self.value_id.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -2542,32 +2399,7 @@ class MultiLanguageProperty(DataElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.value is not None:
-            yield from self.value
-
-        if self.value_id is not None:
-            yield self.value_id
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -2575,57 +2407,51 @@ class MultiLanguageProperty(DataElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.value is not None:
-            for yet_yet_yet_yet_yet_another_item in self.value:
-                yield yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.value, recurse)
 
         if self.value_id is not None:
             yield self.value_id
 
-            yield from self.value_id.descend()
+            if recurse:
+                yield from self.value_id.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -2714,26 +2540,7 @@ class Range(DataElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -2741,46 +2548,42 @@ class Range(DataElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -2865,29 +2668,7 @@ class ReferenceElement(DataElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.value is not None:
-            yield self.value
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -2895,51 +2676,48 @@ class ReferenceElement(DataElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.value is not None:
             yield self.value
 
-            yield from self.value.descend()
+            if recurse:
+                yield from self.value.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -3032,26 +2810,7 @@ class Blob(DataElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -3059,46 +2818,42 @@ class Blob(DataElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -3186,26 +2941,7 @@ class File(DataElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -3213,46 +2949,42 @@ class File(DataElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -3340,33 +3072,7 @@ class AnnotatedRelationshipElement(RelationshipElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        yield self.first
-
-        yield self.second
-
-        if self.annotations is not None:
-            yield from self.annotations
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -3374,60 +3080,55 @@ class AnnotatedRelationshipElement(RelationshipElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         yield self.first
 
-        yield from self.first.descend()
+        if recurse:
+            yield from self.first.descend()
 
         yield self.second
 
-        yield from self.second.descend()
+        if recurse:
+            yield from self.second.descend()
 
         if self.annotations is not None:
-            for yet_yet_yet_yet_yet_another_item in self.annotations:
-                yield yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__data_element(self.annotations, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -3544,32 +3245,7 @@ class Entity(SubmodelElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.statements is not None:
-            yield from self.statements
-
-        if self.specific_asset_ids is not None:
-            yield from self.specific_asset_ids
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -3577,58 +3253,48 @@ class Entity(SubmodelElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.statements is not None:
-            for yet_yet_yet_yet_yet_another_item in self.statements:
-                yield yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__submodel_element(self.statements, recurse)
 
         if self.specific_asset_ids is not None:
-            for yet_yet_yet_yet_yet_yet_another_item in self.specific_asset_ids:
-                yield yet_yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__specific_asset_id(self.specific_asset_ids, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -3807,18 +3473,7 @@ class EventPayload(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.source
-
-        if self.source_semantic_id is not None:
-            yield self.source_semantic_id
-
-        yield self.observable_reference
-
-        if self.observable_semantic_id is not None:
-            yield self.observable_semantic_id
-
-        if self.subject_id is not None:
-            yield self.subject_id
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -3826,28 +3481,43 @@ class EventPayload(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         yield self.source
 
-        yield from self.source.descend()
+        if recurse:
+            yield from self.source.descend()
 
         if self.source_semantic_id is not None:
             yield self.source_semantic_id
 
-            yield from self.source_semantic_id.descend()
+            if recurse:
+                yield from self.source_semantic_id.descend()
 
         yield self.observable_reference
 
-        yield from self.observable_reference.descend()
+        if recurse:
+            yield from self.observable_reference.descend()
 
         if self.observable_semantic_id is not None:
             yield self.observable_semantic_id
 
-            yield from self.observable_semantic_id.descend()
+            if recurse:
+                yield from self.observable_semantic_id.descend()
 
         if self.subject_id is not None:
             yield self.subject_id
 
-            yield from self.subject_id.descend()
+            if recurse:
+                yield from self.subject_id.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -4012,31 +3682,7 @@ class BasicEventElement(EventElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        yield self.observed
-
-        if self.message_broker is not None:
-            yield self.message_broker
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -4044,55 +3690,53 @@ class BasicEventElement(EventElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         yield self.observed
 
-        yield from self.observed.descend()
+        if recurse:
+            yield from self.observed.descend()
 
         if self.message_broker is not None:
             yield self.message_broker
 
-            yield from self.message_broker.descend()
+            if recurse:
+                yield from self.message_broker.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -4218,35 +3862,7 @@ class Operation(SubmodelElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.input_variables is not None:
-            yield from self.input_variables
-
-        if self.output_variables is not None:
-            yield from self.output_variables
-
-        if self.inoutput_variables is not None:
-            yield from self.inoutput_variables
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -4254,64 +3870,51 @@ class Operation(SubmodelElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.input_variables is not None:
-            for yet_yet_yet_yet_yet_another_item in self.input_variables:
-                yield yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__operation_variable(self.input_variables, recurse)
 
         if self.output_variables is not None:
-            for yet_yet_yet_yet_yet_yet_another_item in self.output_variables:
-                yield yet_yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__operation_variable(self.output_variables, recurse)
 
         if self.inoutput_variables is not None:
-            for yet_yet_yet_yet_yet_yet_yet_another_item in self.inoutput_variables:
-                yield yet_yet_yet_yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__operation_variable(self.inoutput_variables, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -4393,7 +3996,7 @@ class OperationVariable(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.value
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -4401,9 +4004,20 @@ class OperationVariable(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         yield self.value
 
-        yield from self.value.descend()
+        if recurse:
+            yield from self.value.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -4459,26 +4073,7 @@ class Capability(SubmodelElement):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.semantic_id is not None:
-            yield self.semantic_id
-
-        if self.supplemental_semantic_ids is not None:
-            yield from self.supplemental_semantic_ids
-
-        if self.qualifiers is not None:
-            yield from self.qualifiers
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -4486,46 +4081,42 @@ class Capability(SubmodelElement):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.semantic_id is not None:
             yield self.semantic_id
 
-            yield from self.semantic_id.descend()
+            if recurse:
+                yield from self.semantic_id.descend()
 
         if self.supplemental_semantic_ids is not None:
-            for yet_yet_another_item in self.supplemental_semantic_ids:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.supplemental_semantic_ids, recurse)
 
         if self.qualifiers is not None:
-            for yet_yet_yet_another_item in self.qualifiers:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__qualifier(self.qualifiers, recurse)
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_yet_yet_another_item
-
-                yield from yet_yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -4693,23 +4284,7 @@ class ConceptDescription(Identifiable, HasDataSpecification):
 
         :yield: instances directly referenced from this instance
         """
-        if self.extensions is not None:
-            yield from self.extensions
-
-        if self.display_name is not None:
-            yield from self.display_name
-
-        if self.description is not None:
-            yield from self.description
-
-        if self.administration is not None:
-            yield self.administration
-
-        if self.embedded_data_specifications is not None:
-            yield from self.embedded_data_specifications
-
-        if self.is_case_of is not None:
-            yield from self.is_case_of
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -4717,40 +4292,39 @@ class ConceptDescription(Identifiable, HasDataSpecification):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.extensions is not None:
-            for an_item in self.extensions:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.extensions is not None:
+            yield from _descend_list_of__extension(self.extensions, recurse)
 
         if self.display_name is not None:
-            for another_item in self.display_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_name_type(self.display_name, recurse)
 
         if self.description is not None:
-            for yet_another_item in self.description:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_text_type(self.description, recurse)
 
         if self.administration is not None:
             yield self.administration
 
-            yield from self.administration.descend()
+            if recurse:
+                yield from self.administration.descend()
 
         if self.embedded_data_specifications is not None:
-            for yet_yet_another_item in self.embedded_data_specifications:
-                yield yet_yet_another_item
-
-                yield from yet_yet_another_item.descend()
+            yield from _descend_list_of__embedded_data_specification(
+                self.embedded_data_specifications,
+                recurse
+            )
 
         if self.is_case_of is not None:
-            for yet_yet_yet_another_item in self.is_case_of:
-                yield yet_yet_yet_another_item
-
-                yield from yet_yet_yet_another_item.descend()
+            yield from _descend_list_of__reference(self.is_case_of, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -4942,10 +4516,7 @@ class Reference(Class):
 
         :yield: instances directly referenced from this instance
         """
-        if self.referred_semantic_id is not None:
-            yield self.referred_semantic_id
-
-        yield from self.keys
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -4953,15 +4524,23 @@ class Reference(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         if self.referred_semantic_id is not None:
             yield self.referred_semantic_id
 
-            yield from self.referred_semantic_id.descend()
+            if recurse:
+                yield from self.referred_semantic_id.descend()
 
-        for an_item in self.keys:
-            yield an_item
-
-            yield from an_item.descend()
+        yield from _descend_list_of__key(self.keys, recurse)
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -5032,18 +4611,23 @@ class Key(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -5271,18 +4855,23 @@ class LangStringNameType(AbstractLangString):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -5347,18 +4936,23 @@ class LangStringTextType(AbstractLangString):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -5459,14 +5053,7 @@ class Environment(Class):
 
         :yield: instances directly referenced from this instance
         """
-        if self.asset_administration_shells is not None:
-            yield from self.asset_administration_shells
-
-        if self.submodels is not None:
-            yield from self.submodels
-
-        if self.concept_descriptions is not None:
-            yield from self.concept_descriptions
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -5474,23 +5061,30 @@ class Environment(Class):
 
         :yield: instances recursively referenced from this instance
         """
-        if self.asset_administration_shells is not None:
-            for an_item in self.asset_administration_shells:
-                yield an_item
+        return self._descend(recurse=True)
 
-                yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        if self.asset_administration_shells is not None:
+            yield from _descend_list_of__asset_administration_shell(
+                self.asset_administration_shells,
+                recurse
+            )
 
         if self.submodels is not None:
-            for another_item in self.submodels:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__submodel(self.submodels, recurse)
 
         if self.concept_descriptions is not None:
-            for yet_another_item in self.concept_descriptions:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__concept_description(
+                self.concept_descriptions,
+                recurse
+            )
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -5569,9 +5163,7 @@ class EmbeddedDataSpecification(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.data_specification
-
-        yield self.data_specification_content
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -5579,13 +5171,25 @@ class EmbeddedDataSpecification(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         yield self.data_specification
 
-        yield from self.data_specification.descend()
+        if recurse:
+            yield from self.data_specification.descend()
 
         yield self.data_specification_content
 
-        yield from self.data_specification_content.descend()
+        if recurse:
+            yield from self.data_specification_content.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -5790,18 +5394,23 @@ class LevelType(Class):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -5878,7 +5487,7 @@ class ValueReferencePair(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield self.value_id
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -5886,9 +5495,20 @@ class ValueReferencePair(Class):
 
         :yield: instances recursively referenced from this instance
         """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
         yield self.value_id
 
-        yield from self.value_id.descend()
+        if recurse:
+            yield from self.value_id.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -5944,7 +5564,7 @@ class ValueList(Class):
 
         :yield: instances directly referenced from this instance
         """
-        yield from self.value_reference_pairs
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -5952,10 +5572,20 @@ class ValueList(Class):
 
         :yield: instances recursively referenced from this instance
         """
-        for an_item in self.value_reference_pairs:
-            yield an_item
+        return self._descend(recurse=True)
 
-            yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        yield from _descend_list_of__value_reference_pair(
+            self.value_reference_pairs,
+            recurse
+        )
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -6009,18 +5639,23 @@ class LangStringPreferredNameTypeIEC61360(AbstractLangString):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -6085,18 +5720,23 @@ class LangStringShortNameTypeIEC61360(AbstractLangString):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -6161,18 +5801,23 @@ class LangStringDefinitionTypeIEC61360(AbstractLangString):
 
         :yield: instances directly referenced from this instance
         """
-        # No descendable properties
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
         Iterate recursively over the instances referenced from this one.
 
         :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
         """
         # No descendable properties
         return
@@ -6357,22 +6002,7 @@ class DataSpecificationIEC61360(DataSpecificationContent):
 
         :yield: instances directly referenced from this instance
         """
-        yield from self.preferred_name
-
-        if self.short_name is not None:
-            yield from self.short_name
-
-        if self.unit_id is not None:
-            yield self.unit_id
-
-        if self.definition is not None:
-            yield from self.definition
-
-        if self.value_list is not None:
-            yield self.value_list
-
-        if self.level_type is not None:
-            yield self.level_type
+        return self._descend(recurse=False)
 
     def descend(self) -> Iterator[Class]:
         """
@@ -6380,37 +6010,50 @@ class DataSpecificationIEC61360(DataSpecificationContent):
 
         :yield: instances recursively referenced from this instance
         """
-        for an_item in self.preferred_name:
-            yield an_item
+        return self._descend(recurse=True)
 
-            yield from an_item.descend()
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        yield from _descend_list_of__lang_string_preferred_name_type_iec_61360(
+            self.preferred_name,
+            recurse
+        )
 
         if self.short_name is not None:
-            for another_item in self.short_name:
-                yield another_item
-
-                yield from another_item.descend()
+            yield from _descend_list_of__lang_string_short_name_type_iec_61360(
+                self.short_name,
+                recurse
+            )
 
         if self.unit_id is not None:
             yield self.unit_id
 
-            yield from self.unit_id.descend()
+            if recurse:
+                yield from self.unit_id.descend()
 
         if self.definition is not None:
-            for yet_another_item in self.definition:
-                yield yet_another_item
-
-                yield from yet_another_item.descend()
+            yield from _descend_list_of__lang_string_definition_type_iec_61360(
+                self.definition,
+                recurse
+            )
 
         if self.value_list is not None:
             yield self.value_list
 
-            yield from self.value_list.descend()
+            if recurse:
+                yield from self.value_list.descend()
 
         if self.level_type is not None:
             yield self.level_type
 
-            yield from self.level_type.descend()
+            if recurse:
+                yield from self.level_type.descend()
 
     def accept(self, visitor: "AbstractVisitor") -> None:
         """Dispatch the :paramref:`visitor` on this instance."""
@@ -6470,6 +6113,366 @@ class DataSpecificationIEC61360(DataSpecificationContent):
         self.value_list = value_list
         self.value = value
         self.level_type = level_type
+
+
+def _descend_list_of__reference(
+        that: List['Reference'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__embedded_data_specification(
+        that: List['EmbeddedDataSpecification'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__extension(
+        that: List['Extension'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__lang_string_name_type(
+        that: List['LangStringNameType'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__lang_string_text_type(
+        that: List['LangStringTextType'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__specific_asset_id(
+        that: List['SpecificAssetID'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__qualifier(
+        that: List['Qualifier'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__submodel_element(
+        that: List['SubmodelElement'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__data_element(
+        that: List['DataElement'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__operation_variable(
+        that: List['OperationVariable'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__key(
+        that: List['Key'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__asset_administration_shell(
+        that: List['AssetAdministrationShell'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__submodel(
+        that: List['Submodel'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__concept_description(
+        that: List['ConceptDescription'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__value_reference_pair(
+        that: List['ValueReferencePair'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__lang_string_preferred_name_type_iec_61360(
+        that: List['LangStringPreferredNameTypeIEC61360'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__lang_string_short_name_type_iec_61360(
+        that: List['LangStringShortNameTypeIEC61360'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
+
+
+def _descend_list_of__lang_string_definition_type_iec_61360(
+        that: List['LangStringDefinitionTypeIEC61360'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    if not recurse:
+        yield from that
+        return
+
+    for item in that:
+        yield item
+
+        yield from item.descend()
 
 
 class AbstractVisitor:
