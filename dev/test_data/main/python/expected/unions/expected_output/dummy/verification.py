@@ -167,7 +167,7 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
-        for error in self.transform(that.structural_property):
+        for error in verify(that.structural_property):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -176,7 +176,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.mixed_property):
+        for error in verify(that.mixed_property):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -185,7 +185,7 @@ class _Transformer(
             )
             yield error
 
-        for error in self.transform(that.model_typed_property):
+        for error in verify(that.model_typed_property):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -194,89 +194,36 @@ class _Transformer(
             )
             yield error
 
-        for i, an_item in enumerate(that.list_structural_property):
-            for error in self.transform(an_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.list_structural_property,
-                        i
-                    )
-                )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'list_structural_property'
-                    )
-                )
-                yield error
-
-        for i, another_item in enumerate(that.list_mixed_property):
-            for error in self.transform(another_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.list_mixed_property,
-                        i
-                    )
-                )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'list_mixed_property'
-                    )
-                )
-                yield error
-
-        for i, yet_another_item in enumerate(that.list_model_typed_property):
-            for error in self.transform(yet_another_item):
-                error.path._prepend(
-                    IndexSegment(
-                        that.list_model_typed_property,
-                        i
-                    )
-                )
-                error.path._prepend(
-                    PropertySegment(
-                        that,
-                        'list_model_typed_property'
-                    )
-                )
-                yield error
-
-        for error in self.transform(that.tuple_property[0]):
-            error.path._prepend(
-                IndexSegment(
-                    that.tuple_property,
-                    0
-                )
-            )
+        for error in _verify_list_of__class(that.list_structural_property):
             error.path._prepend(
                 PropertySegment(
                     that,
-                    'tuple_property'
+                    'list_structural_property'
                 )
             )
             yield error
-        for error in self.transform(that.tuple_property[1]):
-            error.path._prepend(
-                IndexSegment(
-                    that.tuple_property,
-                    1
-                )
-            )
+
+        for error in _verify_list_of__class(that.list_mixed_property):
             error.path._prepend(
                 PropertySegment(
                     that,
-                    'tuple_property'
+                    'list_mixed_property'
                 )
             )
             yield error
-        for error in self.transform(that.tuple_property[2]):
+
+        for error in _verify_list_of__class(that.list_model_typed_property):
             error.path._prepend(
-                IndexSegment(
-                    that.tuple_property,
-                    2
+                PropertySegment(
+                    that,
+                    'list_model_typed_property'
                 )
             )
+            yield error
+
+        for error in _verify_tuple3_of__class__class__class(
+                that.tuple_property
+        ):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -286,7 +233,7 @@ class _Transformer(
             yield error
 
         if that.optional_structural_property is not None:
-            for error in self.transform(that.optional_structural_property):
+            for error in verify(that.optional_structural_property):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -296,7 +243,7 @@ class _Transformer(
                 yield error
 
         if that.optional_mixed_property is not None:
-            for error in self.transform(that.optional_mixed_property):
+            for error in verify(that.optional_mixed_property):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -306,7 +253,7 @@ class _Transformer(
                 yield error
 
         if that.optional_model_typed_property is not None:
-            for error in self.transform(that.optional_model_typed_property):
+            for error in verify(that.optional_model_typed_property):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -316,23 +263,16 @@ class _Transformer(
                 yield error
 
         if that.optional_list_overlapping_property is not None:
-            for i, yet_yet_another_item in enumerate(
+            for error in _verify_list_of__class(
                     that.optional_list_overlapping_property
             ):
-                for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(
-                        IndexSegment(
-                            that.optional_list_overlapping_property,
-                            i
-                        )
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'optional_list_overlapping_property'
                     )
-                    error.path._prepend(
-                        PropertySegment(
-                            that,
-                            'optional_list_overlapping_property'
-                        )
-                    )
-                    yield error
+                )
+                yield error
 
 
 _TRANSFORMER = _Transformer()
@@ -348,6 +288,53 @@ def verify(
     :yield: constraint violations
     """
     yield from _TRANSFORMER.transform(that)
+
+
+def _verify_list_of__class(
+        that: Sequence[our_types.Class]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for i, item in enumerate(that):
+        for error in verify(item):
+            error.path._prepend(
+                IndexSegment(
+                    that,
+                    i
+                )
+            )
+            yield error
+
+
+def _verify_tuple3_of__class__class__class(
+        that: Tuple[our_types.Class, our_types.Class, our_types.Class]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for error in verify(that[0]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                0
+            )
+        )
+        yield error
+
+    for error in verify(that[1]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                1
+            )
+        )
+        yield error
+
+    for error in verify(that[2]):
+        error.path._prepend(
+            IndexSegment(
+                that,
+                2
+            )
+        )
+        yield error
 
 
 # This code has been automatically generated by aas-core-codegen.

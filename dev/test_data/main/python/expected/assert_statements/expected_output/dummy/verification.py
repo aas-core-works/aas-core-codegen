@@ -210,7 +210,7 @@ class _Transformer(
                 'Number must be between minus one thousand and one thousand'
             )
 
-        for error in self.transform(that.parent):
+        for error in verify(that.parent):
             error.path._prepend(
                 PropertySegment(
                     that,

@@ -214,7 +214,7 @@ class _Transformer(
                 'Text must be short'
             )
 
-        for error in self.transform(that.item):
+        for error in verify(that.item):
             error.path._prepend(
                 PropertySegment(
                     that,
@@ -224,7 +224,7 @@ class _Transformer(
             yield error
 
         if that.optional_item is not None:
-            for error in self.transform(that.optional_item):
+            for error in verify(that.optional_item):
                 error.path._prepend(
                     PropertySegment(
                         that,
