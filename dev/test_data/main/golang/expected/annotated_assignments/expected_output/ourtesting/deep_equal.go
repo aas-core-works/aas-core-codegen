@@ -140,31 +140,20 @@ func deepEqualSomething(
 
 	thatParents := that.Parents()
 	otherParents := other.Parents()
-	if 
-		len(thatParents) !=
-		len(otherParents) {
+	if !deepEqualListOf_IParent(
+		thatParents,
+		otherParents,
+	) {
 		return false
-	}
-	for i := range thatParents {
-		if !DeepEqual(
-			thatParents[i],
-			otherParents[i],
-		) {
-			return false
-		}
 	}
 
 	thatTexts := that.Texts()
 	otherTexts := other.Texts()
-	if 
-		len(thatTexts) !=
-		len(otherTexts) {
+	if !deepEqualListOf_string(
+		thatTexts,
+		otherTexts,
+	) {
 		return false
-	}
-	for i := range thatTexts {
-		if thatTexts[i] != otherTexts[i] {
-			return false
-		}
 	}
 
 	thatOptionalText := that.OptionalText()
@@ -217,15 +206,11 @@ func deepEqualSomething(
 		return false
 	}
 	if thatOptionalTexts != nil {
-		if 
-			len(thatOptionalTexts) !=
-			len(otherOptionalTexts) {
+		if !deepEqualListOf_string(
+			thatOptionalTexts,
+			otherOptionalTexts,
+		) {
 			return false
-		}
-		for i := range thatOptionalTexts {
-			if thatOptionalTexts[i] != otherOptionalTexts[i] {
-				return false
-			}
 		}
 	}
 
@@ -257,6 +242,47 @@ func deepEqualSomething(
 			thatOptionalMember.Underlying(),
 			otherOptionalMember.Underlying(),
 		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IParent(
+	that []ourtypes.IParent,
+	other []ourtypes.IParent,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
 			return false
 		}
 	}

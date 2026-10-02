@@ -1,9 +1,9 @@
 """Generate code to perform a comparison of deep equality on instances."""
 
 import io
-from typing import List, Optional
+from typing import List, Set
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -21,6 +21,214 @@ from aas_core_codegen.golang.common import (
     INDENT as I,
     INDENT2 as II,
 )
+
+
+def _compares_by_equality_operator(
+    type_anno: intermediate.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether Go's ``==`` compares deeply the values of ``type_anno``.
+
+    The primitives, the constrained primitives and the enumeration literals
+    compare by value -- except for the byte slices, which Go can not compare
+    with ``==`` at all. A tuple is a struct, which compares by ``==`` field by
+    field, so it compares deeply as long as its items do. The slices and the
+    maps can not be compared with ``==``, and the instances would be compared
+    by reference.
+    """
+    primitive_type = intermediate.try_primitive_type(type_anno)
+    if primitive_type is not None:
+        return primitive_type is not intermediate.PrimitiveType.BYTEARRAY
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        return isinstance(type_anno.our_type, intermediate.Enumeration)
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return all(_compares_by_equality_operator(item) for item in type_anno.items)
+
+    return False
+
+
+def _deep_equal_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the function comparing deeply ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.golang.common.type_moniker`), so two different
+    containers never share a function. The moniker contains an underscore,
+    unlike a class name, so the name never collides with the function
+    comparing a class.
+    """
+    return Identifier(f"deepEqual{golang_common.type_moniker(type_anno)}")
+
+
+def _generate_unequal_condition(
+    that: str, other: str, type_anno: intermediate.TypeAnnotationUnion
+) -> Stripped:
+    """
+    Generate the condition that the values at ``that`` and ``other`` differ.
+
+    A container which can not be compared by ``==`` is delegated to its
+    function, which compares only one level and calls the function of its
+    items by name. This way the deep equality is composed of plain functions,
+    to any depth.
+    """
+    if _compares_by_equality_operator(type_anno):
+        return Stripped(f"{that} != {other}")
+
+    callee: str
+    that_arg = that
+    other_arg = other
+
+    if intermediate.try_primitive_type(type_anno) is not None:
+        # NOTE (mristin):
+        # Only a byte slice is a primitive which is not compared by ``==``.
+        callee = "bytes.Equal"
+
+    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
+        if isinstance(type_anno.our_type, intermediate.NamedUnion):
+            # NOTE (mristin):
+            # A named union is not itself an ``IClass``, so we compare
+            # the underlying instances instead.
+            that_arg = f"{that}.Underlying()"
+            other_arg = f"{other}.Underlying()"
+        else:
+            assert isinstance(
+                type_anno.our_type, intermediate.Class
+            ), f"Unexpected our type not compared by ==: {type_anno}"
+
+        callee = "DeepEqual"
+
+    elif isinstance(
+        type_anno,
+        (
+            intermediate.JsonValueTypeAnnotation,
+            intermediate.JsonArrayTypeAnnotation,
+            intermediate.JsonObjectTypeAnnotation,
+        ),
+    ):
+        # NOTE (mristin):
+        # A JSON-able value is an open structure of maps, slices and
+        # scalars, none of which Go's ``==`` can compare, so it goes
+        # through ``reflect.DeepEqual``. Every other kind of value here is
+        # compared structurally instead, which is why this is the only
+        # place in the module which reaches for reflection.
+        callee = "reflect.DeepEqual"
+
+    elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        callee = _deep_equal_container_name(type_anno)
+
+    else:
+        raise AssertionError(
+            f"Unexpected type annotation to be compared deeply: {type_anno}. "
+            f"The optionals nested in the containers should have been refused in "
+            f"intermediate._translate._verify_only_simple_type_patterns."
+        )
+
+    return Stripped(
+        f"""\
+!{callee}(
+{I}{that_arg},
+{I}{other_arg},
+)"""
+    )
+
+
+def _generate_return_false_if(condition: Stripped) -> Stripped:
+    """Generate the statement returning ``false`` if ``condition`` holds."""
+    return Stripped(
+        f"""\
+if {condition} {{
+{I}return false
+}}"""
+    )
+
+
+@require(
+    lambda type_anno: isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple)
+    and not _compares_by_equality_operator(type_anno)
+)
+def _generate_deep_equal_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the function comparing deeply ``type_anno``."""
+    value_type = golang_common.generate_type(
+        type_anno, types_package=Identifier("ourtypes")
+    )
+
+    body: Stripped
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_check = _generate_return_false_if(
+            _generate_unequal_condition("that[i]", "other[i]", type_anno.items)
+        )
+
+        body = Stripped(
+            f"""\
+if len(that) != len(other) {{
+{I}return false
+}}
+
+for i := range that {{
+{I}{indent_but_first_line(item_check, I)}
+}}
+
+return true"""
+        )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # A set holds only primitives and enumeration literals, which Go
+        # compares with ``==`` as the keys of a map.
+        body = Stripped(
+            f"""\
+if len(that) != len(other) {{
+{I}return false
+}}
+
+for k := range that {{
+{I}if _, ok := other[k]; !ok {{
+{II}return false
+{I}}}
+}}
+
+return true"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        item_checks = [
+            _generate_return_false_if(
+                _generate_unequal_condition(
+                    f"that.Item{i + 1}", f"other.Item{i + 1}", item_type_anno
+                )
+            )
+            for i, item_type_anno in enumerate(type_anno.items)
+        ]
+
+        item_checks_joined = "\n\n".join(item_checks)
+
+        body = Stripped(
+            f"""\
+{item_checks_joined}
+
+return true"""
+        )
+
+    else:
+        assert_never(type_anno)
+
+    return Stripped(
+        f"""\
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func {_deep_equal_container_name(type_anno)}(
+{I}that {value_type},
+{I}other {value_type},
+) bool {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
 
 
 def _generate_for_cls(cls: intermediate.ConcreteClass) -> Stripped:
@@ -41,6 +249,8 @@ def _generate_for_cls(cls: intermediate.ConcreteClass) -> Stripped:
             )
         ]  # type: List[Stripped]
 
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
+
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             subblocks.append(
                 Stripped(
@@ -53,356 +263,31 @@ if
                 )
             )
 
-        cmp_subblock = None  # type: Optional[Stripped]
-
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
-            isinstance(type_anno, intermediate.OurTypeAnnotation)
-            and isinstance(
-                type_anno.our_type,
-                (intermediate.ConstrainedPrimitive, intermediate.Enumeration),
-            )
-        ):
-            primitive_type = intermediate.try_primitive_type(type_anno)
-
             if golang_pointering.is_pointer_type(prop.type_annotation):
-                cmp_subblock = Stripped(
-                    f"""\
-if *{that_var} != *{other_var} {{
-{I}return false
-}}"""
+                value_check = _generate_return_false_if(
+                    _generate_unequal_condition(
+                        f"*{that_var}", f"*{other_var}", type_anno
+                    )
                 )
             else:
-                if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                    cmp_subblock = Stripped(
-                        f"""\
-if !bytes.Equal(
-{I}{that_var},
-{I}{other_var},
-) {{
-{I}return false
-}}"""
-                    )
-                else:
-                    cmp_subblock = Stripped(
-                        f"""\
-if {that_var} != {other_var} {{
-{I}return false
-}}"""
-                    )
+                value_check = _generate_return_false_if(
+                    _generate_unequal_condition(that_var, other_var, type_anno)
+                )
 
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able value is an open structure of maps, slices and
-            # scalars, none of which Go's ``==`` can compare, so it goes
-            # through ``reflect.DeepEqual``. Every other property kind here is
-            # compared structurally instead, which is why this is the only
-            # place in the module which reaches for reflection.
-            cmp_subblock = Stripped(
-                f"""\
-if !reflect.DeepEqual(
-{I}{that_var},
-{I}{other_var},
-) {{
-{I}return false
-}}"""
-            )
-
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                raise AssertionError("Should have been handled before")
-
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                raise AssertionError("Should have been handled before")
-
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                cmp_subblock = Stripped(
+            subblocks.append(
+                Stripped(
                     f"""\
-if !DeepEqual(
-{I}{that_var},
-{I}{other_var},
-) {{
-{I}return false
-}}"""
-                )
-
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                cmp_subblock = Stripped(
-                    f"""\
-if !DeepEqual(
-{I}{that_var}.Underlying(),
-{I}{other_var}.Underlying(),
-) {{
-{I}return false
-}}"""
-                )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.our_type)
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We expect only lists of atomic values at the moment, "
-                f"but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-            # fmt: off
-            direct_comparison_possible =  (
-                isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation)
-                or (
-                    isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                    and isinstance(
-                        type_anno.items.our_type,
-                        (
-                            intermediate.Enumeration,
-                            intermediate.ConstrainedPrimitive
-                        )
-                    )
-                )
-            )
-            # fmt: on
-
-            if direct_comparison_possible:
-                items_primitive_type = intermediate.try_primitive_type(type_anno.items)
-
-                if items_primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                    cmp_subblock = Stripped(
-                        f"""\
-if 
-{I}len({that_var}) !=
-{I}len({other_var}) {{
-{I}return false
-}}
-for i := range {that_var} {{
-{I}if !bytes.Equal({that_var}[i], {other_var}[i]) {{
-{II}return false
-{I}}}
-}}"""
-                    )
-                else:
-                    cmp_subblock = Stripped(
-                        f"""\
-if 
-{I}len({that_var}) !=
-{I}len({other_var}) {{
-{I}return false
-}}
-for i := range {that_var} {{
-{I}if {that_var}[i] != {other_var}[i] {{
-{II}return false
-{I}}}
-}}"""
-                    )
-
-            elif isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                cmp_subblock = Stripped(
-                    f"""\
-if 
-{I}len({that_var}) !=
-{I}len({other_var}) {{
-{I}return false
-}}
-for i := range {that_var} {{
-{I}if !DeepEqual(
-{II}{that_var}[i],
-{II}{other_var}[i],
-{I}) {{
-{II}return false
-{I}}}
-}}"""
-                )
-
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # NOTE (mristin):
-                # See the note on the JSON-able property further below on why
-                # this is the only place which reaches for reflection.
-                cmp_subblock = Stripped(
-                    f"""\
-if !reflect.DeepEqual(
-{I}{that_var},
-{I}{other_var},
-) {{
-{I}return false
-}}"""
-                )
-
-            else:
-                assert isinstance(
-                    type_anno.items, intermediate.OurTypeAnnotation
-                ) and isinstance(type_anno.items.our_type, intermediate.NamedUnion)
-
-                cmp_subblock = Stripped(
-                    f"""\
-if 
-{I}len({that_var}) !=
-{I}len({other_var}) {{
-{I}return false
-}}
-for i := range {that_var} {{
-{I}if !DeepEqual(
-{II}{that_var}[i].Underlying(),
-{II}{other_var}[i].Underlying(),
-{I}) {{
-{II}return false
-{I}}}
-}}"""
-                )
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            item_cmp_blocks = []  # type: List[Stripped]
-
-            for i, item_type_anno in enumerate(type_anno.items):
-                item_that = f"{that_var}.Item{i + 1}"
-                item_other = f"{other_var}.Item{i + 1}"
-
-                if isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(
-                    item_type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    item_cmp_blocks.append(
-                        Stripped(
-                            f"""\
-if !DeepEqual(
-{I}{item_that},
-{I}{item_other},
-) {{
-{I}return false
-}}"""
-                        )
-                    )
-                elif isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                    item_cmp_blocks.append(
-                        Stripped(
-                            f"""\
-if !DeepEqual(
-{I}{item_that}.Underlying(),
-{I}{item_other}.Underlying(),
-) {{
-{I}return false
-}}"""
-                        )
-                    )
-                elif isinstance(
-                    item_type_anno,
-                    (
-                        intermediate.JsonValueTypeAnnotation,
-                        intermediate.JsonArrayTypeAnnotation,
-                        intermediate.JsonObjectTypeAnnotation,
-                    ),
-                ):
-                    # NOTE (mristin):
-                    # See the note on the JSON-able property further below on
-                    # why this reaches for reflection.
-                    item_cmp_blocks.append(
-                        Stripped(
-                            f"""\
-if !reflect.DeepEqual(
-{I}{item_that},
-{I}{item_other},
-) {{
-{I}return false
-}}"""
-                        )
-                    )
-                else:
-                    if isinstance(
-                        item_type_anno, intermediate.OurTypeAnnotation
-                    ) and isinstance(item_type_anno.our_type, intermediate.Enumeration):
-                        items_primitive_type = None
-                    else:
-                        items_primitive_type = intermediate.try_primitive_type(
-                            item_type_anno
-                        )
-                        assert items_primitive_type is not None
-
-                    if items_primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-                        item_cmp_blocks.append(
-                            Stripped(
-                                f"""\
-if !bytes.Equal(
-{I}{item_that},
-{I}{item_other},
-) {{
-{I}return false
-}}"""
-                            )
-                        )
-                    else:
-                        item_cmp_blocks.append(
-                            Stripped(
-                                f"""\
-if {item_that} != {item_other} {{
-{I}return false
-}}"""
-                            )
-                        )
-
-            cmp_subblock = Stripped("\n".join(item_cmp_blocks))
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives and enumeration literals, which Go
-            # compares with ``==`` as the keys of a map.
-            cmp_subblock = Stripped(
-                f"""\
-if 
-{I}len({that_var}) !=
-{I}len({other_var}) {{
-{I}return false
-}}
-for k := range {that_var} {{
-{I}if _, ok := {other_var}[k]; !ok {{
-{II}return false
-{I}}}
-}}"""
-            )
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
-
-        assert cmp_subblock is not None
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            cmp_subblock = Stripped(
-                f"""\
 if {that_var} != nil {{
-{I}{indent_but_first_line(cmp_subblock, I)}
+{I}{indent_but_first_line(value_check, I)}
 }}"""
+                )
             )
-
-        subblocks.append(cmp_subblock)
+        else:
+            subblocks.append(
+                _generate_return_false_if(
+                    _generate_unequal_condition(that_var, other_var, type_anno)
+                )
+            )
 
         blocks.append(Stripped("\n".join(subblocks)))
 
@@ -518,6 +403,30 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
     for cls in symbol_table.concrete_classes:
         blocks.append(_generate_for_cls(cls=cls))
 
+    # NOTE (mristin):
+    # We compare deeply the containers through functions of their own, one per
+    # type moniker.
+    observed_monikers = set()  # type: Set[str]
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ) or _compares_by_equality_operator(type_anno):
+                    continue
+
+                moniker = golang_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                blocks.append(_generate_deep_equal_container(type_anno=type_anno))
+
     blocks.append(_generate_dispatch_function(symbol_table=symbol_table))
 
     blocks.append(golang_common.WARNING)
@@ -534,6 +443,10 @@ def generate(symbol_table: intermediate.SymbolTable, repo_url: Stripped) -> str:
         ("bytes", f'{I}"bytes"'),
         ("fmt", f'{I}"fmt"'),
         ("reflect", f'{I}"reflect"'),
+        (
+            golang_common.COMMON_PACKAGE,
+            f'{I}{golang_common.COMMON_PACKAGE} "{repo_url}/common"',
+        ),
         ("ourtypes", f'{I}ourtypes "{repo_url}/types"'),
     ):
         if golang_common.names_package(blocks, module):

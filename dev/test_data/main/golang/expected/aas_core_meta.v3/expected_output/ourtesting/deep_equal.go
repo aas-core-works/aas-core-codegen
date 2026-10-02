@@ -40,18 +40,11 @@ func deepEqualExtension(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -95,18 +88,11 @@ func deepEqualExtension(
 		return false
 	}
 	if thatRefersTo != nil {
-		if 
-			len(thatRefersTo) !=
-			len(otherRefersTo) {
+		if !deepEqualListOf_IReference(
+			thatRefersTo,
+			otherRefersTo,
+		) {
 			return false
-		}
-		for i := range thatRefersTo {
-			if !DeepEqual(
-				thatRefersTo[i],
-				otherRefersTo[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -128,18 +114,11 @@ func deepEqualAdministrativeInformation(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -232,18 +211,11 @@ func deepEqualQualifier(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -319,18 +291,11 @@ func deepEqualAssetAdministrationShell(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -368,18 +333,11 @@ func deepEqualAssetAdministrationShell(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -391,18 +349,11 @@ func deepEqualAssetAdministrationShell(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -436,18 +387,11 @@ func deepEqualAssetAdministrationShell(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -484,18 +428,11 @@ func deepEqualAssetAdministrationShell(
 		return false
 	}
 	if thatSubmodels != nil {
-		if 
-			len(thatSubmodels) !=
-			len(otherSubmodels) {
+		if !deepEqualListOf_IReference(
+			thatSubmodels,
+			otherSubmodels,
+		) {
 			return false
-		}
-		for i := range thatSubmodels {
-			if !DeepEqual(
-				thatSubmodels[i],
-				otherSubmodels[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -536,18 +473,11 @@ func deepEqualAssetInformation(
 		return false
 	}
 	if thatSpecificAssetIDs != nil {
-		if 
-			len(thatSpecificAssetIDs) !=
-			len(otherSpecificAssetIDs) {
+		if !deepEqualListOf_ISpecificAssetID(
+			thatSpecificAssetIDs,
+			otherSpecificAssetIDs,
+		) {
 			return false
-		}
-		for i := range thatSpecificAssetIDs {
-			if !DeepEqual(
-				thatSpecificAssetIDs[i],
-				otherSpecificAssetIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -643,18 +573,11 @@ func deepEqualSpecificAssetID(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -704,18 +627,11 @@ func deepEqualSubmodel(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -753,18 +669,11 @@ func deepEqualSubmodel(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -776,18 +685,11 @@ func deepEqualSubmodel(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -850,18 +752,11 @@ func deepEqualSubmodel(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -873,18 +768,11 @@ func deepEqualSubmodel(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -896,18 +784,11 @@ func deepEqualSubmodel(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -919,18 +800,11 @@ func deepEqualSubmodel(
 		return false
 	}
 	if thatSubmodelElements != nil {
-		if 
-			len(thatSubmodelElements) !=
-			len(otherSubmodelElements) {
+		if !deepEqualListOf_ISubmodelElement(
+			thatSubmodelElements,
+			otherSubmodelElements,
+		) {
 			return false
-		}
-		for i := range thatSubmodelElements {
-			if !DeepEqual(
-				thatSubmodelElements[i],
-				otherSubmodelElements[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -952,18 +826,11 @@ func deepEqualRelationshipElement(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1001,18 +868,11 @@ func deepEqualRelationshipElement(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1024,18 +884,11 @@ func deepEqualRelationshipElement(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1063,18 +916,11 @@ func deepEqualRelationshipElement(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1086,18 +932,11 @@ func deepEqualRelationshipElement(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1109,18 +948,11 @@ func deepEqualRelationshipElement(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1160,18 +992,11 @@ func deepEqualSubmodelElementList(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1209,18 +1034,11 @@ func deepEqualSubmodelElementList(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1232,18 +1050,11 @@ func deepEqualSubmodelElementList(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1271,18 +1082,11 @@ func deepEqualSubmodelElementList(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1294,18 +1098,11 @@ func deepEqualSubmodelElementList(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1317,18 +1114,11 @@ func deepEqualSubmodelElementList(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1388,18 +1178,11 @@ func deepEqualSubmodelElementList(
 		return false
 	}
 	if thatValue != nil {
-		if 
-			len(thatValue) !=
-			len(otherValue) {
+		if !deepEqualListOf_ISubmodelElement(
+			thatValue,
+			otherValue,
+		) {
 			return false
-		}
-		for i := range thatValue {
-			if !DeepEqual(
-				thatValue[i],
-				otherValue[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1421,18 +1204,11 @@ func deepEqualSubmodelElementCollection(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1470,18 +1246,11 @@ func deepEqualSubmodelElementCollection(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1493,18 +1262,11 @@ func deepEqualSubmodelElementCollection(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1532,18 +1294,11 @@ func deepEqualSubmodelElementCollection(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1555,18 +1310,11 @@ func deepEqualSubmodelElementCollection(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1578,18 +1326,11 @@ func deepEqualSubmodelElementCollection(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1601,18 +1342,11 @@ func deepEqualSubmodelElementCollection(
 		return false
 	}
 	if thatValue != nil {
-		if 
-			len(thatValue) !=
-			len(otherValue) {
+		if !deepEqualListOf_ISubmodelElement(
+			thatValue,
+			otherValue,
+		) {
 			return false
-		}
-		for i := range thatValue {
-			if !DeepEqual(
-				thatValue[i],
-				otherValue[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1634,18 +1368,11 @@ func deepEqualProperty(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1683,18 +1410,11 @@ func deepEqualProperty(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1706,18 +1426,11 @@ func deepEqualProperty(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1745,18 +1458,11 @@ func deepEqualProperty(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1768,18 +1474,11 @@ func deepEqualProperty(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1791,18 +1490,11 @@ func deepEqualProperty(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1859,18 +1551,11 @@ func deepEqualMultiLanguageProperty(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1908,18 +1593,11 @@ func deepEqualMultiLanguageProperty(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1931,18 +1609,11 @@ func deepEqualMultiLanguageProperty(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1970,18 +1641,11 @@ func deepEqualMultiLanguageProperty(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -1993,18 +1657,11 @@ func deepEqualMultiLanguageProperty(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2016,18 +1673,11 @@ func deepEqualMultiLanguageProperty(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2039,18 +1689,11 @@ func deepEqualMultiLanguageProperty(
 		return false
 	}
 	if thatValue != nil {
-		if 
-			len(thatValue) !=
-			len(otherValue) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatValue,
+			otherValue,
+		) {
 			return false
-		}
-		for i := range thatValue {
-			if !DeepEqual(
-				thatValue[i],
-				otherValue[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2088,18 +1731,11 @@ func deepEqualRange(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2137,18 +1773,11 @@ func deepEqualRange(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2160,18 +1789,11 @@ func deepEqualRange(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2199,18 +1821,11 @@ func deepEqualRange(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2222,18 +1837,11 @@ func deepEqualRange(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2245,18 +1853,11 @@ func deepEqualRange(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2310,18 +1911,11 @@ func deepEqualReferenceElement(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2359,18 +1953,11 @@ func deepEqualReferenceElement(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2382,18 +1969,11 @@ func deepEqualReferenceElement(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2421,18 +2001,11 @@ func deepEqualReferenceElement(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2444,18 +2017,11 @@ func deepEqualReferenceElement(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2467,18 +2033,11 @@ func deepEqualReferenceElement(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2516,18 +2075,11 @@ func deepEqualBlob(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2565,18 +2117,11 @@ func deepEqualBlob(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2588,18 +2133,11 @@ func deepEqualBlob(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2627,18 +2165,11 @@ func deepEqualBlob(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2650,18 +2181,11 @@ func deepEqualBlob(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2673,18 +2197,11 @@ func deepEqualBlob(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2728,18 +2245,11 @@ func deepEqualFile(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2777,18 +2287,11 @@ func deepEqualFile(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2800,18 +2303,11 @@ func deepEqualFile(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2839,18 +2335,11 @@ func deepEqualFile(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2862,18 +2351,11 @@ func deepEqualFile(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2885,18 +2367,11 @@ func deepEqualFile(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2937,18 +2412,11 @@ func deepEqualAnnotatedRelationshipElement(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -2986,18 +2454,11 @@ func deepEqualAnnotatedRelationshipElement(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3009,18 +2470,11 @@ func deepEqualAnnotatedRelationshipElement(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3048,18 +2502,11 @@ func deepEqualAnnotatedRelationshipElement(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3071,18 +2518,11 @@ func deepEqualAnnotatedRelationshipElement(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3094,18 +2534,11 @@ func deepEqualAnnotatedRelationshipElement(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3135,18 +2568,11 @@ func deepEqualAnnotatedRelationshipElement(
 		return false
 	}
 	if thatAnnotations != nil {
-		if 
-			len(thatAnnotations) !=
-			len(otherAnnotations) {
+		if !deepEqualListOf_IDataElement(
+			thatAnnotations,
+			otherAnnotations,
+		) {
 			return false
-		}
-		for i := range thatAnnotations {
-			if !DeepEqual(
-				thatAnnotations[i],
-				otherAnnotations[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3168,18 +2594,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3217,18 +2636,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3240,18 +2652,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3279,18 +2684,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3302,18 +2700,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3325,18 +2716,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3348,18 +2732,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatStatements != nil {
-		if 
-			len(thatStatements) !=
-			len(otherStatements) {
+		if !deepEqualListOf_ISubmodelElement(
+			thatStatements,
+			otherStatements,
+		) {
 			return false
-		}
-		for i := range thatStatements {
-			if !DeepEqual(
-				thatStatements[i],
-				otherStatements[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3390,18 +2767,11 @@ func deepEqualEntity(
 		return false
 	}
 	if thatSpecificAssetIDs != nil {
-		if 
-			len(thatSpecificAssetIDs) !=
-			len(otherSpecificAssetIDs) {
+		if !deepEqualListOf_ISpecificAssetID(
+			thatSpecificAssetIDs,
+			otherSpecificAssetIDs,
+		) {
 			return false
-		}
-		for i := range thatSpecificAssetIDs {
-			if !DeepEqual(
-				thatSpecificAssetIDs[i],
-				otherSpecificAssetIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3534,18 +2904,11 @@ func deepEqualBasicEventElement(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3583,18 +2946,11 @@ func deepEqualBasicEventElement(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3606,18 +2962,11 @@ func deepEqualBasicEventElement(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3645,18 +2994,11 @@ func deepEqualBasicEventElement(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3668,18 +3010,11 @@ func deepEqualBasicEventElement(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3691,18 +3026,11 @@ func deepEqualBasicEventElement(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3813,18 +3141,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3862,18 +3183,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3885,18 +3199,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3924,18 +3231,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3947,18 +3247,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3970,18 +3263,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -3993,18 +3279,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatInputVariables != nil {
-		if 
-			len(thatInputVariables) !=
-			len(otherInputVariables) {
+		if !deepEqualListOf_IOperationVariable(
+			thatInputVariables,
+			otherInputVariables,
+		) {
 			return false
-		}
-		for i := range thatInputVariables {
-			if !DeepEqual(
-				thatInputVariables[i],
-				otherInputVariables[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4016,18 +3295,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatOutputVariables != nil {
-		if 
-			len(thatOutputVariables) !=
-			len(otherOutputVariables) {
+		if !deepEqualListOf_IOperationVariable(
+			thatOutputVariables,
+			otherOutputVariables,
+		) {
 			return false
-		}
-		for i := range thatOutputVariables {
-			if !DeepEqual(
-				thatOutputVariables[i],
-				otherOutputVariables[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4039,18 +3311,11 @@ func deepEqualOperation(
 		return false
 	}
 	if thatInoutputVariables != nil {
-		if 
-			len(thatInoutputVariables) !=
-			len(otherInoutputVariables) {
+		if !deepEqualListOf_IOperationVariable(
+			thatInoutputVariables,
+			otherInoutputVariables,
+		) {
 			return false
-		}
-		for i := range thatInoutputVariables {
-			if !DeepEqual(
-				thatInoutputVariables[i],
-				otherInoutputVariables[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4091,18 +3356,11 @@ func deepEqualCapability(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4140,18 +3398,11 @@ func deepEqualCapability(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4163,18 +3414,11 @@ func deepEqualCapability(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4202,18 +3446,11 @@ func deepEqualCapability(
 		return false
 	}
 	if thatSupplementalSemanticIDs != nil {
-		if 
-			len(thatSupplementalSemanticIDs) !=
-			len(otherSupplementalSemanticIDs) {
+		if !deepEqualListOf_IReference(
+			thatSupplementalSemanticIDs,
+			otherSupplementalSemanticIDs,
+		) {
 			return false
-		}
-		for i := range thatSupplementalSemanticIDs {
-			if !DeepEqual(
-				thatSupplementalSemanticIDs[i],
-				otherSupplementalSemanticIDs[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4225,18 +3462,11 @@ func deepEqualCapability(
 		return false
 	}
 	if thatQualifiers != nil {
-		if 
-			len(thatQualifiers) !=
-			len(otherQualifiers) {
+		if !deepEqualListOf_IQualifier(
+			thatQualifiers,
+			otherQualifiers,
+		) {
 			return false
-		}
-		for i := range thatQualifiers {
-			if !DeepEqual(
-				thatQualifiers[i],
-				otherQualifiers[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4248,18 +3478,11 @@ func deepEqualCapability(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4281,18 +3504,11 @@ func deepEqualConceptDescription(
 		return false
 	}
 	if thatExtensions != nil {
-		if 
-			len(thatExtensions) !=
-			len(otherExtensions) {
+		if !deepEqualListOf_IExtension(
+			thatExtensions,
+			otherExtensions,
+		) {
 			return false
-		}
-		for i := range thatExtensions {
-			if !DeepEqual(
-				thatExtensions[i],
-				otherExtensions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4330,18 +3546,11 @@ func deepEqualConceptDescription(
 		return false
 	}
 	if thatDisplayName != nil {
-		if 
-			len(thatDisplayName) !=
-			len(otherDisplayName) {
+		if !deepEqualListOf_ILangStringNameType(
+			thatDisplayName,
+			otherDisplayName,
+		) {
 			return false
-		}
-		for i := range thatDisplayName {
-			if !DeepEqual(
-				thatDisplayName[i],
-				otherDisplayName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4353,18 +3562,11 @@ func deepEqualConceptDescription(
 		return false
 	}
 	if thatDescription != nil {
-		if 
-			len(thatDescription) !=
-			len(otherDescription) {
+		if !deepEqualListOf_ILangStringTextType(
+			thatDescription,
+			otherDescription,
+		) {
 			return false
-		}
-		for i := range thatDescription {
-			if !DeepEqual(
-				thatDescription[i],
-				otherDescription[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4398,18 +3600,11 @@ func deepEqualConceptDescription(
 		return false
 	}
 	if thatEmbeddedDataSpecifications != nil {
-		if 
-			len(thatEmbeddedDataSpecifications) !=
-			len(otherEmbeddedDataSpecifications) {
+		if !deepEqualListOf_IEmbeddedDataSpecification(
+			thatEmbeddedDataSpecifications,
+			otherEmbeddedDataSpecifications,
+		) {
 			return false
-		}
-		for i := range thatEmbeddedDataSpecifications {
-			if !DeepEqual(
-				thatEmbeddedDataSpecifications[i],
-				otherEmbeddedDataSpecifications[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4421,18 +3616,11 @@ func deepEqualConceptDescription(
 		return false
 	}
 	if thatIsCaseOf != nil {
-		if 
-			len(thatIsCaseOf) !=
-			len(otherIsCaseOf) {
+		if !deepEqualListOf_IReference(
+			thatIsCaseOf,
+			otherIsCaseOf,
+		) {
 			return false
-		}
-		for i := range thatIsCaseOf {
-			if !DeepEqual(
-				thatIsCaseOf[i],
-				otherIsCaseOf[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4470,18 +3658,11 @@ func deepEqualReference(
 
 	thatKeys := that.Keys()
 	otherKeys := other.Keys()
-	if 
-		len(thatKeys) !=
-		len(otherKeys) {
+	if !deepEqualListOf_IKey(
+		thatKeys,
+		otherKeys,
+	) {
 		return false
-	}
-	for i := range thatKeys {
-		if !DeepEqual(
-			thatKeys[i],
-			otherKeys[i],
-		) {
-			return false
-		}
 	}
 
 	return true
@@ -4568,18 +3749,11 @@ func deepEqualEnvironment(
 		return false
 	}
 	if thatAssetAdministrationShells != nil {
-		if 
-			len(thatAssetAdministrationShells) !=
-			len(otherAssetAdministrationShells) {
+		if !deepEqualListOf_IAssetAdministrationShell(
+			thatAssetAdministrationShells,
+			otherAssetAdministrationShells,
+		) {
 			return false
-		}
-		for i := range thatAssetAdministrationShells {
-			if !DeepEqual(
-				thatAssetAdministrationShells[i],
-				otherAssetAdministrationShells[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4591,18 +3765,11 @@ func deepEqualEnvironment(
 		return false
 	}
 	if thatSubmodels != nil {
-		if 
-			len(thatSubmodels) !=
-			len(otherSubmodels) {
+		if !deepEqualListOf_ISubmodel(
+			thatSubmodels,
+			otherSubmodels,
+		) {
 			return false
-		}
-		for i := range thatSubmodels {
-			if !DeepEqual(
-				thatSubmodels[i],
-				otherSubmodels[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4614,18 +3781,11 @@ func deepEqualEnvironment(
 		return false
 	}
 	if thatConceptDescriptions != nil {
-		if 
-			len(thatConceptDescriptions) !=
-			len(otherConceptDescriptions) {
+		if !deepEqualListOf_IConceptDescription(
+			thatConceptDescriptions,
+			otherConceptDescriptions,
+		) {
 			return false
-		}
-		for i := range thatConceptDescriptions {
-			if !DeepEqual(
-				thatConceptDescriptions[i],
-				otherConceptDescriptions[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4728,18 +3888,11 @@ func deepEqualValueList(
 ) bool {
 	thatValueReferencePairs := that.ValueReferencePairs()
 	otherValueReferencePairs := other.ValueReferencePairs()
-	if 
-		len(thatValueReferencePairs) !=
-		len(otherValueReferencePairs) {
+	if !deepEqualListOf_IValueReferencePair(
+		thatValueReferencePairs,
+		otherValueReferencePairs,
+	) {
 		return false
-	}
-	for i := range thatValueReferencePairs {
-		if !DeepEqual(
-			thatValueReferencePairs[i],
-			otherValueReferencePairs[i],
-		) {
-			return false
-		}
 	}
 
 	return true
@@ -4820,18 +3973,11 @@ func deepEqualDataSpecificationIEC61360(
 ) bool {
 	thatPreferredName := that.PreferredName()
 	otherPreferredName := other.PreferredName()
-	if 
-		len(thatPreferredName) !=
-		len(otherPreferredName) {
+	if !deepEqualListOf_ILangStringPreferredNameTypeIEC61360(
+		thatPreferredName,
+		otherPreferredName,
+	) {
 		return false
-	}
-	for i := range thatPreferredName {
-		if !DeepEqual(
-			thatPreferredName[i],
-			otherPreferredName[i],
-		) {
-			return false
-		}
 	}
 
 	thatShortName := that.ShortName()
@@ -4842,18 +3988,11 @@ func deepEqualDataSpecificationIEC61360(
 		return false
 	}
 	if thatShortName != nil {
-		if 
-			len(thatShortName) !=
-			len(otherShortName) {
+		if !deepEqualListOf_ILangStringShortNameTypeIEC61360(
+			thatShortName,
+			otherShortName,
+		) {
 			return false
-		}
-		for i := range thatShortName {
-			if !DeepEqual(
-				thatShortName[i],
-				otherShortName[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -4933,18 +4072,11 @@ func deepEqualDataSpecificationIEC61360(
 		return false
 	}
 	if thatDefinition != nil {
-		if 
-			len(thatDefinition) !=
-			len(otherDefinition) {
+		if !deepEqualListOf_ILangStringDefinitionTypeIEC61360(
+			thatDefinition,
+			otherDefinition,
+		) {
 			return false
-		}
-		for i := range thatDefinition {
-			if !DeepEqual(
-				thatDefinition[i],
-				otherDefinition[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -5001,6 +4133,402 @@ func deepEqualDataSpecificationIEC61360(
 		if !DeepEqual(
 			thatLevelType,
 			otherLevelType,
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IReference(
+	that []ourtypes.IReference,
+	other []ourtypes.IReference,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IEmbeddedDataSpecification(
+	that []ourtypes.IEmbeddedDataSpecification,
+	other []ourtypes.IEmbeddedDataSpecification,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IExtension(
+	that []ourtypes.IExtension,
+	other []ourtypes.IExtension,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ILangStringNameType(
+	that []ourtypes.ILangStringNameType,
+	other []ourtypes.ILangStringNameType,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ILangStringTextType(
+	that []ourtypes.ILangStringTextType,
+	other []ourtypes.ILangStringTextType,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ISpecificAssetID(
+	that []ourtypes.ISpecificAssetID,
+	other []ourtypes.ISpecificAssetID,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IQualifier(
+	that []ourtypes.IQualifier,
+	other []ourtypes.IQualifier,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ISubmodelElement(
+	that []ourtypes.ISubmodelElement,
+	other []ourtypes.ISubmodelElement,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IDataElement(
+	that []ourtypes.IDataElement,
+	other []ourtypes.IDataElement,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IOperationVariable(
+	that []ourtypes.IOperationVariable,
+	other []ourtypes.IOperationVariable,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IKey(
+	that []ourtypes.IKey,
+	other []ourtypes.IKey,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IAssetAdministrationShell(
+	that []ourtypes.IAssetAdministrationShell,
+	other []ourtypes.IAssetAdministrationShell,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ISubmodel(
+	that []ourtypes.ISubmodel,
+	other []ourtypes.ISubmodel,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IConceptDescription(
+	that []ourtypes.IConceptDescription,
+	other []ourtypes.IConceptDescription,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IValueReferencePair(
+	that []ourtypes.IValueReferencePair,
+	other []ourtypes.IValueReferencePair,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ILangStringPreferredNameTypeIEC61360(
+	that []ourtypes.ILangStringPreferredNameTypeIEC61360,
+	other []ourtypes.ILangStringPreferredNameTypeIEC61360,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ILangStringShortNameTypeIEC61360(
+	that []ourtypes.ILangStringShortNameTypeIEC61360,
+	other []ourtypes.ILangStringShortNameTypeIEC61360,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ILangStringDefinitionTypeIEC61360(
+	that []ourtypes.ILangStringDefinitionTypeIEC61360,
+	other []ourtypes.ILangStringDefinitionTypeIEC61360,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
 		) {
 			return false
 		}

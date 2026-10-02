@@ -17,13 +17,28 @@ func deepEqualSomething(
 ) bool {
 	thatSomeNames := that.SomeNames()
 	otherSomeNames := other.SomeNames()
-	if 
-		len(thatSomeNames) !=
-		len(otherSomeNames) {
+	if !deepEqualListOf_string(
+		thatSomeNames,
+		otherSomeNames,
+	) {
 		return false
 	}
-	for i := range thatSomeNames {
-		if thatSomeNames[i] != otherSomeNames[i] {
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
 			return false
 		}
 	}

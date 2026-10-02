@@ -49,15 +49,11 @@ func deepEqualItem(
 
 	thatTexts := that.Texts()
 	otherTexts := other.Texts()
-	if 
-		len(thatTexts) !=
-		len(otherTexts) {
+	if !deepEqualListOf_string(
+		thatTexts,
+		otherTexts,
+	) {
 		return false
-	}
-	for i := range thatTexts {
-		if thatTexts[i] != otherTexts[i] {
-			return false
-		}
 	}
 
 	thatMaybeTexts := that.MaybeTexts()
@@ -68,15 +64,11 @@ func deepEqualItem(
 		return false
 	}
 	if thatMaybeTexts != nil {
-		if 
-			len(thatMaybeTexts) !=
-			len(otherMaybeTexts) {
+		if !deepEqualListOf_string(
+			thatMaybeTexts,
+			otherMaybeTexts,
+		) {
 			return false
-		}
-		for i := range thatMaybeTexts {
-			if thatMaybeTexts[i] != otherMaybeTexts[i] {
-				return false
-			}
 		}
 	}
 
@@ -92,18 +84,11 @@ func deepEqualSomething(
 ) bool {
 	thatItems := that.Items()
 	otherItems := other.Items()
-	if 
-		len(thatItems) !=
-		len(otherItems) {
+	if !deepEqualListOf_IItem(
+		thatItems,
+		otherItems,
+	) {
 		return false
-	}
-	for i := range thatItems {
-		if !DeepEqual(
-			thatItems[i],
-			otherItems[i],
-		) {
-			return false
-		}
 	}
 
 	thatMaybeItem := that.MaybeItem()
@@ -117,6 +102,47 @@ func deepEqualSomething(
 		if !DeepEqual(
 			thatMaybeItem,
 			otherMaybeItem,
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IItem(
+	that []ourtypes.IItem,
+	other []ourtypes.IItem,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
 		) {
 			return false
 		}

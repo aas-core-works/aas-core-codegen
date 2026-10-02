@@ -6,6 +6,7 @@ package ourtesting
 import (
 	"fmt"
 	"reflect"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
 
@@ -18,7 +19,7 @@ func deepEqualSomething(
 ) bool {
 	thatValues := that.Values()
 	otherValues := other.Values()
-	if !reflect.DeepEqual(
+	if !deepEqualListOf_jsonValue(
 		thatValues,
 		otherValues,
 	) {
@@ -27,24 +28,65 @@ func deepEqualSomething(
 
 	thatTupleWithJson := that.TupleWithJson()
 	otherTupleWithJson := other.TupleWithJson()
-	if thatTupleWithJson.Item1 != otherTupleWithJson.Item1 {
-		return false
-	}
-	if !reflect.DeepEqual(
-		thatTupleWithJson.Item2,
-		otherTupleWithJson.Item2,
+	if !deepEqualTupleOf4_string_jsonValue_jsonArray_jsonObject(
+		thatTupleWithJson,
+		otherTupleWithJson,
 	) {
 		return false
 	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_jsonValue(
+	that []ourtypes.JsonValue,
+	other []ourtypes.JsonValue,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !reflect.DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualTupleOf4_string_jsonValue_jsonArray_jsonObject(
+	that ourcommon.Tuple4[string, ourtypes.JsonValue, ourtypes.JsonArray, ourtypes.JsonObject],
+	other ourcommon.Tuple4[string, ourtypes.JsonValue, ourtypes.JsonArray, ourtypes.JsonObject],
+) bool {
+	if that.Item1 != other.Item1 {
+		return false
+	}
+
 	if !reflect.DeepEqual(
-		thatTupleWithJson.Item3,
-		otherTupleWithJson.Item3,
+		that.Item2,
+		other.Item2,
 	) {
 		return false
 	}
+
 	if !reflect.DeepEqual(
-		thatTupleWithJson.Item4,
-		otherTupleWithJson.Item4,
+		that.Item3,
+		other.Item3,
+	) {
+		return false
+	}
+
+	if !reflect.DeepEqual(
+		that.Item4,
+		other.Item4,
 	) {
 		return false
 	}

@@ -39,18 +39,11 @@ func deepEqualLangStringSet(
 ) bool {
 	thatLangStrings := that.LangStrings()
 	otherLangStrings := other.LangStrings()
-	if 
-		len(thatLangStrings) !=
-		len(otherLangStrings) {
+	if !deepEqualListOf_ILangString(
+		thatLangStrings,
+		otherLangStrings,
+	) {
 		return false
-	}
-	for i := range thatLangStrings {
-		if !DeepEqual(
-			thatLangStrings[i],
-			otherLangStrings[i],
-		) {
-			return false
-		}
 	}
 
 	return true
@@ -71,18 +64,11 @@ func deepEqualIecContent(
 		return false
 	}
 	if thatDefinition != nil {
-		if 
-			len(thatDefinition) !=
-			len(otherDefinition) {
+		if !deepEqualListOf_ILangString(
+			thatDefinition,
+			otherDefinition,
+		) {
 			return false
-		}
-		for i := range thatDefinition {
-			if !DeepEqual(
-				thatDefinition[i],
-				otherDefinition[i],
-			) {
-				return false
-			}
 		}
 	}
 
@@ -133,18 +119,11 @@ func deepEqualSomething(
 
 	thatLangStringSets := that.LangStringSets()
 	otherLangStringSets := other.LangStringSets()
-	if 
-		len(thatLangStringSets) !=
-		len(otherLangStringSets) {
+	if !deepEqualListOf_ILangStringSet(
+		thatLangStringSets,
+		otherLangStringSets,
+	) {
 		return false
-	}
-	for i := range thatLangStringSets {
-		if !DeepEqual(
-			thatLangStringSets[i],
-			otherLangStringSets[i],
-		) {
-			return false
-		}
 	}
 
 	thatSpecifications := that.Specifications()
@@ -155,18 +134,77 @@ func deepEqualSomething(
 		return false
 	}
 	if thatSpecifications != nil {
-		if 
-			len(thatSpecifications) !=
-			len(otherSpecifications) {
+		if !deepEqualListOf_ISpecification(
+			thatSpecifications,
+			otherSpecifications,
+		) {
 			return false
 		}
-		for i := range thatSpecifications {
-			if !DeepEqual(
-				thatSpecifications[i],
-				otherSpecifications[i],
-			) {
-				return false
-			}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ILangString(
+	that []ourtypes.ILangString,
+	other []ourtypes.ILangString,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ILangStringSet(
+	that []ourtypes.ILangStringSet,
+	other []ourtypes.ILangStringSet,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ISpecification(
+	that []ourtypes.ISpecification,
+	other []ourtypes.ISpecification,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i],
+			other[i],
+		) {
+			return false
 		}
 	}
 

@@ -5,6 +5,7 @@ package ourtesting
 
 import (
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
 
@@ -194,69 +195,36 @@ func deepEqualSomething(
 
 	thatListStructuralProperty := that.ListStructuralProperty()
 	otherListStructuralProperty := other.ListStructuralProperty()
-	if 
-		len(thatListStructuralProperty) !=
-		len(otherListStructuralProperty) {
+	if !deepEqualListOf_StructuralUnion(
+		thatListStructuralProperty,
+		otherListStructuralProperty,
+	) {
 		return false
-	}
-	for i := range thatListStructuralProperty {
-		if !DeepEqual(
-			thatListStructuralProperty[i].Underlying(),
-			otherListStructuralProperty[i].Underlying(),
-		) {
-			return false
-		}
 	}
 
 	thatListMixedProperty := that.ListMixedProperty()
 	otherListMixedProperty := other.ListMixedProperty()
-	if 
-		len(thatListMixedProperty) !=
-		len(otherListMixedProperty) {
+	if !deepEqualListOf_MixedUnion(
+		thatListMixedProperty,
+		otherListMixedProperty,
+	) {
 		return false
-	}
-	for i := range thatListMixedProperty {
-		if !DeepEqual(
-			thatListMixedProperty[i].Underlying(),
-			otherListMixedProperty[i].Underlying(),
-		) {
-			return false
-		}
 	}
 
 	thatListModelTypedProperty := that.ListModelTypedProperty()
 	otherListModelTypedProperty := other.ListModelTypedProperty()
-	if 
-		len(thatListModelTypedProperty) !=
-		len(otherListModelTypedProperty) {
+	if !deepEqualListOf_ModelTypedUnion(
+		thatListModelTypedProperty,
+		otherListModelTypedProperty,
+	) {
 		return false
-	}
-	for i := range thatListModelTypedProperty {
-		if !DeepEqual(
-			thatListModelTypedProperty[i].Underlying(),
-			otherListModelTypedProperty[i].Underlying(),
-		) {
-			return false
-		}
 	}
 
 	thatTupleProperty := that.TupleProperty()
 	otherTupleProperty := other.TupleProperty()
-	if !DeepEqual(
-		thatTupleProperty.Item1.Underlying(),
-		otherTupleProperty.Item1.Underlying(),
-	) {
-		return false
-	}
-	if !DeepEqual(
-		thatTupleProperty.Item2.Underlying(),
-		otherTupleProperty.Item2.Underlying(),
-	) {
-		return false
-	}
-	if !DeepEqual(
-		thatTupleProperty.Item3.Underlying(),
-		otherTupleProperty.Item3.Underlying(),
+	if !deepEqualTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+		thatTupleProperty,
+		otherTupleProperty,
 	) {
 		return false
 	}
@@ -317,18 +285,129 @@ func deepEqualSomething(
 		return false
 	}
 	if thatOptionalListOverlappingProperty != nil {
-		if 
-			len(thatOptionalListOverlappingProperty) !=
-			len(otherOptionalListOverlappingProperty) {
+		if !deepEqualListOf_OverlappingUnion(
+			thatOptionalListOverlappingProperty,
+			otherOptionalListOverlappingProperty,
+		) {
 			return false
 		}
-		for i := range thatOptionalListOverlappingProperty {
-			if !DeepEqual(
-				thatOptionalListOverlappingProperty[i].Underlying(),
-				otherOptionalListOverlappingProperty[i].Underlying(),
-			) {
-				return false
-			}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_StructuralUnion(
+	that []*ourtypes.StructuralUnion,
+	other []*ourtypes.StructuralUnion,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i].Underlying(),
+			other[i].Underlying(),
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_MixedUnion(
+	that []*ourtypes.MixedUnion,
+	other []*ourtypes.MixedUnion,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i].Underlying(),
+			other[i].Underlying(),
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ModelTypedUnion(
+	that []*ourtypes.ModelTypedUnion,
+	other []*ourtypes.ModelTypedUnion,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i].Underlying(),
+			other[i].Underlying(),
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+	that ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion],
+	other ourcommon.Tuple3[*ourtypes.StructuralUnion, *ourtypes.MixedUnion, *ourtypes.ModelTypedUnion],
+) bool {
+	if !DeepEqual(
+		that.Item1.Underlying(),
+		other.Item1.Underlying(),
+	) {
+		return false
+	}
+
+	if !DeepEqual(
+		that.Item2.Underlying(),
+		other.Item2.Underlying(),
+	) {
+		return false
+	}
+
+	if !DeepEqual(
+		that.Item3.Underlying(),
+		other.Item3.Underlying(),
+	) {
+		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_OverlappingUnion(
+	that []*ourtypes.OverlappingUnion,
+	other []*ourtypes.OverlappingUnion,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i].Underlying(),
+			other[i].Underlying(),
+		) {
+			return false
 		}
 	}
 

@@ -103,15 +103,11 @@ func deepEqualSomething(
 		return false
 	}
 	if thatOptionalTexts != nil {
-		if 
-			len(thatOptionalTexts) !=
-			len(otherOptionalTexts) {
+		if !deepEqualListOf_string(
+			thatOptionalTexts,
+			otherOptionalTexts,
+		) {
 			return false
-		}
-		for i := range thatOptionalTexts {
-			if thatOptionalTexts[i] != otherOptionalTexts[i] {
-				return false
-			}
 		}
 	}
 
@@ -124,6 +120,25 @@ func deepEqualSomething(
 	}
 	if thatOptionalKind != nil {
 		if *thatOptionalKind != *otherOptionalKind {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
 			return false
 		}
 	}

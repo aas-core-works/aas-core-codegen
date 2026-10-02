@@ -18,65 +18,143 @@ func deepEqualSomething(
 ) bool {
 	thatSomeBools := that.SomeBools()
 	otherSomeBools := other.SomeBools()
-	if 
-		len(thatSomeBools) !=
-		len(otherSomeBools) {
+	if !deepEqualListOf_bool(
+		thatSomeBools,
+		otherSomeBools,
+	) {
 		return false
-	}
-	for i := range thatSomeBools {
-		if thatSomeBools[i] != otherSomeBools[i] {
-			return false
-		}
 	}
 
 	thatSomeInts := that.SomeInts()
 	otherSomeInts := other.SomeInts()
-	if 
-		len(thatSomeInts) !=
-		len(otherSomeInts) {
+	if !deepEqualListOf_long(
+		thatSomeInts,
+		otherSomeInts,
+	) {
 		return false
-	}
-	for i := range thatSomeInts {
-		if thatSomeInts[i] != otherSomeInts[i] {
-			return false
-		}
 	}
 
 	thatSomeFloats := that.SomeFloats()
 	otherSomeFloats := other.SomeFloats()
-	if 
-		len(thatSomeFloats) !=
-		len(otherSomeFloats) {
+	if !deepEqualListOf_double(
+		thatSomeFloats,
+		otherSomeFloats,
+	) {
 		return false
-	}
-	for i := range thatSomeFloats {
-		if thatSomeFloats[i] != otherSomeFloats[i] {
-			return false
-		}
 	}
 
 	thatSomeStrings := that.SomeStrings()
 	otherSomeStrings := other.SomeStrings()
-	if 
-		len(thatSomeStrings) !=
-		len(otherSomeStrings) {
+	if !deepEqualListOf_string(
+		thatSomeStrings,
+		otherSomeStrings,
+	) {
 		return false
-	}
-	for i := range thatSomeStrings {
-		if thatSomeStrings[i] != otherSomeStrings[i] {
-			return false
-		}
 	}
 
 	thatSomeBytes := that.SomeBytes()
 	otherSomeBytes := other.SomeBytes()
-	if 
-		len(thatSomeBytes) !=
-		len(otherSomeBytes) {
+	if !deepEqualListOf_bytes(
+		thatSomeBytes,
+		otherSomeBytes,
+	) {
 		return false
 	}
-	for i := range thatSomeBytes {
-		if !bytes.Equal(thatSomeBytes[i], otherSomeBytes[i]) {
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_bool(
+	that []bool,
+	other []bool,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_long(
+	that []int64,
+	other []int64,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_double(
+	that []float64,
+	other []float64,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_bytes(
+	that [][]byte,
+	other [][]byte,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !bytes.Equal(
+			that[i],
+			other[i],
+		) {
 			return false
 		}
 	}

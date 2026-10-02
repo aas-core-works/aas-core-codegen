@@ -5,6 +5,7 @@ package ourtesting
 
 import (
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
 
@@ -49,55 +50,25 @@ func deepEqualSomething(
 ) bool {
 	thatPair := that.Pair()
 	otherPair := other.Pair()
-	if thatPair.Item1 != otherPair.Item1 {
-		return false
-	}
-	if thatPair.Item2 != otherPair.Item2 {
+	if thatPair != otherPair {
 		return false
 	}
 
 	thatItems := that.Items()
 	otherItems := other.Items()
-	if !DeepEqual(
-		thatItems.Item1,
-		otherItems.Item1,
-	) {
-		return false
-	}
-	if !DeepEqual(
-		thatItems.Item2,
-		otherItems.Item2,
+	if !deepEqualTupleOf2_IAbstractItem_IAbstractItem(
+		thatItems,
+		otherItems,
 	) {
 		return false
 	}
 
 	thatTricky := that.Tricky()
 	otherTricky := other.Tricky()
-	if thatTricky.Item1 != otherTricky.Item1 {
-		return false
-	}
-	if !DeepEqual(
-		thatTricky.Item2,
-		otherTricky.Item2,
+	if !deepEqualTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+		thatTricky,
+		otherTricky,
 	) {
-		return false
-	}
-	if !DeepEqual(
-		thatTricky.Item3,
-		otherTricky.Item3,
-	) {
-		return false
-	}
-	if !DeepEqual(
-		thatTricky.Item4,
-		otherTricky.Item4,
-	) {
-		return false
-	}
-	if thatTricky.Item5 != otherTricky.Item5 {
-		return false
-	}
-	if thatTricky.Item6 != otherTricky.Item6 {
 		return false
 	}
 
@@ -109,15 +80,97 @@ func deepEqualSomething(
 		return false
 	}
 	if thatOptionalPair != nil {
-		if thatOptionalPair.Item1 != otherOptionalPair.Item1 {
-			return false
-		}
-		if !DeepEqual(
-			thatOptionalPair.Item2,
-			otherOptionalPair.Item2,
+		if !deepEqualTupleOf2_string_IAbstractItem(
+			*thatOptionalPair,
+			*otherOptionalPair,
 		) {
 			return false
 		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualTupleOf2_IAbstractItem_IAbstractItem(
+	that ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem],
+	other ourcommon.Tuple2[ourtypes.IAbstractItem, ourtypes.IAbstractItem],
+) bool {
+	if !DeepEqual(
+		that.Item1,
+		other.Item1,
+	) {
+		return false
+	}
+
+	if !DeepEqual(
+		that.Item2,
+		other.Item2,
+	) {
+		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+	that ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result],
+	other ourcommon.Tuple6[int64, ourtypes.ISomeItem, ourtypes.IAbstractItem, ourtypes.ISomeItem, int64, ourtypes.Result],
+) bool {
+	if that.Item1 != other.Item1 {
+		return false
+	}
+
+	if !DeepEqual(
+		that.Item2,
+		other.Item2,
+	) {
+		return false
+	}
+
+	if !DeepEqual(
+		that.Item3,
+		other.Item3,
+	) {
+		return false
+	}
+
+	if !DeepEqual(
+		that.Item4,
+		other.Item4,
+	) {
+		return false
+	}
+
+	if that.Item5 != other.Item5 {
+		return false
+	}
+
+	if that.Item6 != other.Item6 {
+		return false
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualTupleOf2_string_IAbstractItem(
+	that ourcommon.Tuple2[string, ourtypes.IAbstractItem],
+	other ourcommon.Tuple2[string, ourtypes.IAbstractItem],
+) bool {
+	if that.Item1 != other.Item1 {
+		return false
+	}
+
+	if !DeepEqual(
+		that.Item2,
+		other.Item2,
+	) {
+		return false
 	}
 
 	return true

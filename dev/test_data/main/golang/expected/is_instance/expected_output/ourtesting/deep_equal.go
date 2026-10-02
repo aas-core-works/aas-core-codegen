@@ -45,18 +45,11 @@ func deepEqualOrderedContainer(
 
 	thatChildren := that.Children()
 	otherChildren := other.Children()
-	if 
-		len(thatChildren) !=
-		len(otherChildren) {
+	if !deepEqualListOf_IElement(
+		thatChildren,
+		otherChildren,
+	) {
 		return false
-	}
-	for i := range thatChildren {
-		if !DeepEqual(
-			thatChildren[i],
-			otherChildren[i],
-		) {
-			return false
-		}
 	}
 
 	thatIsSorted := that.IsSorted()
@@ -83,18 +76,11 @@ func deepEqualUnorderedContainer(
 
 	thatChildren := that.Children()
 	otherChildren := other.Children()
-	if 
-		len(thatChildren) !=
-		len(otherChildren) {
+	if !deepEqualListOf_IElement(
+		thatChildren,
+		otherChildren,
+	) {
 		return false
-	}
-	for i := range thatChildren {
-		if !DeepEqual(
-			thatChildren[i],
-			otherChildren[i],
-		) {
-			return false
-		}
 	}
 
 	return true
@@ -226,15 +212,52 @@ func deepEqualSomething(
 
 	thatValues := that.Values()
 	otherValues := other.Values()
-	if 
-		len(thatValues) !=
-		len(otherValues) {
+	if !deepEqualListOf_Value(
+		thatValues,
+		otherValues,
+	) {
 		return false
 	}
-	for i := range thatValues {
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IElement(
+	that []ourtypes.IElement,
+	other []ourtypes.IElement,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
 		if !DeepEqual(
-			thatValues[i].Underlying(),
-			otherValues[i].Underlying(),
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_Value(
+	that []*ourtypes.Value,
+	other []*ourtypes.Value,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !DeepEqual(
+			that[i].Underlying(),
+			other[i].Underlying(),
 		) {
 			return false
 		}

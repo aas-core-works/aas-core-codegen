@@ -52,15 +52,11 @@ func deepEqualBag(
 
 	thatTags := that.Tags()
 	otherTags := other.Tags()
-	if 
-		len(thatTags) !=
-		len(otherTags) {
+	if !deepEqualListOf_string(
+		thatTags,
+		otherTags,
+	) {
 		return false
-	}
-	for i := range thatTags {
-		if thatTags[i] != otherTags[i] {
-			return false
-		}
 	}
 
 	return true
@@ -75,28 +71,58 @@ func deepEqualContainer(
 ) bool {
 	thatNames := that.Names()
 	otherNames := other.Names()
-	if 
-		len(thatNames) !=
-		len(otherNames) {
+	if !deepEqualListOf_string(
+		thatNames,
+		otherNames,
+	) {
 		return false
-	}
-	for i := range thatNames {
-		if thatNames[i] != otherNames[i] {
-			return false
-		}
 	}
 
 	thatItems := that.Items()
 	otherItems := other.Items()
-	if 
-		len(thatItems) !=
-		len(otherItems) {
+	if !deepEqualListOf_IItem(
+		thatItems,
+		otherItems,
+	) {
 		return false
 	}
-	for i := range thatItems {
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_string(
+	that []string,
+	other []string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if that[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_IItem(
+	that []ourtypes.IItem,
+	other []ourtypes.IItem,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
 		if !DeepEqual(
-			thatItems[i],
-			otherItems[i],
+			that[i],
+			other[i],
 		) {
 			return false
 		}
