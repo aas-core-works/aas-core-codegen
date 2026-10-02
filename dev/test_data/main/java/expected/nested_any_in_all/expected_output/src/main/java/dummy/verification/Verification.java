@@ -97,23 +97,13 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getLangStrings().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final ILangString elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("langStrings"));
-            return error;
-          }));
+        Stream.of(that.getLangStrings())
+          .flatMap(Verification::verifyListOf_ILangString)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("langStrings"));
+              return error;
+            }));
 
       return errorStream;
     }
@@ -125,23 +115,13 @@ public class Verification {
 
       if (that.getDefinition().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Verification.zip(
-            IntStream.iterate(0, i -> i + 1).boxed(),
-            that.getDefinition().get().stream())
-              .flatMap(elemTuple -> {
-                final int index = elemTuple.getFirst();
-                final ILangString elem = elemTuple.getSecond();
-                return Verification.verifyToErrorStream(elem)
-                  .map(error -> {
-                    error.prependSegment(new Reporting.IndexSegment(index));
-                    return error;
-                  });
-              })
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("definition"));
-              return error;
-            }));
+          Stream.of(that.getDefinition().get())
+            .flatMap(Verification::verifyListOf_ILangString)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("definition"));
+                return error;
+              }));
       }
 
       return errorStream;
@@ -209,43 +189,23 @@ public class Verification {
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getLangStringSets().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final ILangStringSet elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("langStringSets"));
-            return error;
-          }));
+        Stream.of(that.getLangStringSets())
+          .flatMap(Verification::verifyListOf_ILangStringSet)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("langStringSets"));
+              return error;
+            }));
 
       if (that.getSpecifications().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Verification.zip(
-            IntStream.iterate(0, i -> i + 1).boxed(),
-            that.getSpecifications().get().stream())
-              .flatMap(elemTuple -> {
-                final int index = elemTuple.getFirst();
-                final ISpecification elem = elemTuple.getSecond();
-                return Verification.verifyToErrorStream(elem)
-                  .map(error -> {
-                    error.prependSegment(new Reporting.IndexSegment(index));
-                    return error;
-                  });
-              })
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("specifications"));
-              return error;
-            }));
+          Stream.of(that.getSpecifications().get())
+            .flatMap(Verification::verifyListOf_ISpecification)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("specifications"));
+                return error;
+              }));
       }
 
       return errorStream;
@@ -296,6 +256,57 @@ public class Verification {
    */
   public static Iterable<Reporting.Error> verify(IClass that) {
     return new _ValidationErrorIterable(that);
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_ILangString(
+    List<ILangString> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_ILangStringSet(
+    List<ILangStringSet> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_ISpecification(
+    List<ISpecification> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

@@ -384,23 +384,13 @@ public class Verification {
 
       if (that.getChildren().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Verification.zip(
-            IntStream.iterate(0, i -> i + 1).boxed(),
-            that.getChildren().get().stream())
-              .flatMap(elemTuple -> {
-                final int index = elemTuple.getFirst();
-                final IParent elem = elemTuple.getSecond();
-                return Verification.verifyToErrorStream(elem)
-                  .map(error -> {
-                    error.prependSegment(new Reporting.IndexSegment(index));
-                    return error;
-                  });
-              })
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("children"));
-              return error;
-            }));
+          Stream.of(that.getChildren().get())
+            .flatMap(Verification::verifyListOf_IParent)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("children"));
+                return error;
+              }));
       }
 
       return errorStream;
@@ -581,23 +571,13 @@ public class Verification {
 
       if (that.getParents().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Verification.zip(
-            IntStream.iterate(0, i -> i + 1).boxed(),
-            that.getParents().get().stream())
-              .flatMap(elemTuple -> {
-                final int index = elemTuple.getFirst();
-                final IParent elem = elemTuple.getSecond();
-                return Verification.verifyToErrorStream(elem)
-                  .map(error -> {
-                    error.prependSegment(new Reporting.IndexSegment(index));
-                    return error;
-                  });
-              })
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("parents"));
-              return error;
-            }));
+          Stream.of(that.getParents().get())
+            .flatMap(Verification::verifyListOf_IParent)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("parents"));
+                return error;
+              }));
       }
 
       return errorStream;
@@ -661,6 +641,23 @@ public class Verification {
     } else {
       return Stream.empty();
     }
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_IParent(
+    List<IParent> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

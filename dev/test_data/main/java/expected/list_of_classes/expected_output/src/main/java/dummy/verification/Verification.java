@@ -27,6 +27,7 @@ import dummy.reporting.Reporting;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.List;
 
 public class Verification {
   /**
@@ -84,42 +85,22 @@ public class Verification {
             }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getSomeItems().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final IAbstractItem elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("someItems"));
-            return error;
-          }));
+        Stream.of(that.getSomeItems())
+          .flatMap(Verification::verifyListOf_IAbstractItem)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("someItems"));
+              return error;
+            }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getSomeSimples().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final ISimple elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("someSimples"));
-            return error;
-          }));
+        Stream.of(that.getSomeSimples())
+          .flatMap(Verification::verifyListOf_ISimple)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("someSimples"));
+              return error;
+            }));
 
       return errorStream;
     }
@@ -169,6 +150,40 @@ public class Verification {
    */
   public static Iterable<Reporting.Error> verify(IClass that) {
     return new _ValidationErrorIterable(that);
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_IAbstractItem(
+    List<IAbstractItem> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_ISimple(
+    List<ISimple> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

@@ -169,23 +169,13 @@ public class Verification {
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getItems().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final IItem elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("items"));
-            return error;
-          }));
+        Stream.of(that.getItems())
+          .flatMap(Verification::verifyListOf_IItem)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("items"));
+              return error;
+            }));
 
       return errorStream;
     }
@@ -248,6 +238,23 @@ public class Verification {
     } else {
       return Stream.empty();
     }
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_IItem(
+    List<IItem> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

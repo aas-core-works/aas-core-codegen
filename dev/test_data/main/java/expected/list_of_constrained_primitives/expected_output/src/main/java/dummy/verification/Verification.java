@@ -27,6 +27,7 @@ import dummy.reporting.Reporting;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.List;
 
 public class Verification {
   /**
@@ -45,23 +46,13 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getSomeNames().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final String elem = elemTuple.getSecond();
-              return Verification.verifyName(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("someNames"));
-            return error;
-          }));
+        Stream.of(that.getSomeNames())
+          .flatMap(Verification::verifyListOf_Name)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("someNames"));
+              return error;
+            }));
 
       return errorStream;
     }
@@ -128,6 +119,23 @@ public class Verification {
     }
 
     return errorStream;
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_Name(
+    List<String> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyName(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

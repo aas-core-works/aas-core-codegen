@@ -804,34 +804,264 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
     return Stripped(writer.getvalue()), None
 
 
-def _generate_verify_method(our_type: intermediate.OurType) -> Stripped:
-    """Generate the name of the ``verify*`` method."""
-    if isinstance(our_type, intermediate.Enumeration):
-        name = java_naming.enum_name(our_type.name)
-        return Stripped(f"verify{name}")
+def _needs_verification(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether a value of ``type_annotation`` has anything to verify at any depth.
 
-    elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-        name = java_naming.class_name(our_type.name)
-        return Stripped(f"verify{name}")
+    In Java, we verify all our types, including the enumerations, and all
+    the JSON-able values.
+    """
+    return any(
+        isinstance(
+            type_anno,
+            (
+                intermediate.OurTypeAnnotation,
+                intermediate.JsonValueTypeAnnotation,
+                intermediate.JsonArrayTypeAnnotation,
+                intermediate.JsonObjectTypeAnnotation,
+            ),
+        )
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
+    )
 
-    elif isinstance(
-        our_type,
-        (
-            intermediate.AbstractClass,
-            intermediate.ConcreteClass,
-            intermediate.NamedUnion,
-        ),
+
+def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
+    """
+    Name ``type_anno`` by what its verification depends on.
+
+    This follows the Polish notation of
+    :py:func:`aas_core_codegen.java.common.type_moniker`, except that
+    a constrained primitive is named by itself (*e.g.*, ``NonEmptyString``),
+    and not by its constrainee (``String``), and a JSON object by its
+    constrained key, if any (*e.g.*, ``jsonObjectByNonEmptyString``).
+
+    We need a moniker of our own since
+    :py:func:`aas_core_codegen.java.common.type_moniker` names the types by
+    their Java type. For example, ``List[Non_empty_string]`` and
+    ``List[Id_short_type]`` would both be named ``ListOf_String``. However,
+    they are verified differently, so they can not share one verification
+    method.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return java_common.list_moniker(_verification_moniker(type_anno.items))
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return java_common.set_moniker(_verification_moniker(type_anno.items))
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return java_common.tuple_moniker(
+            [_verification_moniker(item) for item in type_anno.items]
+        )
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type, intermediate.ConstrainedPrimitive
+    ):
+        return java_naming.class_name(type_anno.our_type.name)
+
+    if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+        key_constrained_primitive = intermediate.try_constrained_primitive(
+            type_anno.key
+        )
+        if key_constrained_primitive is not None:
+            return (
+                f"jsonObjectBy"
+                f"{java_naming.class_name(key_constrained_primitive.name)}"
+            )
+
+    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected optional to be verified: {type_anno}. The optionals "
+            f"nested in the containers should have been refused in "
+            f"intermediate._translate._verify_only_simple_type_patterns."
+        )
+
+    return java_common.leaf_moniker(type_anno)
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _verify_method(type_anno: intermediate.TypeAnnotationUnion) -> Identifier:
+    """
+    Name the method of ``Verification`` verifying a value of ``type_anno``.
+
+    The names of the methods generated for the containers and for the JSON
+    objects with constrained keys contain an underscore, so they never collide
+    with the methods of the enumerations and of the constrained primitives,
+    which are named by ``capitalized_camel_case``.
+    """
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        our_type = type_anno.our_type
+
+        if isinstance(our_type, intermediate.Enumeration):
+            return Identifier(f"verify{java_naming.enum_name(our_type.name)}")
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return Identifier(f"verify{java_naming.class_name(our_type.name)}")
+
+        elif isinstance(
+            our_type,
+            (
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+                intermediate.NamedUnion,
+            ),
+        ):
+            # NOTE (mristin):
+            # A named union has no invariants of its own; ``verifyToErrorStream``
+            # has an overload for it (see
+            # :py:func:`_generate_union_verify_helper`) that recurses into
+            # the underlying instance, so it is dispatched exactly like a class.
+            return Identifier("verifyToErrorStream")
+
+        else:
+            assert_never(our_type)
+
+    elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
+        return Identifier("verifyJsonValue")
+
+    elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
+        return Identifier("verifyJsonArray")
+
+    elif isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+        key_constrained_primitive = intermediate.try_constrained_primitive(
+            type_anno.key
+        )
+
+        # NOTE (mristin):
+        # A bare ``str`` key has nothing to verify.
+        if key_constrained_primitive is None:
+            return Identifier("verifyJsonObject")
+
+        return Identifier(
+            f"verifyJsonObjectBy_"
+            f"{java_naming.class_name(key_constrained_primitive.name)}"
+        )
+
+    elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return Identifier(f"verify{_verification_moniker(type_anno)}")
+
+    raise AssertionError(
+        f"Unexpected type annotation with something to verify: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _generate_verify_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the method of ``Verification`` verifying ``type_anno``.
+
+    The method verifies only one level and calls the method of its items by
+    name. This way the verification is composed of plain methods, to any depth.
+    """
+    body: Stripped
+
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
         # NOTE (mristin):
-        # A named union has no invariants of its own; ``verifyToErrorStream``
-        # has an overload for it (see
-        # :py:func:`_generate_union_verify_helper`) that recurses into
-        # the underlying instance, so it is dispatched exactly like a class.
-        return Stripped("verifyToErrorStream")
-    else:
-        assert_never(our_type)
+        # A set has no index of its own, so we verify its items in the order
+        # in which they are serialized. The index in the error path hence
+        # points to the item in the serialized array.
+        items_expr = (
+            java_common.sorted_set_items(type_anno.items, Stripped("that"))
+            if isinstance(type_anno, intermediate.SetTypeAnnotation)
+            else "that"
+        )
 
-    raise AssertionError("Unexpected execution path")
+        body = Stripped(
+            f"""\
+return Verification.zip(
+{I}IntStream.iterate(0, i -> i + 1).boxed(),
+{I}{items_expr}.stream())
+{II}.flatMap(itemTuple ->
+{III}Verification.{_verify_method(type_anno.items)}(itemTuple.getSecond())
+{IIII}.map(error -> {{
+{IIIII}error.prependSegment(
+{IIIIII}new Reporting.IndexSegment(itemTuple.getFirst()));
+{IIIII}return error;
+{IIII}}}));"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        item_streams = [
+            Stripped(
+                f"""\
+Stream.of(that.item{i + 1}())
+{I}.flatMap(Verification::{_verify_method(item_type_anno)})
+{II}.map(error -> {{
+{III}error.prependSegment(
+{IIII}new Reporting.IndexSegment({i}));
+{III}return error;
+{II}}})"""
+            )
+            for i, item_type_anno in enumerate(type_anno.items)
+            if _needs_verification(item_type_anno)
+        ]
+
+        stream = item_streams[0]
+        for item_stream in item_streams[1:]:
+            stream = Stripped(
+                f"""\
+Stream.<Reporting.Error>concat(
+{I}{indent_but_first_line(stream, I)},
+{I}{indent_but_first_line(item_stream, I)})"""
+            )
+
+        body = Stripped(f"return {stream};")
+
+    else:
+        assert_never(type_anno)
+
+    value_type = java_common.generate_type(type_anno)
+
+    return Stripped(
+        f"""\
+/**
+ * Verify the items of {{@code that}} recursively.
+ */
+private static Stream<Reporting.Error> {_verify_method(type_anno)}(
+{I}{indent_but_first_line(value_type, I)} that) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
+@require(
+    lambda type_anno: intermediate.try_constrained_primitive(type_anno.key) is not None
+)
+def _generate_verify_json_object_with_constrained_key(
+    type_anno: intermediate.JsonObjectTypeAnnotation,
+) -> Stripped:
+    """Generate the method of ``Verification`` verifying ``type_anno``."""
+    key_verify_method = _verify_method(type_anno.key)
+
+    return Stripped(
+        f"""\
+/**
+ * Verify that {{@code that}} is a JSON-able object with valid keys.
+ */
+private static Stream<Reporting.Error> {_verify_method(type_anno)}(
+{I}ObjectNode that) {{
+{I}return Stream.<Reporting.Error>concat(
+{II}Verification.verifyJsonObject(that),
+{II}Verification.streamOfFieldNames(that)
+{III}.flatMap(key ->
+{IIII}Verification.{key_verify_method}(key)
+{IIIII}.map(error ->
+{IIIIII}// NOTE (mristin):
+{IIIIII}// A member of an open JSON object is no property of one of
+{IIIIII}// our classes, so it gets no segment of its own -- the key
+{IIIIII}// goes into the message instead, as it does in
+{IIIIII}// ``verifyJsonValue``.
+{IIIIII}new Reporting.Error(
+{IIIIII}{I}"In the member \\"" + key + "\\": " + error.getCause()))));
+}}"""
+    )
 
 
 def _generate_union_verify_helper() -> Stripped:
@@ -858,278 +1088,6 @@ public static Stream<Reporting.Error> verifyToErrorStream(IUnion<?> that) {{
 {I}return verifyToErrorStream(that.getUnderlying());
 }}"""
     )
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_transform_property(
-    prop: intermediate.Property,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the snippet to transform a property to errors."""
-    # NOTE (empwilli):
-    # Instead of writing here a complex but general solution with unrolling we choose
-    # to provide a simple, but limited, solution. First, the meta-model is quite
-    # limited itself at the moment, so the complexity of the general solution is not
-    # warranted. Second, we hope that there will be fewer bugs in the simple solution
-    # which is particularly important at this early adoption stage.
-    #
-    # We anticipate that in the future we will indeed need a general and complex
-    # solution. Here are just some thoughts on how to approach it:
-    # * Leave the pattern matching to produce more readable code for simple cases,
-    # * Unroll only in case of composite types and optional composite types.
-
-    type_anno = (
-        prop.type_annotation
-        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        else prop.type_annotation.value
-    )
-
-    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        return None, Error(
-            prop.parsed.node,
-            "We currently implemented verification based on a very limited "
-            "pattern matching due to code simplicity. We did not handle "
-            "the case of nested optional values. Please contact "
-            "the developers if you need this functionality.",
-        )
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented verification based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of optional values. Please contact "
-                "the developers if you need this functionality.",
-            )
-        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented verification based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of lists. Please contact "
-                "the developers if you need this functionality.",
-            )
-        else:
-            pass
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        pass
-    else:
-        pass
-
-    stmts = []  # type: List[Stripped]
-
-    getter_name = java_naming.getter_name(prop.name)
-    prop_literal = java_common.string_literal(prop.json_name)
-
-    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        source_expr = Stripped(f"that.{getter_name}().get()")
-    else:
-        source_expr = Stripped(f"that.{getter_name}()")
-
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        # There is nothing that we check for primitive types.
-        return Stripped(""), None
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        verify_method = _generate_verify_method(our_type=type_anno.our_type)
-
-        # NOTE (mristin):
-        # A named union is matched by its own ``verifyToErrorStream``
-        # overload (see :py:func:`_generate_union_verify_helper`), so
-        # it can be verified exactly like a class instance here.
-
-        stmts.append(
-            Stripped(
-                f"""\
-errorStream = Stream.<Reporting.Error>concat(errorStream,
-{I}Stream.of({source_expr})
-{II}.flatMap(Verification::{verify_method})
-{III}.map(error -> {{
-{IIII}error.prependSegment(
-{IIIII}new Reporting.NameSegment({prop_literal}));
-{IIII}return error;
-{III}}}));"""
-            )
-        )
-
-    elif isinstance(
-        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
-    ):
-        if isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "We chose to implement only a very limited pattern matching; "
-                "see the note above in the code."
-            )
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "We expect only primitives, constrained primitives and enumeration "
-                "literals as items of a set, as the other items are refused in "
-                "intermediate._translate._verify_items_of_sets."
-            )
-        else:
-            assert_never(type_anno)
-
-        # NOTE (empwilli):
-        # We only descend into our classes here.
-        if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            return Stripped(""), None
-
-        verify_method = _generate_verify_method(type_anno.items.our_type)
-        item_type = java_common.generate_type(type_anno.items)
-
-        # NOTE (mristin):
-        # A set has no index of its own, so we verify its items in the order
-        # in which they are serialized. The index in the error path hence
-        # points to the item in the serialized array.
-        items_expr = (
-            java_common.sorted_set_items(type_anno.items, source_expr)
-            if isinstance(type_anno, intermediate.SetTypeAnnotation)
-            else source_expr
-        )
-
-        # NOTE (mristin):
-        # A named union item is matched by its own ``verifyToErrorStream``
-        # overload (see :py:func:`_generate_union_verify_helper`), so
-        # it can be verified exactly like a class item here.
-
-        stmts.append(
-            Stripped(
-                f"""\
-errorStream = Stream.<Reporting.Error>concat(errorStream,
-{I}Verification.zip(
-{II}IntStream.iterate(0, i -> i + 1).boxed(),
-{II}{items_expr}.stream())
-{III}.flatMap(elemTuple -> {{
-{IIII}final int index = elemTuple.getFirst();
-{IIII}final {item_type} elem = elemTuple.getSecond();
-{IIII}return Verification.{verify_method}(elem)
-{IIIII}.map(error -> {{
-{IIIIII}error.prependSegment(new Reporting.IndexSegment(index));
-{IIIIII}return error;
-{IIIII}}});
-{III}}})
-{II}.map(error -> {{
-{III}error.prependSegment(
-{IIII}new Reporting.NameSegment({prop_literal}));
-{III}return error;
-{II}}}));"""
-            )
-        )
-
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        for i, item_type_anno in enumerate(type_anno.items):
-            if not isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                # There is nothing that we check for primitive items.
-                continue
-
-            verify_method = _generate_verify_method(our_type=item_type_anno.our_type)
-            item_expr = Stripped(f"{source_expr}.item{i + 1}()")
-
-            # NOTE (mristin):
-            # A named union item is matched by its own
-            # ``verifyToErrorStream`` overload (see
-            # :py:func:`_generate_union_verify_helper`), so it can be
-            # verified exactly like a class item here.
-
-            stmts.append(
-                Stripped(
-                    f"""\
-errorStream = Stream.<Reporting.Error>concat(errorStream,
-{I}Stream.of({item_expr})
-{II}.flatMap(Verification::{verify_method})
-{III}.map(error -> {{
-{IIII}error.prependSegment(
-{IIIII}new Reporting.IndexSegment({i}));
-{IIII}error.prependSegment(
-{IIIII}new Reporting.NameSegment({prop_literal}));
-{IIII}return error;
-{III}}}));"""
-                )
-            )
-
-    elif isinstance(
-        type_anno,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        json_verify_method: str
-        if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
-            json_verify_method = "verifyJsonValue"
-        elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
-            json_verify_method = "verifyJsonArray"
-        else:
-            json_verify_method = "verifyJsonObject"
-
-        stmts.append(
-            Stripped(
-                f"""\
-errorStream = Stream.<Reporting.Error>concat(errorStream,
-{I}Stream.of({source_expr})
-{II}.flatMap(Verification::{json_verify_method})
-{III}.map(error -> {{
-{IIII}error.prependSegment(
-{IIIII}new Reporting.NameSegment({prop_literal}));
-{IIII}return error;
-{III}}}));"""
-            )
-        )
-
-        key_constrained_primitive = (
-            intermediate.try_constrained_primitive(type_anno.key)
-            if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation)
-            else None
-        )
-
-        # NOTE (mristin):
-        # A bare ``str`` key has nothing to verify.
-        if key_constrained_primitive is not None:
-            key_verify_method = _generate_verify_method(
-                our_type=key_constrained_primitive
-            )
-
-            stmts.append(
-                Stripped(
-                    f"""\
-errorStream = Stream.<Reporting.Error>concat(errorStream,
-{I}Verification.streamOfFieldNames({source_expr})
-{II}.flatMap(key ->
-{III}Verification.{key_verify_method}(key)
-{IIII}.map(error -> {{
-{IIIII}// NOTE (mristin):
-{IIIII}// A member of an open JSON object is no property of one of
-{IIIII}// our classes, so it gets no segment of its own -- the key
-{IIIII}// goes into the message instead, as it does in
-{IIIII}// ``verifyJsonValue``.
-{IIIII}final Reporting.Error keyError = new Reporting.Error(
-{IIIIII}"In the member \\"" + key + "\\": " + error.getCause());
-{IIIII}keyError.prependSegment(
-{IIIIII}new Reporting.NameSegment({prop_literal}));
-{IIIII}return keyError;
-{IIII}}})));"""
-                )
-            )
-
-    else:
-        assert_never(type_anno)
-
-    verify_block = Stripped("\n".join(stmts))
-    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        return (
-            Stripped(
-                f"""\
-if (that.{getter_name}().isPresent()) {{
-{I}{indent_but_first_line(verify_block, I)}
-}}"""
-            ),
-            None,
-        )
-    else:
-        return verify_block, None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1176,16 +1134,40 @@ def _generate_transform_for_class(
         return None, errors
 
     for prop in cls.properties:
-        block, error = _generate_transform_property(prop=prop)
-        if error is not None:
-            errors.append(error)
-        else:
-            assert block is not None
-            if block != "":
-                blocks.append(block)
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
+        if not _needs_verification(type_anno):
+            continue
 
-    if len(errors) > 0:
-        return None, errors
+        getter_name = java_naming.getter_name(prop.name)
+        prop_literal = java_common.string_literal(prop.json_name)
+
+        optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+
+        source_expr = (
+            f"that.{getter_name}().get()" if optional else f"that.{getter_name}()"
+        )
+
+        block = Stripped(
+            f"""\
+errorStream = Stream.<Reporting.Error>concat(errorStream,
+{I}Stream.of({source_expr})
+{II}.flatMap(Verification::{_verify_method(type_anno)})
+{III}.map(error -> {{
+{IIII}error.prependSegment(
+{IIIII}new Reporting.NameSegment({prop_literal}));
+{IIII}return error;
+{III}}}));"""
+        )
+
+        if optional:
+            block = Stripped(
+                f"""\
+if (that.{getter_name}().isPresent()) {{
+{I}{indent_but_first_line(block, I)}
+}}"""
+            )
+
+        blocks.append(block)
 
     if len(blocks) == 0:
         blocks.append(
@@ -1581,22 +1563,68 @@ def generate(
         )
 
     # NOTE (mristin):
+    # We verify the containers and the JSON objects with constrained keys
+    # through methods of their own, one per verification moniker.
+    own_method_type_annos = (
+        []
+    )  # type: List[Union[intermediate.ContainerTypeAnnotation, intermediate.JsonObjectTypeAnnotation]]
+
+    observed_monikers = set()  # type: Set[str]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not (
+                    (
+                        isinstance(
+                            type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                        )
+                        and _needs_verification(type_anno)
+                    )
+                    or (
+                        isinstance(type_anno, intermediate.JsonObjectTypeAnnotation)
+                        and intermediate.try_constrained_primitive(type_anno.key)
+                        is not None
+                    )
+                ):
+                    continue
+
+                moniker = _verification_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+                own_method_type_annos.append(type_anno)
+
+    # NOTE (mristin):
     # A verification function which takes a list or an optional as an argument
     # needs the import of ``List`` or ``Optional``, respectively, in its signature.
     # The signatures of the implementation-specific functions are written by hand,
-    # but follow the same types.
+    # but follow the same types. The same holds for the methods verifying
+    # the lists.
     argument_type_annotations = [
         arg.type_annotation
         for verification in symbol_table.verification_functions
         for arg in verification.arguments
     ]
 
-    if intermediate_uses.json_types(symbol_table) or any(
-        isinstance(
-            intermediate.beneath_optional(type_annotation),
-            intermediate.ListTypeAnnotation,
+    if (
+        intermediate_uses.json_types(symbol_table)
+        or any(
+            isinstance(
+                intermediate.beneath_optional(type_annotation),
+                intermediate.ListTypeAnnotation,
+            )
+            for type_annotation in argument_type_annotations
         )
-        for type_annotation in argument_type_annotations
+        or any(
+            isinstance(type_anno, intermediate.ListTypeAnnotation)
+            for type_anno in own_method_type_annos
+        )
     ):
         imports.append(Stripped("import java.util.List;"))
 
@@ -1770,6 +1798,14 @@ public static Iterable<Reporting.Error> verify(IClass that) {{
 
     if len(symbol_table.named_unions) > 0:
         verification_blocks.append(_generate_union_verify_helper())
+
+    for type_anno in own_method_type_annos:
+        if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+            verification_blocks.append(
+                _generate_verify_json_object_with_constrained_key(type_anno=type_anno)
+            )
+        else:
+            verification_blocks.append(_generate_verify_container(type_anno=type_anno))
 
     if len(errors) > 0:
         return None, errors
