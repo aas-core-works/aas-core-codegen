@@ -469,6 +469,113 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IInstance>
+> Wrap_listOf_Instance(
+  const std::vector<
+    std::shared_ptr<types::IInstance>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IInstance>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IInstance>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IListOf>
+> Wrap_listOf_ListOf(
+  const std::vector<
+    std::shared_ptr<types::IListOf>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IListOf>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IListOf>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::tuple<
+  std::shared_ptr<types::IListOf>,
+  std::wstring
+> Wrap_tupleOf2_ListOf_str(
+  const std::tuple<
+    std::shared_ptr<types::IListOf>,
+    std::wstring
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  return std::tuple<
+    std::shared_ptr<types::IListOf>,
+    std::wstring
+  >(
+    Wrap<E>(std::get<0>(that), factory),
+    std::get<1>(that)
+  );
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -633,102 +740,25 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IInstance>
-    >& value(
-      that->instances()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IInstance>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IInstance>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_instances(
-      std::move(wrapped)
-    );
-  }
+  that->set_instances(
+    Wrap_listOf_Instance<E>(that->instances(), factory)
+  );
 
   that->set_pointer(
-    Wrap<E>(
-      that->pointer(),
-      factory
-    )
+    Wrap<E>(that->pointer(), factory)
   );
 
   that->set_json_object_of_name(
-    Wrap<E>(
-      that->json_object_of_name(),
-      factory
-    )
+    Wrap<E>(that->json_object_of_name(), factory)
   );
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IListOf>
-    >& value(
-      that->lists()
-    );
-    const std::size_t size = value.size();
+  that->set_lists(
+    Wrap_listOf_ListOf<E>(that->lists(), factory)
+  );
 
-    std::vector<
-      std::shared_ptr<types::IListOf>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IListOf>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_lists(
-      std::move(wrapped)
-    );
-  }
-
-  {
-    const std::tuple<
-      std::shared_ptr<types::IListOf>,
-      std::wstring
-    >& value(
-      that->pair()
-    );
-
-    std::tuple<
-      std::shared_ptr<types::IListOf>,
-      std::wstring
-    > wrapped(value);
-
-    std::get<0>(wrapped) = Wrap<E>(
-      std::get<0>(value),
-      factory
-    );
-
-    that->set_pair(
-      std::move(wrapped)
-    );
-  }
+  that->set_pair(
+    Wrap_tupleOf2_ListOf_str<E>(that->pair(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)

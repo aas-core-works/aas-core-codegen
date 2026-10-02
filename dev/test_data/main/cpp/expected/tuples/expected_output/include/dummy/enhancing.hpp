@@ -354,6 +354,121 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::tuple<
+  std::shared_ptr<types::IAbstractItem>,
+  std::shared_ptr<types::IAbstractItem>
+> Wrap_tupleOf2_AbstractItem_AbstractItem(
+  const std::tuple<
+    std::shared_ptr<types::IAbstractItem>,
+    std::shared_ptr<types::IAbstractItem>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  return std::tuple<
+    std::shared_ptr<types::IAbstractItem>,
+    std::shared_ptr<types::IAbstractItem>
+  >(
+    Wrap<E>(std::get<0>(that), factory),
+    Wrap<E>(std::get<1>(that), factory)
+  );
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::tuple<
+  int64_t,
+  std::shared_ptr<types::ISomeItem>,
+  std::shared_ptr<types::IAbstractItem>,
+  std::shared_ptr<types::ISomeItem>,
+  int64_t,
+  types::Result
+> Wrap_tupleOf6_int_SomeItem_AbstractItem_SomeItem_PositiveInt_Result(
+  const std::tuple<
+    int64_t,
+    std::shared_ptr<types::ISomeItem>,
+    std::shared_ptr<types::IAbstractItem>,
+    std::shared_ptr<types::ISomeItem>,
+    int64_t,
+    types::Result
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  return std::tuple<
+    int64_t,
+    std::shared_ptr<types::ISomeItem>,
+    std::shared_ptr<types::IAbstractItem>,
+    std::shared_ptr<types::ISomeItem>,
+    int64_t,
+    types::Result
+  >(
+    std::get<0>(that),
+    Wrap<E>(std::get<1>(that), factory),
+    Wrap<E>(std::get<2>(that), factory),
+    Wrap<E>(std::get<3>(that), factory),
+    std::get<4>(that),
+    std::get<5>(that)
+  );
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::tuple<
+  std::wstring,
+  std::shared_ptr<types::IAbstractItem>
+> Wrap_tupleOf2_str_AbstractItem(
+  const std::tuple<
+    std::wstring,
+    std::shared_ptr<types::IAbstractItem>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  return std::tuple<
+    std::wstring,
+    std::shared_ptr<types::IAbstractItem>
+  >(
+    std::get<0>(that),
+    Wrap<E>(std::get<1>(that), factory)
+  );
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -446,96 +561,27 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::tuple<
-      std::shared_ptr<types::IAbstractItem>,
-      std::shared_ptr<types::IAbstractItem>
-    >& value(
-      that->items()
-    );
-
-    std::tuple<
-      std::shared_ptr<types::IAbstractItem>,
-      std::shared_ptr<types::IAbstractItem>
-    > wrapped(value);
-
-    std::get<0>(wrapped) = Wrap<E>(
-      std::get<0>(value),
+  that->set_items(
+    Wrap_tupleOf2_AbstractItem_AbstractItem<E>(
+      that->items(),
       factory
-    );
+    )
+  );
 
-    std::get<1>(wrapped) = Wrap<E>(
-      std::get<1>(value),
+  that->set_tricky(
+    Wrap_tupleOf6_int_SomeItem_AbstractItem_SomeItem_PositiveInt_Result<E>(
+      that->tricky(),
       factory
-    );
-
-    that->set_items(
-      std::move(wrapped)
-    );
-  }
-
-  {
-    const std::tuple<
-      int64_t,
-      std::shared_ptr<types::ISomeItem>,
-      std::shared_ptr<types::IAbstractItem>,
-      std::shared_ptr<types::ISomeItem>,
-      int64_t,
-      types::Result
-    >& value(
-      that->tricky()
-    );
-
-    std::tuple<
-      int64_t,
-      std::shared_ptr<types::ISomeItem>,
-      std::shared_ptr<types::IAbstractItem>,
-      std::shared_ptr<types::ISomeItem>,
-      int64_t,
-      types::Result
-    > wrapped(value);
-
-    std::get<1>(wrapped) = Wrap<E>(
-      std::get<1>(value),
-      factory
-    );
-
-    std::get<2>(wrapped) = Wrap<E>(
-      std::get<2>(value),
-      factory
-    );
-
-    std::get<3>(wrapped) = Wrap<E>(
-      std::get<3>(value),
-      factory
-    );
-
-    that->set_tricky(
-      std::move(wrapped)
-    );
-  }
+    )
+  );
 
   if (that->optional_pair().has_value()) {
-    const std::tuple<
-        std::wstring,
-        std::shared_ptr<types::IAbstractItem>
-      >& value(
-      that->optional_pair().value()
-    );
-
-    std::tuple<
-      std::wstring,
-      std::shared_ptr<types::IAbstractItem>
-    > wrapped(value);
-
-    std::get<1>(wrapped) = Wrap<E>(
-      std::get<1>(value),
-      factory
-    );
-
     that->set_optional_pair(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_tupleOf2_str_AbstractItem<E>(
+          that->optional_pair().value(),
+          factory
+        )
       )
     );
   }

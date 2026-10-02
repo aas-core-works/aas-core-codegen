@@ -820,6 +820,74 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IElement>
+> Wrap_listOf_Element(
+  const std::vector<
+    std::shared_ptr<types::IElement>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IElement>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IElement>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<types::Value> Wrap_listOf_Value(
+  const std::vector<types::Value>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<types::Value> result;
+  result.reserve(that.size());
+
+  for (
+    const types::Value& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -876,35 +944,9 @@ std::shared_ptr<types::IOrderedContainer> WrapOrderedContainer(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IElement>
-    >& value(
-      that->children()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IElement>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IElement>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_children(
-      std::move(wrapped)
-    );
-  }
+  that->set_children(
+    Wrap_listOf_Element<E>(that->children(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)
@@ -940,35 +982,9 @@ std::shared_ptr<types::IUnorderedContainer> WrapUnorderedContainer(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IElement>
-    >& value(
-      that->children()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IElement>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IElement>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_children(
-      std::move(wrapped)
-    );
-  }
+  that->set_children(
+    Wrap_listOf_Element<E>(that->children(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)
@@ -1077,10 +1093,7 @@ std::shared_ptr<types::IAttributeOperand> WrapAttributeOperand(
   // in the caller.
 
   that->set_attribute(
-    Wrap<E>(
-      that->attribute(),
-      factory
-    )
+    Wrap<E>(that->attribute(), factory)
   );
 
   std::shared_ptr<E> enh(
@@ -1190,65 +1203,24 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_root(
-    Wrap<E>(
-      that->root(),
-      factory
-    )
+    Wrap<E>(that->root(), factory)
   );
 
   if (that->optional_element().has_value()) {
-    const std::shared_ptr<types::IElement>& value(
-      that->optional_element().value()
-    );
-
-    std::shared_ptr<
-      types::IElement
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_element(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->optional_element().value(), factory)
       )
     );
   }
 
   that->set_value(
-    Wrap<E>(
-      that->value(),
-      factory
-    )
+    Wrap<E>(that->value(), factory)
   );
 
-  {
-    const std::vector<types::Value>& value(
-      that->values()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<types::Value> wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const types::Value& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_values(
-      std::move(wrapped)
-    );
-  }
+  that->set_values(
+    Wrap_listOf_Value<E>(that->values(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)

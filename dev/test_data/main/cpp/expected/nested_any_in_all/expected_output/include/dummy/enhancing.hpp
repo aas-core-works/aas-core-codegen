@@ -523,6 +523,117 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ILangString>
+> Wrap_listOf_LangString(
+  const std::vector<
+    std::shared_ptr<types::ILangString>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ILangString>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ILangString>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ILangStringSet>
+> Wrap_listOf_LangStringSet(
+  const std::vector<
+    std::shared_ptr<types::ILangStringSet>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ILangStringSet>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ILangStringSet>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::ISpecification>
+> Wrap_listOf_Specification(
+  const std::vector<
+    std::shared_ptr<types::ISpecification>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::ISpecification>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::ISpecification>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -579,35 +690,9 @@ std::shared_ptr<types::ILangStringSet> WrapLangStringSet(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::ILangString>
-    >& value(
-      that->lang_strings()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangString>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangString>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_lang_strings(
-      std::move(wrapped)
-    );
-  }
+  that->set_lang_strings(
+    Wrap_listOf_LangString<E>(that->lang_strings(), factory)
+  );
 
   std::shared_ptr<E> enh(
     factory(that)
@@ -644,33 +729,12 @@ std::shared_ptr<types::IIecContent> WrapIecContent(
   // in the caller.
 
   if (that->definition().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ILangString>
-      >& value(
-      that->definition().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangString>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangString>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_definition(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_LangString<E>(
+          that->definition().value(),
+          factory
+        )
       )
     );
   }
@@ -746,10 +810,7 @@ std::shared_ptr<types::ISpecification> WrapSpecification(
   // in the caller.
 
   that->set_content(
-    Wrap<E>(
-      that->content(),
-      factory
-    )
+    Wrap<E>(that->content(), factory)
   );
 
   std::shared_ptr<E> enh(
@@ -786,64 +847,20 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  {
-    const std::vector<
-      std::shared_ptr<types::ILangStringSet>
-    >& value(
-      that->lang_string_sets()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ILangStringSet>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ILangStringSet>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_lang_string_sets(
-      std::move(wrapped)
-    );
-  }
+  that->set_lang_string_sets(
+    Wrap_listOf_LangStringSet<E>(
+      that->lang_string_sets(),
+      factory
+    )
+  );
 
   if (that->specifications().has_value()) {
-    const std::vector<
-        std::shared_ptr<types::ISpecification>
-      >& value(
-      that->specifications().value()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::ISpecification>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::ISpecification>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
     that->set_specifications(
       common::make_optional(
-        std::move(wrapped)
+        Wrap_listOf_Specification<E>(
+          that->specifications().value(),
+          factory
+        )
       )
     );
   }

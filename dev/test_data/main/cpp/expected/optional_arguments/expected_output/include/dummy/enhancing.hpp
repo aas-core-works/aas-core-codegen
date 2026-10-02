@@ -330,29 +330,13 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_item(
-    Wrap<E>(
-      that->item(),
-      factory
-    )
+    Wrap<E>(that->item(), factory)
   );
 
   if (that->optional_item().has_value()) {
-    const std::shared_ptr<types::IItem>& value(
-      that->optional_item().value()
-    );
-
-    std::shared_ptr<
-      types::IItem
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_item(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->optional_item().value(), factory)
       )
     );
   }

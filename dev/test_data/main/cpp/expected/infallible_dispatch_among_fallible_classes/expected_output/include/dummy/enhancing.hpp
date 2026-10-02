@@ -522,6 +522,43 @@ class EnhancedSomething
 };
 
 /**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::vector<
+  std::shared_ptr<types::IAbstractWithoutNumbers>
+> Wrap_listOf_AbstractWithoutNumbers(
+  const std::vector<
+    std::shared_ptr<types::IAbstractWithoutNumbers>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::vector<
+    std::shared_ptr<types::IAbstractWithoutNumbers>
+  > result;
+  result.reserve(that.size());
+
+  for (
+    const std::shared_ptr<types::IAbstractWithoutNumbers>& item :
+    that
+  ) {
+    result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
  * Wrap \p that with an enhanced instance.
  *
  * \param that instance to be wrapped and enhanced
@@ -687,82 +724,34 @@ std::shared_ptr<types::ISomething> WrapSomething(
   // in the caller.
 
   that->set_abstract_property(
-    Wrap<E>(
-      that->abstract_property(),
-      factory
-    )
+    Wrap<E>(that->abstract_property(), factory)
   );
 
   that->set_parent_property(
-    Wrap<E>(
-      that->parent_property(),
+    Wrap<E>(that->parent_property(), factory)
+  );
+
+  that->set_list_abstract_property(
+    Wrap_listOf_AbstractWithoutNumbers<E>(
+      that->list_abstract_property(),
       factory
     )
   );
 
-  {
-    const std::vector<
-      std::shared_ptr<types::IAbstractWithoutNumbers>
-    >& value(
-      that->list_abstract_property()
-    );
-    const std::size_t size = value.size();
-
-    std::vector<
-      std::shared_ptr<types::IAbstractWithoutNumbers>
-    > wrapped;
-    wrapped.reserve(size);
-
-    for (
-      const std::shared_ptr<types::IAbstractWithoutNumbers>& item
-      : value
-    ) {
-      wrapped.emplace_back(
-        Wrap<E>(
-          item,
-          factory
-        )
-      );
-    }
-
-    that->set_list_abstract_property(
-      std::move(wrapped)
-    );
-  }
-
   if (that->optional_parent_property().has_value()) {
-    const std::shared_ptr<types::IParentWithoutNumbers>& value(
-      that->optional_parent_property().value()
-    );
-
-    std::shared_ptr<
-      types::IParentWithoutNumbers
-    > wrapped(
-      Wrap<E>(
-        value,
-        factory
-      )
-    );
-
     that->set_optional_parent_property(
       common::make_optional(
-        std::move(wrapped)
+        Wrap<E>(that->optional_parent_property().value(), factory)
       )
     );
   }
 
   that->set_union_without_numbers_property(
-    Wrap<E>(
-      that->union_without_numbers_property(),
-      factory
-    )
+    Wrap<E>(that->union_without_numbers_property(), factory)
   );
 
   that->set_union_with_numbers_property(
-    Wrap<E>(
-      that->union_with_numbers_property(),
-      factory
-    )
+    Wrap<E>(that->union_with_numbers_property(), factory)
   );
 
   std::shared_ptr<E> enh(
