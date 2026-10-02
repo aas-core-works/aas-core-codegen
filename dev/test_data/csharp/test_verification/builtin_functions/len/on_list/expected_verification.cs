@@ -67,20 +67,13 @@ namespace dummyNamespace
                         "Some property must contain at least one item.");
                 }
 
-                int indexSomeProperty = 0;
-                foreach (var item in that.SomeProperty)
+                foreach (
+                    var error in Verification.Verify_ListOf_IItem(
+                        that.SomeProperty))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexSomeProperty));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "someProperty"));
-                        yield return error;
-                    }
-                    indexSomeProperty++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("someProperty"));
+                    yield return error;
                 }
             }
         }  // private class Transformer
@@ -96,6 +89,25 @@ namespace dummyNamespace
             foreach (var error in _transformer.Transform(that))
             {
                 yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IItem(
+            List<Our.IItem> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

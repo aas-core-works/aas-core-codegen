@@ -191,20 +191,13 @@ namespace dummy
                 Our.IOrderedContainer that
             )
             {
-                int indexChildren = 0;
-                foreach (var item in that.Children)
+                foreach (
+                    var error in Verification.Verify_ListOf_IElement(
+                        that.Children))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexChildren));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "children"));
-                        yield return error;
-                    }
-                    indexChildren++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("children"));
+                    yield return error;
                 }
             }
 
@@ -213,20 +206,13 @@ namespace dummy
                 Our.IUnorderedContainer that
             )
             {
-                int indexChildren = 0;
-                foreach (var item in that.Children)
+                foreach (
+                    var error in Verification.Verify_ListOf_IElement(
+                        that.Children))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexChildren));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "children"));
-                        yield return error;
-                    }
-                    indexChildren++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("children"));
+                    yield return error;
                 }
             }
 
@@ -256,8 +242,7 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.Attribute))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "attribute"));
+                        new Reporting.NameSegment("attribute"));
                     yield return error;
                 }
             }
@@ -345,8 +330,7 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.Root))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "root"));
+                        new Reporting.NameSegment("root"));
                     yield return error;
                 }
 
@@ -355,8 +339,7 @@ namespace dummy
                     foreach (var error in Verification.Verify(that.OptionalElement))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalElement"));
+                            new Reporting.NameSegment("optionalElement"));
                         yield return error;
                     }
                 }
@@ -364,25 +347,15 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.Value))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "value"));
+                        new Reporting.NameSegment("value"));
                     yield return error;
                 }
 
-                int indexValues = 0;
-                foreach (var item in that.Values)
+                foreach (var error in Verification.Verify_ListOf_Value(that.Values))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexValues));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "values"));
-                        yield return error;
-                    }
-                    indexValues++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("values"));
+                    yield return error;
                 }
             }
         }  // private class Transformer
@@ -406,6 +379,44 @@ namespace dummy
             foreach (var error in Verify(that.Underlying))
             {
                 yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IElement(
+            List<Our.IElement> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_Value(
+            List<Our.Value> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

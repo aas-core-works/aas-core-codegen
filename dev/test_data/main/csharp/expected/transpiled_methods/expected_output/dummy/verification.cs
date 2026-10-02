@@ -100,16 +100,12 @@ namespace dummy
                         "Parity is either zero or one.");
                 }
 
-                if (that.Kind != null)
+                if (that.Kind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.Kind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyKind(value))
+                    foreach (var error in Verification.VerifyKind(that.Kind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "kind"));
+                            new Reporting.NameSegment("kind"));
                         yield return error;
                     }
                 }
@@ -155,16 +151,12 @@ namespace dummy
                         "Prefix is at most three long.");
                 }
 
-                if (that.Kind != null)
+                if (that.Kind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.Kind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyKind(value))
+                    foreach (var error in Verification.VerifyKind(that.Kind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "kind"));
+                            new Reporting.NameSegment("kind"));
                         yield return error;
                     }
                 }

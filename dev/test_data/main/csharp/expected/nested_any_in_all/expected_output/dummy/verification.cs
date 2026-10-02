@@ -109,20 +109,13 @@ namespace dummy
                 Our.ILangStringSet that
             )
             {
-                int indexLangStrings = 0;
-                foreach (var item in that.LangStrings)
+                foreach (
+                    var error in Verification.Verify_ListOf_ILangString(
+                        that.LangStrings))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexLangStrings));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "langStrings"));
-                        yield return error;
-                    }
-                    indexLangStrings++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("langStrings"));
+                    yield return error;
                 }
             }
 
@@ -133,20 +126,13 @@ namespace dummy
             {
                 if (that.Definition != null)
                 {
-                    int indexDefinition = 0;
-                    foreach (var item in that.Definition)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangString(
+                            that.Definition))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDefinition));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "definition"));
-                            yield return error;
-                        }
-                        indexDefinition++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("definition"));
+                        yield return error;
                     }
                 }
             }
@@ -168,8 +154,7 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.Content))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "content"));
+                        new Reporting.NameSegment("content"));
                     yield return error;
                 }
             }
@@ -208,38 +193,24 @@ namespace dummy
                         "English.");
                 }
 
-                int indexLangStringSets = 0;
-                foreach (var item in that.LangStringSets)
+                foreach (
+                    var error in Verification.Verify_ListOf_ILangStringSet(
+                        that.LangStringSets))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexLangStringSets));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "langStringSets"));
-                        yield return error;
-                    }
-                    indexLangStringSets++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("langStringSets"));
+                    yield return error;
                 }
 
                 if (that.Specifications != null)
                 {
-                    int indexSpecifications = 0;
-                    foreach (var item in that.Specifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISpecification(
+                            that.Specifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "specifications"));
-                            yield return error;
-                        }
-                        indexSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("specifications"));
+                        yield return error;
                     }
                 }
             }
@@ -256,6 +227,63 @@ namespace dummy
             foreach (var error in _transformer.Transform(that))
             {
                 yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ILangString(
+            List<Our.ILangString> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ILangStringSet(
+            List<Our.ILangStringSet> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ISpecification(
+            List<Our.ISpecification> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

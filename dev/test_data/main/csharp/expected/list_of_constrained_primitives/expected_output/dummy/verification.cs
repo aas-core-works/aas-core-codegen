@@ -51,20 +51,11 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                int indexSomeNames = 0;
-                foreach (var item in that.SomeNames)
+                foreach (var error in Verification.Verify_ListOf_Name(that.SomeNames))
                 {
-                    foreach (var error in Verification.VerifyName(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexSomeNames));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "someNames"));
-                        yield return error;
-                    }
-                    indexSomeNames++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("someNames"));
+                    yield return error;
                 }
             }
         }  // private class Transformer
@@ -94,6 +85,25 @@ namespace dummy
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
                     "Non-empty");
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_Name(
+            List<string> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.VerifyName(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

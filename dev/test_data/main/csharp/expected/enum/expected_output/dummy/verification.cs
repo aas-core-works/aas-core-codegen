@@ -59,8 +59,7 @@ namespace dummy
                 foreach (var error in Verification.VerifyResult(that.SomeResult))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "someResult"));
+                        new Reporting.NameSegment("someResult"));
                     yield return error;
                 }
             }

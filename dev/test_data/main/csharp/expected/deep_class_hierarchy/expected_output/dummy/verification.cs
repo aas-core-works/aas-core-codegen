@@ -81,16 +81,16 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.SomeChoice))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "someChoice"));
+                        new Reporting.NameSegment("someChoice"));
                     yield return error;
                 }
 
-                foreach (var error in Verification.Verify(that.SomethingWithoutChoice))
+                foreach (
+                    var error in Verification.Verify(
+                        that.SomethingWithoutChoice))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "somethingWithoutChoice"));
+                        new Reporting.NameSegment("somethingWithoutChoice"));
                     yield return error;
                 }
             }
@@ -103,16 +103,14 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.Node))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "node"));
+                        new Reporting.NameSegment("node"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.Something))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "something"));
+                        new Reporting.NameSegment("something"));
                     yield return error;
                 }
             }

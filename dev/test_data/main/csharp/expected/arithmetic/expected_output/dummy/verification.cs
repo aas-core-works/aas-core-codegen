@@ -222,8 +222,7 @@ namespace dummy
                 foreach (var error in Verification.VerifyEvenInt(that.Even))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "even"));
+                        new Reporting.NameSegment("even"));
                     yield return error;
                 }
             }

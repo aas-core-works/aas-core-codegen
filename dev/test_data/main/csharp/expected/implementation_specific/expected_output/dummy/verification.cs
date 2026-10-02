@@ -122,16 +122,12 @@ namespace dummy
                         "The square brackets in the label must be balanced.");
                 }
 
-                if (that.Color != null)
+                if (that.Color.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.Color value = that.Color
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyColor(value))
+                    foreach (var error in Verification.VerifyColor(that.Color.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "color"));
+                            new Reporting.NameSegment("color"));
                         yield return error;
                     }
                 }
@@ -169,20 +165,11 @@ namespace dummy
                         "The names must not repeat.");
                 }
 
-                int indexItems = 0;
-                foreach (var item in that.Items)
+                foreach (var error in Verification.Verify_ListOf_IItem(that.Items))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexItems));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "items"));
-                        yield return error;
-                    }
-                    indexItems++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("items"));
+                    yield return error;
                 }
             }
         }  // private class Transformer
@@ -212,6 +199,25 @@ namespace dummy
             {
                 yield return new Reporting.Error(
                     $"Invalid Color: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IItem(
+            List<Our.IItem> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

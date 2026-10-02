@@ -51,43 +51,46 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                foreach (var error in Verification.VerifyConstrainedbool(that.SomeBool))
+                foreach (
+                    var error in Verification.VerifyConstrainedbool(
+                        that.SomeBool))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "someBool"));
+                        new Reporting.NameSegment("someBool"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.VerifyPositiveint(that.SomeInt))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "someInt"));
+                        new Reporting.NameSegment("someInt"));
                     yield return error;
                 }
 
-                foreach (var error in Verification.VerifyPositivefloat(that.SomeFloat))
+                foreach (
+                    var error in Verification.VerifyPositivefloat(
+                        that.SomeFloat))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "someFloat"));
+                        new Reporting.NameSegment("someFloat"));
                     yield return error;
                 }
 
-                foreach (var error in Verification.VerifyNonemptystring(that.SomeString))
+                foreach (
+                    var error in Verification.VerifyNonemptystring(
+                        that.SomeString))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "someString"));
+                        new Reporting.NameSegment("someString"));
                     yield return error;
                 }
 
-                foreach (var error in Verification.VerifyNonemptybytes(that.SomeBytes))
+                foreach (
+                    var error in Verification.VerifyNonemptybytes(
+                        that.SomeBytes))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "someBytes"));
+                        new Reporting.NameSegment("someBytes"));
                     yield return error;
                 }
             }

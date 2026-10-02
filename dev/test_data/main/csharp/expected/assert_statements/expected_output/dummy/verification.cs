@@ -226,8 +226,7 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.Parent))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "parent"));
+                        new Reporting.NameSegment("parent"));
                     yield return error;
                 }
             }

@@ -32,7 +32,6 @@ from aas_core_codegen.csharp.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
-    INDENT4 as IIII,
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 from aas_core_codegen.intermediate import uses as intermediate_uses
@@ -760,370 +759,274 @@ def _generate_verify_method(our_type: intermediate.OurType) -> Stripped:
     raise AssertionError("Unexpected execution path")
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_transform_property(
-    prop: intermediate.Property,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the snippet to transform a property to errors."""
-    # NOTE (mristin):
-    # Instead of writing here a complex but general solution with unrolling we choose
-    # to provide a simple, but limited, solution. First, the meta-model is quite
-    # limited itself at the moment, so the complexity of the general solution is not
-    # warranted. Second, we hope that there will be fewer bugs in the simple solution
-    # which is particularly important at this early adoption stage.
-    #
-    # We anticipate that in the future we will indeed need a general and complex
-    # solution. Here are just some thoughts on how to approach it:
-    # * Leave the pattern matching to produce more readable code for simple cases,
-    # * Unroll only in case of composite types and optional composite types.
+def _needs_verification(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether a value of ``type_annotation`` has anything to verify at any depth.
 
-    type_anno = (
-        prop.type_annotation
-        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        else prop.type_annotation.value
+    In C#, we verify all our types, including the enumerations, as any integer
+    can be cast to an enumeration, and all the JSON-able values.
+
+    This check is specific to C#, and hence does not live in
+    :py:mod:`aas_core_codegen.intermediate`: other targets verify different
+    types. For example, the Python SDK relies on mypy for the enumerations,
+    and does not verify them at all.
+    """
+    return any(
+        isinstance(
+            type_anno,
+            (
+                intermediate.OurTypeAnnotation,
+                intermediate.JsonValueTypeAnnotation,
+                intermediate.JsonArrayTypeAnnotation,
+                intermediate.JsonObjectTypeAnnotation,
+            ),
+        )
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
     )
 
-    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-        return None, Error(
-            prop.parsed.node,
-            "We currently implemented verification based on a very limited "
-            "pattern matching due to code simplicity. We did not handle "
-            "the case of nested optional values. Please contact "
-            "the developers if you need this functionality.",
-        )
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented verification based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of optional values. Please contact "
-                "the developers if you need this functionality.",
-            )
-        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
-            return None, Error(
-                prop.parsed.node,
-                "We currently implemented verification based on a very limited "
-                "pattern matching due to code simplicity. We did not handle "
-                "the case of lists of lists. Please contact "
-                "the developers if you need this functionality.",
-            )
-        else:
-            pass
-    else:
-        pass
 
-    stmts = []  # type: List[Stripped]
+def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
+    """
+    Name ``type_anno`` by what its verification depends on.
 
-    prop_name = csharp_naming.property_name(prop.name)
-    prop_literal = csharp_common.string_literal(prop.json_name)
+    This follows the Polish notation of
+    :py:func:`aas_core_codegen.csharp.common.type_moniker`, except that
+    a constrained primitive is named by itself (*e.g.*, ``NonEmptyString``),
+    and not by its constrainee (``string``), and a JSON object by its
+    constrained key, if any (*e.g.*, ``jsonObjectByNonEmptyString``).
 
-    # NOTE (mristin):
-    # For some unexplainable reason, C# compiler can not infer that properties which
-    # are enumerations are not null after an ``if (that.someProperty != null)``.
-    # Hence, we need to add a null-coalescing for these particular cases.
-    # Otherwise, we can just stick to ``that.someProperty``.
+    We need a moniker of our own since
+    :py:func:`aas_core_codegen.csharp.common.type_moniker` names the types by
+    their C# type. For example, ``List[Non_empty_string]`` and
+    ``List[Id_short_type]`` would both be named ``ListOf_string``. However,
+    they are verified differently, so they can not share one verification
+    method.
 
-    needs_null_coalescing = (
-        isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        and isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation)
-        and isinstance(prop.type_annotation.value.our_type, intermediate.Enumeration)
-    )
-    if needs_null_coalescing:
-        source_expr = Stripped("value")
-    else:
-        source_expr = Stripped(f"that.{prop_name}")
+    We deliberately do not change
+    :py:func:`aas_core_codegen.csharp.common.leaf_moniker` itself to
+    distinguish the constrained primitives. The JSON and XML de/serialization
+    key their cached de/serializers by the moniker as well, and there
+    the C# type is all that matters. For example, the XML de-serialization
+    of ``aas-core-meta`` V3 would then emit about 20 identical
+    ``Read_...`` content readers, one per constrained primitive, instead of
+    a single ``Read_string``.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return f"ListOf_{_verification_moniker(type_anno.items)}"
 
-        # NOTE (mristin):
-        # An optional of a value type, such as a tuple, is a ``System.Nullable``,
-        # so we have to unwrap it before we can descend into it.
-        if isinstance(
-            prop.type_annotation, intermediate.OptionalTypeAnnotation
-        ) and csharp_common.is_value_type(type_anno):
-            source_expr = Stripped(f"that.{prop_name}.Value")
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return f"SetOf_{_verification_moniker(type_anno.items)}"
 
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        # There is nothing that we check for primitive types.
-        return Stripped(""), None
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        verify_method = _generate_verify_method(our_type=type_anno.our_type)
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        joined = "_".join(_verification_moniker(item) for item in type_anno.items)
+        return f"TupleOf{len(type_anno.items)}_{joined}"
 
-        foreach_error_in_verify = (
-            f"foreach (var error in {verify_method}({source_expr}))"
-        )
-        # Heuristic to break the lines, very rudimentary
-        if len(foreach_error_in_verify) > 80:
-            foreach_error_in_verify = f"""\
-foreach (
-    {I}var error in {verify_method}(
-    {II}{source_expr}))"""
+    if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type, intermediate.ConstrainedPrimitive
+    ):
+        return csharp_naming.class_name(type_anno.our_type.name)
 
-        stmts.append(
-            Stripped(
-                f"""\
-{foreach_error_in_verify}
-{{
-{I}error.PrependSegment(
-{II}new Reporting.NameSegment(
-{III}{prop_literal}));
-{I}yield return error;
-}}"""
-            )
-        )
-
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "We chose to implement only a very limited pattern matching; "
-            "see the note above in the code."
-        )
-
-        # NOTE (mristin):
-        # We only descend into our classes here.
-        if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            return Stripped(""), None
-
-        index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
-        verify_method = _generate_verify_method(type_anno.items.our_type)
-
-        foreach_item_in_source_expr = f"foreach (var item in {source_expr})"
-        # Rudimentary heuristics for line breaking
-        if len(foreach_item_in_source_expr) > 80:
-            foreach_item_in_source_expr = f"""\
-foreach(
-{I}var item in {source_expr})"""
-
-        foreach_error_in_verify_item = f"foreach (var error in {verify_method}(item))"
-        if len(foreach_error_in_verify_item) > 70:
-            foreach_error_in_verify_item = f"""\
-foreach (
-{I}var error in {verify_method}(item))"""
-
-        stmts.append(
-            Stripped(
-                f"""\
-int {index_var} = 0;
-{foreach_item_in_source_expr}
-{{
-{I}{indent_but_first_line(foreach_error_in_verify_item, I)}
-{I}{{
-{II}error.PrependSegment(
-{III}new Reporting.IndexSegment(
-{IIII}{index_var}));
-{II}error.PrependSegment(
-{III}new Reporting.NameSegment(
-{IIII}{prop_literal}));
-{II}yield return error;
-{I}}}
-{I}{index_var}++;
-}}"""
-            )
-        )
-
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        for i, item_type_anno in enumerate(type_anno.items):
-            # NOTE (mristin):
-            # We only descend into our types here; there is nothing to check for
-            # a plain primitive item.
-            if not isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                continue
-
-            item_expr = f"{source_expr}.Item{i + 1}"
-            verify_method = _generate_verify_method(our_type=item_type_anno.our_type)
-
-            foreach_error_in_verify = (
-                f"foreach (var error in {verify_method}({item_expr}))"
-            )
-            # Heuristic to break the lines, very rudimentary
-            if len(foreach_error_in_verify) > 80:
-                foreach_error_in_verify = f"""\
-foreach (
-    {I}var error in {verify_method}(
-    {II}{item_expr}))"""
-
-            stmts.append(
-                Stripped(
-                    f"""\
-{foreach_error_in_verify}
-{{
-{I}error.PrependSegment(
-{II}new Reporting.IndexSegment(
-{III}{i}));
-{I}error.PrependSegment(
-{II}new Reporting.NameSegment(
-{III}{prop_literal}));
-{I}yield return error;
-}}"""
-                )
-            )
-
-    elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
-        stmts.append(
-            Stripped(
-                f"""\
-foreach (
-{I}var error in JsonValueVerification.Verify(
-{II}{source_expr}, JsonValueVerification.ExpectedShape.Any))
-{{
-{I}error.PrependSegment(
-{II}new Reporting.NameSegment(
-{III}{prop_literal}));
-{I}yield return error;
-}}"""
-            )
-        )
-
-    elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
-        stmts.append(
-            Stripped(
-                f"""\
-foreach (
-{I}var error in JsonValueVerification.Verify(
-{II}{source_expr}, JsonValueVerification.ExpectedShape.Array))
-{{
-{I}error.PrependSegment(
-{II}new Reporting.NameSegment(
-{III}{prop_literal}));
-{I}yield return error;
-}}"""
-            )
-        )
-
-    elif isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
-        stmts.append(
-            Stripped(
-                f"""\
-foreach (
-{I}var error in JsonValueVerification.Verify(
-{II}{source_expr}, JsonValueVerification.ExpectedShape.Object))
-{{
-{I}error.PrependSegment(
-{II}new Reporting.NameSegment(
-{III}{prop_literal}));
-{I}yield return error;
-}}"""
-            )
-        )
-
+    if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
         key_constrained_primitive = intermediate.try_constrained_primitive(
             type_anno.key
         )
-
-        # NOTE (mristin):
-        # A bare ``str`` key has nothing to verify.
         if key_constrained_primitive is not None:
-            key_verify_method = _generate_verify_method(
-                our_type=key_constrained_primitive
+            return (
+                f"jsonObjectBy"
+                f"{csharp_naming.class_name(key_constrained_primitive.name)}"
             )
 
-            stmts.append(
-                Stripped(
-                    f"""\
-foreach (var member in {source_expr})
+    return csharp_common.leaf_moniker(type_anno)
+
+
+def _verify_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """Name the method of ``Verification`` verifying ``type_anno``."""
+    return Identifier(f"Verify_{_verification_moniker(type_anno)}")
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _generate_verify_into(
+    expr: str, type_anno: intermediate.TypeAnnotationUnion, segments: Sequence[str]
+) -> Stripped:
+    """
+    Generate the statements yielding the errors of the value at ``expr``.
+
+    The ``segments`` are prepended to the path of each error, the innermost first.
+
+    An atomic value is verified by its own method. A container is delegated to
+    its method in ``Verification``, which verifies only one level and calls
+    the method of its items by name. This way the verification is composed of
+    plain functions, to any depth, without any delegates.
+    """
+    blocks = []  # type: List[Stripped]
+
+    method: str
+    args: List[str]
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        method = _generate_verify_method(our_type=type_anno.our_type)
+        args = [expr]
+
+    elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
+        method = "JsonValueVerification.Verify"
+        args = [expr, "JsonValueVerification.ExpectedShape.Any"]
+
+    elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
+        method = "JsonValueVerification.Verify"
+        args = [expr, "JsonValueVerification.ExpectedShape.Array"]
+
+    elif isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+        method = "JsonValueVerification.Verify"
+        args = [expr, "JsonValueVerification.ExpectedShape.Object"]
+
+    elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        method = f"Verification.{_verify_container_name(type_anno)}"
+        args = [expr]
+
+    else:
+        raise AssertionError(
+            f"Unexpected type annotation with something to verify: {type_anno}. "
+            f"The optionals nested in the containers should have been refused in "
+            f"intermediate._translate._verify_only_simple_type_patterns."
+        )
+
+    args_joined = ", ".join(args)
+
+    foreach_header = f"foreach (var error in {method}({args_joined}))"
+    # Heuristic to break the lines, very rudimentary
+    if len(foreach_header) > 70:
+        foreach_header = f"""\
+foreach (
+{I}var error in {method}(
+{II}{args_joined}))"""
+
+    prepend_stmts = "\n".join(
+        f"""\
+error.PrependSegment(
+{I}{segment});"""
+        for segment in segments
+    )
+
+    blocks.append(
+        Stripped(
+            f"""\
+{foreach_header}
 {{
-{I}foreach (var error in {key_verify_method}(member.Key))
-{I}{{
-{II}error.PrependSegment(
-{III}new Reporting.KeySegment(
-{IIII}member.Key));
-{II}error.PrependSegment(
-{III}new Reporting.NameSegment(
-{IIII}{prop_literal}));
-{II}yield return error;
-{I}}}
+{I}{indent_but_first_line(prepend_stmts, I)}
+{I}yield return error;
 }}"""
-                )
+        )
+    )
+
+    # NOTE (mristin):
+    # A bare ``str`` key has nothing to verify.
+    if isinstance(
+        type_anno, intermediate.JsonObjectTypeAnnotation
+    ) and _needs_verification(type_anno.key):
+        key_stmts = _generate_verify_into(
+            expr="member.Key",
+            type_anno=type_anno.key,
+            segments=["new Reporting.KeySegment(member.Key)", *segments],
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+foreach (var member in {expr})
+{{
+{I}{indent_but_first_line(key_stmts, I)}
+}}"""
             )
+        )
+
+    return Stripped("\n\n".join(blocks))
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _generate_verify_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the method of ``Verification`` verifying ``type_anno``."""
+    body: Stripped
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_stmts = _generate_verify_into(
+            expr="item",
+            type_anno=type_anno.items,
+            segments=["new Reporting.IndexSegment(index)"],
+        )
+
+        body = Stripped(
+            f"""\
+int index = 0;
+foreach (var item in that)
+{{
+{I}{indent_but_first_line(item_stmts, I)}
+{I}index++;
+}}"""
+        )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # We only verify the constrained primitives and the enumeration literals
-        # here; there is nothing to check for a plain primitive item.
-        if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            return Stripped(""), None
+        item_stmts = _generate_verify_into(
+            expr="item",
+            type_anno=type_anno.items,
+            segments=["new Reporting.IndexSegment(index)"],
+        )
 
-        index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
-        verify_method = _generate_verify_method(type_anno.items.our_type)
         comparison = csharp_common.set_items_comparison(type_anno.items)
 
         # NOTE (mristin):
         # A set has no index of its own, so we report the position of the item
         # in the sorted order, which is the index in the serialized array.
-        stmts.append(
-            Stripped(
-                f"""\
-int {index_var} = 0;
+        body = Stripped(
+            f"""\
+int index = 0;
 foreach (
 {I}var item in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(
-{II}{source_expr},
+{II}that,
 {II}{comparison}))
 {{
-{I}foreach (var error in {verify_method}(item))
-{I}{{
-{II}error.PrependSegment(
-{III}new Reporting.IndexSegment(
-{IIII}{index_var}));
-{II}error.PrependSegment(
-{III}new Reporting.NameSegment(
-{IIII}{prop_literal}));
-{II}yield return error;
-{I}}}
-{I}{index_var}++;
+{I}{indent_but_first_line(item_stmts, I)}
+{I}index++;
 }}"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = Stripped(
+            "\n\n".join(
+                _generate_verify_into(
+                    expr=f"that.Item{i + 1}",
+                    type_anno=item_type_anno,
+                    segments=[f"new Reporting.IndexSegment({i})"],
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if _needs_verification(item_type_anno)
             )
         )
 
     else:
         assert_never(type_anno)
 
-    verify_block = Stripped("\n".join(stmts))
-    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-        if needs_null_coalescing:
-            value_type = csharp_common.generate_type(prop.type_annotation.value)
-            if isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation):
-                our_type = prop.type_annotation.value.our_type
-                if isinstance(
-                    our_type,
-                    (
-                        intermediate.Enumeration,
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                    ),
-                ):
-                    value_type = Stripped(f"Our.{value_type}")
+    name = _verify_container_name(type_anno)
+    value_type = csharp_common.generate_type(
+        type_anno, our_type_qualifier=Stripped("Our")
+    )
 
-            return (
-                Stripped(
-                    f"""\
-if (that.{prop_name} != null)
+    return Stripped(
+        f"""\
+/// <summary>
+/// Verify the items of <paramref name="that" /> recursively.
+/// </summary>
+private static IEnumerable<Reporting.Error> {name}(
+{I}{value_type} that)
 {{
-{I}// We need to help the static analyzer with a null coalescing.
-{I}{value_type} value = that.{prop_name}
-{II}?? throw new System.InvalidOperationException();
-{I}{indent_but_first_line(verify_block, I)}
+{I}{indent_but_first_line(body, I)}
 }}"""
-                ),
-                None,
-            )
-
-        else:
-            condition = (
-                f"that.{prop_name}.HasValue"
-                if csharp_common.is_value_type(type_anno)
-                else f"that.{prop_name} != null"
-            )
-
-            return (
-                Stripped(
-                    f"""\
-if ({condition})
-{{
-{I}{indent_but_first_line(verify_block, I)}
-}}"""
-                ),
-                None,
-            )
-    else:
-        return verify_block, None
+    )
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1170,16 +1073,46 @@ def _generate_transform_for_class(
         return None, errors
 
     for prop in cls.properties:
-        block, error = _generate_transform_property(prop=prop)
-        if error is not None:
-            errors.append(error)
-        else:
-            assert block is not None
-            if block != "":
-                blocks.append(block)
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    if len(errors) > 0:
-        return None, errors
+        if not _needs_verification(type_anno):
+            continue
+
+        prop_name = csharp_naming.property_name(prop.name)
+
+        # NOTE (mristin):
+        # An optional of a value type, such as an enumeration or a tuple, is
+        # a System.Nullable, so we have to unwrap it before we can verify it.
+        source_expr = f"that.{prop_name}"
+        if isinstance(
+            prop.type_annotation, intermediate.OptionalTypeAnnotation
+        ) and csharp_common.is_value_type(type_anno):
+            source_expr = f"that.{prop_name}.Value"
+
+        block = _generate_verify_into(
+            expr=source_expr,
+            type_anno=type_anno,
+            segments=[
+                f"new Reporting.NameSegment("
+                f"{csharp_common.string_literal(prop.json_name)})"
+            ],
+        )
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            condition = (
+                f"that.{prop_name}.HasValue"
+                if csharp_common.is_value_type(type_anno)
+                else f"that.{prop_name} != null"
+            )
+
+            block = Stripped(
+                f"""if ({condition})
+{{
+{I}{indent_but_first_line(block, I)}
+}}"""
+            )
+
+        blocks.append(block)
 
     if len(blocks) == 0:
         blocks.append(
@@ -1589,6 +1522,29 @@ public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
 
     if len(symbol_table.named_unions) > 0:
         verification_blocks.append(_generate_union_verify_helper())
+
+    observed_monikers = set()  # type: Set[str]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ) or not _needs_verification(type_anno):
+                    continue
+
+                moniker = _verification_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+                verification_blocks.append(
+                    _generate_verify_container(type_anno=type_anno)
+                )
 
     if len(errors) > 0:
         return None, errors
