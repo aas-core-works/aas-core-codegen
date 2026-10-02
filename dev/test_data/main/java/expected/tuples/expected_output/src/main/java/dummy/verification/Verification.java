@@ -111,72 +111,18 @@ public class Verification {
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getItems().item1())
-          .flatMap(Verification::verifyToErrorStream)
+        Stream.of(that.getItems())
+          .flatMap(Verification::verifyTupleOf2_IAbstractItem_IAbstractItem)
             .map(error -> {
-              error.prependSegment(
-                new Reporting.IndexSegment(0));
-              error.prependSegment(
-                new Reporting.NameSegment("items"));
-              return error;
-            }));
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getItems().item2())
-          .flatMap(Verification::verifyToErrorStream)
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.IndexSegment(1));
               error.prependSegment(
                 new Reporting.NameSegment("items"));
               return error;
             }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTricky().item2())
-          .flatMap(Verification::verifyToErrorStream)
+        Stream.of(that.getTricky())
+          .flatMap(Verification::verifyTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_PositiveInt_Result)
             .map(error -> {
-              error.prependSegment(
-                new Reporting.IndexSegment(1));
-              error.prependSegment(
-                new Reporting.NameSegment("tricky"));
-              return error;
-            }));
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTricky().item3())
-          .flatMap(Verification::verifyToErrorStream)
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.IndexSegment(2));
-              error.prependSegment(
-                new Reporting.NameSegment("tricky"));
-              return error;
-            }));
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTricky().item4())
-          .flatMap(Verification::verifyToErrorStream)
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.IndexSegment(3));
-              error.prependSegment(
-                new Reporting.NameSegment("tricky"));
-              return error;
-            }));
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTricky().item5())
-          .flatMap(Verification::verifyPositiveInt)
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.IndexSegment(4));
-              error.prependSegment(
-                new Reporting.NameSegment("tricky"));
-              return error;
-            }));
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTricky().item6())
-          .flatMap(Verification::verifyResult)
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.IndexSegment(5));
               error.prependSegment(
                 new Reporting.NameSegment("tricky"));
               return error;
@@ -184,11 +130,9 @@ public class Verification {
 
       if (that.getOptionalPair().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Stream.of(that.getOptionalPair().get().item2())
-            .flatMap(Verification::verifyToErrorStream)
+          Stream.of(that.getOptionalPair().get())
+            .flatMap(Verification::verifyTupleOf2_string_IAbstractItem)
               .map(error -> {
-                error.prependSegment(
-                  new Reporting.IndexSegment(1));
                 error.prependSegment(
                   new Reporting.NameSegment("optionalPair"));
                 return error;
@@ -273,6 +217,94 @@ public class Verification {
     } else {
       return Stream.empty();
     }
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyTupleOf2_IAbstractItem_IAbstractItem(
+    Tuple2<IAbstractItem, IAbstractItem> that) {
+    return Stream.<Reporting.Error>concat(
+      Stream.of(that.item1())
+        .flatMap(Verification::verifyToErrorStream)
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.IndexSegment(0));
+            return error;
+          }),
+      Stream.of(that.item2())
+        .flatMap(Verification::verifyToErrorStream)
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.IndexSegment(1));
+            return error;
+          }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_PositiveInt_Result(
+    Tuple6<
+      Long,
+      ISomeItem,
+      IAbstractItem,
+      ISomeItem,
+      Long,
+      Result> that) {
+    return Stream.<Reporting.Error>concat(
+      Stream.<Reporting.Error>concat(
+        Stream.<Reporting.Error>concat(
+          Stream.<Reporting.Error>concat(
+            Stream.of(that.item2())
+              .flatMap(Verification::verifyToErrorStream)
+                .map(error -> {
+                  error.prependSegment(
+                    new Reporting.IndexSegment(1));
+                  return error;
+                }),
+            Stream.of(that.item3())
+              .flatMap(Verification::verifyToErrorStream)
+                .map(error -> {
+                  error.prependSegment(
+                    new Reporting.IndexSegment(2));
+                  return error;
+                })),
+          Stream.of(that.item4())
+            .flatMap(Verification::verifyToErrorStream)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.IndexSegment(3));
+                return error;
+              })),
+        Stream.of(that.item5())
+          .flatMap(Verification::verifyPositiveInt)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(4));
+              return error;
+            })),
+      Stream.of(that.item6())
+        .flatMap(Verification::verifyResult)
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.IndexSegment(5));
+            return error;
+          }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyTupleOf2_string_IAbstractItem(
+    Tuple2<String, IAbstractItem> that) {
+    return Stream.of(that.item2())
+      .flatMap(Verification::verifyToErrorStream)
+        .map(error -> {
+          error.prependSegment(
+            new Reporting.IndexSegment(1));
+          return error;
+        });
   }
 
   private static class _Pair<A, B> {

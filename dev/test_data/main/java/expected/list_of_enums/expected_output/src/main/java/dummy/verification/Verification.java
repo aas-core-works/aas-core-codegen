@@ -27,6 +27,7 @@ import dummy.reporting.Reporting;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.List;
 
 public class Verification {
   /**
@@ -57,23 +58,13 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getSomeResults().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final Result elem = elemTuple.getSecond();
-              return Verification.verifyResult(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("someResults"));
-            return error;
-          }));
+        Stream.of(that.getSomeResults())
+          .flatMap(Verification::verifyListOf_Result)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("someResults"));
+              return error;
+            }));
 
       return errorStream;
     }
@@ -136,6 +127,23 @@ public class Verification {
     } else {
       return Stream.empty();
     }
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_Result(
+    List<Result> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyResult(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

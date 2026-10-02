@@ -27,6 +27,7 @@ import dummy.reporting.Reporting;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.List;
 
 public class Verification {
   /**
@@ -217,88 +218,36 @@ public class Verification {
             }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getListStructuralProperty().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final StructuralUnion elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("listStructuralProperty"));
-            return error;
-          }));
-
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getListMixedProperty().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final MixedUnion elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("listMixedProperty"));
-            return error;
-          }));
-
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getListModelTypedProperty().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final ModelTypedUnion elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("listModelTypedProperty"));
-            return error;
-          }));
-
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTupleProperty().item1())
-          .flatMap(Verification::verifyToErrorStream)
+        Stream.of(that.getListStructuralProperty())
+          .flatMap(Verification::verifyListOf_StructuralUnion)
             .map(error -> {
               error.prependSegment(
-                new Reporting.IndexSegment(0));
-              error.prependSegment(
-                new Reporting.NameSegment("tupleProperty"));
+                new Reporting.NameSegment("listStructuralProperty"));
               return error;
             }));
+
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTupleProperty().item2())
-          .flatMap(Verification::verifyToErrorStream)
+        Stream.of(that.getListMixedProperty())
+          .flatMap(Verification::verifyListOf_MixedUnion)
             .map(error -> {
               error.prependSegment(
-                new Reporting.IndexSegment(1));
-              error.prependSegment(
-                new Reporting.NameSegment("tupleProperty"));
+                new Reporting.NameSegment("listMixedProperty"));
               return error;
             }));
+
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getTupleProperty().item3())
-          .flatMap(Verification::verifyToErrorStream)
+        Stream.of(that.getListModelTypedProperty())
+          .flatMap(Verification::verifyListOf_ModelTypedUnion)
             .map(error -> {
               error.prependSegment(
-                new Reporting.IndexSegment(2));
+                new Reporting.NameSegment("listModelTypedProperty"));
+              return error;
+            }));
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getTupleProperty())
+          .flatMap(Verification::verifyTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion)
+            .map(error -> {
               error.prependSegment(
                 new Reporting.NameSegment("tupleProperty"));
               return error;
@@ -339,23 +288,13 @@ public class Verification {
 
       if (that.getOptionalListOverlappingProperty().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Verification.zip(
-            IntStream.iterate(0, i -> i + 1).boxed(),
-            that.getOptionalListOverlappingProperty().get().stream())
-              .flatMap(elemTuple -> {
-                final int index = elemTuple.getFirst();
-                final OverlappingUnion elem = elemTuple.getSecond();
-                return Verification.verifyToErrorStream(elem)
-                  .map(error -> {
-                    error.prependSegment(new Reporting.IndexSegment(index));
-                    return error;
-                  });
-              })
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("optionalListOverlappingProperty"));
-              return error;
-            }));
+          Stream.of(that.getOptionalListOverlappingProperty().get())
+            .flatMap(Verification::verifyListOf_OverlappingUnion)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("optionalListOverlappingProperty"));
+                return error;
+              }));
       }
 
       return errorStream;
@@ -410,6 +349,104 @@ public class Verification {
 
   public static Stream<Reporting.Error> verifyToErrorStream(IUnion<?> that) {
     return verifyToErrorStream(that.getUnderlying());
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_StructuralUnion(
+    List<StructuralUnion> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_MixedUnion(
+    List<MixedUnion> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_ModelTypedUnion(
+    List<ModelTypedUnion> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+    Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> that) {
+    return Stream.<Reporting.Error>concat(
+      Stream.<Reporting.Error>concat(
+        Stream.of(that.item1())
+          .flatMap(Verification::verifyToErrorStream)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(0));
+              return error;
+            }),
+        Stream.of(that.item2())
+          .flatMap(Verification::verifyToErrorStream)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(1));
+              return error;
+            })),
+      Stream.of(that.item3())
+        .flatMap(Verification::verifyToErrorStream)
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.IndexSegment(2));
+            return error;
+          }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_OverlappingUnion(
+    List<OverlappingUnion> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

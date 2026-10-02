@@ -188,28 +188,12 @@ public class Verification {
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
         Stream.of(that.getMappingWithConstrainedKey())
-          .flatMap(Verification::verifyJsonObject)
+          .flatMap(Verification::verifyJsonObjectBy_NonEmptyString)
             .map(error -> {
               error.prependSegment(
                 new Reporting.NameSegment("mappingWithConstrainedKey"));
               return error;
             }));
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.streamOfFieldNames(that.getMappingWithConstrainedKey())
-          .flatMap(key ->
-            Verification.verifyNonEmptyString(key)
-              .map(error -> {
-                // NOTE (mristin):
-                // A member of an open JSON object is no property of one of
-                // our classes, so it gets no segment of its own -- the key
-                // goes into the message instead, as it does in
-                // ``verifyJsonValue``.
-                final Reporting.Error keyError = new Reporting.Error(
-                  "In the member \"" + key + "\": " + error.getCause());
-                keyError.prependSegment(
-                  new Reporting.NameSegment("mappingWithConstrainedKey"));
-                return keyError;
-              })));
 
       if (that.getOptionalValue().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
@@ -309,6 +293,26 @@ public class Verification {
     }
 
     return errorStream;
+  }
+
+  /**
+   * Verify that {@code that} is a JSON-able object with valid keys.
+   */
+  private static Stream<Reporting.Error> verifyJsonObjectBy_NonEmptyString(
+    ObjectNode that) {
+    return Stream.<Reporting.Error>concat(
+      Verification.verifyJsonObject(that),
+      Verification.streamOfFieldNames(that)
+        .flatMap(key ->
+          Verification.verifyNonEmptyString(key)
+            .map(error ->
+              // NOTE (mristin):
+              // A member of an open JSON object is no property of one of
+              // our classes, so it gets no segment of its own -- the key
+              // goes into the message instead, as it does in
+              // ``verifyJsonValue``.
+              new Reporting.Error(
+                "In the member \"" + key + "\": " + error.getCause()))));
   }
 
   private static class _Pair<A, B> {

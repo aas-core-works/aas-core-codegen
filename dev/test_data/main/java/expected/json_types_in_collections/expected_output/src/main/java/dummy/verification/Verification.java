@@ -159,7 +159,23 @@ public class Verification {
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
-      // No verification has been defined for Something.
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getValues())
+          .flatMap(Verification::verifyListOf_jsonValue)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("values"));
+              return error;
+            }));
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getTupleWithJson())
+          .flatMap(Verification::verifyTupleOf4_string_jsonValue_jsonArray_jsonObject)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("tupleWithJson"));
+              return error;
+            }));
 
       return errorStream;
     }
@@ -209,6 +225,53 @@ public class Verification {
    */
   public static Iterable<Reporting.Error> verify(IClass that) {
     return new _ValidationErrorIterable(that);
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_jsonValue(
+    List<JsonNode> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyJsonValue(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyTupleOf4_string_jsonValue_jsonArray_jsonObject(
+    Tuple4<String, JsonNode, ArrayNode, ObjectNode> that) {
+    return Stream.<Reporting.Error>concat(
+      Stream.<Reporting.Error>concat(
+        Stream.of(that.item2())
+          .flatMap(Verification::verifyJsonValue)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(1));
+              return error;
+            }),
+        Stream.of(that.item3())
+          .flatMap(Verification::verifyJsonArray)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(2));
+              return error;
+            })),
+      Stream.of(that.item4())
+        .flatMap(Verification::verifyJsonObject)
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.IndexSegment(3));
+            return error;
+          }));
   }
 
   private static class _Pair<A, B> {

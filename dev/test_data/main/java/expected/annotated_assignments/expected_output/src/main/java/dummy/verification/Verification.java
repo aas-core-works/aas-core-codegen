@@ -627,23 +627,13 @@ public class Verification {
             }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getParents().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final IParent elem = elemTuple.getSecond();
-              return Verification.verifyToErrorStream(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("parents"));
-            return error;
-          }));
+        Stream.of(that.getParents())
+          .flatMap(Verification::verifyListOf_IParent)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("parents"));
+              return error;
+            }));
 
       if (that.getOptionalKind().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
@@ -760,6 +750,23 @@ public class Verification {
 
   public static Stream<Reporting.Error> verifyToErrorStream(IUnion<?> that) {
     return verifyToErrorStream(that.getUnderlying());
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_IParent(
+    List<IParent> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyToErrorStream(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {

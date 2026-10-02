@@ -452,42 +452,22 @@ public class Verification {
             }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getKinds().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final Kind elem = elemTuple.getSecond();
-              return Verification.verifyKind(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("kinds"));
-            return error;
-          }));
+        Stream.of(that.getKinds())
+          .flatMap(Verification::verifyListOf_Kind)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("kinds"));
+              return error;
+            }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          that.getCodes().stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final String elem = elemTuple.getSecond();
-              return Verification.verifyCode(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("codes"));
-            return error;
-          }));
+        Stream.of(that.getCodes())
+          .flatMap(Verification::verifyListOf_Code)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("codes"));
+              return error;
+            }));
 
       if (that.getOptionalKind().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
@@ -557,62 +537,32 @@ public class Verification {
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          SetHelpers.sortedBy(that.getDirections(), SetHelpers::compareByRankOfDirection).stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final Direction elem = elemTuple.getSecond();
-              return Verification.verifyDirection(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("directions"));
-            return error;
-          }));
+        Stream.of(that.getDirections())
+          .flatMap(Verification::verifySetOf_Direction)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("directions"));
+              return error;
+            }));
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Verification.zip(
-          IntStream.iterate(0, i -> i + 1).boxed(),
-          SetHelpers.sortedByCodePoints(that.getCodes()).stream())
-            .flatMap(elemTuple -> {
-              final int index = elemTuple.getFirst();
-              final String elem = elemTuple.getSecond();
-              return Verification.verifyCode(elem)
-                .map(error -> {
-                  error.prependSegment(new Reporting.IndexSegment(index));
-                  return error;
-                });
-            })
-          .map(error -> {
-            error.prependSegment(
-              new Reporting.NameSegment("codes"));
-            return error;
-          }));
+        Stream.of(that.getCodes())
+          .flatMap(Verification::verifySetOf_Code)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("codes"));
+              return error;
+            }));
 
       if (that.getOptionalDirections().isPresent()) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Verification.zip(
-            IntStream.iterate(0, i -> i + 1).boxed(),
-            SetHelpers.sortedBy(that.getOptionalDirections().get(), SetHelpers::compareByRankOfDirection).stream())
-              .flatMap(elemTuple -> {
-                final int index = elemTuple.getFirst();
-                final Direction elem = elemTuple.getSecond();
-                return Verification.verifyDirection(elem)
-                  .map(error -> {
-                    error.prependSegment(new Reporting.IndexSegment(index));
-                    return error;
-                  });
-              })
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("optionalDirections"));
-              return error;
-            }));
+          Stream.of(that.getOptionalDirections().get())
+            .flatMap(Verification::verifySetOf_Direction)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("optionalDirections"));
+                return error;
+              }));
       }
 
       return errorStream;
@@ -706,6 +656,74 @@ public class Verification {
     }
 
     return errorStream;
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_Kind(
+    List<Kind> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyKind(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyListOf_Code(
+    List<String> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      that.stream())
+        .flatMap(itemTuple ->
+          Verification.verifyCode(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifySetOf_Direction(
+    Set<Direction> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      SetHelpers.sortedBy(that, SetHelpers::compareByRankOfDirection).stream())
+        .flatMap(itemTuple ->
+          Verification.verifyDirection(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifySetOf_Code(
+    Set<String> that) {
+    return Verification.zip(
+      IntStream.iterate(0, i -> i + 1).boxed(),
+      SetHelpers.sortedByCodePoints(that).stream())
+        .flatMap(itemTuple ->
+          Verification.verifyCode(itemTuple.getSecond())
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.IndexSegment(itemTuple.getFirst()));
+              return error;
+            }));
   }
 
   private static class _Pair<A, B> {
