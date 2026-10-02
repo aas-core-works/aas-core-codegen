@@ -208,25 +208,27 @@ func wrapSomething[E any](
 		result = that
 	}
 
-	theItem := that.Item()
 	that.SetItem(
-		Wrap[E](
-			theItem,
-			factory,
-		).(ourtypes.IItem),
+		wrapClass[E](that.Item(), factory),
 	)
 
 	theOptionalItem := that.OptionalItem()
 	if theOptionalItem != nil {
 		that.SetOptionalItem(
-			Wrap[E](
-				theOptionalItem,
-				factory,
-			).(ourtypes.IItem),
+			wrapClass[E](theOptionalItem, factory),
 		)
 	}
 
 	return
+}
+
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return Wrap[E](that, factory).(T)
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.

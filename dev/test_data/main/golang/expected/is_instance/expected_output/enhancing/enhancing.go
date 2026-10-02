@@ -17,30 +17,6 @@ type enhanced[E any] interface {
 	setEnhancement(E)
 }
 
-// Constrain a generic type parameter to a named union whose underlying
-// instance can be re-wrapped into the same concrete union type, needed for
-// a generic helper that both unwraps and re-wraps without knowing the
-// concrete union type.
-type selfUnion[T any] interface {
-	Underlying() ourtypes.IClass
-	WithUnderlying(ourtypes.IClass) T
-}
-
-// Wrap the underlying instance of `that` union recursively with the
-// enhancement produced by `factory`, and re-wrap the result back into the
-// same concrete union type as `that`.
-func wrapUnion[E any, T selfUnion[T]](
-	that T,
-	factory func(ourtypes.IClass) (E, bool),
-) T {
-	return that.WithUnderlying(
-		Wrap[E](
-			that.Underlying(),
-			factory,
-		),
-	)
-}
-
 type enhancedLeaf[E any] struct {
 	instance ourtypes.ILeaf
 	enhancement E
@@ -199,14 +175,7 @@ func wrapOrderedContainer[E any](
 		result = that
 	}
 
-	theChildren := that.Children()
-	for i, v := range theChildren {
-		// Update in-situ
-		theChildren[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.IElement)
-	}
+	wrap_ListOf_IElement_inPlace[E](that.Children(), factory)
 
 	return
 }
@@ -283,14 +252,7 @@ func wrapUnorderedContainer[E any](
 		result = that
 	}
 
-	theChildren := that.Children()
-	for i, v := range theChildren {
-		// Update in-situ
-		theChildren[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.IElement)
-	}
+	wrap_ListOf_IElement_inPlace[E](that.Children(), factory)
 
 	return
 }
@@ -484,12 +446,8 @@ func wrapAttributeOperand[E any](
 		result = that
 	}
 
-	theAttribute := that.Attribute()
 	that.SetAttribute(
-		wrapUnion[E](
-			theAttribute,
-			factory,
-		),
+		wrapUnion[E](that.Attribute(), factory),
 	)
 
 	return
@@ -717,39 +675,77 @@ func wrapSomething[E any](
 		result = that
 	}
 
-	theRoot := that.Root()
 	that.SetRoot(
-		Wrap[E](
-			theRoot,
-			factory,
-		).(ourtypes.IElement),
+		wrapClass[E](that.Root(), factory),
 	)
 
 	theOptionalElement := that.OptionalElement()
 	if theOptionalElement != nil {
 		that.SetOptionalElement(
-			Wrap[E](
-				theOptionalElement,
-				factory,
-			).(ourtypes.IElement),
+			wrapClass[E](theOptionalElement, factory),
 		)
 	}
 
-	theValue := that.Value()
 	that.SetValue(
-		wrapUnion[E](
-			theValue,
+		wrapUnion[E](that.Value(), factory),
+	)
+
+	wrap_ListOf_Value_inPlace[E](that.Values(), factory)
+
+	return
+}
+
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return Wrap[E](that, factory).(T)
+}
+
+// Constrain a generic type parameter to a named union whose underlying
+// instance can be re-wrapped into the same concrete union type, needed for
+// a generic helper that both unwraps and re-wraps without knowing the
+// concrete union type.
+type selfUnion[T any] interface {
+	Underlying() ourtypes.IClass
+	WithUnderlying(ourtypes.IClass) T
+}
+
+// Wrap the underlying instance of `that` union recursively with the
+// enhancement produced by `factory`, and re-wrap the result back into the
+// same concrete union type as `that`.
+func wrapUnion[E any, T selfUnion[T]](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return that.WithUnderlying(
+		Wrap[E](
+			that.Underlying(),
 			factory,
 		),
 	)
+}
 
-	theValues := that.Values()
-	for i, v := range theValues {
-		// Update in-situ
-		theValues[i] = wrapUnion[E](v, factory)
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IElement_inPlace[E any](
+	that []ourtypes.IElement,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
 	}
+}
 
-	return
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_Value_inPlace[E any](
+	that []*ourtypes.Value,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapUnion[E](that[i], factory)
+	}
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.

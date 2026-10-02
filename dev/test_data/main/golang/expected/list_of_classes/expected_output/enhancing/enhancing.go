@@ -292,33 +292,44 @@ func wrapSomething[E any](
 		result = that
 	}
 
-	theItem := that.Item()
 	that.SetItem(
-		Wrap[E](
-			theItem,
-			factory,
-		).(ourtypes.ISimple),
+		wrapClass[E](that.Item(), factory),
 	)
 
-	theSomeItems := that.SomeItems()
-	for i, v := range theSomeItems {
-		// Update in-situ
-		theSomeItems[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.IAbstractItem)
-	}
+	wrap_ListOf_IAbstractItem_inPlace[E](that.SomeItems(), factory)
 
-	theSomeSimples := that.SomeSimples()
-	for i, v := range theSomeSimples {
-		// Update in-situ
-		theSomeSimples[i] = Wrap[E](
-			v,
-			factory,
-		).(ourtypes.ISimple)
-	}
+	wrap_ListOf_ISimple_inPlace[E](that.SomeSimples(), factory)
 
 	return
+}
+
+// Wrap `that` instance recursively with the enhancement produced by
+// the `factory`, and keep its static type.
+func wrapClass[E any, T ourtypes.IClass](
+	that T,
+	factory func(ourtypes.IClass) (E, bool),
+) T {
+	return Wrap[E](that, factory).(T)
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_IAbstractItem_inPlace[E any](
+	that []ourtypes.IAbstractItem,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_ListOf_ISimple_inPlace[E any](
+	that []ourtypes.ISimple,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for i := range that {
+		that[i] = wrapClass[E](that[i], factory)
+	}
 }
 
 // Wrap `that` instance recursively with the enhancement produced by the `factory`.
