@@ -8,6 +8,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Set,
     Tuple,
     Union,
 )
@@ -286,6 +287,20 @@ def _verify_structure_name_collisions(
         else:
             assert_never(our_type)
 
+    # NOTE (mristin):
+    # The descent into the containers lives in a class in the package of
+    # the classes as well, and the classes refer to it unqualified.
+    other = observed_structure_names.get(Identifier("Descent"), None)
+    if other is not None:
+        errors.append(
+            Error(
+                other.parsed.node,
+                "The Java name 'Descent' "
+                f"of the {_human_readable_identifier(other)} collides with "
+                f"the class of the descent into the containers",
+            )
+        )
+
     # endregion
 
     # region Intra-structure collisions
@@ -348,6 +363,195 @@ def _has_descendable_properties(cls: intermediate.Class) -> bool:
     return False
 
 
+def _descend_into_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the method of the class ``Descent`` descending into ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.java.common.type_moniker`), so two different
+    containers never share a method.
+    """
+    return Identifier(f"descend{java_common.type_moniker(type_anno)}")
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    recurse: bool,
+    recurse_expr: str,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the stream of the instances held by the value at ``expr``.
+
+    An instance is streamed in-line. A container is delegated to its method in
+    the class ``Descent``, which descends only one level and calls the method
+    of its items by name. This way the descent is composed of plain functions,
+    to any depth.
+
+    The ``recurse_expr`` is the Java expression passed on to the methods of
+    the containers, and has to evaluate to ``recurse``.
+    """
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # A named union is not itself an ``IClass``, so we descend into
+        # the underlying instance instead.
+        instance_expr = (
+            f"{expr}.getUnderlying()"
+            if isinstance(type_anno.our_type, intermediate.NamedUnion)
+            else expr
+        )
+
+        if not recurse:
+            return Stripped(f"Stream.<IClass>of({instance_expr})")
+
+        return Stripped(
+            f"""\
+Stream.concat(Stream.<IClass>of({instance_expr}),
+{I}StreamSupport.stream({instance_expr}.descend().spliterator(), false))"""
+        )
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        name = _descend_into_container_name(type_anno)
+        call = f"Descent.{name}({expr}, {recurse_expr})"
+        # Heuristic to break the lines, very rudimentary
+        if len(call) > 70:
+            call = f"""\
+Descent.{name}(
+{I}{expr},
+{I}{recurse_expr})"""
+
+        return Stripped(call)
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the method of the class ``Descent`` for ``type_anno``.
+
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    stream_by_recurse = dict()  # type: Dict[bool, Stripped]
+
+    for recurse in (False, True):
+        stream: Stripped
+
+        if isinstance(
+            type_anno,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
+            if not recurse and isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ):
+                # NOTE (mristin):
+                # We map the instances directly instead of flat-mapping them,
+                # so that we do not create a stream for every single item.
+                instance_expr = (
+                    "item.getUnderlying()"
+                    if isinstance(type_anno.items.our_type, intermediate.NamedUnion)
+                    else "item"
+                )
+
+                stream = Stripped(f"that.stream().<IClass>map(item -> {instance_expr})")
+            else:
+                item_stream = _generate_descend_into(
+                    expr="item",
+                    type_anno=type_anno.items,
+                    recurse=recurse,
+                    recurse_expr="recurse",
+                    descendability=descendability,
+                )
+
+                stream = Stripped(
+                    f"""\
+that.stream().flatMap(item ->
+{I}{indent_but_first_line(item_stream, I)})"""
+                )
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            item_streams = [
+                _generate_descend_into(
+                    expr=f"that.item{i + 1}()",
+                    type_anno=item_type_anno,
+                    recurse=recurse,
+                    recurse_expr="recurse",
+                    descendability=descendability,
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if descendability[item_type_anno]
+            ]
+
+            stream = item_streams[0]
+            for item_stream in item_streams[1:]:
+                stream = Stripped(
+                    f"""\
+Stream.concat(
+{I}{indent_but_first_line(stream, I)},
+{I}{indent_but_first_line(item_stream, I)})"""
+                )
+
+        else:
+            assert_never(type_anno)
+
+        stream_by_recurse[recurse] = stream
+
+    body: Stripped
+
+    # NOTE (mristin):
+    # The streams coincide if the container holds only other containers, as
+    # ``recurse`` is simply passed on to their methods.
+    if stream_by_recurse[False] == stream_by_recurse[True]:
+        body = Stripped(f"return {stream_by_recurse[True]};")
+    else:
+        body = Stripped(
+            f"""\
+if (!recurse) {{
+{I}return {indent_but_first_line(stream_by_recurse[False], I)};
+}}
+
+return {stream_by_recurse[True]};"""
+        )
+
+    name = _descend_into_container_name(type_anno)
+    value_type = java_common.generate_type(type_anno)
+
+    return Stripped(
+        f"""\
+/**
+ * Iterate over the class instances held by {{@code that}}.
+ *
+ * <p>If {{@code recurse}} is set, descend recursively into the instances
+ * as well.
+ */
+static Stream<IClass> {name}(
+{I}{indent_but_first_line(value_type, I)} that,
+{I}boolean recurse) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> Stripped:
     """Generate the iterator function body for recursive and non-recursive descend methods.
 
@@ -359,8 +563,6 @@ def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> St
         Stripped("Stream<IClass> memberStream = Stream.empty();")
     ]  # type: List[Stripped]
 
-    # region Streams
-
     for prop in cls.properties:
         descendability = intermediate.map_descendability(
             type_annotation=prop.type_annotation
@@ -369,175 +571,25 @@ def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> St
         if not descendability[prop.type_annotation]:
             continue
 
-        prop_expr = None  # type: Optional[Stripped]
-
         prop_name = java_naming.property_name(prop.name)
 
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            continue
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                continue
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                continue
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                if not descendability[type_anno] or not recurse:
-                    prop_expr = Stripped(
-                        f"Stream.<IClass>of({class_name}.this.{prop_name})"
-                    )
-                else:
-                    prop_expr = Stripped(
-                        f"""\
-Stream.concat(Stream.<IClass>of({class_name}.this.{prop_name}),
-{I}StreamSupport.stream({class_name}.this.{prop_name}.descend().spliterator(), false))"""
-                    )
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                underlying_expr = Stripped(
-                    f"{class_name}.this.{prop_name}.getUnderlying()"
-                )
-
-                if not descendability[type_anno] or not recurse:
-                    prop_expr = Stripped(f"Stream.<IClass>of({underlying_expr})")
-                else:
-                    prop_expr = Stripped(
-                        f"""\
-Stream.concat(Stream.<IClass>of({underlying_expr}),
-{I}StreamSupport.stream({underlying_expr}.descend().spliterator(), false))"""
-                    )
-            else:
-                assert_never(type_anno.our_type)
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) and isinstance(
-                type_anno.items.our_type,
-                (
-                    intermediate.AbstractClass,
-                    intermediate.ConcreteClass,
-                    intermediate.NamedUnion,
-                ),
-            ), (
-                f"We expect only list of classes or named unions "
-                f"at the moment, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-            if isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                item_stream = Stripped(
-                    f"{class_name}.this.{prop_name}.stream()"
-                    f".map(item -> item.getUnderlying())"
-                )
-            else:
-                item_stream = Stripped(f"{class_name}.this.{prop_name}.stream()")
-
-            if not recurse:
-                prop_expr = item_stream
-            else:
-                prop_expr = Stripped(
-                    f"""\
-{item_stream}
-{I}.flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-{II}StreamSupport.stream(item.descend().spliterator(), false)))"""
-                )
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            item_stream_exprs = []  # type: List[Stripped]
-
-            for i, item_type_anno in enumerate(type_anno.items):
-                if not descendability.get(item_type_anno, False):
-                    continue
-
-                assert isinstance(
-                    item_type_anno, intermediate.OurTypeAnnotation
-                ) and isinstance(
-                    item_type_anno.our_type,
-                    (
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                        intermediate.NamedUnion,
-                    ),
-                ), (
-                    f"We expect only atomic values (primitives, constrained "
-                    f"primitives, enumeration literals), classes or named unions "
-                    f"as items of a tuple at the moment, but you specified "
-                    f"{type_anno}. "
-                    f"Please contact the developers if you need this feature."
-                )
-
-                item_access = Stripped(f"{class_name}.this.{prop_name}.item{i + 1}()")
-
-                if isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                    item_access = Stripped(f"{item_access}.getUnderlying()")
-
-                if not recurse:
-                    item_stream_exprs.append(
-                        Stripped(f"Stream.<IClass>of({item_access})")
-                    )
-                else:
-                    item_stream_exprs.append(
-                        Stripped(
-                            f"""\
-Stream.concat(Stream.<IClass>of({item_access}),
-{I}StreamSupport.stream({item_access}.descend().spliterator(), false))"""
-                        )
-                    )
-
-            assert len(item_stream_exprs) > 0, (
-                "Expected at least one descendable item, since the property "
-                "has been determined to be descendable"
-            )
-
-            prop_expr = item_stream_exprs[0]
-            for item_stream_expr in item_stream_exprs[1:]:
-                prop_expr = Stripped(
-                    f"""\
-Stream.concat(
-{I}{indent_but_first_line(prop_expr, I)},
-{I}{indent_but_first_line(item_stream_expr, I)})"""
-                )
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            raise AssertionError(
-                f"A JSON-able value is plain data, never a reference to one of "
-                f"our own classes, so it can not have been determined "
-                f"descendable: {type_anno}"
-            )
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"A set holds only primitives, constrained primitives and "
-                f"enumeration literals, never a reference to one of our own "
-                f"classes, so it can not have been determined "
-                f"descendable: {type_anno}"
-            )
-
-        else:
-            assert_never(type_anno)
-
-        stream_stmt = Stripped(
-            f"""\
-if ({prop_name} != null) {{
-{I}memberStream = Stream.concat(memberStream,
-{II}{indent_but_first_line(prop_expr, II)});
-}}"""
+        prop_stream = _generate_descend_into(
+            expr=f"{class_name}.this.{prop_name}",
+            type_anno=intermediate.beneath_optional(prop.type_annotation),
+            recurse=recurse,
+            recurse_expr="true" if recurse else "false",
+            descendability=descendability,
         )
 
-        blocks.append(stream_stmt)
-
-    # endregion
+        blocks.append(
+            Stripped(
+                f"""\
+if ({prop_name} != null) {{
+{I}memberStream = Stream.concat(memberStream,
+{II}{indent_but_first_line(prop_stream, II)});
+}}"""
+            )
+        )
 
     blocks.append(Stripped("return memberStream;"))
 
@@ -2493,6 +2545,74 @@ def generate(
 
     if len(errors) > 0:
         return None, errors
+
+    descent_methods = []  # type: List[Stripped]
+    observed_monikers = set()  # type: Set[str]
+    descent_imports = {
+        Stripped(f"{package}.common.*"),
+        Stripped(f"{package}.types.enums.*"),
+        Stripped(f"{package}.types.model.*"),
+        Stripped("java.util.stream.Stream"),
+        Stripped("java.util.stream.StreamSupport"),
+    }  # type: Set[Stripped]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for type_anno, descendable in descendability.items():
+                if not descendable or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                moniker = java_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                if isinstance(type_anno, intermediate.ListTypeAnnotation):
+                    descent_imports.add(Stripped("java.util.List"))
+                elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+                    descent_imports.add(Stripped("java.util.Set"))
+
+                descent_methods.append(
+                    _generate_descend_into_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
+
+    if len(descent_methods) > 0:
+        descent_methods_joined = "\n\n".join(descent_methods)
+
+        files.append(
+            _generate_java_file(
+                file_name=java_common.class_package_path(Stripped("Descent")),
+                imports=Stripped(
+                    "\n".join(f"import {imp};" for imp in sorted(descent_imports))
+                ),
+                code=Stripped(
+                    f"""\
+/**
+ * Descend into the containers which hold class instances.
+ *
+ * <p>Each method descends only one level, and calls the method of the items
+ * by name, so that the descent is composed of plain functions to any depth.
+ */
+final class Descent {{
+{I}private Descent() {{
+{II}// Prevent instantiation
+{I}}}
+
+{I}{indent_but_first_line(descent_methods_joined, I)}
+}}"""
+                ),
+                package=java_common.PackageIdentifier(
+                    f"{package}.types.{java_common.CLASS_PKG}"
+                ),
+            )
+        )
 
     return files, None
 

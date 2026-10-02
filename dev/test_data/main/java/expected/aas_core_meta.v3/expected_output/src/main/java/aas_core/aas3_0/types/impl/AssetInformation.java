@@ -266,7 +266,9 @@ public class AssetInformation implements IAssetInformation {
 
       if (specificAssetIds != null) {
         memberStream = Stream.concat(memberStream,
-          AssetInformation.this.specificAssetIds.stream());
+          Descent.descendListOf_ISpecificAssetId(
+            AssetInformation.this.specificAssetIds,
+            false));
       }
 
       if (defaultThumbnail != null) {
@@ -305,9 +307,9 @@ public class AssetInformation implements IAssetInformation {
 
       if (specificAssetIds != null) {
         memberStream = Stream.concat(memberStream,
-          AssetInformation.this.specificAssetIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ISpecificAssetId(
+            AssetInformation.this.specificAssetIds,
+            true));
       }
 
       if (defaultThumbnail != null) {

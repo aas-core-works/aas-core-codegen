@@ -192,17 +192,21 @@ public class Environment implements IEnvironment {
 
       if (assetAdministrationShells != null) {
         memberStream = Stream.concat(memberStream,
-          Environment.this.assetAdministrationShells.stream());
+          Descent.descendListOf_IAssetAdministrationShell(
+            Environment.this.assetAdministrationShells,
+            false));
       }
 
       if (submodels != null) {
         memberStream = Stream.concat(memberStream,
-          Environment.this.submodels.stream());
+          Descent.descendListOf_ISubmodel(Environment.this.submodels, false));
       }
 
       if (conceptDescriptions != null) {
         memberStream = Stream.concat(memberStream,
-          Environment.this.conceptDescriptions.stream());
+          Descent.descendListOf_IConceptDescription(
+            Environment.this.conceptDescriptions,
+            false));
       }
 
       return memberStream;
@@ -236,23 +240,21 @@ public class Environment implements IEnvironment {
 
       if (assetAdministrationShells != null) {
         memberStream = Stream.concat(memberStream,
-          Environment.this.assetAdministrationShells.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IAssetAdministrationShell(
+            Environment.this.assetAdministrationShells,
+            true));
       }
 
       if (submodels != null) {
         memberStream = Stream.concat(memberStream,
-          Environment.this.submodels.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ISubmodel(Environment.this.submodels, true));
       }
 
       if (conceptDescriptions != null) {
         memberStream = Stream.concat(memberStream,
-          Environment.this.conceptDescriptions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IConceptDescription(
+            Environment.this.conceptDescriptions,
+            true));
       }
 
       return memberStream;

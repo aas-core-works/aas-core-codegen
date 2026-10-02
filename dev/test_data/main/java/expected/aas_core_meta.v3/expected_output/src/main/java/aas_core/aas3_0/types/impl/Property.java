@@ -431,17 +431,21 @@ public class Property implements IProperty {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.extensions.stream());
+          Descent.descendListOf_IExtension(Property.this.extensions, false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            Property.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            Property.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -451,17 +455,21 @@ public class Property implements IProperty {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Property.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(Property.this.qualifiers, false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Property.this.embeddedDataSpecifications,
+            false));
       }
 
       if (valueId != null) {
@@ -500,23 +508,21 @@ public class Property implements IProperty {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(Property.this.extensions, true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            Property.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            Property.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -527,23 +533,21 @@ public class Property implements IProperty {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Property.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(Property.this.qualifiers, true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Property.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Property.this.embeddedDataSpecifications,
+            true));
       }
 
       if (valueId != null) {

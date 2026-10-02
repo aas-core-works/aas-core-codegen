@@ -127,7 +127,9 @@ public class LangStringSet implements ILangStringSet {
 
       if (langStrings != null) {
         memberStream = Stream.concat(memberStream,
-          LangStringSet.this.langStrings.stream());
+          Descent.descendListOf_ILangString(
+            LangStringSet.this.langStrings,
+            false));
       }
 
       return memberStream;
@@ -161,9 +163,9 @@ public class LangStringSet implements ILangStringSet {
 
       if (langStrings != null) {
         memberStream = Stream.concat(memberStream,
-          LangStringSet.this.langStrings.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangString(
+            LangStringSet.this.langStrings,
+            true));
       }
 
       return memberStream;

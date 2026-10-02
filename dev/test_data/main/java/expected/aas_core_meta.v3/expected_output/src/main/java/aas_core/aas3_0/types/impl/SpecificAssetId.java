@@ -249,7 +249,9 @@ public class SpecificAssetId implements ISpecificAssetId {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          SpecificAssetId.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            SpecificAssetId.this.supplementalSemanticIds,
+            false));
       }
 
       if (externalSubjectId != null) {
@@ -294,9 +296,9 @@ public class SpecificAssetId implements ISpecificAssetId {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          SpecificAssetId.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            SpecificAssetId.this.supplementalSemanticIds,
+            true));
       }
 
       if (externalSubjectId != null) {

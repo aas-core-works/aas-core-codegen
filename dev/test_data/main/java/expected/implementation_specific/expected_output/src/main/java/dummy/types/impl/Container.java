@@ -146,7 +146,7 @@ public class Container implements IContainer {
 
       if (items != null) {
         memberStream = Stream.concat(memberStream,
-          Container.this.items.stream());
+          Descent.descendListOf_IItem(Container.this.items, false));
       }
 
       return memberStream;
@@ -180,9 +180,7 @@ public class Container implements IContainer {
 
       if (items != null) {
         memberStream = Stream.concat(memberStream,
-          Container.this.items.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IItem(Container.this.items, true));
       }
 
       return memberStream;

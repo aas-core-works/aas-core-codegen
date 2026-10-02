@@ -414,17 +414,21 @@ public class Blob implements IBlob {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.extensions.stream());
+          Descent.descendListOf_IExtension(Blob.this.extensions, false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            Blob.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            Blob.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -434,17 +438,21 @@ public class Blob implements IBlob {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Blob.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(Blob.this.qualifiers, false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Blob.this.embeddedDataSpecifications,
+            false));
       }
 
       return memberStream;
@@ -478,23 +486,17 @@ public class Blob implements IBlob {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(Blob.this.extensions, true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(Blob.this.displayName, true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(Blob.this.description, true));
       }
 
       if (semanticId != null) {
@@ -505,23 +507,21 @@ public class Blob implements IBlob {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Blob.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(Blob.this.qualifiers, true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Blob.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Blob.this.embeddedDataSpecifications,
+            true));
       }
 
       return memberStream;

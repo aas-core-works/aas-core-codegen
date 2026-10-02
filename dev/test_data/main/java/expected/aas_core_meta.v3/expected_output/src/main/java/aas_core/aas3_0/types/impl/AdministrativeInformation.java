@@ -225,7 +225,9 @@ public class AdministrativeInformation implements IAdministrativeInformation {
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          AdministrativeInformation.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            AdministrativeInformation.this.embeddedDataSpecifications,
+            false));
       }
 
       if (creator != null) {
@@ -264,9 +266,9 @@ public class AdministrativeInformation implements IAdministrativeInformation {
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          AdministrativeInformation.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            AdministrativeInformation.this.embeddedDataSpecifications,
+            true));
       }
 
       if (creator != null) {

@@ -404,17 +404,23 @@ public class ConceptDescription implements IConceptDescription {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.extensions.stream());
+          Descent.descendListOf_IExtension(
+            ConceptDescription.this.extensions,
+            false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            ConceptDescription.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            ConceptDescription.this.description,
+            false));
       }
 
       if (administration != null) {
@@ -424,12 +430,16 @@ public class ConceptDescription implements IConceptDescription {
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            ConceptDescription.this.embeddedDataSpecifications,
+            false));
       }
 
       if (isCaseOf != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.isCaseOf.stream());
+          Descent.descendListOf_IReference(
+            ConceptDescription.this.isCaseOf,
+            false));
       }
 
       return memberStream;
@@ -463,23 +473,23 @@ public class ConceptDescription implements IConceptDescription {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(
+            ConceptDescription.this.extensions,
+            true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            ConceptDescription.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            ConceptDescription.this.description,
+            true));
       }
 
       if (administration != null) {
@@ -490,16 +500,16 @@ public class ConceptDescription implements IConceptDescription {
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            ConceptDescription.this.embeddedDataSpecifications,
+            true));
       }
 
       if (isCaseOf != null) {
         memberStream = Stream.concat(memberStream,
-          ConceptDescription.this.isCaseOf.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            ConceptDescription.this.isCaseOf,
+            true));
       }
 
       return memberStream;

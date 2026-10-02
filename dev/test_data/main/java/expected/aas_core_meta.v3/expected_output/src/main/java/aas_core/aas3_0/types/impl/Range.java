@@ -424,17 +424,21 @@ public class Range implements IRange {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.extensions.stream());
+          Descent.descendListOf_IExtension(Range.this.extensions, false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            Range.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            Range.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -444,17 +448,21 @@ public class Range implements IRange {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Range.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(Range.this.qualifiers, false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Range.this.embeddedDataSpecifications,
+            false));
       }
 
       return memberStream;
@@ -488,23 +496,21 @@ public class Range implements IRange {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(Range.this.extensions, true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            Range.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            Range.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -515,23 +521,21 @@ public class Range implements IRange {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Range.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(Range.this.qualifiers, true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Range.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Range.this.embeddedDataSpecifications,
+            true));
       }
 
       return memberStream;

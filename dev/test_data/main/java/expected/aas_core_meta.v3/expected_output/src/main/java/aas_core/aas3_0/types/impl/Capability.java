@@ -353,17 +353,21 @@ public class Capability implements ICapability {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.extensions.stream());
+          Descent.descendListOf_IExtension(Capability.this.extensions, false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            Capability.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            Capability.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -373,17 +377,21 @@ public class Capability implements ICapability {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Capability.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(Capability.this.qualifiers, false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Capability.this.embeddedDataSpecifications,
+            false));
       }
 
       return memberStream;
@@ -417,23 +425,21 @@ public class Capability implements ICapability {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(Capability.this.extensions, true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            Capability.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            Capability.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -444,23 +450,21 @@ public class Capability implements ICapability {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Capability.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(Capability.this.qualifiers, true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          Capability.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            Capability.this.embeddedDataSpecifications,
+            true));
       }
 
       return memberStream;

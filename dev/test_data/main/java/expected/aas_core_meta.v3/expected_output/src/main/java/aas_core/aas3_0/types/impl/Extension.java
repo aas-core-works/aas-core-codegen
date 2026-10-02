@@ -269,12 +269,14 @@ public class Extension implements IExtension {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Extension.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Extension.this.supplementalSemanticIds,
+            false));
       }
 
       if (refersTo != null) {
         memberStream = Stream.concat(memberStream,
-          Extension.this.refersTo.stream());
+          Descent.descendListOf_IReference(Extension.this.refersTo, false));
       }
 
       return memberStream;
@@ -314,16 +316,14 @@ public class Extension implements IExtension {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Extension.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Extension.this.supplementalSemanticIds,
+            true));
       }
 
       if (refersTo != null) {
         memberStream = Stream.concat(memberStream,
-          Extension.this.refersTo.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(Extension.this.refersTo, true));
       }
 
       return memberStream;

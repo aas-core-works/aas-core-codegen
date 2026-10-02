@@ -143,7 +143,9 @@ public class UnorderedContainer implements IUnorderedContainer {
 
       if (children != null) {
         memberStream = Stream.concat(memberStream,
-          UnorderedContainer.this.children.stream());
+          Descent.descendListOf_IElement(
+            UnorderedContainer.this.children,
+            false));
       }
 
       return memberStream;
@@ -177,9 +179,7 @@ public class UnorderedContainer implements IUnorderedContainer {
 
       if (children != null) {
         memberStream = Stream.concat(memberStream,
-          UnorderedContainer.this.children.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IElement(UnorderedContainer.this.children, true));
       }
 
       return memberStream;

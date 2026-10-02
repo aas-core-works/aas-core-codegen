@@ -548,17 +548,23 @@ public class BasicEventElement implements IBasicEventElement {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.extensions.stream());
+          Descent.descendListOf_IExtension(
+            BasicEventElement.this.extensions,
+            false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            BasicEventElement.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            BasicEventElement.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -568,17 +574,23 @@ public class BasicEventElement implements IBasicEventElement {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            BasicEventElement.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(
+            BasicEventElement.this.qualifiers,
+            false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            BasicEventElement.this.embeddedDataSpecifications,
+            false));
       }
 
       if (observed != null) {
@@ -622,23 +634,23 @@ public class BasicEventElement implements IBasicEventElement {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(
+            BasicEventElement.this.extensions,
+            true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(
+            BasicEventElement.this.displayName,
+            true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(
+            BasicEventElement.this.description,
+            true));
       }
 
       if (semanticId != null) {
@@ -649,23 +661,23 @@ public class BasicEventElement implements IBasicEventElement {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            BasicEventElement.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(
+            BasicEventElement.this.qualifiers,
+            true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          BasicEventElement.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            BasicEventElement.this.embeddedDataSpecifications,
+            true));
       }
 
       if (observed != null) {

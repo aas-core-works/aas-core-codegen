@@ -133,7 +133,9 @@ public class ValueList implements IValueList {
 
       if (valueReferencePairs != null) {
         memberStream = Stream.concat(memberStream,
-          ValueList.this.valueReferencePairs.stream());
+          Descent.descendListOf_IValueReferencePair(
+            ValueList.this.valueReferencePairs,
+            false));
       }
 
       return memberStream;
@@ -167,9 +169,9 @@ public class ValueList implements IValueList {
 
       if (valueReferencePairs != null) {
         memberStream = Stream.concat(memberStream,
-          ValueList.this.valueReferencePairs.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IValueReferencePair(
+            ValueList.this.valueReferencePairs,
+            true));
       }
 
       return memberStream;

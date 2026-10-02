@@ -297,7 +297,9 @@ public class Qualifier implements IQualifier {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Qualifier.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            Qualifier.this.supplementalSemanticIds,
+            false));
       }
 
       if (valueId != null) {
@@ -342,9 +344,9 @@ public class Qualifier implements IQualifier {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          Qualifier.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            Qualifier.this.supplementalSemanticIds,
+            true));
       }
 
       if (valueId != null) {

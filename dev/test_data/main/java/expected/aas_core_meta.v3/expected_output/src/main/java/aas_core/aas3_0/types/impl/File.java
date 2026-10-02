@@ -409,17 +409,21 @@ public class File implements IFile {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.extensions.stream());
+          Descent.descendListOf_IExtension(File.this.extensions, false));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.displayName.stream());
+          Descent.descendListOf_ILangStringNameType(
+            File.this.displayName,
+            false));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.description.stream());
+          Descent.descendListOf_ILangStringTextType(
+            File.this.description,
+            false));
       }
 
       if (semanticId != null) {
@@ -429,17 +433,21 @@ public class File implements IFile {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.supplementalSemanticIds.stream());
+          Descent.descendListOf_IReference(
+            File.this.supplementalSemanticIds,
+            false));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.qualifiers.stream());
+          Descent.descendListOf_IQualifier(File.this.qualifiers, false));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.embeddedDataSpecifications.stream());
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            File.this.embeddedDataSpecifications,
+            false));
       }
 
       return memberStream;
@@ -473,23 +481,17 @@ public class File implements IFile {
 
       if (extensions != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.extensions.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IExtension(File.this.extensions, true));
       }
 
       if (displayName != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.displayName.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringNameType(File.this.displayName, true));
       }
 
       if (description != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.description.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_ILangStringTextType(File.this.description, true));
       }
 
       if (semanticId != null) {
@@ -500,23 +502,21 @@ public class File implements IFile {
 
       if (supplementalSemanticIds != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.supplementalSemanticIds.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IReference(
+            File.this.supplementalSemanticIds,
+            true));
       }
 
       if (qualifiers != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.qualifiers.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IQualifier(File.this.qualifiers, true));
       }
 
       if (embeddedDataSpecifications != null) {
         memberStream = Stream.concat(memberStream,
-          File.this.embeddedDataSpecifications.stream()
-            .flatMap(item -> Stream.concat(Stream.<IClass>of(item),
-              StreamSupport.stream(item.descend().spliterator(), false))));
+          Descent.descendListOf_IEmbeddedDataSpecification(
+            File.this.embeddedDataSpecifications,
+            true));
       }
 
       return memberStream;
