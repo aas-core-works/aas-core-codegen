@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
@@ -44,6 +45,17 @@ func (ve *VerificationError) Error() string {
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
+}
+
+// Sort the keys of `that` so that the errors come in a stable order,
+// as the iteration order of a Go map is deliberately random.
+func sortedKeysOfJsonObject(that ourtypes.JsonObject) []string {
+	keys := make([]string, 0, len(that))
+	for key := range that {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 // Verify that `value` is a JSON-able value, at any depth.
@@ -107,16 +119,7 @@ func verifyJsonValue(
 			return false
 
 		case ourtypes.JsonObject:
-			// NOTE (mristin):
-			// The keys are sorted so that the errors come in a stable order,
-			// as the iteration order of a Go map is deliberately random.
-			keys := make([]string, 0, len(casted))
-			for key := range casted {
-				keys = append(keys, key)
-			}
-			sort.Strings(keys)
-
-			for _, key := range keys {
+			for _, key := range sortedKeysOfJsonObject(casted) {
 				abort = verifyJsonValue(
 					casted[key],
 					func(err *VerificationError) bool {
@@ -202,43 +205,78 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.Values() {
-			abort = verifyJsonValue(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Values",
-						},
-					)
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_jsonValue(
+			that.Values(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Values",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
+	abort = verifyTupleOf4_string_jsonValue_jsonArray_jsonObject(
+		that.TupleWithJson(),
+		func(err *VerificationError) bool {
+			err.Path.PrependName(
+				&ourreporting.NameSegment{
+					Name: "TupleWithJson",
+				},
+			)
+			return onError(err)
+		},
+	)
+	if abort {
+		return
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_jsonValue(
+	that []ourtypes.JsonValue,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = verifyJsonValue(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyTupleOf4_string_jsonValue_jsonArray_jsonObject(
+	that ourcommon.Tuple4[string, ourtypes.JsonValue, ourtypes.JsonArray, ourtypes.JsonObject],
+	onError func(*VerificationError) bool,
+) (abort bool) {
 	abort = verifyJsonValue(
-		that.TupleWithJson().Item2,
+		that.Item2,
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
 				&ourreporting.IndexSegment{
 					Index: 1,
 				},
 			)
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "TupleWithJson",
-				},
-			)
-
 			return onError(err)
 		},
 	)
@@ -247,19 +285,13 @@ func VerifySomething(
 	}
 
 	abort = verifyJsonArray(
-		that.TupleWithJson().Item3,
+		that.Item3,
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
 				&ourreporting.IndexSegment{
 					Index: 2,
 				},
 			)
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "TupleWithJson",
-				},
-			)
-
 			return onError(err)
 		},
 	)
@@ -268,19 +300,13 @@ func VerifySomething(
 	}
 
 	abort = verifyJsonObject(
-		that.TupleWithJson().Item4,
+		that.Item4,
 		func(err *VerificationError) bool {
 			err.Path.PrependIndex(
 				&ourreporting.IndexSegment{
 					Index: 3,
 				},
 			)
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "TupleWithJson",
-				},
-			)
-
 			return onError(err)
 		},
 	)

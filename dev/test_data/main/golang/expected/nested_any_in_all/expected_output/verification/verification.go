@@ -134,28 +134,19 @@ func VerifyLangStringSet(
 			return
 		}
 	} else {
-		for i, v := range that.LangStrings() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "LangStrings",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangString(
+			that.LangStrings(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "LangStrings",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -175,28 +166,19 @@ func VerifyIecContent(
 	abort = false
 
 	if that.Definition() != nil {
-		for i, v := range that.Definition() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Definition",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangString(
+			that.Definition(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Definition",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -332,54 +314,111 @@ func VerifySomething(
 			return
 		}
 	} else {
-		for i, v := range that.LangStringSets() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "LangStringSets",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_ILangStringSet(
+			that.LangStringSets(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "LangStringSets",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
 	if that.Specifications() != nil {
-		for i, v := range that.Specifications() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
+		abort = verifyListOf_ISpecification(
+			that.Specifications(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Specifications",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
 
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Specifications",
-						},
-					)
+	return
+}
 
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+// Verify the items of `that` recursively.
+func verifyListOf_ILangString(
+	that []ourtypes.ILangString,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ILangStringSet(
+	that []ourtypes.ILangStringSet,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyListOf_ISpecification(
+	that []ourtypes.ISpecification,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 

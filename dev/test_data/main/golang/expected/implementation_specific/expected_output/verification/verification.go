@@ -223,28 +223,44 @@ func VerifyContainer(
 			return
 		}
 	} else {
-		for i, v := range that.Items() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
+		abort = verifyListOf_IItem(
+			that.Items(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Items",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
 
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Items",
-						},
-					)
+	return
+}
 
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+// Verify the items of `that` recursively.
+func verifyListOf_IItem(
+	that []ourtypes.IItem,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 

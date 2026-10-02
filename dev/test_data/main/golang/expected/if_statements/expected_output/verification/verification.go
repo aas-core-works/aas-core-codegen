@@ -376,28 +376,19 @@ func VerifyContainer(
 	abort = false
 
 	if that.Children() != nil {
-		for i, v := range that.Children() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
-
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Children",
-						},
-					)
-
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+		abort = verifyListOf_IParent(
+			that.Children(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Children",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -669,28 +660,44 @@ func VerifySomething(
 	}
 
 	if that.Parents() != nil {
-		for i, v := range that.Parents() {
-			abort = Verify(
-				v,
-				func(err *VerificationError) bool {
-					err.Path.PrependIndex(
-						&ourreporting.IndexSegment{
-							Index: i,
-						},
-					)
+		abort = verifyListOf_IParent(
+			that.Parents(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Parents",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
 
-					err.Path.PrependName(
-						&ourreporting.NameSegment{
-							Name: "Parents",
-						},
-					)
+	return
+}
 
-					return onError(err)
-				},
-			)
-			if abort {
-				return
-			}
+// Verify the items of `that` recursively.
+func verifyListOf_IParent(
+	that []ourtypes.IParent,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for i, item := range that {
+		abort = Verify(
+			item,
+			func(err *VerificationError) bool {
+				err.Path.PrependIndex(
+					&ourreporting.IndexSegment{
+						Index: i,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
 		}
 	}
 

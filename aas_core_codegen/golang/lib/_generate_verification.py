@@ -10,6 +10,7 @@ from typing import (
     Sequence,
     Mapping,
     Union,
+    Set,
 )
 
 from icontract import ensure, require
@@ -26,7 +27,6 @@ from aas_core_codegen.common import (
 )
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
-    PrimitiveTypeAnnotation,
 )
 from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
@@ -817,695 +817,299 @@ assert_union_without_excluded(
 )
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_verify_property_snippet(
-    prop: intermediate.Property,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
+def _needs_verification(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
     """
-    Generate the snippet to verify a property.
+    Check whether a value of ``type_annotation`` has anything to verify at any depth.
 
-    Return an empty string if there is nothing to be verified for the given property.
+    In Go, we verify all our types, including the enumerations, as any string
+    can be converted to an enumeration, and all the JSON-able values.
     """
-    # NOTE (mristin):
-    # Instead of writing here a complex but general solution with unrolling we choose
-    # to provide a simple, but limited, solution. First, the meta-model is quite
-    # limited itself at the moment, so the complexity of the general solution is not
-    # warranted. Second, we hope that there will be fewer bugs in the simple solution
-    # which is particularly important at this early adoption stage.
-    #
-    # We anticipate that in the future we will indeed need a general and complex
-    # solution. Here are just some thoughts on how to approach it:
-    # * Leave the pattern matching to produce more readable code for simple cases,
-    # * Unroll only in case of composite types and optional composite types.
+    return any(
+        isinstance(
+            type_anno,
+            (
+                intermediate.OurTypeAnnotation,
+                intermediate.JsonValueTypeAnnotation,
+                intermediate.JsonArrayTypeAnnotation,
+                intermediate.JsonObjectTypeAnnotation,
+            ),
+        )
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
+    )
 
-    type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    prop_name = golang_naming.property_name(prop.name)
-    prop_name_literal = golang_common.string_literal(prop_name)
+def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
+    """
+    Name ``type_anno`` by what its verification depends on.
 
-    getter_name = golang_naming.getter_name(prop.name)
+    This follows the Polish notation of
+    :py:func:`aas_core_codegen.golang.common.type_moniker`, except that a constrained primitive is named by itself
+    (*e.g.*, ``NonEmptyXMLSerializableString``), and not by its constrainee
+    (``string``), and a JSON object by its constrained key, if any (*e.g.*,
+    ``jsonObjectByNonEmptyXMLSerializableString``).
 
-    optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+    We need a moniker of our own since
+    :py:func:`aas_core_codegen.golang.common.type_moniker` names the types by
+    their Go type. For example, ``List[Non_empty_XML_serializable_string]`` and
+    ``List[Id_short_type]`` would both be named ``ListOf_string``. However,
+    they are verified differently, so they can not share one verification
+    function.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return f"ListOf_{_verification_moniker(type_anno.items)}"
 
-    block = None  # type: Optional[Stripped]
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return f"SetOf_{_verification_moniker(type_anno.items)}"
 
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        if type_anno.a_type is intermediate.PrimitiveType.BYTEARRAY and not optional:
-            block = Stripped(
-                f"""\
-if that.{getter_name}() == nil {{
-{I}abort = onError(
-{II}newVerificationError(
-{III}"Required property not set: {prop_name}",
-{II}),
-{I})
-{I}if abort {{
-{II}return
-{I}}}
-}}"""
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        joined = "_".join(_verification_moniker(item) for item in type_anno.items)
+        return f"TupleOf{len(type_anno.items)}_{joined}"
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type, intermediate.ConstrainedPrimitive
+    ):
+        return golang_naming.capital_camel_case(type_anno.our_type.name)
+
+    if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+        key_constrained_primitive = intermediate.try_constrained_primitive(
+            type_anno.key
+        )
+        if key_constrained_primitive is not None:
+            return (
+                f"jsonObjectBy"
+                f"{golang_naming.capital_camel_case(key_constrained_primitive.name)}"
             )
 
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
+    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected optional to be verified: {type_anno}. The optionals "
+            f"nested in the containers should have been refused in "
+            f"intermediate._translate._verify_only_simple_type_patterns."
+        )
+
+    return golang_common.leaf_moniker(type_anno)
+
+
+def _verify_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the function verifying ``type_anno``.
+
+    The underscore keeps the name apart from the names of the other verification
+    functions, which go through
+    :py:func:`aas_core_codegen.golang.naming.function_name` and never contain
+    an underscore.
+    """
+    return Identifier(f"verify{_verification_moniker(type_anno)}")
+
+
+def _prepend_index(index_expr: str) -> Stripped:
+    """Generate the statement prepending the index segment to the path of ``err``."""
+    return Stripped(
+        f"""\
+err.Path.PrependIndex(
+{I}&ourreporting.IndexSegment{{
+{II}Index: {index_expr},
+{I}}},
+)"""
+    )
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _generate_verify_into(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    segments: Sequence[Stripped],
+) -> Stripped:
+    """
+    Generate the statements reporting the errors of the value at ``expr``.
+
+    The ``segments`` are the statements prepending to the path of an error,
+    the innermost first.
+
+    An atomic value is verified by its own function. A container is delegated to
+    its function, which verifies only one level and calls the function of its
+    items by name. This way the verification is composed of plain functions, to
+    any depth.
+    """
+    function: str
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
         our_type = type_anno.our_type
 
         if isinstance(
             our_type, (intermediate.Enumeration, intermediate.ConstrainedPrimitive)
         ):
-            verify_function_name = golang_naming.function_name(
+            function = golang_naming.function_name(
                 Identifier(f"verify_{our_type.name}")
-            )
-
-            pointer_prefix = (
-                "*" if golang_pointering.is_pointer_type(prop.type_annotation) else ""
-            )
-
-            block = Stripped(
-                f"""\
-abort = {verify_function_name}(
-{I}{pointer_prefix}that.{getter_name}(),
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
             )
 
         elif isinstance(
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            block = Stripped(
-                f"""\
-abort = Verify(
-{I}that.{getter_name}(),
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-            )
+            function = "Verify"
 
         elif isinstance(our_type, intermediate.NamedUnion):
             # NOTE (mristin):
             # A named union has no verification function of its own -- it is
             # verified through the same general [Verify] dispatch function
-            # as a class, over its underlying instance. We keep this as its
-            # own branch, separate from the class branch above, so that it
-            # can diverge independently, *e.g.*, if primitive alternatives
-            # are ever allowed into a named union.
-            block = Stripped(
-                f"""\
-abort = Verify(
-{I}that.{getter_name}().Underlying(),
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-            )
+            # as a class, over its underlying instance.
+            function = "Verify"
+            expr = f"{expr}.Underlying()"
 
         else:
             assert_never(our_type)
 
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            f"NOTE (mristin): We expect only lists of atomic values "
-            f"at the moment, but you specified {type_anno}. "
-            f"Please contact the developers if you need this feature."
+    elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
+        function = "verifyJsonValue"
+
+    elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
+        function = "verifyJsonArray"
+
+    elif isinstance(type_anno, intermediate.JsonObjectTypeAnnotation):
+        function = "verifyJsonObject"
+
+    elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        function = _verify_container_name(type_anno)
+
+    else:
+        raise AssertionError(
+            f"Unexpected type annotation with something to verify: {type_anno}. "
+            f"The optionals nested in the containers should have been refused in "
+            f"intermediate._translate._verify_only_simple_type_patterns."
         )
 
-        loop_body: Optional[Stripped] = None
+    prepend_stmts = "\n".join(segments)
 
-        if isinstance(type_anno.items, PrimitiveTypeAnnotation):
-            # There is no verification for primitive types within a list.
-            pass
-
-        elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            # NOTE (mristin):
-            # We adapted the code for verifying the atomic values from above. This does
-            # cause a bit of duplication, but abstracting away the code to make it
-            # reusable resulted in a much more convoluted and less understandable code
-            # that we decided to duplicate it here. For example, the logic for
-            # prepending the path to the error can not be easily abstracted.
-
-            if isinstance(
-                type_anno.items.our_type,
-                (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-            ):
-                verify_function_name = golang_naming.function_name(
-                    Identifier(f"verify_{type_anno.items.our_type.name}")
-                )
-
-                pointer_prefix = (
-                    "*" if golang_pointering.is_pointer_type(type_anno.items) else ""
-                )
-
-                loop_body = Stripped(
-                    f"""\
-abort = {verify_function_name}(
-{I}{pointer_prefix}v,
+    blocks = [
+        Stripped(
+            f"""\
+abort = {function}(
+{I}{expr},
 {I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: i,
-{III}}},
-{II})
-
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-
+{II}{indent_but_first_line(prepend_stmts, II)}
 {II}return onError(err)
 {I}}},
 )
 if abort {{
 {I}return
 }}"""
-                )
-
-            elif isinstance(
-                type_anno.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                loop_body = Stripped(
-                    f"""\
-abort = Verify(
-{I}v,
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: i,
-{III}}},
-{II})
-
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-                )
-
-            elif isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union has no verification function of its own -- it
-                # is verified through the same general [Verify] dispatch
-                # function as a class, over its underlying instance. We keep
-                # this as its own branch, separate from the class branch
-                # above, so that it can diverge independently, *e.g.*, if
-                # primitive alternatives are ever allowed into a named union.
-                loop_body = Stripped(
-                    f"""\
-abort = Verify(
-{I}v.Underlying(),
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: i,
-{III}}},
-{II})
-
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-                )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.items.our_type)
-
-        elif isinstance(
-            type_anno.items,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            item_verify_function: str
-            if isinstance(type_anno.items, intermediate.JsonValueTypeAnnotation):
-                item_verify_function = "verifyJsonValue"
-            elif isinstance(type_anno.items, intermediate.JsonArrayTypeAnnotation):
-                item_verify_function = "verifyJsonArray"
-            else:
-                item_verify_function = "verifyJsonObject"
-
-            loop_body = Stripped(
-                f"""\
-abort = {item_verify_function}(
-{I}v,
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: i,
-{III}}},
-{II})
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-            )
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno.items)
-
-        if loop_body is not None:
-            block = Stripped(
-                f"""\
-for i, v := range that.{getter_name}() {{
-{I}{indent_but_first_line(loop_body, I)}
-}}"""
-            )
-
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        item_blocks = []  # type: List[Stripped]
-
-        for i, item_type_anno in enumerate(type_anno.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We expect only atomic items in a tuple "
-                f"at the moment, but got {item_type_anno} in {type_anno}. "
-                f"This should have already been verified in "
-                f"intermediate._translate._verify_only_simple_type_patterns."
-            )
-
-            item_expr = f"that.{getter_name}().Item{i + 1}"
-
-            if isinstance(item_type_anno, intermediate.PrimitiveTypeAnnotation):
-                # There is no verification for primitive types within a tuple.
-                continue
-
-            elif isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                if isinstance(
-                    item_type_anno.our_type,
-                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-                ):
-                    verify_function_name = golang_naming.function_name(
-                        Identifier(f"verify_{item_type_anno.our_type.name}")
-                    )
-
-                    item_blocks.append(
-                        Stripped(
-                            f"""\
-abort = {verify_function_name}(
-{I}{item_expr},
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: {i},
-{III}}},
-{II})
-
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-                        )
-                    )
-
-                elif isinstance(
-                    item_type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    item_blocks.append(
-                        Stripped(
-                            f"""\
-abort = Verify(
-{I}{item_expr},
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: {i},
-{III}}},
-{II})
-
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-                        )
-                    )
-
-                elif isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union has no verification function of its own
-                    # -- it is verified through the same general [Verify]
-                    # dispatch function as a class, over its underlying
-                    # instance. We keep this as its own branch, separate from
-                    # the class branch above, so that it can diverge
-                    # independently, *e.g.*, if primitive alternatives are
-                    # ever allowed into a named union.
-                    item_blocks.append(
-                        Stripped(
-                            f"""\
-abort = Verify(
-{I}{item_expr}.Underlying(),
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: {i},
-{III}}},
-{II})
-
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-                        )
-                    )
-
-                else:
-                    # noinspection PyTypeChecker
-                    assert_never(item_type_anno.our_type)
-
-            elif isinstance(
-                item_type_anno,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                tuple_verify_function: str
-                if isinstance(item_type_anno, intermediate.JsonValueTypeAnnotation):
-                    tuple_verify_function = "verifyJsonValue"
-                elif isinstance(item_type_anno, intermediate.JsonArrayTypeAnnotation):
-                    tuple_verify_function = "verifyJsonArray"
-                else:
-                    tuple_verify_function = "verifyJsonObject"
-
-                item_blocks.append(
-                    Stripped(
-                        f"""\
-abort = {tuple_verify_function}(
-{I}that.{getter_name}().Item{i + 1},
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependIndex(
-{III}&ourreporting.IndexSegment{{
-{IIII}Index: {i},
-{III}}},
-{II})
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-                    )
-                )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(item_type_anno)
-
-        if len(item_blocks) > 0:
-            block = Stripped("\n\n".join(item_blocks))
-
-    elif isinstance(
-        type_anno,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        json_verify_function: str
-        if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
-            json_verify_function = "verifyJsonValue"
-        elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
-            json_verify_function = "verifyJsonArray"
-        else:
-            json_verify_function = "verifyJsonObject"
-
-        blocks_of_json = [
-            Stripped(
-                f"""\
-abort = {json_verify_function}(
-{I}that.{getter_name}(),
-{I}func(err *VerificationError) bool {{
-{II}err.Path.PrependName(
-{III}&ourreporting.NameSegment{{
-{IIII}Name: {prop_name_literal},
-{III}}},
-{II})
-{II}return onError(err)
-{I}}},
-)
-if abort {{
-{I}return
-}}"""
-            )
-        ]
-
-        key_constrained_primitive = (
-            intermediate.try_constrained_primitive(type_anno.key)
-            if isinstance(type_anno, intermediate.JsonObjectTypeAnnotation)
-            else None
         )
+    ]
 
-        # NOTE (mristin):
-        # A bare ``str`` key has nothing to verify.
-        if key_constrained_primitive is not None:
-            key_verify_function = golang_naming.function_name(
-                Identifier(f"verify_{key_constrained_primitive.name}")
-            )
-
-            blocks_of_json.append(
+    # NOTE (mristin):
+    # A bare ``str`` key has nothing to verify.
+    if isinstance(
+        type_anno, intermediate.JsonObjectTypeAnnotation
+    ) and _needs_verification(type_anno.key):
+        key_stmts = _generate_verify_into(
+            expr="key",
+            type_anno=type_anno.key,
+            segments=[
                 Stripped(
                     f"""\
-for key := range that.{getter_name}() {{
-{I}abort = {key_verify_function}(
-{II}key,
-{II}func(err *VerificationError) bool {{
-{III}err.Path.PrependKey(
-{IIII}&ourreporting.KeySegment{{
-{IIIII}Key: key,
-{IIII}}},
-{III})
+err.Path.PrependKey(
+{I}&ourreporting.KeySegment{{
+{II}Key: key,
+{I}}},
+)"""
+                ),
+                *segments,
+            ],
+        )
 
-{III}err.Path.PrependName(
-{IIII}&ourreporting.NameSegment{{
-{IIIII}Name: {prop_name_literal},
-{IIII}}},
-{III})
-
-{III}return onError(err)
-{II}}},
-{I})
-{I}if abort {{
-{II}return
-{I}}}
+        blocks.append(
+            Stripped(
+                f"""\
+for _, key := range sortedKeysOfJsonObject({expr}) {{
+{I}{indent_but_first_line(key_stmts, I)}
 }}"""
-                )
             )
+        )
 
-        block = Stripped("\n\n".join(blocks_of_json))
+    return Stripped("\n\n".join(blocks))
+
+
+@require(lambda type_anno: _needs_verification(type_anno))
+def _generate_verify_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the function verifying ``type_anno``."""
+    body: Stripped
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_stmts = _generate_verify_into(
+            expr="item", type_anno=type_anno.items, segments=[_prepend_index("i")]
+        )
+
+        body = Stripped(
+            f"""\
+for i, item := range that {{
+{I}{indent_but_first_line(item_stmts, I)}
+}}"""
+        )
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        item_stmts = _generate_verify_into(
+            expr="item", type_anno=type_anno.items, segments=[_prepend_index("i")]
+        )
+
         # NOTE (mristin):
-        # A set holds only primitives, constrained primitives and enumeration
-        # literals. Only the latter two need to be verified.
-        if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-            assert isinstance(
-                type_anno.items.our_type,
-                (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-            ), (
-                f"NOTE (mristin): We expect only sets of enumeration literals and "
-                f"constrained primitives, as we refuse the others in "
-                f"intermediate._translate._verify_items_of_sets, "
-                f"but you specified {type_anno}."
-            )
+        # A set has no index, so we report the position of the item in
+        # the sorted order. This is the index of the item in the serialized
+        # array, so that the path resolves in the serialized data.
+        loop_head = "for i, item := range "
 
-            verify_function_name = golang_naming.function_name(
-                Identifier(f"verify_{type_anno.items.our_type.name}")
-            )
+        # NOTE (mristin):
+        # The loop is indented by one tab in the body of the function.
+        sorted_items_expr = golang_common.sorted_set_items_expr(
+            "that",
+            type_anno.items,
+            column=golang_common.TAB_WIDTH + len(loop_head),
+        )
 
-            # NOTE (mristin):
-            # A set has no index, so we report the position of the item in
-            # the sorted order. This is the index of the item in the serialized
-            # array, so that the path resolves in the serialized data.
-            loop_head = "for i, v := range "
-
-            # NOTE (mristin):
-            # The loop is nested in the check of the property's presence, so it
-            # is indented by two tabs.
-            sorted_items_expr = golang_common.sorted_set_items_expr(
-                f"that.{getter_name}()",
-                type_anno.items,
-                column=2 * golang_common.TAB_WIDTH + len(loop_head),
-            )
-
-            block = Stripped(
-                f"""\
+        body = Stripped(
+            f"""\
 {loop_head}{sorted_items_expr} {{
-{I}abort = {verify_function_name}(
-{II}v,
-{II}func(err *VerificationError) bool {{
-{III}err.Path.PrependIndex(
-{IIII}&ourreporting.IndexSegment{{
-{IIIII}Index: i,
-{IIII}}},
-{III})
-
-{III}err.Path.PrependName(
-{IIII}&ourreporting.NameSegment{{
-{IIIII}Name: {prop_name_literal},
-{IIII}}},
-{III})
-
-{III}return onError(err)
-{II}}},
-{I})
-{I}if abort {{
-{II}return
-{I}}}
+{I}{indent_but_first_line(item_stmts, I)}
 }}"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = Stripped(
+            "\n\n".join(
+                _generate_verify_into(
+                    expr=f"that.Item{i + 1}",
+                    type_anno=item_type_anno,
+                    segments=[_prepend_index(str(i))],
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if _needs_verification(item_type_anno)
             )
+        )
 
     else:
         assert_never(type_anno)
 
-    primitive_type = intermediate.try_primitive_type(type_anno)
-
-    is_reference = (
-        optional
-        or primitive_type is intermediate.PrimitiveType.BYTEARRAY
-        or (
-            isinstance(type_anno, intermediate.OurTypeAnnotation)
-            and isinstance(
-                type_anno.our_type,
-                (
-                    intermediate.AbstractClass,
-                    intermediate.ConcreteClass,
-                    intermediate.NamedUnion,
-                ),
-            )
-        )
-        or isinstance(
-            type_anno,
-            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
-        )
+    value_type = golang_common.generate_type(
+        type_anno, types_package=golang_common.TYPES_PACKAGE
     )
 
-    if not optional and is_reference and block is None:
-        block = Stripped(
-            f"""\
-if that.{getter_name}() == nil {{
-{I}abort = onError(
-{II}newVerificationError(
-{III}"Required property not set: {prop_name}",
-{II}),
-{I})
-{I}if abort {{
-{II}return
-{I}}}
-}}"""
-        )
-    elif not optional and is_reference and block is not None:
-        block = Stripped(
-            f"""\
-if that.{getter_name}() == nil {{
-{I}abort = onError(
-{II}newVerificationError(
-{III}"Required property not set: {prop_name}",
-{II}),
-{I})
-{I}if abort {{
-{II}return
-{I}}}
-}} else {{
-{I}{indent_but_first_line(block, I)}
-}}"""
-        )
-    elif optional and block is not None:
-        block = Stripped(
-            f"""\
-if that.{getter_name}() != nil {{
-{I}{indent_but_first_line(block, I)}
-}}"""
-        )
-    elif block is None:
-        return Stripped(""), None
-    else:
-        assert AssertionError(f"Unhandled case: {block=}, {optional=}, {is_reference=}")
+    return Stripped(
+        f"""\
+// Verify the items of `that` recursively.
+func {_verify_container_name(type_anno)}(
+{I}that {value_type},
+{I}onError func(*VerificationError) bool,
+) (abort bool) {{
+{I}{indent_but_first_line(body, I)}
 
-    return block, None
+{I}return
+}}"""
+    )
 
 
 def _generate_verify_json_value(
@@ -1528,6 +1132,19 @@ def _generate_verify_json_value(
         return []
 
     return [
+        Stripped(
+            f"""\
+// Sort the keys of `that` so that the errors come in a stable order,
+// as the iteration order of a Go map is deliberately random.
+func sortedKeysOfJsonObject(that ourtypes.JsonObject) []string {{
+{I}keys := make([]string, 0, len(that))
+{I}for key := range that {{
+{II}keys = append(keys, key)
+{I}}}
+{I}sort.Strings(keys)
+{I}return keys
+}}"""
+        ),
         Stripped(
             f"""\
 // Verify that `value` is a JSON-able value, at any depth.
@@ -1591,16 +1208,7 @@ func verifyJsonValue(
 {III}return false
 
 {II}case ourtypes.JsonObject:
-{III}// NOTE (mristin):
-{III}// The keys are sorted so that the errors come in a stable order,
-{III}// as the iteration order of a Go map is deliberately random.
-{III}keys := make([]string, 0, len(casted))
-{III}for key := range casted {{
-{IIII}keys = append(keys, key)
-{III}}}
-{III}sort.Strings(keys)
-
-{III}for _, key := range keys {{
+{III}for _, key := range sortedKeysOfJsonObject(casted) {{
 {IIII}abort = verifyJsonValue(
 {IIIII}casted[key],
 {IIIII}func(err *VerificationError) bool {{
@@ -1716,21 +1324,88 @@ def _generate_verify_class(
     # region Recurse into properties
 
     for prop in cls.properties:
-        block, error = _generate_verify_property_snippet(prop=prop)
-        if error is not None:
-            errors.append(
-                Error(
-                    cls.parsed.node,
-                    f"Failed to generate the verification of the property {prop.name!r} "
-                    f"of the class {cls.name!r}",
-                    [error],
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+        getter_name = golang_naming.getter_name(prop.name)
+        prop_name = golang_naming.property_name(prop.name)
+
+        block = None  # type: Optional[Stripped]
+        if _needs_verification(type_anno):
+            pointer_prefix = (
+                "*" if golang_pointering.is_pointer_type(prop.type_annotation) else ""
+            )
+
+            prop_name_literal = golang_common.string_literal(prop_name)
+
+            block = _generate_verify_into(
+                expr=f"{pointer_prefix}that.{getter_name}()",
+                type_anno=type_anno,
+                segments=[
+                    Stripped(
+                        f"""\
+err.Path.PrependName(
+{I}&ourreporting.NameSegment{{
+{II}Name: {prop_name_literal},
+{I}}},
+)"""
+                    )
+                ],
+            )
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            if block is not None:
+                block = Stripped(
+                    f"""\
+if that.{getter_name}() != nil {{
+{I}{indent_but_first_line(block, I)}
+}}"""
+                )
+
+        elif (
+            intermediate.try_primitive_type(type_anno)
+            is intermediate.PrimitiveType.BYTEARRAY
+            or isinstance(
+                type_anno,
+                (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+            )
+            or (
+                isinstance(type_anno, intermediate.OurTypeAnnotation)
+                and isinstance(
+                    type_anno.our_type,
+                    (
+                        intermediate.AbstractClass,
+                        intermediate.ConcreteClass,
+                        intermediate.NamedUnion,
+                    ),
                 )
             )
-            continue
+        ):
+            # NOTE (mristin):
+            # Go represents these values by nilable references, so we have to
+            # check that a required property is actually set.
+            else_block = (
+                ""
+                if block is None
+                else f""" else {{
+{I}{indent_but_first_line(block, I)}
+}}"""
+            )
 
-        assert block is not None
+            block = Stripped(
+                f"""\
+if that.{getter_name}() == nil {{
+{I}abort = onError(
+{II}newVerificationError(
+{III}"Required property not set: {prop_name}",
+{II}),
+{I})
+{I}if abort {{
+{II}return
+{I}}}
+}}{else_block}"""
+            )
 
-        if block != "":
+        if block is not None:
             blocks.append(block)
 
     # endregion
@@ -2096,6 +1771,9 @@ func (ve *VerificationError) PathString() string {{
         "verifyJsonValue": "our helper function to verify JSON-able values",
         "verifyJsonArray": "our helper function to verify JSON-able arrays",
         "verifyJsonObject": "our helper function to verify JSON-able objects",
+        "sortedKeysOfJsonObject": (
+            "our helper function to sort the keys of JSON-able objects"
+        ),
     }  # type: MutableMapping[str, str]
 
     for verification in symbol_table.verification_functions:
@@ -2199,6 +1877,27 @@ func (ve *VerificationError) PathString() string {{
         else:
             assert block is not None
             blocks.append(block)
+
+    observed_monikers = set()  # type: Set[str]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ) or not _needs_verification(type_anno):
+                    continue
+
+                moniker = _verification_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+                blocks.append(_generate_verify_container(type_anno=type_anno))
 
     for enumeration in symbol_table.enumerations:
         block = _generate_verify_enumeration(enumeration=enumeration)

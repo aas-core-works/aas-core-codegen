@@ -65,17 +65,6 @@ func VerifySomething(
 		if abort {
 			return
 		}
-	} else {
-		if that.SomeBytes() == nil {
-			abort = onError(
-				newVerificationError(
-					"Required property not set: SomeBytes",
-				),
-			)
-			if abort {
-				return
-			}
-		}
 	}
 
 	return
