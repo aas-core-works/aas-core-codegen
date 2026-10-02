@@ -35,7 +35,7 @@ type IClass interface {
 	// Apply the action on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// We do not recurse into the referenced instances.
 	//
@@ -45,7 +45,7 @@ type IClass interface {
 	// Apply the action recursively on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// The action is not applied on this instance.
 	Descend(action func(IClass) bool) (abort bool)
@@ -368,7 +368,7 @@ func (f *First) IncrementCount() int64 {
 // Apply the action on the instances referenced from f.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -376,19 +376,32 @@ func (f *First) IncrementCount() int64 {
 func (f *First) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_First(f, action, false)
 }
 
 // Apply the action recursively on the instances referenced from f.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on f.
 func (f *First) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_First(f, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_First(
+	that *First,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -644,7 +657,7 @@ func (s *Second) Prefix() string {
 // Apply the action on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -652,19 +665,32 @@ func (s *Second) Prefix() string {
 func (s *Second) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_Second(s, action, false)
 }
 
 // Apply the action recursively on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on s.
 func (s *Second) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_Second(s, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Second(
+	that *Second,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 

@@ -39,7 +39,7 @@ type IClass interface {
 	// Apply the action on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// We do not recurse into the referenced instances.
 	//
@@ -49,7 +49,7 @@ type IClass interface {
 	// Apply the action recursively on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// The action is not applied on this instance.
 	Descend(action func(IClass) bool) (abort bool)
@@ -101,7 +101,7 @@ func (sf *StructuralFirst) ModelType(
 // Apply the action on the instances referenced from sf.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -109,19 +109,32 @@ func (sf *StructuralFirst) ModelType(
 func (sf *StructuralFirst) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_StructuralFirst(sf, action, false)
 }
 
 // Apply the action recursively on the instances referenced from sf.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on sf.
 func (sf *StructuralFirst) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_StructuralFirst(sf, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_StructuralFirst(
+	that *StructuralFirst,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -184,7 +197,7 @@ func (ss *StructuralSecond) ModelType(
 // Apply the action on the instances referenced from ss.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -192,19 +205,32 @@ func (ss *StructuralSecond) ModelType(
 func (ss *StructuralSecond) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_StructuralSecond(ss, action, false)
 }
 
 // Apply the action recursively on the instances referenced from ss.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on ss.
 func (ss *StructuralSecond) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_StructuralSecond(ss, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_StructuralSecond(
+	that *StructuralSecond,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -366,7 +392,7 @@ func (mado *MixedAbstractDescendantOne) ModelType(
 // Apply the action on the instances referenced from mado.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -374,19 +400,32 @@ func (mado *MixedAbstractDescendantOne) ModelType(
 func (mado *MixedAbstractDescendantOne) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_MixedAbstractDescendantOne(mado, action, false)
 }
 
 // Apply the action recursively on the instances referenced from mado.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on mado.
 func (mado *MixedAbstractDescendantOne) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_MixedAbstractDescendantOne(mado, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_MixedAbstractDescendantOne(
+	that *MixedAbstractDescendantOne,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -449,7 +488,7 @@ func (madt *MixedAbstractDescendantTwo) ModelType(
 // Apply the action on the instances referenced from madt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -457,19 +496,32 @@ func (madt *MixedAbstractDescendantTwo) ModelType(
 func (madt *MixedAbstractDescendantTwo) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_MixedAbstractDescendantTwo(madt, action, false)
 }
 
 // Apply the action recursively on the instances referenced from madt.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on madt.
 func (madt *MixedAbstractDescendantTwo) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_MixedAbstractDescendantTwo(madt, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_MixedAbstractDescendantTwo(
+	that *MixedAbstractDescendantTwo,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -537,7 +589,7 @@ func (mcwd *MixedConcreteWithDescendants) ModelType(
 // Apply the action on the instances referenced from mcwd.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -545,19 +597,32 @@ func (mcwd *MixedConcreteWithDescendants) ModelType(
 func (mcwd *MixedConcreteWithDescendants) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_MixedConcreteWithDescendants(mcwd, action, false)
 }
 
 // Apply the action recursively on the instances referenced from mcwd.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on mcwd.
 func (mcwd *MixedConcreteWithDescendants) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_MixedConcreteWithDescendants(mcwd, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_MixedConcreteWithDescendants(
+	that *MixedConcreteWithDescendants,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -632,7 +697,7 @@ func (mcwdc *MixedConcreteWithDescendantsChild) ModelType(
 // Apply the action on the instances referenced from mcwdc.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -640,19 +705,32 @@ func (mcwdc *MixedConcreteWithDescendantsChild) ModelType(
 func (mcwdc *MixedConcreteWithDescendantsChild) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_MixedConcreteWithDescendantsChild(mcwdc, action, false)
 }
 
 // Apply the action recursively on the instances referenced from mcwdc.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on mcwdc.
 func (mcwdc *MixedConcreteWithDescendantsChild) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_MixedConcreteWithDescendantsChild(mcwdc, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_MixedConcreteWithDescendantsChild(
+	that *MixedConcreteWithDescendantsChild,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -717,7 +795,7 @@ func (mcl *MixedConcreteLeaf) ModelType(
 // Apply the action on the instances referenced from mcl.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -725,19 +803,32 @@ func (mcl *MixedConcreteLeaf) ModelType(
 func (mcl *MixedConcreteLeaf) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_MixedConcreteLeaf(mcl, action, false)
 }
 
 // Apply the action recursively on the instances referenced from mcl.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on mcl.
 func (mcl *MixedConcreteLeaf) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_MixedConcreteLeaf(mcl, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_MixedConcreteLeaf(
+	that *MixedConcreteLeaf,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -902,7 +993,7 @@ func (mtf *ModelTypedFirst) ModelType(
 // Apply the action on the instances referenced from mtf.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -910,19 +1001,32 @@ func (mtf *ModelTypedFirst) ModelType(
 func (mtf *ModelTypedFirst) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_ModelTypedFirst(mtf, action, false)
 }
 
 // Apply the action recursively on the instances referenced from mtf.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on mtf.
 func (mtf *ModelTypedFirst) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_ModelTypedFirst(mtf, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_ModelTypedFirst(
+	that *ModelTypedFirst,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -985,7 +1089,7 @@ func (mts *ModelTypedSecond) ModelType(
 // Apply the action on the instances referenced from mts.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -993,19 +1097,32 @@ func (mts *ModelTypedSecond) ModelType(
 func (mts *ModelTypedSecond) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_ModelTypedSecond(mts, action, false)
 }
 
 // Apply the action recursively on the instances referenced from mts.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on mts.
 func (mts *ModelTypedSecond) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_ModelTypedSecond(mts, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_ModelTypedSecond(
+	that *ModelTypedSecond,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 
@@ -1436,7 +1553,7 @@ func (s *Something) ModelType(
 // Apply the action on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -1444,291 +1561,179 @@ func (s *Something) ModelType(
 func (s *Something) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	abort = action(
-		s.structuralProperty.Underlying(),
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
-		s.mixedProperty.Underlying(),
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
-		s.modelTypedProperty.Underlying(),
-	)
-	if abort {
-		return
-	}
-
-	for _, v := range s.listStructuralProperty {
-		abort = action(v.Underlying());
-		if abort {
-			return
-		}
-	}
-
-	for _, v1 := range s.listMixedProperty {
-		abort = action(v1.Underlying());
-		if abort {
-			return
-		}
-	}
-
-	for _, v2 := range s.listModelTypedProperty {
-		abort = action(v2.Underlying());
-		if abort {
-			return
-		}
-	}
-
-	abort = action(
-		s.tupleProperty.Item1.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tupleProperty.Item2.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tupleProperty.Item3.Underlying(),
-	)
-	if abort {
-		return
-	}
-
-	if s.optionalStructuralProperty != nil {
-		abort = action(
-			s.optionalStructuralProperty.Underlying(),
-		)
-		if abort {
-			return
-		}
-	}
-
-	if s.optionalMixedProperty != nil {
-		abort = action(
-			s.optionalMixedProperty.Underlying(),
-		)
-		if abort {
-			return
-		}
-	}
-
-	if s.optionalModelTypedProperty != nil {
-		abort = action(
-			s.optionalModelTypedProperty.Underlying(),
-		)
-		if abort {
-			return
-		}
-	}
-
-	if s.optionalListOverlappingProperty != nil {
-		for _, v3 := range s.optionalListOverlappingProperty {
-			abort = action(v3.Underlying());
-			if abort {
-				return
-			}
-		}
-	}
-
-	return
+	return descend_Something(s, action, false)
 }
 
 // Apply the action recursively on the instances referenced from s.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on s.
 func (s *Something) Descend(
 	action func(IClass) bool,
 ) (abort bool) {
+	return descend_Something(s, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Something(
+	that *Something,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
 	abort = action(
-		s.structuralProperty.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = s.structuralProperty.Underlying().Descend(
-		action,
+		that.structuralProperty.Underlying(),
 	)
 	if abort {
 		return
 	}
 
-	abort = action(
-		s.mixedProperty.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = s.mixedProperty.Underlying().Descend(
-		action,
-	)
-	if abort {
-		return
-	}
-
-	abort = action(
-		s.modelTypedProperty.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = s.modelTypedProperty.Underlying().Descend(
-		action,
-	)
-	if abort {
-		return
-	}
-
-	for _, v := range s.listStructuralProperty {
-		abort = action(v.Underlying());
-		if abort {
-			return
-		}
-
-		abort = v.Underlying().Descend(
+	if recurse {
+		abort = that.structuralProperty.Underlying().Descend(
 			action,
-		);
+		)
 		if abort {
 			return
 		}
 	}
 
-	for _, v1 := range s.listMixedProperty {
-		abort = action(v1.Underlying());
-		if abort {
-			return
-		}
+	abort = action(
+		that.mixedProperty.Underlying(),
+	)
+	if abort {
+		return
+	}
 
-		abort = v1.Underlying().Descend(
+	if recurse {
+		abort = that.mixedProperty.Underlying().Descend(
 			action,
-		);
+		)
 		if abort {
 			return
 		}
 	}
 
-	for _, v2 := range s.listModelTypedProperty {
-		abort = action(v2.Underlying());
-		if abort {
-			return
-		}
+	abort = action(
+		that.modelTypedProperty.Underlying(),
+	)
+	if abort {
+		return
+	}
 
-		abort = v2.Underlying().Descend(
+	if recurse {
+		abort = that.modelTypedProperty.Underlying().Descend(
 			action,
-		);
+		)
 		if abort {
 			return
 		}
 	}
 
-	abort = action(
-		s.tupleProperty.Item1.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = s.tupleProperty.Item1.Underlying().Descend(
+	abort = descend_ListOf_StructuralUnion(
+		that.listStructuralProperty,
 		action,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tupleProperty.Item2.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = s.tupleProperty.Item2.Underlying().Descend(
-		action,
-	)
-	if abort {
-		return
-	}
-	abort = action(
-		s.tupleProperty.Item3.Underlying(),
-	)
-	if abort {
-		return
-	}
-	abort = s.tupleProperty.Item3.Underlying().Descend(
-		action,
+		recurse,
 	)
 	if abort {
 		return
 	}
 
-	if s.optionalStructuralProperty != nil {
+	abort = descend_ListOf_MixedUnion(
+		that.listMixedProperty,
+		action,
+		recurse,
+	)
+	if abort {
+		return
+	}
+
+	abort = descend_ListOf_ModelTypedUnion(
+		that.listModelTypedProperty,
+		action,
+		recurse,
+	)
+	if abort {
+		return
+	}
+
+	abort = descend_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+		that.tupleProperty,
+		action,
+		recurse,
+	)
+	if abort {
+		return
+	}
+
+	if that.optionalStructuralProperty != nil {
 		abort = action(
-			s.optionalStructuralProperty.Underlying(),
+			that.optionalStructuralProperty.Underlying(),
 		)
 		if abort {
 			return
 		}
-		abort = s.optionalStructuralProperty.Underlying().Descend(
-			action,
-		)
-		if abort {
-			return
-		}
-	}
 
-	if s.optionalMixedProperty != nil {
-		abort = action(
-			s.optionalMixedProperty.Underlying(),
-		)
-		if abort {
-			return
-		}
-		abort = s.optionalMixedProperty.Underlying().Descend(
-			action,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if s.optionalModelTypedProperty != nil {
-		abort = action(
-			s.optionalModelTypedProperty.Underlying(),
-		)
-		if abort {
-			return
-		}
-		abort = s.optionalModelTypedProperty.Underlying().Descend(
-			action,
-		)
-		if abort {
-			return
-		}
-	}
-
-	if s.optionalListOverlappingProperty != nil {
-		for _, v3 := range s.optionalListOverlappingProperty {
-			abort = action(v3.Underlying());
-			if abort {
-				return
-			}
-
-			abort = v3.Underlying().Descend(
+		if recurse {
+			abort = that.optionalStructuralProperty.Underlying().Descend(
 				action,
-			);
+			)
 			if abort {
 				return
 			}
+		}
+	}
+
+	if that.optionalMixedProperty != nil {
+		abort = action(
+			that.optionalMixedProperty.Underlying(),
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.optionalMixedProperty.Underlying().Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.optionalModelTypedProperty != nil {
+		abort = action(
+			that.optionalModelTypedProperty.Underlying(),
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = that.optionalModelTypedProperty.Underlying().Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	if that.optionalListOverlappingProperty != nil {
+		abort = descend_ListOf_OverlappingUnion(
+			that.optionalListOverlappingProperty,
+			action,
+			recurse,
+		)
+		if abort {
+			return
 		}
 	}
 
@@ -1759,6 +1764,191 @@ func NewSomething(
 		optionalModelTypedProperty: nil,
 		optionalListOverlappingProperty: nil,
 	}
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_StructuralUnion(
+	that []*StructuralUnion,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item.Underlying(),
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Underlying().Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_MixedUnion(
+	that []*MixedUnion,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item.Underlying(),
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Underlying().Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_ModelTypedUnion(
+	that []*ModelTypedUnion,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item.Underlying(),
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Underlying().Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+	that ourcommon.Tuple3[*StructuralUnion, *MixedUnion, *ModelTypedUnion],
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	abort = action(
+		that.Item1.Underlying(),
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item1.Underlying().Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	abort = action(
+		that.Item2.Underlying(),
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item2.Underlying().Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	abort = action(
+		that.Item3.Underlying(),
+	)
+	if abort {
+		return
+	}
+
+	if recurse {
+		abort = that.Item3.Underlying().Descend(
+			action,
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func descend_ListOf_OverlappingUnion(
+	that []*OverlappingUnion,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	for _, item := range that {
+		abort = action(
+			item.Underlying(),
+		)
+		if abort {
+			return
+		}
+
+		if recurse {
+			abort = item.Underlying().Descend(
+				action,
+			)
+			if abort {
+				return
+			}
+		}
+	}
+
+	return
 }
 
 // This code has been automatically generated by aas-core-codegen.

@@ -25,7 +25,7 @@ type IClass interface {
 	// Apply the action on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// We do not recurse into the referenced instances.
 	//
@@ -35,7 +35,7 @@ type IClass interface {
 	// Apply the action recursively on the instances referenced from this instance.
 	//
 	// If any of the actions returns abort `true`, the descent is immediately
-	// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+	// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 	//
 	// The action is not applied on this instance.
 	Descend(action func(IClass) bool) (abort bool)
@@ -153,7 +153,7 @@ func (b *Box) Volume() int64 {
 // Apply the action on the instances referenced from b.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -161,19 +161,32 @@ func (b *Box) Volume() int64 {
 func (b *Box) DescendOnce(
 	action func(IClass) bool,
 ) (abort bool) {
-	// No descendable properties
-
-	return
+	return descend_Box(b, action, false)
 }
 
 // Apply the action recursively on the instances referenced from b.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on b.
 func (b *Box) Descend(
 	action func(IClass) bool,
+) (abort bool) {
+	return descend_Box(b, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_Box(
+	that *Box,
+	action func(IClass) bool,
+	recurse bool,
 ) (abort bool) {
 	// No descendable properties
 

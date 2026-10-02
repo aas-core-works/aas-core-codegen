@@ -7,6 +7,7 @@ from typing import (
     Dict,
     List,
     Mapping,
+    Set,
     Tuple,
     cast,
     Union,
@@ -565,295 +566,209 @@ const (
     )
 
 
-def _generate_descend_body(
-    cls: intermediate.ConcreteClass, recurse: bool, receiver: Identifier
+def _descend_into_container_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Identifier:
+    """
+    Name the function descending into ``type_anno``.
+
+    The moniker is injective (see
+    :py:func:`aas_core_codegen.golang.common.type_moniker`), so two different
+    containers never share a function.
+    """
+    return Identifier(f"descend_{golang_common.type_moniker(type_anno)}")
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into(
+    expr: str,
+    type_anno: intermediate.TypeAnnotationUnion,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
 ) -> Stripped:
     """
-    Generate the body of the `descend and descend-once methods.
+    Generate the statements applying the action on the instances held at ``expr``.
+
+    An instance is handled in-line. A container is delegated to its function,
+    which descends only one level and calls the function of its items by name.
+    This way the descent is composed of plain functions, to any depth.
+
+    The generated code recurses only if the Golang variable ``recurse`` is set.
+    """
+    if isinstance(type_anno, intermediate.OurTypeAnnotation):
+        # NOTE (mristin):
+        # A named union is not itself an ``IClass``, so we descend into
+        # the underlying instance instead.
+        instance_expr = (
+            f"{expr}.Underlying()"
+            if isinstance(type_anno.our_type, intermediate.NamedUnion)
+            else expr
+        )
+
+        return Stripped(
+            f"""\
+abort = action(
+{I}{instance_expr},
+)
+if abort {{
+{I}return
+}}
+
+if recurse {{
+{I}abort = {instance_expr}.Descend(
+{II}action,
+{I})
+{I}if abort {{
+{II}return
+{I}}}
+}}"""
+        )
+
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        name = _descend_into_container_name(type_anno)
+
+        return Stripped(
+            f"""\
+abort = {name}(
+{I}{expr},
+{I}action,
+{I}recurse,
+)
+if abort {{
+{I}return
+}}"""
+        )
+
+    raise AssertionError(
+        f"Unexpected type annotation holding instances: {type_anno}. "
+        f"The optionals nested in the containers should have been refused in "
+        f"intermediate._translate._verify_only_simple_type_patterns."
+    )
+
+
+@require(
+    lambda type_anno, descendability: (
+        type_anno in descendability and descendability[type_anno]
+    )
+)
+def _generate_descend_into_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
+) -> Stripped:
+    """
+    Generate the function descending into ``type_anno``.
+
+    The ``descendability`` maps ``type_anno`` and its nested type annotations,
+    see :py:func:`aas_core_codegen.intermediate.map_descendability`.
+    """
+    body: Stripped
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        item_stmts = _generate_descend_into(
+            expr="item",
+            type_anno=type_anno.items,
+            descendability=descendability,
+        )
+
+        body = Stripped(
+            f"""\
+for _, item := range that {{
+{I}{indent_but_first_line(item_stmts, I)}
+}}"""
+        )
+
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # A set is a Golang map, which we can only iterate in a random order,
+        # so the descent would not be deterministic. Since no set holds
+        # instances at the moment, we refuse to generate the descent for now.
+        raise AssertionError(
+            f"Unexpected set holding instances: {type_anno}. We do not generate "
+            f"the descent into sets, since the order of iteration over a Golang map "
+            f"is random. Please contact the developers if you need this feature."
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        body = Stripped(
+            "\n\n".join(
+                _generate_descend_into(
+                    expr=f"that.Item{i + 1}",
+                    type_anno=item_type_anno,
+                    descendability=descendability,
+                )
+                for i, item_type_anno in enumerate(type_anno.items)
+                if descendability[item_type_anno]
+            )
+        )
+
+    else:
+        assert_never(type_anno)
+
+    name = _descend_into_container_name(type_anno)
+    value_type = golang_common.generate_type(type_anno)
+
+    return Stripped(
+        f"""\
+// Apply the action on the instances held by that, and recursively on their
+// descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+func {name}(
+{I}that {value_type},
+{I}action func(IClass) bool,
+{I}recurse bool,
+) (abort bool) {{
+{I}{indent_but_first_line(body, I)}
+
+{I}return
+}}"""
+    )
+
+
+def _generate_descend_methods(
+    cls: intermediate.ConcreteClass, receiver: Identifier
+) -> List[Stripped]:
+    """
+    Generate the ``DescendOnce`` and ``Descend`` methods for ``cls``.
+
+    Both methods delegate to a single function, which takes the recursion as
+    a run-time flag, so that we do not generate the same body twice.
     """
     blocks = []  # type: List[Stripped]
 
-    generator_for_loop_variables = golang_common.GeneratorForLoopVariables()
-
     for prop in cls.properties:
-        prop_name = golang_naming.private_property_name(prop.name)
+        descendability = intermediate.map_descendability(prop.type_annotation)
 
-        prop_blocks = []  # type: List[Stripped]
+        if not descendability[prop.type_annotation]:
+            continue
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-            continue
-        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-            if isinstance(type_anno.our_type, intermediate.Enumeration):
-                continue
-            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-                continue
-            elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                prop_blocks.append(
-                    Stripped(
-                        f"""\
-abort = action(
-{I}{receiver}.{prop_name},
-)
-if abort {{
-{I}return
-}}"""
-                    )
-                )
+        prop_name = golang_naming.private_property_name(prop.name)
 
-                if recurse:
-                    prop_blocks.append(
-                        Stripped(
-                            f"""\
-abort = {receiver}.{prop_name}.Descend(
-{I}action,
-)
-if abort {{
-{I}return
-}}"""
-                        )
-                    )
+        # NOTE (mristin):
+        # An optional of a non-nilable type, such as a tuple, is a pointer,
+        # but we pass the containers by value.
+        access_expr = (
+            f"*that.{prop_name}"
+            if golang_pointering.is_pointer_type(prop.type_annotation)
+            else f"that.{prop_name}"
+        )
 
-            elif isinstance(type_anno.our_type, intermediate.NamedUnion):
-                # NOTE (mristin):
-                # A named union is not itself an ``IClass``, so we descend into
-                # the underlying instance instead of the property directly. We
-                # keep this as its own branch, separate from the class branch
-                # above, so that it can diverge independently, *e.g.*, if
-                # primitive alternatives are ever allowed into a named union.
-                underlying_expr = f"{receiver}.{prop_name}.Underlying()"
+        block = _generate_descend_into(
+            expr=access_expr,
+            type_anno=type_anno,
+            descendability=descendability,
+        )
 
-                prop_blocks.append(
-                    Stripped(
-                        f"""\
-abort = action(
-{I}{underlying_expr},
-)
-if abort {{
-{I}return
-}}"""
-                    )
-                )
-
-                if recurse:
-                    prop_blocks.append(
-                        Stripped(
-                            f"""\
-abort = {underlying_expr}.Descend(
-{I}action,
-)
-if abort {{
-{I}return
-}}"""
-                        )
-                    )
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.our_type)
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We currently generate only the code to descend into "
-                f"lists of atomic values, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-            if isinstance(type_anno.items, intermediate.PrimitiveTypeAnnotation):
-                continue
-
-            elif isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-                if isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-                ):
-                    continue
-
-                elif isinstance(
-                    type_anno.items.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    loop_var = next(generator_for_loop_variables)
-
-                    if not recurse:
-                        prop_blocks.append(
-                            Stripped(
-                                f"""\
-for _, {loop_var} := range {receiver}.{prop_name} {{
-{I}abort = action({loop_var});
-{I}if abort {{
-{II}return
-{I}}}
-}}"""
-                            )
-                        )
-                    else:
-                        prop_blocks.append(
-                            Stripped(
-                                f"""\
-for _, {loop_var} := range {receiver}.{prop_name} {{
-{I}abort = action({loop_var});
-{I}if abort {{
-{II}return
-{I}}}
-
-{I}abort = {loop_var}.Descend(
-{II}action,
-{I});
-{I}if abort {{
-{II}return
-{I}}}
-}}"""
-                            )
-                        )
-
-                elif isinstance(type_anno.items.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union is not itself an ``IClass``, so we descend
-                    # into the underlying instance instead of the list item
-                    # directly. We keep this as its own branch, separate from
-                    # the class branch above, so that it can diverge
-                    # independently, *e.g.*, if primitive alternatives are
-                    # ever allowed into a named union.
-                    loop_var = next(generator_for_loop_variables)
-
-                    if not recurse:
-                        prop_blocks.append(
-                            Stripped(
-                                f"""\
-for _, {loop_var} := range {receiver}.{prop_name} {{
-{I}abort = action({loop_var}.Underlying());
-{I}if abort {{
-{II}return
-{I}}}
-}}"""
-                            )
-                        )
-                    else:
-                        prop_blocks.append(
-                            Stripped(
-                                f"""\
-for _, {loop_var} := range {receiver}.{prop_name} {{
-{I}abort = action({loop_var}.Underlying());
-{I}if abort {{
-{II}return
-{I}}}
-
-{I}abort = {loop_var}.Underlying().Descend(
-{II}action,
-{I});
-{I}if abort {{
-{II}return
-{I}}}
-}}"""
-                            )
-                        )
-
-                else:
-                    # noinspection PyTypeChecker
-                    assert_never(type_anno.items)
-            elif isinstance(
-                type_anno.items,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                # NOTE (mristin):
-                # A JSON-able value is plain data, never a reference to one of
-                # our own classes, so there is nothing to descend into.
-                continue
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_anno.items)
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            for i, item_type_anno in enumerate(type_anno.items):
-                if not isinstance(item_type_anno, intermediate.OurTypeAnnotation):
-                    continue
-
-                if isinstance(
-                    item_type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
-                ):
-                    item_expr = f"{receiver}.{prop_name}.Item{i + 1}"
-                elif isinstance(item_type_anno.our_type, intermediate.NamedUnion):
-                    # NOTE (mristin):
-                    # A named union is not itself an ``IClass``, so we descend
-                    # into the underlying instance instead of the tuple item
-                    # directly. We keep this as its own branch, separate from
-                    # the class branch above, so that it can diverge
-                    # independently, *e.g.*, if primitive alternatives are
-                    # ever allowed into a named union.
-                    item_expr = f"{receiver}.{prop_name}.Item{i + 1}.Underlying()"
-                else:
-                    continue
-
-                prop_blocks.append(
-                    Stripped(
-                        f"""\
-abort = action(
-{I}{item_expr},
-)
-if abort {{
-{I}return
-}}"""
-                    )
-                )
-
-                if recurse:
-                    prop_blocks.append(
-                        Stripped(
-                            f"""\
-abort = {item_expr}.Descend(
-{I}action,
-)
-if abort {{
-{I}return
-}}"""
-                        )
-                    )
-
-            if len(prop_blocks) == 0:
-                continue
-
-        elif isinstance(
-            type_anno,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able value is plain data, never a reference to one of our
-            # own classes, so there is nothing to descend into.
-            continue
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            # NOTE (mristin):
-            # A set holds only primitives and enumeration literals, never
-            # a reference to one of our own classes, so there is nothing to
-            # descend into.
-            continue
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
-
-        block = Stripped("\n".join(prop_blocks))
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             block = Stripped(
                 f"""\
-if {receiver}.{prop_name} != nil {{
+if that.{prop_name} != nil {{
 {I}{indent_but_first_line(block, I)}
 }}"""
             )
@@ -865,23 +780,22 @@ if {receiver}.{prop_name} != nil {{
 
     blocks.append(Stripped("return"))
 
-    return Stripped("\n\n".join(blocks))
-
-
-def _generate_descend_once_method(
-    cls: intermediate.ConcreteClass, receiver: Identifier
-) -> Stripped:
-    """Generate the descend-once method for the concrete class ``cls``."""
-    body = _generate_descend_body(cls=cls, recurse=False, receiver=receiver)
+    body = "\n\n".join(blocks)
 
     struct_name = golang_naming.struct_name(cls.name)
 
-    return Stripped(
-        f"""\
+    # NOTE (mristin):
+    # We name the function with an underscore so that it can not collide with
+    # any of the other names in the package, which never contain one.
+    function_name = Identifier(f"descend_{struct_name}")
+
+    return [
+        Stripped(
+            f"""\
 // Apply the action on the instances referenced from {receiver}.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // We do not recurse into the referenced instances.
 //
@@ -889,33 +803,41 @@ def _generate_descend_once_method(
 func ({receiver} *{struct_name}) DescendOnce(
 {I}action func(IClass) bool,
 ) (abort bool) {{
-{I}{indent_but_first_line(body, I)}
+{I}return {function_name}({receiver}, action, false)
 }}"""
-    )
-
-
-def _generate_descend_method(
-    cls: intermediate.ConcreteClass, receiver: Identifier
-) -> Stripped:
-    """Generate the recursive ``descend`` method for the concrete class ``cls``."""
-    body = _generate_descend_body(cls=cls, recurse=True, receiver=receiver)
-
-    struct_name = golang_naming.struct_name(cls.name)
-
-    return Stripped(
-        f"""\
+        ),
+        Stripped(
+            f"""\
 // Apply the action recursively on the instances referenced from {receiver}.
 //
 // If any of the actions returns abort `true`, the descent is immediately
-// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 //
 // The action is not applied on {receiver}.
 func ({receiver} *{struct_name}) Descend(
 {I}action func(IClass) bool,
 ) (abort bool) {{
+{I}return {function_name}({receiver}, action, true)
+}}"""
+        ),
+        Stripped(
+            f"""\
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func {function_name}(
+{I}that *{struct_name},
+{I}action func(IClass) bool,
+{I}recurse bool,
+) (abort bool) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
-    )
+        ),
+    ]
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1722,9 +1644,7 @@ func ({receiver} *{struct_name}) {model_type_getter}(
         else:
             assert_never(method)
 
-    methods.append(_generate_descend_once_method(cls=cls, receiver=receiver))
-
-    methods.append(_generate_descend_method(cls=cls, receiver=receiver))
+    methods.extend(_generate_descend_methods(cls=cls, receiver=receiver))
 
     # endregion
 
@@ -2086,7 +2006,7 @@ type IClass interface {{
 {I}// Apply the action on the instances referenced from this instance.
 {I}//
 {I}// If any of the actions returns abort `true`, the descent is immediately
-{I}// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+{I}// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 {I}//
 {I}// We do not recurse into the referenced instances.
 {I}//
@@ -2096,7 +2016,7 @@ type IClass interface {{
 {I}// Apply the action recursively on the instances referenced from this instance.
 {I}//
 {I}// If any of the actions returns abort `true`, the descent is immediately
-{I}// stopped,  and abort `true` is also returned. Otherwise, return abort `false`.
+{I}// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
 {I}//
 {I}// The action is not applied on this instance.
 {I}Descend(action func(IClass) bool) (abort bool)
@@ -2161,6 +2081,30 @@ type IClass interface {{
         else:
             # noinspection PyTypeChecker
             assert_never(our_type)
+
+    observed_monikers = set()  # type: Set[str]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            descendability = intermediate.map_descendability(prop.type_annotation)
+
+            for type_anno, descendable in descendability.items():
+                if not descendable or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                moniker = golang_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+
+                blocks.append(
+                    _generate_descend_into_container(
+                        type_anno=type_anno, descendability=descendability
+                    )
+                )
 
     if len(errors) > 0:
         return None, errors
