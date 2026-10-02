@@ -189,7 +189,7 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Children)
+            foreach (var anItem in Descent.DescendOnce_ListOf_IElement(Children))
             {
                 yield return anItem;
             }
@@ -200,15 +200,9 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Children)
+            foreach (var anItem in Descent.Descend_ListOf_IElement(Children))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
         }
 
@@ -280,7 +274,7 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in Children)
+            foreach (var anItem in Descent.DescendOnce_ListOf_IElement(Children))
             {
                 yield return anItem;
             }
@@ -291,15 +285,9 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in Children)
+            foreach (var anItem in Descent.Descend_ListOf_IElement(Children))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
         }
 
@@ -1079,9 +1067,9 @@ namespace dummy
 
             yield return Value.Underlying;
 
-            foreach (var anItem in Values)
+            foreach (var anItem in Descent.DescendOnce_ListOf_Value(Values))
             {
-                yield return anItem.Underlying;
+                yield return anItem;
             }
         }
 
@@ -1117,15 +1105,9 @@ namespace dummy
                 yield return anItem;
             }
 
-            foreach (var anItem in Values)
+            foreach (var anItem in Descent.Descend_ListOf_Value(Values))
             {
-                yield return anItem.Underlying;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Underlying.Descend())
-                {
-                    yield return anotherItem;
-                }
+                yield return anItem;
             }
         }
 
@@ -1181,6 +1163,80 @@ namespace dummy
             OptionalElement = optionalElement;
         }
     }
+
+    /// <summary>
+    /// Descend into the containers which hold class instances.
+    /// </summary>
+    /// <remarks>
+    /// Each method descends only one level, and calls the method of the items
+    /// by name, so that the descent is composed of plain functions to any depth.
+    /// </remarks>
+    internal static class Descent
+    {
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IElement(
+            List<IElement> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IElement(
+            List<IElement> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_Value(
+            List<Value> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+
+                // Recurse
+                foreach (var anItem in item.Underlying.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_Value(
+            List<Value> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item.Underlying;
+            }
+        }
+    }  // internal static class Descent
 }  // namespace dummy
 
 /*

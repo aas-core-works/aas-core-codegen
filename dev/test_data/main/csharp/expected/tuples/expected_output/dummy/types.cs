@@ -244,19 +244,28 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            yield return Items.Item1;
+            foreach (
+                var anItem in Descent.DescendOnce_TupleOf2_IAbstractItem_IAbstractItem(
+                    Items))
+            {
+                yield return anItem;
+            }
 
-            yield return Items.Item2;
-
-            yield return Tricky.Item2;
-
-            yield return Tricky.Item3;
-
-            yield return Tricky.Item4;
+            foreach (
+                var anItem in Descent.DescendOnce_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+                    Tricky))
+            {
+                yield return anItem;
+            }
 
             if (OptionalPair.HasValue)
             {
-                yield return OptionalPair.Value.Item2;
+                foreach (
+                    var anItem in Descent.DescendOnce_TupleOf2_string_IAbstractItem(
+                        OptionalPair.Value))
+                {
+                    yield return anItem;
+                }
             }
         }
 
@@ -265,52 +274,25 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            yield return Items.Item1;
-
-            // Recurse
-            foreach (var anItem in Items.Item1.Descend())
+            foreach (
+                var anItem in Descent.Descend_TupleOf2_IAbstractItem_IAbstractItem(
+                    Items))
             {
                 yield return anItem;
             }
 
-            yield return Items.Item2;
-
-            // Recurse
-            foreach (var anItem in Items.Item2.Descend())
-            {
-                yield return anItem;
-            }
-
-            yield return Tricky.Item2;
-
-            // Recurse
-            foreach (var anItem in Tricky.Item2.Descend())
-            {
-                yield return anItem;
-            }
-
-            yield return Tricky.Item3;
-
-            // Recurse
-            foreach (var anItem in Tricky.Item3.Descend())
-            {
-                yield return anItem;
-            }
-
-            yield return Tricky.Item4;
-
-            // Recurse
-            foreach (var anItem in Tricky.Item4.Descend())
+            foreach (
+                var anItem in Descent.Descend_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+                    Tricky))
             {
                 yield return anItem;
             }
 
             if (OptionalPair.HasValue)
             {
-                yield return OptionalPair.Value.Item2;
-
-                // Recurse
-                foreach (var anItem in OptionalPair.Value.Item2.Descend())
+                foreach (
+                    var anItem in Descent.Descend_TupleOf2_string_IAbstractItem(
+                        OptionalPair.Value))
                 {
                     yield return anItem;
                 }
@@ -369,6 +351,124 @@ namespace dummy
             OptionalPair = optionalPair;
         }
     }
+
+    /// <summary>
+    /// Descend into the containers which hold class instances.
+    /// </summary>
+    /// <remarks>
+    /// Each method descends only one level, and calls the method of the items
+    /// by name, so that the descent is composed of plain functions to any depth.
+    /// </remarks>
+    internal static class Descent
+    {
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_TupleOf2_IAbstractItem_IAbstractItem(
+            (IAbstractItem, IAbstractItem) that)
+        {
+            yield return that.Item1;
+
+            // Recurse
+            foreach (var anItem in that.Item1.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return that.Item2;
+
+            // Recurse
+            foreach (var anItem in that.Item2.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_TupleOf2_IAbstractItem_IAbstractItem(
+            (IAbstractItem, IAbstractItem) that)
+        {
+            yield return that.Item1;
+
+            yield return that.Item2;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+            (long, ISomeItem, IAbstractItem, ISomeItem, long, Result) that)
+        {
+            yield return that.Item2;
+
+            // Recurse
+            foreach (var anItem in that.Item2.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return that.Item3;
+
+            // Recurse
+            foreach (var anItem in that.Item3.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return that.Item4;
+
+            // Recurse
+            foreach (var anItem in that.Item4.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_TupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+            (long, ISomeItem, IAbstractItem, ISomeItem, long, Result) that)
+        {
+            yield return that.Item2;
+
+            yield return that.Item3;
+
+            yield return that.Item4;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_TupleOf2_string_IAbstractItem(
+            (string, IAbstractItem) that)
+        {
+            yield return that.Item2;
+
+            // Recurse
+            foreach (var anItem in that.Item2.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_TupleOf2_string_IAbstractItem(
+            (string, IAbstractItem) that)
+        {
+            yield return that.Item2;
+        }
+    }  // internal static class Descent
 }  // namespace dummy
 
 /*

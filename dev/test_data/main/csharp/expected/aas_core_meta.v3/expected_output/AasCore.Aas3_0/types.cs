@@ -243,7 +243,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -251,7 +253,9 @@ namespace AasCore.Aas3_0
 
             if (RefersTo != null)
             {
-                foreach (var anItem in RefersTo)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        RefersTo))
                 {
                     yield return anItem;
                 }
@@ -276,29 +280,19 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (RefersTo != null)
             {
-                foreach (var anItem in RefersTo)
+                foreach (var anItem in Descent.Descend_ListOf_IReference(RefersTo))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -672,7 +666,9 @@ namespace AasCore.Aas3_0
         {
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -691,15 +687,11 @@ namespace AasCore.Aas3_0
         {
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -1023,7 +1015,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -1053,15 +1047,11 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -1334,7 +1324,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -1342,7 +1334,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -1350,7 +1344,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -1363,7 +1359,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -1378,7 +1376,9 @@ namespace AasCore.Aas3_0
 
             if (Submodels != null)
             {
-                foreach (var anItem in Submodels)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        Submodels))
                 {
                     yield return anItem;
                 }
@@ -1392,43 +1392,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -1445,15 +1431,11 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -1478,15 +1460,9 @@ namespace AasCore.Aas3_0
 
             if (Submodels != null)
             {
-                foreach (var anItem in Submodels)
+                foreach (var anItem in Descent.Descend_ListOf_IReference(Submodels))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -1783,7 +1759,9 @@ namespace AasCore.Aas3_0
         {
             if (SpecificAssetIds != null)
             {
-                foreach (var anItem in SpecificAssetIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISpecificAssetId(
+                        SpecificAssetIds))
                 {
                     yield return anItem;
                 }
@@ -1802,15 +1780,11 @@ namespace AasCore.Aas3_0
         {
             if (SpecificAssetIds != null)
             {
-                foreach (var anItem in SpecificAssetIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ISpecificAssetId(
+                        SpecificAssetIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -2137,7 +2111,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -2167,15 +2143,11 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -2487,7 +2459,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -2495,7 +2469,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -2503,7 +2479,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -2521,7 +2499,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -2529,7 +2509,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -2537,7 +2519,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -2545,7 +2529,9 @@ namespace AasCore.Aas3_0
 
             if (SubmodelElements != null)
             {
-                foreach (var anItem in SubmodelElements)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISubmodelElement(
+                        SubmodelElements))
                 {
                     yield return anItem;
                 }
@@ -2559,43 +2545,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -2623,57 +2595,39 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (SubmodelElements != null)
             {
-                foreach (var anItem in SubmodelElements)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ISubmodelElement(
+                        SubmodelElements))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -2971,7 +2925,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -2979,7 +2935,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -2987,7 +2945,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -3000,7 +2960,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -3008,7 +2970,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -3016,7 +2980,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -3034,43 +3000,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -3087,43 +3039,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -3624,7 +3562,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -3632,7 +3572,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -3640,7 +3582,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -3653,7 +3597,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -3661,7 +3607,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -3669,7 +3617,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -3682,7 +3632,9 @@ namespace AasCore.Aas3_0
 
             if (Value != null)
             {
-                foreach (var anItem in Value)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISubmodelElement(
+                        Value))
                 {
                     yield return anItem;
                 }
@@ -3696,43 +3648,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -3749,43 +3687,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -3802,15 +3726,9 @@ namespace AasCore.Aas3_0
 
             if (Value != null)
             {
-                foreach (var anItem in Value)
+                foreach (var anItem in Descent.Descend_ListOf_ISubmodelElement(Value))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -4083,7 +4001,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -4091,7 +4011,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -4099,7 +4021,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -4112,7 +4036,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -4120,7 +4046,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -4128,7 +4056,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -4136,7 +4066,9 @@ namespace AasCore.Aas3_0
 
             if (Value != null)
             {
-                foreach (var anItem in Value)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISubmodelElement(
+                        Value))
                 {
                     yield return anItem;
                 }
@@ -4150,43 +4082,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -4203,57 +4121,37 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Value != null)
             {
-                foreach (var anItem in Value)
+                foreach (var anItem in Descent.Descend_ListOf_ISubmodelElement(Value))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -4605,7 +4503,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -4613,7 +4513,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -4621,7 +4523,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -4634,7 +4538,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -4642,7 +4548,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -4650,7 +4558,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -4669,43 +4579,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -4722,43 +4618,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -5099,7 +4981,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -5107,7 +4991,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -5115,7 +5001,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -5128,7 +5016,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -5136,7 +5026,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -5144,7 +5036,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -5152,7 +5046,9 @@ namespace AasCore.Aas3_0
 
             if (Value != null)
             {
-                foreach (var anItem in Value)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Value))
                 {
                     yield return anItem;
                 }
@@ -5171,43 +5067,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -5224,57 +5106,39 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Value != null)
             {
-                foreach (var anItem in Value)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Value))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -5589,7 +5453,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -5597,7 +5463,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -5605,7 +5473,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -5618,7 +5488,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -5626,7 +5498,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -5634,7 +5508,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -5648,43 +5524,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -5701,43 +5563,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -6019,7 +5867,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -6027,7 +5877,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -6035,7 +5887,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -6048,7 +5902,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -6056,7 +5912,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -6064,7 +5922,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -6083,43 +5943,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -6136,43 +5982,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -6497,7 +6329,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -6505,7 +6339,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -6513,7 +6349,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -6526,7 +6364,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -6534,7 +6374,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -6542,7 +6384,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -6556,43 +6400,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -6609,43 +6439,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -6945,7 +6761,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -6953,7 +6771,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -6961,7 +6781,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -6974,7 +6796,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -6982,7 +6806,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -6990,7 +6816,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -7004,43 +6832,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -7057,43 +6871,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -7372,7 +7172,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -7380,7 +7182,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -7388,7 +7192,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -7401,7 +7207,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -7409,7 +7217,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -7417,7 +7227,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -7429,7 +7241,9 @@ namespace AasCore.Aas3_0
 
             if (Annotations != null)
             {
-                foreach (var anItem in Annotations)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IDataElement(
+                        Annotations))
                 {
                     yield return anItem;
                 }
@@ -7443,43 +7257,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -7496,43 +7296,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -7554,15 +7340,11 @@ namespace AasCore.Aas3_0
 
             if (Annotations != null)
             {
-                foreach (var anItem in Annotations)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IDataElement(
+                        Annotations))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -7909,7 +7691,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -7917,7 +7701,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -7925,7 +7711,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -7938,7 +7726,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -7946,7 +7736,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -7954,7 +7746,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -7962,7 +7756,9 @@ namespace AasCore.Aas3_0
 
             if (Statements != null)
             {
-                foreach (var anItem in Statements)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISubmodelElement(
+                        Statements))
                 {
                     yield return anItem;
                 }
@@ -7970,7 +7766,9 @@ namespace AasCore.Aas3_0
 
             if (SpecificAssetIds != null)
             {
-                foreach (var anItem in SpecificAssetIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISpecificAssetId(
+                        SpecificAssetIds))
                 {
                     yield return anItem;
                 }
@@ -7984,43 +7782,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -8037,71 +7821,49 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Statements != null)
             {
-                foreach (var anItem in Statements)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ISubmodelElement(
+                        Statements))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (SpecificAssetIds != null)
             {
-                foreach (var anItem in SpecificAssetIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ISpecificAssetId(
+                        SpecificAssetIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -8873,7 +8635,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -8881,7 +8645,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -8889,7 +8655,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -8902,7 +8670,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -8910,7 +8680,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -8918,7 +8690,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -8939,43 +8713,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -8992,43 +8752,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -9400,7 +9146,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -9408,7 +9156,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -9416,7 +9166,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -9429,7 +9181,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -9437,7 +9191,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -9445,7 +9201,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -9453,7 +9211,9 @@ namespace AasCore.Aas3_0
 
             if (InputVariables != null)
             {
-                foreach (var anItem in InputVariables)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IOperationVariable(
+                        InputVariables))
                 {
                     yield return anItem;
                 }
@@ -9461,7 +9221,9 @@ namespace AasCore.Aas3_0
 
             if (OutputVariables != null)
             {
-                foreach (var anItem in OutputVariables)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IOperationVariable(
+                        OutputVariables))
                 {
                     yield return anItem;
                 }
@@ -9469,7 +9231,9 @@ namespace AasCore.Aas3_0
 
             if (InoutputVariables != null)
             {
-                foreach (var anItem in InoutputVariables)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IOperationVariable(
+                        InoutputVariables))
                 {
                     yield return anItem;
                 }
@@ -9483,43 +9247,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -9536,85 +9286,59 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (InputVariables != null)
             {
-                foreach (var anItem in InputVariables)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IOperationVariable(
+                        InputVariables))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (OutputVariables != null)
             {
-                foreach (var anItem in OutputVariables)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IOperationVariable(
+                        OutputVariables))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (InoutputVariables != null)
             {
-                foreach (var anItem in InoutputVariables)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IOperationVariable(
+                        InoutputVariables))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -9961,7 +9685,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -9969,7 +9695,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -9977,7 +9705,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -9990,7 +9720,9 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
                 }
@@ -9998,7 +9730,9 @@ namespace AasCore.Aas3_0
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IQualifier(
+                        Qualifiers))
                 {
                     yield return anItem;
                 }
@@ -10006,7 +9740,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -10020,43 +9756,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -10073,43 +9795,29 @@ namespace AasCore.Aas3_0
 
             if (SupplementalSemanticIds != null)
             {
-                foreach (var anItem in SupplementalSemanticIds)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IReference(
+                        SupplementalSemanticIds))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Qualifiers != null)
             {
-                foreach (var anItem in Qualifiers)
+                foreach (var anItem in Descent.Descend_ListOf_IQualifier(Qualifiers))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -10523,7 +10231,9 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IExtension(
+                        Extensions))
                 {
                     yield return anItem;
                 }
@@ -10531,7 +10241,9 @@ namespace AasCore.Aas3_0
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
                 }
@@ -10539,7 +10251,9 @@ namespace AasCore.Aas3_0
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
                 }
@@ -10552,7 +10266,9 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
                 }
@@ -10560,7 +10276,9 @@ namespace AasCore.Aas3_0
 
             if (IsCaseOf != null)
             {
-                foreach (var anItem in IsCaseOf)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IReference(
+                        IsCaseOf))
                 {
                     yield return anItem;
                 }
@@ -10574,43 +10292,29 @@ namespace AasCore.Aas3_0
         {
             if (Extensions != null)
             {
-                foreach (var anItem in Extensions)
+                foreach (var anItem in Descent.Descend_ListOf_IExtension(Extensions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (DisplayName != null)
             {
-                foreach (var anItem in DisplayName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringNameType(
+                        DisplayName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Description != null)
             {
-                foreach (var anItem in Description)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringTextType(
+                        Description))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -10627,29 +10331,19 @@ namespace AasCore.Aas3_0
 
             if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in EmbeddedDataSpecifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IEmbeddedDataSpecification(
+                        EmbeddedDataSpecifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (IsCaseOf != null)
             {
-                foreach (var anItem in IsCaseOf)
+                foreach (var anItem in Descent.Descend_ListOf_IReference(IsCaseOf))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -10997,7 +10691,7 @@ namespace AasCore.Aas3_0
                 yield return ReferredSemanticId;
             }
 
-            foreach (var anItem in Keys)
+            foreach (var anItem in Descent.DescendOnce_ListOf_IKey(Keys))
             {
                 yield return anItem;
             }
@@ -11019,15 +10713,9 @@ namespace AasCore.Aas3_0
                 }
             }
 
-            foreach (var anItem in Keys)
+            foreach (var anItem in Descent.Descend_ListOf_IKey(Keys))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
         }
 
@@ -11733,7 +11421,9 @@ namespace AasCore.Aas3_0
         {
             if (AssetAdministrationShells != null)
             {
-                foreach (var anItem in AssetAdministrationShells)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IAssetAdministrationShell(
+                        AssetAdministrationShells))
                 {
                     yield return anItem;
                 }
@@ -11741,7 +11431,9 @@ namespace AasCore.Aas3_0
 
             if (Submodels != null)
             {
-                foreach (var anItem in Submodels)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISubmodel(
+                        Submodels))
                 {
                     yield return anItem;
                 }
@@ -11749,7 +11441,9 @@ namespace AasCore.Aas3_0
 
             if (ConceptDescriptions != null)
             {
-                foreach (var anItem in ConceptDescriptions)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_IConceptDescription(
+                        ConceptDescriptions))
                 {
                     yield return anItem;
                 }
@@ -11763,43 +11457,29 @@ namespace AasCore.Aas3_0
         {
             if (AssetAdministrationShells != null)
             {
-                foreach (var anItem in AssetAdministrationShells)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IAssetAdministrationShell(
+                        AssetAdministrationShells))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (Submodels != null)
             {
-                foreach (var anItem in Submodels)
+                foreach (var anItem in Descent.Descend_ListOf_ISubmodel(Submodels))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
             if (ConceptDescriptions != null)
             {
-                foreach (var anItem in ConceptDescriptions)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_IConceptDescription(
+                        ConceptDescriptions))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -12517,7 +12197,9 @@ namespace AasCore.Aas3_0
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in ValueReferencePairs)
+            foreach (
+                var anItem in Descent.DescendOnce_ListOf_IValueReferencePair(
+                    ValueReferencePairs))
             {
                 yield return anItem;
             }
@@ -12528,15 +12210,11 @@ namespace AasCore.Aas3_0
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in ValueReferencePairs)
+            foreach (
+                var anItem in Descent.Descend_ListOf_IValueReferencePair(
+                    ValueReferencePairs))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
         }
 
@@ -13188,14 +12866,18 @@ namespace AasCore.Aas3_0
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in PreferredName)
+            foreach (
+                var anItem in Descent.DescendOnce_ListOf_ILangStringPreferredNameTypeIec61360(
+                    PreferredName))
             {
                 yield return anItem;
             }
 
             if (ShortName != null)
             {
-                foreach (var anItem in ShortName)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringShortNameTypeIec61360(
+                        ShortName))
                 {
                     yield return anItem;
                 }
@@ -13208,7 +12890,9 @@ namespace AasCore.Aas3_0
 
             if (Definition != null)
             {
-                foreach (var anItem in Definition)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangStringDefinitionTypeIec61360(
+                        Definition))
                 {
                     yield return anItem;
                 }
@@ -13230,28 +12914,20 @@ namespace AasCore.Aas3_0
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in PreferredName)
+            foreach (
+                var anItem in Descent.Descend_ListOf_ILangStringPreferredNameTypeIec61360(
+                    PreferredName))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
 
             if (ShortName != null)
             {
-                foreach (var anItem in ShortName)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringShortNameTypeIec61360(
+                        ShortName))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -13268,15 +12944,11 @@ namespace AasCore.Aas3_0
 
             if (Definition != null)
             {
-                foreach (var anItem in Definition)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ILangStringDefinitionTypeIec61360(
+                        Definition))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
 
@@ -13371,6 +13043,592 @@ namespace AasCore.Aas3_0
             LevelType = levelType;
         }
     }
+
+    /// <summary>
+    /// Descend into the containers which hold class instances.
+    /// </summary>
+    /// <remarks>
+    /// Each method descends only one level, and calls the method of the items
+    /// by name, so that the descent is composed of plain functions to any depth.
+    /// </remarks>
+    internal static class Descent
+    {
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IReference(
+            List<IReference> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IReference(
+            List<IReference> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IEmbeddedDataSpecification(
+            List<IEmbeddedDataSpecification> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IEmbeddedDataSpecification(
+            List<IEmbeddedDataSpecification> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IExtension(
+            List<IExtension> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IExtension(
+            List<IExtension> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ILangStringNameType(
+            List<ILangStringNameType> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ILangStringNameType(
+            List<ILangStringNameType> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ILangStringTextType(
+            List<ILangStringTextType> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ILangStringTextType(
+            List<ILangStringTextType> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ISpecificAssetId(
+            List<ISpecificAssetId> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ISpecificAssetId(
+            List<ISpecificAssetId> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IQualifier(
+            List<IQualifier> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IQualifier(
+            List<IQualifier> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ISubmodelElement(
+            List<ISubmodelElement> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ISubmodelElement(
+            List<ISubmodelElement> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IDataElement(
+            List<IDataElement> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IDataElement(
+            List<IDataElement> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IOperationVariable(
+            List<IOperationVariable> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IOperationVariable(
+            List<IOperationVariable> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IKey(
+            List<IKey> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IKey(
+            List<IKey> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IAssetAdministrationShell(
+            List<IAssetAdministrationShell> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IAssetAdministrationShell(
+            List<IAssetAdministrationShell> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ISubmodel(
+            List<ISubmodel> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ISubmodel(
+            List<ISubmodel> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IConceptDescription(
+            List<IConceptDescription> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IConceptDescription(
+            List<IConceptDescription> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_IValueReferencePair(
+            List<IValueReferencePair> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_IValueReferencePair(
+            List<IValueReferencePair> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ILangStringPreferredNameTypeIec61360(
+            List<ILangStringPreferredNameTypeIec61360> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ILangStringPreferredNameTypeIec61360(
+            List<ILangStringPreferredNameTypeIec61360> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ILangStringShortNameTypeIec61360(
+            List<ILangStringShortNameTypeIec61360> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ILangStringShortNameTypeIec61360(
+            List<ILangStringShortNameTypeIec61360> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ILangStringDefinitionTypeIec61360(
+            List<ILangStringDefinitionTypeIec61360> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ILangStringDefinitionTypeIec61360(
+            List<ILangStringDefinitionTypeIec61360> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+    }  // internal static class Descent
 }  // namespace AasCore.Aas3_0
 
 /*

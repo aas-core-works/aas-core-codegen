@@ -151,7 +151,9 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in LangStrings)
+            foreach (
+                var anItem in Descent.DescendOnce_ListOf_ILangString(
+                    LangStrings))
             {
                 yield return anItem;
             }
@@ -162,15 +164,11 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in LangStrings)
+            foreach (
+                var anItem in Descent.Descend_ListOf_ILangString(
+                    LangStrings))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
         }
 
@@ -256,7 +254,9 @@ namespace dummy
         {
             if (Definition != null)
             {
-                foreach (var anItem in Definition)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ILangString(
+                        Definition))
                 {
                     yield return anItem;
                 }
@@ -270,15 +270,9 @@ namespace dummy
         {
             if (Definition != null)
             {
-                foreach (var anItem in Definition)
+                foreach (var anItem in Descent.Descend_ListOf_ILangString(Definition))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -511,14 +505,18 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in LangStringSets)
+            foreach (
+                var anItem in Descent.DescendOnce_ListOf_ILangStringSet(
+                    LangStringSets))
             {
                 yield return anItem;
             }
 
             if (Specifications != null)
             {
-                foreach (var anItem in Specifications)
+                foreach (
+                    var anItem in Descent.DescendOnce_ListOf_ISpecification(
+                        Specifications))
                 {
                     yield return anItem;
                 }
@@ -530,28 +528,20 @@ namespace dummy
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in LangStringSets)
+            foreach (
+                var anItem in Descent.Descend_ListOf_ILangStringSet(
+                    LangStringSets))
             {
                 yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
             }
 
             if (Specifications != null)
             {
-                foreach (var anItem in Specifications)
+                foreach (
+                    var anItem in Descent.Descend_ListOf_ISpecification(
+                        Specifications))
                 {
                     yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
                 }
             }
         }
@@ -606,6 +596,112 @@ namespace dummy
             Specifications = specifications;
         }
     }
+
+    /// <summary>
+    /// Descend into the containers which hold class instances.
+    /// </summary>
+    /// <remarks>
+    /// Each method descends only one level, and calls the method of the items
+    /// by name, so that the descent is composed of plain functions to any depth.
+    /// </remarks>
+    internal static class Descent
+    {
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ILangString(
+            List<ILangString> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ILangString(
+            List<ILangString> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ILangStringSet(
+            List<ILangStringSet> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ILangStringSet(
+            List<ILangStringSet> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_ListOf_ISpecification(
+            List<ISpecification> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+
+                // Recurse
+                foreach (var anItem in item.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_ListOf_ISpecification(
+            List<ISpecification> that)
+        {
+            foreach (var item in that)
+            {
+                yield return item;
+            }
+        }
+    }  // internal static class Descent
 }  // namespace dummy
 
 /*
