@@ -422,6 +422,25 @@ export function textsBeforeStopAreFew(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_class(
+  that: ReadonlyArray<OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verify(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -520,24 +539,14 @@ class Verifier
     }
 
     if (context === true) {
-      let itemsIndex = 0;
-      for (const item of that.items) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.items,
-              itemsIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "items"
-            )
-          );
-          yield error;
-        }
-        itemsIndex++;
+      for (const error of verify_ListOf_class(that.items)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "items"
+          )
+        );
+        yield error;
       }
     }
   }

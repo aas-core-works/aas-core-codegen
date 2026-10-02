@@ -346,7 +346,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(that.item, context)) {
+      for (const error of verify(that.item)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -357,9 +357,7 @@ class Verifier
       }
 
       if (that.optionalItem !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalItem, context)
-        ) {
+        for (const error of verify(that.optionalItem)) {
           error.path.prepend(
             new PropertySegment(
               that,

@@ -577,6 +577,25 @@ export function noneIsShortAndTextIsShort(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_class(
+  that: ReadonlyArray<OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verify(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -775,7 +794,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(that.item, context)) {
+      for (const error of verify(that.item)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -785,7 +804,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(that.parent, context)) {
+      for (const error of verify(that.parent)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -795,30 +814,18 @@ class Verifier
         yield error;
       }
 
-      let parentsIndex = 0;
-      for (const item of that.parents) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.parents,
-              parentsIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "parents"
-            )
-          );
-          yield error;
-        }
-        parentsIndex++;
+      for (const error of verify_ListOf_class(that.parents)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "parents"
+          )
+        );
+        yield error;
       }
 
       if (that.optionalParent !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalParent, context)
-        ) {
+        for (const error of verify(that.optionalParent)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -830,9 +837,7 @@ class Verifier
       }
 
       if (that.optionalMember !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalMember, context)
-        ) {
+        for (const error of verify(that.optionalMember)) {
           error.path.prepend(
             new PropertySegment(
               that,

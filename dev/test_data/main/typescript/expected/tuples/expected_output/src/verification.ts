@@ -200,6 +200,104 @@ export function someVerification(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_TupleOf2_class_class(
+  that: readonly [OurTypes.Class, OurTypes.Class]
+): IterableIterator<VerificationError> {
+  for (const error of verify(that[0])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        0
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verify(that[1])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        1
+      )
+    );
+    yield error;
+  }
+}
+
+/**
+ * Verify the items of `that` recursively.
+ */
+function *verify_TupleOf6_int_class_class_class_PositiveInt_Result(
+  that: readonly [
+    number,
+    OurTypes.Class,
+    OurTypes.Class,
+    OurTypes.Class,
+    number,
+    OurTypes.Result
+  ]
+): IterableIterator<VerificationError> {
+  for (const error of verify(that[1])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        1
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verify(that[2])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        2
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verify(that[3])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        3
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verifyPositiveInt(that[4])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        4
+      )
+    );
+    yield error;
+  }
+}
+
+/**
+ * Verify the items of `that` recursively.
+ */
+function *verify_TupleOf2_str_class(
+  that: readonly [string, OurTypes.Class]
+): IterableIterator<VerificationError> {
+  for (const error of verify(that[1])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        1
+      )
+    );
+    yield error;
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -250,32 +348,7 @@ class Verifier
     }
 
     if (context === true) {
-      for (const error of this.transformWithContext(
-          that.items[0], context)
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.items,
-            0
-          )
-        );
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "items"
-          )
-        );
-        yield error;
-      }
-      for (const error of this.transformWithContext(
-          that.items[1], context)
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.items,
-            1
-          )
-        );
+      for (const error of verify_TupleOf2_class_class(that.items)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -285,64 +358,9 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(
-          that.tricky[1], context)
+      for (const error of verify_TupleOf6_int_class_class_class_PositiveInt_Result(
+          that.tricky)
       ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tricky,
-            1
-          )
-        );
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "tricky"
-          )
-        );
-        yield error;
-      }
-      for (const error of this.transformWithContext(
-          that.tricky[2], context)
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tricky,
-            2
-          )
-        );
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "tricky"
-          )
-        );
-        yield error;
-      }
-      for (const error of this.transformWithContext(
-          that.tricky[3], context)
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tricky,
-            3
-          )
-        );
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "tricky"
-          )
-        );
-        yield error;
-      }
-      for (const error of verifyPositiveInt(that.tricky[4])) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tricky,
-            4
-          )
-        );
         error.path.prepend(
           new PropertySegment(
             that,
@@ -353,15 +371,7 @@ class Verifier
       }
 
       if (that.optionalPair !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalPair[1], context)
-        ) {
-          error.path.prepend(
-            new IndexSegment(
-              that.optionalPair,
-              1
-            )
-          );
+        for (const error of verify_TupleOf2_str_class(that.optionalPair)) {
           error.path.prepend(
             new PropertySegment(
               that,

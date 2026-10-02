@@ -190,6 +190,25 @@ export class VerificationError {
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_class(
+  that: ReadonlyArray<OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verify(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -228,7 +247,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(that.item, context)) {
+      for (const error of verify(that.item)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -238,44 +257,24 @@ class Verifier
         yield error;
       }
 
-      let someItemsIndex = 0;
-      for (const item of that.someItems) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.someItems,
-              someItemsIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "someItems"
-            )
-          );
-          yield error;
-        }
-        someItemsIndex++;
+      for (const error of verify_ListOf_class(that.someItems)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "someItems"
+          )
+        );
+        yield error;
       }
 
-      let someSimplesIndex = 0;
-      for (const item of that.someSimples) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.someSimples,
-              someSimplesIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "someSimples"
-            )
-          );
-          yield error;
-        }
-        someSimplesIndex++;
+      for (const error of verify_ListOf_class(that.someSimples)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "someSimples"
+          )
+        );
+        yield error;
       }
     }
   }

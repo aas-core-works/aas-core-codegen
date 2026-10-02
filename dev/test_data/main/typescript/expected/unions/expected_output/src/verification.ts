@@ -190,6 +190,62 @@ export class VerificationError {
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_ListOf_class(
+  that: ReadonlyArray<OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (let i = 0; i < that.length; i++) {
+    for (const error of verify(that[i])) {
+      error.path.prepend(
+        new IndexSegment(
+          that,
+          i
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
+ * Verify the items of `that` recursively.
+ */
+function *verify_TupleOf3_class_class_class(
+  that: readonly [OurTypes.Class, OurTypes.Class, OurTypes.Class]
+): IterableIterator<VerificationError> {
+  for (const error of verify(that[0])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        0
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verify(that[1])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        1
+      )
+    );
+    yield error;
+  }
+
+  for (const error of verify(that[2])) {
+    error.path.prepend(
+      new IndexSegment(
+        that,
+        2
+      )
+    );
+    yield error;
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -319,9 +375,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(
-          that.structuralProperty, context)
-      ) {
+      for (const error of verify(that.structuralProperty)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -331,9 +385,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(
-          that.mixedProperty, context)
-      ) {
+      for (const error of verify(that.mixedProperty)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -343,9 +395,7 @@ class Verifier
         yield error;
       }
 
-      for (const error of this.transformWithContext(
-          that.modelTypedProperty, context)
-      ) {
+      for (const error of verify(that.modelTypedProperty)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -355,109 +405,39 @@ class Verifier
         yield error;
       }
 
-      let listStructuralPropertyIndex = 0;
-      for (const item of that.listStructuralProperty) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.listStructuralProperty,
-              listStructuralPropertyIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "listStructuralProperty"
-            )
-          );
-          yield error;
-        }
-        listStructuralPropertyIndex++;
-      }
-
-      let listMixedPropertyIndex = 0;
-      for (const item of that.listMixedProperty) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.listMixedProperty,
-              listMixedPropertyIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "listMixedProperty"
-            )
-          );
-          yield error;
-        }
-        listMixedPropertyIndex++;
-      }
-
-      let listModelTypedPropertyIndex = 0;
-      for (const item of that.listModelTypedProperty) {
-        for (const error of this.transformWithContext(item, context)) {
-          error.path.prepend(
-            new IndexSegment(
-              that.listModelTypedProperty,
-              listModelTypedPropertyIndex
-            )
-          );
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "listModelTypedProperty"
-            )
-          );
-          yield error;
-        }
-        listModelTypedPropertyIndex++;
-      }
-
-      for (const error of this.transformWithContext(
-          that.tupleProperty[0], context)
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tupleProperty,
-            0
-          )
-        );
+      for (const error of verify_ListOf_class(that.listStructuralProperty)) {
         error.path.prepend(
           new PropertySegment(
             that,
-            "tupleProperty"
+            "listStructuralProperty"
           )
         );
         yield error;
       }
-      for (const error of this.transformWithContext(
-          that.tupleProperty[1], context)
-      ) {
-        error.path.prepend(
-          new IndexSegment(
-            that.tupleProperty,
-            1
-          )
-        );
+
+      for (const error of verify_ListOf_class(that.listMixedProperty)) {
         error.path.prepend(
           new PropertySegment(
             that,
-            "tupleProperty"
+            "listMixedProperty"
           )
         );
         yield error;
       }
-      for (const error of this.transformWithContext(
-          that.tupleProperty[2], context)
-      ) {
+
+      for (const error of verify_ListOf_class(that.listModelTypedProperty)) {
         error.path.prepend(
-          new IndexSegment(
-            that.tupleProperty,
-            2
+          new PropertySegment(
+            that,
+            "listModelTypedProperty"
           )
         );
+        yield error;
+      }
+
+      for (const error of verify_TupleOf3_class_class_class(
+          that.tupleProperty)
+      ) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -468,9 +448,7 @@ class Verifier
       }
 
       if (that.optionalStructuralProperty !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalStructuralProperty, context)
-        ) {
+        for (const error of verify(that.optionalStructuralProperty)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -482,9 +460,7 @@ class Verifier
       }
 
       if (that.optionalMixedProperty !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalMixedProperty, context)
-        ) {
+        for (const error of verify(that.optionalMixedProperty)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -496,9 +472,7 @@ class Verifier
       }
 
       if (that.optionalModelTypedProperty !== null) {
-        for (const error of this.transformWithContext(
-            that.optionalModelTypedProperty, context)
-        ) {
+        for (const error of verify(that.optionalModelTypedProperty)) {
           error.path.prepend(
             new PropertySegment(
               that,
@@ -510,24 +484,16 @@ class Verifier
       }
 
       if (that.optionalListOverlappingProperty !== null) {
-        let optionalListOverlappingPropertyIndex = 0;
-        for (const item of that.optionalListOverlappingProperty) {
-          for (const error of this.transformWithContext(item, context)) {
-            error.path.prepend(
-              new IndexSegment(
-                that.optionalListOverlappingProperty,
-                optionalListOverlappingPropertyIndex
-              )
-            );
-            error.path.prepend(
-              new PropertySegment(
-                that,
-                "optionalListOverlappingProperty"
-              )
-            );
-            yield error;
-          }
-          optionalListOverlappingPropertyIndex++;
+        for (const error of verify_ListOf_class(
+            that.optionalListOverlappingProperty)
+        ) {
+          error.path.prepend(
+            new PropertySegment(
+              that,
+              "optionalListOverlappingProperty"
+            )
+          );
+          yield error;
         }
       }
     }

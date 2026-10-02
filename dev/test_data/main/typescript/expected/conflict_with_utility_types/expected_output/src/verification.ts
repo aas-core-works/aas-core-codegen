@@ -210,9 +210,7 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (context === true) {
-      for (const error of this.transformWithContext(
-          that.aReadonly, context)
-      ) {
+      for (const error of verify(that.aReadonly)) {
         error.path.prepend(
           new PropertySegment(
             that,
