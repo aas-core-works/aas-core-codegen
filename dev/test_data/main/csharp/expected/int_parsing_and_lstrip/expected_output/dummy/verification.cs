@@ -234,8 +234,7 @@ namespace dummy
                 foreach (var error in Verification.VerifyDecimalText(that.Decimal))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "decimal"));
+                        new Reporting.NameSegment("decimal"));
                     yield return error;
                 }
             }

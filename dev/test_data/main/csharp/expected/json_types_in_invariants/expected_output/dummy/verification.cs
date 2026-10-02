@@ -147,8 +147,7 @@ namespace dummy
                         that.Mapping, JsonValueVerification.ExpectedShape.Object))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "mapping"));
+                        new Reporting.NameSegment("mapping"));
                     yield return error;
                 }
 
@@ -157,8 +156,7 @@ namespace dummy
                         that.Values, JsonValueVerification.ExpectedShape.Array))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "values"));
+                        new Reporting.NameSegment("values"));
                     yield return error;
                 }
 
@@ -169,8 +167,7 @@ namespace dummy
                             that.OptionalMapping, JsonValueVerification.ExpectedShape.Object))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalMapping"));
+                            new Reporting.NameSegment("optionalMapping"));
                         yield return error;
                     }
                 }

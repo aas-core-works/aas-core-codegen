@@ -2680,49 +2680,38 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 foreach (var error in Verification.VerifyNameType(that.Name))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "name"));
+                        new Reporting.NameSegment("name"));
                     yield return error;
                 }
 
-                if (that.ValueType != null)
+                if (that.ValueType.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.DataTypeDefXsd value = that.ValueType
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyDataTypeDefXsd(value))
+                    foreach (
+                        var error in Verification.VerifyDataTypeDefXsd(
+                            that.ValueType.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueType"));
+                            new Reporting.NameSegment("valueType"));
                         yield return error;
                     }
                 }
@@ -2732,28 +2721,20 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyValueDataType(that.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "value"));
+                            new Reporting.NameSegment("value"));
                         yield return error;
                     }
                 }
 
                 if (that.RefersTo != null)
                 {
-                    int indexRefersTo = 0;
-                    foreach (var item in that.RefersTo)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.RefersTo))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexRefersTo));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "refersTo"));
-                            yield return error;
-                        }
-                        indexRefersTo++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("refersTo"));
+                        yield return error;
                     }
                 }
             }
@@ -2787,20 +2768,13 @@ namespace AasCore.Aas3_0
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
@@ -2809,8 +2783,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyVersionType(that.Version))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "version"));
+                            new Reporting.NameSegment("version"));
                         yield return error;
                     }
                 }
@@ -2820,8 +2793,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyRevisionType(that.Revision))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "revision"));
+                            new Reporting.NameSegment("revision"));
                         yield return error;
                     }
                 }
@@ -2831,8 +2803,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.Creator))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "creator"));
+                            new Reporting.NameSegment("creator"));
                         yield return error;
                     }
                 }
@@ -2842,8 +2813,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdentifier(that.TemplateId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "templateId"));
+                            new Reporting.NameSegment("templateId"));
                         yield return error;
                     }
                 }
@@ -2889,41 +2859,31 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
-                if (that.Kind != null)
+                if (that.Kind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.QualifierKind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyQualifierKind(value))
+                    foreach (
+                        var error in Verification.VerifyQualifierKind(
+                            that.Kind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "kind"));
+                            new Reporting.NameSegment("kind"));
                         yield return error;
                     }
                 }
@@ -2931,16 +2891,16 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyQualifierType(that.Type))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "type"));
+                        new Reporting.NameSegment("type"));
                     yield return error;
                 }
 
-                foreach (var error in Verification.VerifyDataTypeDefXsd(that.ValueType))
+                foreach (
+                    var error in Verification.VerifyDataTypeDefXsd(
+                        that.ValueType))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "valueType"));
+                        new Reporting.NameSegment("valueType"));
                     yield return error;
                 }
 
@@ -2949,8 +2909,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyValueDataType(that.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "value"));
+                            new Reporting.NameSegment("value"));
                         yield return error;
                     }
                 }
@@ -2960,8 +2919,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.ValueId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueId"));
+                            new Reporting.NameSegment("valueId"));
                         yield return error;
                     }
                 }
@@ -3074,20 +3032,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -3096,8 +3047,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -3107,47 +3057,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -3156,8 +3091,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.Administration))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "administration"));
+                            new Reporting.NameSegment("administration"));
                         yield return error;
                     }
                 }
@@ -3165,27 +3099,19 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyIdentifier(that.Id))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "id"));
+                        new Reporting.NameSegment("id"));
                     yield return error;
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
@@ -3194,8 +3120,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.DerivedFrom))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "derivedFrom"));
+                            new Reporting.NameSegment("derivedFrom"));
                         yield return error;
                     }
                 }
@@ -3203,27 +3128,19 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.Verify(that.AssetInformation))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "assetInformation"));
+                        new Reporting.NameSegment("assetInformation"));
                     yield return error;
                 }
 
                 if (that.Submodels != null)
                 {
-                    int indexSubmodels = 0;
-                    foreach (var item in that.Submodels)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.Submodels))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSubmodels));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "submodels"));
-                            yield return error;
-                        }
-                        indexSubmodels++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("submodels"));
+                        yield return error;
                     }
                 }
             }
@@ -3282,38 +3199,31 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyAssetKind(that.AssetKind))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "assetKind"));
+                        new Reporting.NameSegment("assetKind"));
                     yield return error;
                 }
 
                 if (that.GlobalAssetId != null)
                 {
-                    foreach (var error in Verification.VerifyIdentifier(that.GlobalAssetId))
+                    foreach (
+                        var error in Verification.VerifyIdentifier(
+                            that.GlobalAssetId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "globalAssetId"));
+                            new Reporting.NameSegment("globalAssetId"));
                         yield return error;
                     }
                 }
 
                 if (that.SpecificAssetIds != null)
                 {
-                    int indexSpecificAssetIds = 0;
-                    foreach (var item in that.SpecificAssetIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISpecificAssetId(
+                            that.SpecificAssetIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSpecificAssetIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "specificAssetIds"));
-                            yield return error;
-                        }
-                        indexSpecificAssetIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("specificAssetIds"));
+                        yield return error;
                     }
                 }
 
@@ -3322,8 +3232,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdentifier(that.AssetType))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "assetType"));
+                            new Reporting.NameSegment("assetType"));
                         yield return error;
                     }
                 }
@@ -3333,8 +3242,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.DefaultThumbnail))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "defaultThumbnail"));
+                            new Reporting.NameSegment("defaultThumbnail"));
                         yield return error;
                     }
                 }
@@ -3348,18 +3256,18 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyPathType(that.Path))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "path"));
+                        new Reporting.NameSegment("path"));
                     yield return error;
                 }
 
                 if (that.ContentType != null)
                 {
-                    foreach (var error in Verification.VerifyContentType(that.ContentType))
+                    foreach (
+                        var error in Verification.VerifyContentType(
+                            that.ContentType))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "contentType"));
+                            new Reporting.NameSegment("contentType"));
                         yield return error;
                     }
                 }
@@ -3405,44 +3313,34 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 foreach (var error in Verification.VerifyLabelType(that.Name))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "name"));
+                        new Reporting.NameSegment("name"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.VerifyIdentifier(that.Value))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "value"));
+                        new Reporting.NameSegment("value"));
                     yield return error;
                 }
 
@@ -3451,8 +3349,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.ExternalSubjectId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "externalSubjectId"));
+                            new Reporting.NameSegment("externalSubjectId"));
                         yield return error;
                     }
                 }
@@ -3649,20 +3546,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -3671,8 +3561,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -3682,47 +3571,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -3731,8 +3605,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.Administration))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "administration"));
+                            new Reporting.NameSegment("administration"));
                         yield return error;
                     }
                 }
@@ -3740,21 +3613,18 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyIdentifier(that.Id))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "id"));
+                        new Reporting.NameSegment("id"));
                     yield return error;
                 }
 
-                if (that.Kind != null)
+                if (that.Kind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.ModellingKind value = that.Kind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyModellingKind(value))
+                    foreach (
+                        var error in Verification.VerifyModellingKind(
+                            that.Kind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "kind"));
+                            new Reporting.NameSegment("kind"));
                         yield return error;
                     }
                 }
@@ -3764,85 +3634,56 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 if (that.SubmodelElements != null)
                 {
-                    int indexSubmodelElements = 0;
-                    foreach (var item in that.SubmodelElements)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISubmodelElement(
+                            that.SubmodelElements))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSubmodelElements));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "submodelElements"));
-                            yield return error;
-                        }
-                        indexSubmodelElements++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("submodelElements"));
+                        yield return error;
                     }
                 }
             }
@@ -3960,20 +3801,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -3982,8 +3816,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -3993,47 +3826,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -4042,82 +3860,58 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 foreach (var error in Verification.Verify(that.First))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "first"));
+                        new Reporting.NameSegment("first"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.Second))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "second"));
+                        new Reporting.NameSegment("second"));
                     yield return error;
                 }
             }
@@ -4321,20 +4115,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -4343,8 +4130,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -4354,47 +4140,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -4403,66 +4174,44 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
@@ -4471,52 +4220,41 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticIdListElement))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticIdListElement"));
+                            new Reporting.NameSegment("semanticIdListElement"));
                         yield return error;
                     }
                 }
 
                 foreach (
-                        var error in Verification.VerifyAasSubmodelElements(
-                            that.TypeValueListElement))
+                    var error in Verification.VerifyAasSubmodelElements(
+                        that.TypeValueListElement))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "typeValueListElement"));
+                        new Reporting.NameSegment("typeValueListElement"));
                     yield return error;
                 }
 
-                if (that.ValueTypeListElement != null)
+                if (that.ValueTypeListElement.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.DataTypeDefXsd value = that.ValueTypeListElement
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyDataTypeDefXsd(value))
+                    foreach (
+                        var error in Verification.VerifyDataTypeDefXsd(
+                            that.ValueTypeListElement.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueTypeListElement"));
+                            new Reporting.NameSegment("valueTypeListElement"));
                         yield return error;
                     }
                 }
 
                 if (that.Value != null)
                 {
-                    int indexValue = 0;
-                    foreach (var item in that.Value)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISubmodelElement(
+                            that.Value))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexValue));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "value"));
-                            yield return error;
-                        }
-                        indexValue++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("value"));
+                        yield return error;
                     }
                 }
             }
@@ -4667,20 +4405,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -4689,8 +4420,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -4700,47 +4430,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -4749,85 +4464,56 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 if (that.Value != null)
                 {
-                    int indexValue = 0;
-                    foreach (var item in that.Value)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISubmodelElement(
+                            that.Value))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexValue));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "value"));
-                            yield return error;
-                        }
-                        indexValue++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("value"));
+                        yield return error;
                     }
                 }
             }
@@ -4965,20 +4651,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -4987,8 +4666,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -4998,47 +4676,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -5047,74 +4710,53 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
-                foreach (var error in Verification.VerifyDataTypeDefXsd(that.ValueType))
+                foreach (
+                    var error in Verification.VerifyDataTypeDefXsd(
+                        that.ValueType))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "valueType"));
+                        new Reporting.NameSegment("valueType"));
                     yield return error;
                 }
 
@@ -5123,8 +4765,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyValueDataType(that.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "value"));
+                            new Reporting.NameSegment("value"));
                         yield return error;
                     }
                 }
@@ -5134,8 +4775,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.ValueId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueId"));
+                            new Reporting.NameSegment("valueId"));
                         yield return error;
                     }
                 }
@@ -5283,20 +4923,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -5305,8 +4938,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -5316,47 +4948,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -5365,85 +4982,56 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 if (that.Value != null)
                 {
-                    int indexValue = 0;
-                    foreach (var item in that.Value)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Value))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexValue));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "value"));
-                            yield return error;
-                        }
-                        indexValue++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("value"));
+                        yield return error;
                     }
                 }
 
@@ -5452,8 +5040,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.ValueId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueId"));
+                            new Reporting.NameSegment("valueId"));
                         yield return error;
                     }
                 }
@@ -5601,20 +5188,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -5623,8 +5203,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -5634,47 +5213,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -5683,74 +5247,53 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
-                foreach (var error in Verification.VerifyDataTypeDefXsd(that.ValueType))
+                foreach (
+                    var error in Verification.VerifyDataTypeDefXsd(
+                        that.ValueType))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "valueType"));
+                        new Reporting.NameSegment("valueType"));
                     yield return error;
                 }
 
@@ -5759,8 +5302,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyValueDataType(that.Min))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "min"));
+                            new Reporting.NameSegment("min"));
                         yield return error;
                     }
                 }
@@ -5770,8 +5312,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyValueDataType(that.Max))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "max"));
+                            new Reporting.NameSegment("max"));
                         yield return error;
                     }
                 }
@@ -5901,20 +5442,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -5923,8 +5457,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -5934,47 +5467,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -5983,66 +5501,44 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
@@ -6051,8 +5547,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "value"));
+                            new Reporting.NameSegment("value"));
                         yield return error;
                     }
                 }
@@ -6182,20 +5677,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -6204,8 +5692,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -6215,47 +5702,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -6264,66 +5736,44 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
@@ -6332,17 +5782,17 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyBlobType(that.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "value"));
+                            new Reporting.NameSegment("value"));
                         yield return error;
                     }
                 }
 
-                foreach (var error in Verification.VerifyContentType(that.ContentType))
+                foreach (
+                    var error in Verification.VerifyContentType(
+                        that.ContentType))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "contentType"));
+                        new Reporting.NameSegment("contentType"));
                     yield return error;
                 }
             }
@@ -6471,20 +5921,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -6493,8 +5936,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -6504,47 +5946,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -6553,66 +5980,44 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
@@ -6621,17 +6026,17 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyPathType(that.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "value"));
+                            new Reporting.NameSegment("value"));
                         yield return error;
                     }
                 }
 
-                foreach (var error in Verification.VerifyContentType(that.ContentType))
+                foreach (
+                    var error in Verification.VerifyContentType(
+                        that.ContentType))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "contentType"));
+                        new Reporting.NameSegment("contentType"));
                     yield return error;
                 }
             }
@@ -6774,20 +6179,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -6796,8 +6194,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -6807,47 +6204,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -6856,101 +6238,70 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 foreach (var error in Verification.Verify(that.First))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "first"));
+                        new Reporting.NameSegment("first"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.Second))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "second"));
+                        new Reporting.NameSegment("second"));
                     yield return error;
                 }
 
                 if (that.Annotations != null)
                 {
-                    int indexAnnotations = 0;
-                    foreach (var item in that.Annotations)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IDataElement(
+                            that.Annotations))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexAnnotations));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "annotations"));
-                            yield return error;
-                        }
-                        indexAnnotations++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("annotations"));
+                        yield return error;
                     }
                 }
             }
@@ -7130,20 +6481,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -7152,8 +6496,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -7163,47 +6506,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -7212,123 +6540,87 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 if (that.Statements != null)
                 {
-                    int indexStatements = 0;
-                    foreach (var item in that.Statements)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISubmodelElement(
+                            that.Statements))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexStatements));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "statements"));
-                            yield return error;
-                        }
-                        indexStatements++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("statements"));
+                        yield return error;
                     }
                 }
 
                 foreach (var error in Verification.VerifyEntityType(that.EntityType))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "entityType"));
+                        new Reporting.NameSegment("entityType"));
                     yield return error;
                 }
 
                 if (that.GlobalAssetId != null)
                 {
-                    foreach (var error in Verification.VerifyIdentifier(that.GlobalAssetId))
+                    foreach (
+                        var error in Verification.VerifyIdentifier(
+                            that.GlobalAssetId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "globalAssetId"));
+                            new Reporting.NameSegment("globalAssetId"));
                         yield return error;
                     }
                 }
 
                 if (that.SpecificAssetIds != null)
                 {
-                    int indexSpecificAssetIds = 0;
-                    foreach (var item in that.SpecificAssetIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISpecificAssetId(
+                            that.SpecificAssetIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSpecificAssetIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "specificAssetIds"));
-                            yield return error;
-                        }
-                        indexSpecificAssetIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("specificAssetIds"));
+                        yield return error;
                     }
                 }
             }
@@ -7359,8 +6651,7 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.Verify(that.Source))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "source"));
+                        new Reporting.NameSegment("source"));
                     yield return error;
                 }
 
@@ -7369,8 +6660,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SourceSemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "sourceSemanticId"));
+                            new Reporting.NameSegment("sourceSemanticId"));
                         yield return error;
                     }
                 }
@@ -7378,8 +6668,7 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.Verify(that.ObservableReference))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "observableReference"));
+                        new Reporting.NameSegment("observableReference"));
                     yield return error;
                 }
 
@@ -7388,8 +6677,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.ObservableSemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "observableSemanticId"));
+                            new Reporting.NameSegment("observableSemanticId"));
                         yield return error;
                     }
                 }
@@ -7399,8 +6687,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyMessageTopicType(that.Topic))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "topic"));
+                            new Reporting.NameSegment("topic"));
                         yield return error;
                     }
                 }
@@ -7410,8 +6697,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SubjectId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "subjectId"));
+                            new Reporting.NameSegment("subjectId"));
                         yield return error;
                     }
                 }
@@ -7419,8 +6705,7 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyDateTimeUtc(that.TimeStamp))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "timeStamp"));
+                        new Reporting.NameSegment("timeStamp"));
                     yield return error;
                 }
 
@@ -7429,8 +6714,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyBlobType(that.Payload))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "payload"));
+                            new Reporting.NameSegment("payload"));
                         yield return error;
                     }
                 }
@@ -7575,20 +6859,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -7597,8 +6874,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -7608,47 +6884,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -7657,100 +6918,76 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 foreach (var error in Verification.Verify(that.Observed))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "observed"));
+                        new Reporting.NameSegment("observed"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.VerifyDirection(that.Direction))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "direction"));
+                        new Reporting.NameSegment("direction"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.VerifyStateOfEvent(that.State))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "state"));
+                        new Reporting.NameSegment("state"));
                     yield return error;
                 }
 
                 if (that.MessageTopic != null)
                 {
-                    foreach (var error in Verification.VerifyMessageTopicType(that.MessageTopic))
+                    foreach (
+                        var error in Verification.VerifyMessageTopicType(
+                            that.MessageTopic))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "messageTopic"));
+                            new Reporting.NameSegment("messageTopic"));
                         yield return error;
                     }
                 }
@@ -7760,8 +6997,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.MessageBroker))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "messageBroker"));
+                            new Reporting.NameSegment("messageBroker"));
                         yield return error;
                     }
                 }
@@ -7771,8 +7007,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyDateTimeUtc(that.LastUpdate))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "lastUpdate"));
+                            new Reporting.NameSegment("lastUpdate"));
                         yield return error;
                     }
                 }
@@ -7782,8 +7017,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyDuration(that.MinInterval))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "minInterval"));
+                            new Reporting.NameSegment("minInterval"));
                         yield return error;
                     }
                 }
@@ -7793,8 +7027,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyDuration(that.MaxInterval))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "maxInterval"));
+                            new Reporting.NameSegment("maxInterval"));
                         yield return error;
                     }
                 }
@@ -7955,20 +7188,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -7977,8 +7203,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -7988,47 +7213,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -8037,123 +7247,80 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 if (that.InputVariables != null)
                 {
-                    int indexInputVariables = 0;
-                    foreach (var item in that.InputVariables)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IOperationVariable(
+                            that.InputVariables))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexInputVariables));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "inputVariables"));
-                            yield return error;
-                        }
-                        indexInputVariables++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("inputVariables"));
+                        yield return error;
                     }
                 }
 
                 if (that.OutputVariables != null)
                 {
-                    int indexOutputVariables = 0;
-                    foreach (var item in that.OutputVariables)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IOperationVariable(
+                            that.OutputVariables))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexOutputVariables));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "outputVariables"));
-                            yield return error;
-                        }
-                        indexOutputVariables++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("outputVariables"));
+                        yield return error;
                     }
                 }
 
                 if (that.InoutputVariables != null)
                 {
-                    int indexInoutputVariables = 0;
-                    foreach (var item in that.InoutputVariables)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IOperationVariable(
+                            that.InoutputVariables))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexInoutputVariables));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "inoutputVariables"));
-                            yield return error;
-                        }
-                        indexInoutputVariables++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("inoutputVariables"));
+                        yield return error;
                     }
                 }
             }
@@ -8176,8 +7343,7 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.Verify(that.Value))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "value"));
+                        new Reporting.NameSegment("value"));
                     yield return error;
                 }
             }
@@ -8295,20 +7461,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -8317,8 +7476,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -8328,47 +7486,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -8377,66 +7520,44 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "semanticId"));
+                            new Reporting.NameSegment("semanticId"));
                         yield return error;
                     }
                 }
 
                 if (that.SupplementalSemanticIds != null)
                 {
-                    int indexSupplementalSemanticIds = 0;
-                    foreach (var item in that.SupplementalSemanticIds)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.SupplementalSemanticIds))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSupplementalSemanticIds));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "supplementalSemanticIds"));
-                            yield return error;
-                        }
-                        indexSupplementalSemanticIds++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("supplementalSemanticIds"));
+                        yield return error;
                     }
                 }
 
                 if (that.Qualifiers != null)
                 {
-                    int indexQualifiers = 0;
-                    foreach (var item in that.Qualifiers)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IQualifier(
+                            that.Qualifiers))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexQualifiers));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "qualifiers"));
-                            yield return error;
-                        }
-                        indexQualifiers++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("qualifiers"));
+                        yield return error;
                     }
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
             }
@@ -8609,20 +7730,13 @@ namespace AasCore.Aas3_0
 
                 if (that.Extensions != null)
                 {
-                    int indexExtensions = 0;
-                    foreach (var item in that.Extensions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IExtension(
+                            that.Extensions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexExtensions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "extensions"));
-                            yield return error;
-                        }
-                        indexExtensions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("extensions"));
+                        yield return error;
                     }
                 }
 
@@ -8631,8 +7745,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyNameType(that.Category))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "category"));
+                            new Reporting.NameSegment("category"));
                         yield return error;
                     }
                 }
@@ -8642,47 +7755,32 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
+                            new Reporting.NameSegment("idShort"));
                         yield return error;
                     }
                 }
 
                 if (that.DisplayName != null)
                 {
-                    int indexDisplayName = 0;
-                    foreach (var item in that.DisplayName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringNameType(
+                            that.DisplayName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDisplayName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "displayName"));
-                            yield return error;
-                        }
-                        indexDisplayName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("displayName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Description != null)
                 {
-                    int indexDescription = 0;
-                    foreach (var item in that.Description)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringTextType(
+                            that.Description))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDescription));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "description"));
-                            yield return error;
-                        }
-                        indexDescription++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("description"));
+                        yield return error;
                     }
                 }
 
@@ -8691,8 +7789,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.Administration))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "administration"));
+                            new Reporting.NameSegment("administration"));
                         yield return error;
                     }
                 }
@@ -8700,46 +7797,31 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyIdentifier(that.Id))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "id"));
+                        new Reporting.NameSegment("id"));
                     yield return error;
                 }
 
                 if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexEmbeddedDataSpecifications = 0;
-                    foreach (var item in that.EmbeddedDataSpecifications)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IEmbeddedDataSpecification(
+                            that.EmbeddedDataSpecifications))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexEmbeddedDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "embeddedDataSpecifications"));
-                            yield return error;
-                        }
-                        indexEmbeddedDataSpecifications++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("embeddedDataSpecifications"));
+                        yield return error;
                     }
                 }
 
                 if (that.IsCaseOf != null)
                 {
-                    int indexIsCaseOf = 0;
-                    foreach (var item in that.IsCaseOf)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IReference(
+                            that.IsCaseOf))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexIsCaseOf));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "isCaseOf"));
-                            yield return error;
-                        }
-                        indexIsCaseOf++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("isCaseOf"));
+                        yield return error;
                     }
                 }
             }
@@ -8897,8 +7979,7 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyReferenceTypes(that.Type))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "type"));
+                        new Reporting.NameSegment("type"));
                     yield return error;
                 }
 
@@ -8907,26 +7988,16 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.ReferredSemanticId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "referredSemanticId"));
+                            new Reporting.NameSegment("referredSemanticId"));
                         yield return error;
                     }
                 }
 
-                int indexKeys = 0;
-                foreach (var item in that.Keys)
+                foreach (var error in Verification.Verify_ListOf_IKey(that.Keys))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexKeys));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "keys"));
-                        yield return error;
-                    }
-                    indexKeys++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("keys"));
+                    yield return error;
                 }
             }
 
@@ -8938,16 +8009,14 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.VerifyKeyTypes(that.Type))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "type"));
+                        new Reporting.NameSegment("type"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.VerifyIdentifier(that.Value))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "value"));
+                        new Reporting.NameSegment("value"));
                     yield return error;
                 }
             }
@@ -8964,21 +8033,21 @@ namespace AasCore.Aas3_0
                         "String shall have a maximum length of 128 characters.");
                 }
 
-                foreach (var error in Verification.VerifyBcp47LanguageTag(that.Language))
+                foreach (
+                    var error in Verification.VerifyBcp47LanguageTag(
+                        that.Language))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "language"));
+                        new Reporting.NameSegment("language"));
                     yield return error;
                 }
 
                 foreach (
-                        var error in Verification.VerifyNonEmptyXmlSerializableString(
-                            that.Text))
+                    var error in Verification.VerifyNonEmptyXmlSerializableString(
+                        that.Text))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "text"));
+                        new Reporting.NameSegment("text"));
                     yield return error;
                 }
             }
@@ -8995,21 +8064,21 @@ namespace AasCore.Aas3_0
                         "String shall have a maximum length of 1023 characters.");
                 }
 
-                foreach (var error in Verification.VerifyBcp47LanguageTag(that.Language))
+                foreach (
+                    var error in Verification.VerifyBcp47LanguageTag(
+                        that.Language))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "language"));
+                        new Reporting.NameSegment("language"));
                     yield return error;
                 }
 
                 foreach (
-                        var error in Verification.VerifyNonEmptyXmlSerializableString(
-                            that.Text))
+                    var error in Verification.VerifyNonEmptyXmlSerializableString(
+                        that.Text))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "text"));
+                        new Reporting.NameSegment("text"));
                     yield return error;
                 }
             }
@@ -9050,58 +8119,37 @@ namespace AasCore.Aas3_0
 
                 if (that.AssetAdministrationShells != null)
                 {
-                    int indexAssetAdministrationShells = 0;
-                    foreach (var item in that.AssetAdministrationShells)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IAssetAdministrationShell(
+                            that.AssetAdministrationShells))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexAssetAdministrationShells));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "assetAdministrationShells"));
-                            yield return error;
-                        }
-                        indexAssetAdministrationShells++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("assetAdministrationShells"));
+                        yield return error;
                     }
                 }
 
                 if (that.Submodels != null)
                 {
-                    int indexSubmodels = 0;
-                    foreach (var item in that.Submodels)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ISubmodel(
+                            that.Submodels))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexSubmodels));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "submodels"));
-                            yield return error;
-                        }
-                        indexSubmodels++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("submodels"));
+                        yield return error;
                     }
                 }
 
                 if (that.ConceptDescriptions != null)
                 {
-                    int indexConceptDescriptions = 0;
-                    foreach (var item in that.ConceptDescriptions)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IConceptDescription(
+                            that.ConceptDescriptions))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexConceptDescriptions));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "conceptDescriptions"));
-                            yield return error;
-                        }
-                        indexConceptDescriptions++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("conceptDescriptions"));
+                        yield return error;
                     }
                 }
             }
@@ -9114,16 +8162,16 @@ namespace AasCore.Aas3_0
                 foreach (var error in Verification.Verify(that.DataSpecification))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "dataSpecification"));
+                        new Reporting.NameSegment("dataSpecification"));
                     yield return error;
                 }
 
-                foreach (var error in Verification.Verify(that.DataSpecificationContent))
+                foreach (
+                    var error in Verification.Verify(
+                        that.DataSpecificationContent))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "dataSpecificationContent"));
+                        new Reporting.NameSegment("dataSpecificationContent"));
                     yield return error;
                 }
             }
@@ -9142,19 +8190,19 @@ namespace AasCore.Aas3_0
                 Our.IValueReferencePair that
             )
             {
-                foreach (var error in Verification.VerifyValueTypeIec61360(that.Value))
+                foreach (
+                    var error in Verification.VerifyValueTypeIec61360(
+                        that.Value))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "value"));
+                        new Reporting.NameSegment("value"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.ValueId))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "valueId"));
+                        new Reporting.NameSegment("valueId"));
                     yield return error;
                 }
             }
@@ -9171,20 +8219,13 @@ namespace AasCore.Aas3_0
                         "Value reference pair types must contain at least one item.");
                 }
 
-                int indexValueReferencePairs = 0;
-                foreach (var item in that.ValueReferencePairs)
+                foreach (
+                    var error in Verification.Verify_ListOf_IValueReferencePair(
+                        that.ValueReferencePairs))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexValueReferencePairs));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueReferencePairs"));
-                        yield return error;
-                    }
-                    indexValueReferencePairs++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("valueReferencePairs"));
+                    yield return error;
                 }
             }
 
@@ -9200,21 +8241,21 @@ namespace AasCore.Aas3_0
                         "String shall have a maximum length of 255 characters.");
                 }
 
-                foreach (var error in Verification.VerifyBcp47LanguageTag(that.Language))
+                foreach (
+                    var error in Verification.VerifyBcp47LanguageTag(
+                        that.Language))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "language"));
+                        new Reporting.NameSegment("language"));
                     yield return error;
                 }
 
                 foreach (
-                        var error in Verification.VerifyNonEmptyXmlSerializableString(
-                            that.Text))
+                    var error in Verification.VerifyNonEmptyXmlSerializableString(
+                        that.Text))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "text"));
+                        new Reporting.NameSegment("text"));
                     yield return error;
                 }
             }
@@ -9231,21 +8272,21 @@ namespace AasCore.Aas3_0
                         "String shall have a maximum length of 18 characters.");
                 }
 
-                foreach (var error in Verification.VerifyBcp47LanguageTag(that.Language))
+                foreach (
+                    var error in Verification.VerifyBcp47LanguageTag(
+                        that.Language))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "language"));
+                        new Reporting.NameSegment("language"));
                     yield return error;
                 }
 
                 foreach (
-                        var error in Verification.VerifyNonEmptyXmlSerializableString(
-                            that.Text))
+                    var error in Verification.VerifyNonEmptyXmlSerializableString(
+                        that.Text))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "text"));
+                        new Reporting.NameSegment("text"));
                     yield return error;
                 }
             }
@@ -9262,21 +8303,21 @@ namespace AasCore.Aas3_0
                         "String shall have a maximum length of 1023 characters.");
                 }
 
-                foreach (var error in Verification.VerifyBcp47LanguageTag(that.Language))
+                foreach (
+                    var error in Verification.VerifyBcp47LanguageTag(
+                        that.Language))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "language"));
+                        new Reporting.NameSegment("language"));
                     yield return error;
                 }
 
                 foreach (
-                        var error in Verification.VerifyNonEmptyXmlSerializableString(
-                            that.Text))
+                    var error in Verification.VerifyNonEmptyXmlSerializableString(
+                        that.Text))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "text"));
+                        new Reporting.NameSegment("text"));
                     yield return error;
                 }
             }
@@ -9374,50 +8415,35 @@ namespace AasCore.Aas3_0
                         "least in English.");
                 }
 
-                int indexPreferredName = 0;
-                foreach (var item in that.PreferredName)
+                foreach (
+                    var error in Verification.Verify_ListOf_ILangStringPreferredNameTypeIec61360(
+                        that.PreferredName))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexPreferredName));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "preferredName"));
-                        yield return error;
-                    }
-                    indexPreferredName++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("preferredName"));
+                    yield return error;
                 }
 
                 if (that.ShortName != null)
                 {
-                    int indexShortName = 0;
-                    foreach (var item in that.ShortName)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringShortNameTypeIec61360(
+                            that.ShortName))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexShortName));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "shortName"));
-                            yield return error;
-                        }
-                        indexShortName++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("shortName"));
+                        yield return error;
                     }
                 }
 
                 if (that.Unit != null)
                 {
                     foreach (
-                            var error in Verification.VerifyNonEmptyXmlSerializableString(
-                                that.Unit))
+                        var error in Verification.VerifyNonEmptyXmlSerializableString(
+                            that.Unit))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "unit"));
+                            new Reporting.NameSegment("unit"));
                         yield return error;
                     }
                 }
@@ -9427,8 +8453,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.UnitId))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "unitId"));
+                            new Reporting.NameSegment("unitId"));
                         yield return error;
                     }
                 }
@@ -9436,12 +8461,11 @@ namespace AasCore.Aas3_0
                 if (that.SourceOfDefinition != null)
                 {
                     foreach (
-                            var error in Verification.VerifyNonEmptyXmlSerializableString(
-                                that.SourceOfDefinition))
+                        var error in Verification.VerifyNonEmptyXmlSerializableString(
+                            that.SourceOfDefinition))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "sourceOfDefinition"));
+                            new Reporting.NameSegment("sourceOfDefinition"));
                         yield return error;
                     }
                 }
@@ -9449,58 +8473,47 @@ namespace AasCore.Aas3_0
                 if (that.Symbol != null)
                 {
                     foreach (
-                            var error in Verification.VerifyNonEmptyXmlSerializableString(
-                                that.Symbol))
+                        var error in Verification.VerifyNonEmptyXmlSerializableString(
+                            that.Symbol))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "symbol"));
+                            new Reporting.NameSegment("symbol"));
                         yield return error;
                     }
                 }
 
-                if (that.DataType != null)
+                if (that.DataType.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.DataTypeIec61360 value = that.DataType
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyDataTypeIec61360(value))
+                    foreach (
+                        var error in Verification.VerifyDataTypeIec61360(
+                            that.DataType.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "dataType"));
+                            new Reporting.NameSegment("dataType"));
                         yield return error;
                     }
                 }
 
                 if (that.Definition != null)
                 {
-                    int indexDefinition = 0;
-                    foreach (var item in that.Definition)
+                    foreach (
+                        var error in Verification.Verify_ListOf_ILangStringDefinitionTypeIec61360(
+                            that.Definition))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDefinition));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "definition"));
-                            yield return error;
-                        }
-                        indexDefinition++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("definition"));
+                        yield return error;
                     }
                 }
 
                 if (that.ValueFormat != null)
                 {
                     foreach (
-                            var error in Verification.VerifyNonEmptyXmlSerializableString(
-                                that.ValueFormat))
+                        var error in Verification.VerifyNonEmptyXmlSerializableString(
+                            that.ValueFormat))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueFormat"));
+                            new Reporting.NameSegment("valueFormat"));
                         yield return error;
                     }
                 }
@@ -9510,19 +8523,19 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.ValueList))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "valueList"));
+                            new Reporting.NameSegment("valueList"));
                         yield return error;
                     }
                 }
 
                 if (that.Value != null)
                 {
-                    foreach (var error in Verification.VerifyValueTypeIec61360(that.Value))
+                    foreach (
+                        var error in Verification.VerifyValueTypeIec61360(
+                            that.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "value"));
+                            new Reporting.NameSegment("value"));
                         yield return error;
                     }
                 }
@@ -9532,8 +8545,7 @@ namespace AasCore.Aas3_0
                     foreach (var error in Verification.Verify(that.LevelType))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "levelType"));
+                            new Reporting.NameSegment("levelType"));
                         yield return error;
                     }
                 }
@@ -10185,6 +9197,348 @@ namespace AasCore.Aas3_0
             {
                 yield return new Reporting.Error(
                     $"Invalid DataTypeIec61360: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IReference(
+            List<Our.IReference> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IEmbeddedDataSpecification(
+            List<Our.IEmbeddedDataSpecification> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IExtension(
+            List<Our.IExtension> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ILangStringNameType(
+            List<Our.ILangStringNameType> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ILangStringTextType(
+            List<Our.ILangStringTextType> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ISpecificAssetId(
+            List<Our.ISpecificAssetId> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IQualifier(
+            List<Our.IQualifier> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ISubmodelElement(
+            List<Our.ISubmodelElement> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IDataElement(
+            List<Our.IDataElement> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IOperationVariable(
+            List<Our.IOperationVariable> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IKey(
+            List<Our.IKey> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IAssetAdministrationShell(
+            List<Our.IAssetAdministrationShell> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ISubmodel(
+            List<Our.ISubmodel> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IConceptDescription(
+            List<Our.IConceptDescription> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IValueReferencePair(
+            List<Our.IValueReferencePair> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ILangStringPreferredNameTypeIec61360(
+            List<Our.ILangStringPreferredNameTypeIec61360> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ILangStringShortNameTypeIec61360(
+            List<Our.ILangStringShortNameTypeIec61360> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ILangStringDefinitionTypeIec61360(
+            List<Our.ILangStringDefinitionTypeIec61360> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

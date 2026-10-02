@@ -411,16 +411,12 @@ namespace dummy
                 Our.IItem that
             )
             {
-                if (that.MaybeKind != null)
+                if (that.MaybeKind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.Kind value = that.MaybeKind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyKind(value))
+                    foreach (var error in Verification.VerifyKind(that.MaybeKind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "maybeKind"));
+                            new Reporting.NameSegment("maybeKind"));
                         yield return error;
                     }
                 }
@@ -438,20 +434,11 @@ namespace dummy
                         "Texts are not empty");
                 }
 
-                int indexItems = 0;
-                foreach (var item in that.Items)
+                foreach (var error in Verification.Verify_ListOf_IItem(that.Items))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexItems));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "items"));
-                        yield return error;
-                    }
-                    indexItems++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("items"));
+                    yield return error;
                 }
 
                 if (that.MaybeItem != null)
@@ -459,8 +446,7 @@ namespace dummy
                     foreach (var error in Verification.Verify(that.MaybeItem))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "maybeItem"));
+                            new Reporting.NameSegment("maybeItem"));
                         yield return error;
                     }
                 }
@@ -492,6 +478,25 @@ namespace dummy
             {
                 yield return new Reporting.Error(
                     $"Invalid Kind: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IItem(
+            List<Our.IItem> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

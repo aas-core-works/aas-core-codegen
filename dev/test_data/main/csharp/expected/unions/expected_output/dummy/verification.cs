@@ -184,113 +184,68 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.StructuralProperty))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "structuralProperty"));
+                        new Reporting.NameSegment("structuralProperty"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.MixedProperty))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "mixedProperty"));
+                        new Reporting.NameSegment("mixedProperty"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.ModelTypedProperty))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "modelTypedProperty"));
+                        new Reporting.NameSegment("modelTypedProperty"));
                     yield return error;
                 }
 
-                int indexListStructuralProperty = 0;
-                foreach (var item in that.ListStructuralProperty)
-                {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexListStructuralProperty));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "listStructuralProperty"));
-                        yield return error;
-                    }
-                    indexListStructuralProperty++;
-                }
-
-                int indexListMixedProperty = 0;
-                foreach (var item in that.ListMixedProperty)
-                {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexListMixedProperty));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "listMixedProperty"));
-                        yield return error;
-                    }
-                    indexListMixedProperty++;
-                }
-
-                int indexListModelTypedProperty = 0;
-                foreach (var item in that.ListModelTypedProperty)
-                {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexListModelTypedProperty));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "listModelTypedProperty"));
-                        yield return error;
-                    }
-                    indexListModelTypedProperty++;
-                }
-
-                foreach (var error in Verification.Verify(that.TupleProperty.Item1))
+                foreach (
+                    var error in Verification.Verify_ListOf_StructuralUnion(
+                        that.ListStructuralProperty))
                 {
                     error.PrependSegment(
-                        new Reporting.IndexSegment(
-                            0));
-                    error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "tupleProperty"));
+                        new Reporting.NameSegment("listStructuralProperty"));
                     yield return error;
                 }
-                foreach (var error in Verification.Verify(that.TupleProperty.Item2))
+
+                foreach (
+                    var error in Verification.Verify_ListOf_MixedUnion(
+                        that.ListMixedProperty))
                 {
                     error.PrependSegment(
-                        new Reporting.IndexSegment(
-                            1));
-                    error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "tupleProperty"));
+                        new Reporting.NameSegment("listMixedProperty"));
                     yield return error;
                 }
-                foreach (var error in Verification.Verify(that.TupleProperty.Item3))
+
+                foreach (
+                    var error in Verification.Verify_ListOf_ModelTypedUnion(
+                        that.ListModelTypedProperty))
                 {
                     error.PrependSegment(
-                        new Reporting.IndexSegment(
-                            2));
+                        new Reporting.NameSegment("listModelTypedProperty"));
+                    yield return error;
+                }
+
+                foreach (
+                    var error in Verification.Verify_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+                        that.TupleProperty))
+                {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "tupleProperty"));
+                        new Reporting.NameSegment("tupleProperty"));
                     yield return error;
                 }
 
                 if (that.OptionalStructuralProperty != null)
                 {
-                    foreach (var error in Verification.Verify(that.OptionalStructuralProperty))
+                    foreach (
+                        var error in Verification.Verify(
+                            that.OptionalStructuralProperty))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalStructuralProperty"));
+                            new Reporting.NameSegment("optionalStructuralProperty"));
                         yield return error;
                     }
                 }
@@ -300,39 +255,32 @@ namespace dummy
                     foreach (var error in Verification.Verify(that.OptionalMixedProperty))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalMixedProperty"));
+                            new Reporting.NameSegment("optionalMixedProperty"));
                         yield return error;
                     }
                 }
 
                 if (that.OptionalModelTypedProperty != null)
                 {
-                    foreach (var error in Verification.Verify(that.OptionalModelTypedProperty))
+                    foreach (
+                        var error in Verification.Verify(
+                            that.OptionalModelTypedProperty))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalModelTypedProperty"));
+                            new Reporting.NameSegment("optionalModelTypedProperty"));
                         yield return error;
                     }
                 }
 
                 if (that.OptionalListOverlappingProperty != null)
                 {
-                    int indexOptionalListOverlappingProperty = 0;
-                    foreach (var item in that.OptionalListOverlappingProperty)
+                    foreach (
+                        var error in Verification.Verify_ListOf_OverlappingUnion(
+                            that.OptionalListOverlappingProperty))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexOptionalListOverlappingProperty));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "optionalListOverlappingProperty"));
-                            yield return error;
-                        }
-                        indexOptionalListOverlappingProperty++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("optionalListOverlappingProperty"));
+                        yield return error;
                     }
                 }
             }
@@ -357,6 +305,110 @@ namespace dummy
             foreach (var error in Verify(that.Underlying))
             {
                 yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_StructuralUnion(
+            List<Our.StructuralUnion> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_MixedUnion(
+            List<Our.MixedUnion> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_ModelTypedUnion(
+            List<Our.ModelTypedUnion> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+            (Our.StructuralUnion, Our.MixedUnion, Our.ModelTypedUnion) that)
+        {
+            foreach (var error in Verification.Verify(that.Item1))
+            {
+                error.PrependSegment(
+                    new Reporting.IndexSegment(0));
+                yield return error;
+            }
+
+            foreach (var error in Verification.Verify(that.Item2))
+            {
+                error.PrependSegment(
+                    new Reporting.IndexSegment(1));
+                yield return error;
+            }
+
+            foreach (var error in Verification.Verify(that.Item3))
+            {
+                error.PrependSegment(
+                    new Reporting.IndexSegment(2));
+                yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_OverlappingUnion(
+            List<Our.OverlappingUnion> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

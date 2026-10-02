@@ -653,61 +653,48 @@ namespace dummy
                 foreach (var error in Verification.VerifyKind(that.Kind))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "kind"));
+                        new Reporting.NameSegment("kind"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.VerifyCode(that.Code))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "code"));
+                        new Reporting.NameSegment("code"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.Item))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "item"));
+                        new Reporting.NameSegment("item"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.Parent))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "parent"));
+                        new Reporting.NameSegment("parent"));
                     yield return error;
                 }
 
-                int indexParents = 0;
-                foreach (var item in that.Parents)
+                foreach (
+                    var error in Verification.Verify_ListOf_IParent(
+                        that.Parents))
                 {
-                    foreach (var error in Verification.Verify(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexParents));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "parents"));
-                        yield return error;
-                    }
-                    indexParents++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("parents"));
+                    yield return error;
                 }
 
-                if (that.OptionalKind != null)
+                if (that.OptionalKind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.Kind value = that.OptionalKind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyKind(value))
+                    foreach (
+                        var error in Verification.VerifyKind(
+                            that.OptionalKind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalKind"));
+                            new Reporting.NameSegment("optionalKind"));
                         yield return error;
                     }
                 }
@@ -717,8 +704,7 @@ namespace dummy
                     foreach (var error in Verification.Verify(that.OptionalParent))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalParent"));
+                            new Reporting.NameSegment("optionalParent"));
                         yield return error;
                     }
                 }
@@ -728,8 +714,7 @@ namespace dummy
                     foreach (var error in Verification.Verify(that.OptionalMember))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalMember"));
+                            new Reporting.NameSegment("optionalMember"));
                         yield return error;
                     }
                 }
@@ -783,6 +768,25 @@ namespace dummy
             foreach (var error in Verify(that.Underlying))
             {
                 yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IParent(
+            List<Our.IParent> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

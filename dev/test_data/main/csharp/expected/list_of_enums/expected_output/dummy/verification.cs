@@ -56,20 +56,13 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                int indexSomeResults = 0;
-                foreach (var item in that.SomeResults)
+                foreach (
+                    var error in Verification.Verify_ListOf_Result(
+                        that.SomeResults))
                 {
-                    foreach (var error in Verification.VerifyResult(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexSomeResults));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "someResults"));
-                        yield return error;
-                    }
-                    indexSomeResults++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("someResults"));
+                    yield return error;
                 }
             }
         }  // private class Transformer
@@ -99,6 +92,25 @@ namespace dummy
             {
                 yield return new Reporting.Error(
                     $"Invalid Result: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_Result(
+            List<Our.Result> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.VerifyResult(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

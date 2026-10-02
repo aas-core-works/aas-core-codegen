@@ -384,16 +384,14 @@ namespace dummy
                 foreach (var error in Verification.VerifyKind(that.Kind))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "kind"));
+                        new Reporting.NameSegment("kind"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.VerifyNonEmptyString(that.Name))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "name"));
+                        new Reporting.NameSegment("name"));
                     yield return error;
                 }
             }

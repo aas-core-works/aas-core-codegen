@@ -206,8 +206,7 @@ namespace dummy
                 foreach (var error in Verification.Verify(that.Item))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "item"));
+                        new Reporting.NameSegment("item"));
                     yield return error;
                 }
 
@@ -216,22 +215,19 @@ namespace dummy
                     foreach (var error in Verification.Verify(that.OptionalItem))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalItem"));
+                            new Reporting.NameSegment("optionalItem"));
                         yield return error;
                     }
                 }
 
-                if (that.OptionalKind != null)
+                if (that.OptionalKind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.Kind value = that.OptionalKind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyKind(value))
+                    foreach (
+                        var error in Verification.VerifyKind(
+                            that.OptionalKind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalKind"));
+                            new Reporting.NameSegment("optionalKind"));
                         yield return error;
                     }
                 }

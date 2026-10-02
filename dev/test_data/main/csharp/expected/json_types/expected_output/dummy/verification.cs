@@ -57,8 +57,7 @@ namespace dummy
                         that.Value, JsonValueVerification.ExpectedShape.Any))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "value"));
+                        new Reporting.NameSegment("value"));
                     yield return error;
                 }
 
@@ -67,8 +66,7 @@ namespace dummy
                         that.Values, JsonValueVerification.ExpectedShape.Array))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "values"));
+                        new Reporting.NameSegment("values"));
                     yield return error;
                 }
 
@@ -77,8 +75,7 @@ namespace dummy
                         that.Mapping, JsonValueVerification.ExpectedShape.Object))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "mapping"));
+                        new Reporting.NameSegment("mapping"));
                     yield return error;
                 }
 
@@ -87,20 +84,18 @@ namespace dummy
                         that.MappingWithConstrainedKey, JsonValueVerification.ExpectedShape.Object))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "mappingWithConstrainedKey"));
+                        new Reporting.NameSegment("mappingWithConstrainedKey"));
                     yield return error;
                 }
+
                 foreach (var member in that.MappingWithConstrainedKey)
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(member.Key))
                     {
                         error.PrependSegment(
-                            new Reporting.KeySegment(
-                                member.Key));
+                            new Reporting.KeySegment(member.Key));
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "mappingWithConstrainedKey"));
+                            new Reporting.NameSegment("mappingWithConstrainedKey"));
                         yield return error;
                     }
                 }
@@ -112,8 +107,7 @@ namespace dummy
                             that.OptionalValue, JsonValueVerification.ExpectedShape.Any))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalValue"));
+                            new Reporting.NameSegment("optionalValue"));
                         yield return error;
                     }
                 }
@@ -125,8 +119,7 @@ namespace dummy
                             that.OptionalValues, JsonValueVerification.ExpectedShape.Array))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalValues"));
+                            new Reporting.NameSegment("optionalValues"));
                         yield return error;
                     }
                 }
@@ -138,8 +131,7 @@ namespace dummy
                             that.OptionalMapping, JsonValueVerification.ExpectedShape.Object))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalMapping"));
+                            new Reporting.NameSegment("optionalMapping"));
                         yield return error;
                     }
                 }

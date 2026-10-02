@@ -52,8 +52,23 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                // No verification has been defined for Something.
-                yield break;
+                foreach (
+                    var error in Verification.Verify_ListOf_jsonValue(
+                        that.Values))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment("values"));
+                    yield return error;
+                }
+
+                foreach (
+                    var error in Verification.Verify_TupleOf4_string_jsonValue_jsonArray_jsonObject(
+                        that.TupleWithJson))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment("tupleWithJson"));
+                    yield return error;
+                }
             }
         }  // private class Transformer
 
@@ -67,6 +82,61 @@ namespace dummy
         {
             foreach (var error in _transformer.Transform(that))
             {
+                yield return error;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_jsonValue(
+            List<Nodes.JsonNode> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (
+                    var error in JsonValueVerification.Verify(
+                        item, JsonValueVerification.ExpectedShape.Any))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_TupleOf4_string_jsonValue_jsonArray_jsonObject(
+            (string, Nodes.JsonNode, Nodes.JsonArray, Nodes.JsonObject) that)
+        {
+            foreach (
+                var error in JsonValueVerification.Verify(
+                    that.Item2, JsonValueVerification.ExpectedShape.Any))
+            {
+                error.PrependSegment(
+                    new Reporting.IndexSegment(1));
+                yield return error;
+            }
+
+            foreach (
+                var error in JsonValueVerification.Verify(
+                    that.Item3, JsonValueVerification.ExpectedShape.Array))
+            {
+                error.PrependSegment(
+                    new Reporting.IndexSegment(2));
+                yield return error;
+            }
+
+            foreach (
+                var error in JsonValueVerification.Verify(
+                    that.Item4, JsonValueVerification.ExpectedShape.Object))
+            {
+                error.PrependSegment(
+                    new Reporting.IndexSegment(3));
                 yield return error;
             }
         }

@@ -499,53 +499,32 @@ namespace dummy
                 foreach (var error in Verification.VerifyKind(that.Kind))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "kind"));
+                        new Reporting.NameSegment("kind"));
                     yield return error;
                 }
 
-                int indexKinds = 0;
-                foreach (var item in that.Kinds)
+                foreach (var error in Verification.Verify_ListOf_Kind(that.Kinds))
                 {
-                    foreach (var error in Verification.VerifyKind(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexKinds));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "kinds"));
-                        yield return error;
-                    }
-                    indexKinds++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("kinds"));
+                    yield return error;
                 }
 
-                int indexCodes = 0;
-                foreach (var item in that.Codes)
+                foreach (var error in Verification.Verify_ListOf_Code(that.Codes))
                 {
-                    foreach (var error in Verification.VerifyCode(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexCodes));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "codes"));
-                        yield return error;
-                    }
-                    indexCodes++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("codes"));
+                    yield return error;
                 }
 
-                if (that.OptionalKind != null)
+                if (that.OptionalKind.HasValue)
                 {
-                    // We need to help the static analyzer with a null coalescing.
-                    Our.Kind value = that.OptionalKind
-                        ?? throw new System.InvalidOperationException();
-                    foreach (var error in Verification.VerifyKind(value))
+                    foreach (
+                        var error in Verification.VerifyKind(
+                            that.OptionalKind.Value))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalKind"));
+                            new Reporting.NameSegment("optionalKind"));
                         yield return error;
                     }
                 }
@@ -604,63 +583,31 @@ namespace dummy
                         "Texts must not contain the forbidden text.");
                 }
 
-                int indexDirections = 0;
                 foreach (
-                    var item in Common.SetHelpers.Sorted(
-                        that.Directions,
-                        Common.SetHelpers.CompareByRankOfDirection))
+                    var error in Verification.Verify_SetOf_Direction(
+                        that.Directions))
                 {
-                    foreach (var error in Verification.VerifyDirection(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexDirections));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "directions"));
-                        yield return error;
-                    }
-                    indexDirections++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("directions"));
+                    yield return error;
                 }
 
-                int indexCodes = 0;
-                foreach (
-                    var item in Common.SetHelpers.Sorted(
-                        that.Codes,
-                        Common.SetHelpers.CompareByCodePoints))
+                foreach (var error in Verification.Verify_SetOf_Code(that.Codes))
                 {
-                    foreach (var error in Verification.VerifyCode(item))
-                    {
-                        error.PrependSegment(
-                            new Reporting.IndexSegment(
-                                indexCodes));
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "codes"));
-                        yield return error;
-                    }
-                    indexCodes++;
+                    error.PrependSegment(
+                        new Reporting.NameSegment("codes"));
+                    yield return error;
                 }
 
                 if (that.OptionalDirections != null)
                 {
-                    int indexOptionalDirections = 0;
                     foreach (
-                        var item in Common.SetHelpers.Sorted(
-                            that.OptionalDirections,
-                            Common.SetHelpers.CompareByRankOfDirection))
+                        var error in Verification.Verify_SetOf_Direction(
+                            that.OptionalDirections))
                     {
-                        foreach (var error in Verification.VerifyDirection(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexOptionalDirections));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "optionalDirections"));
-                            yield return error;
-                        }
-                        indexOptionalDirections++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("optionalDirections"));
+                        yield return error;
                     }
                 }
             }
@@ -719,6 +666,88 @@ namespace dummy
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
                     "Code must not be empty.");
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_Kind(
+            List<Our.Kind> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.VerifyKind(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_Code(
+            List<string> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.VerifyCode(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_SetOf_Direction(
+            HashSet<Our.Direction> that)
+        {
+            int index = 0;
+            foreach (
+                var item in Common.SetHelpers.Sorted(
+                    that,
+                    Common.SetHelpers.CompareByRankOfDirection))
+            {
+                foreach (var error in Verification.VerifyDirection(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_SetOf_Code(
+            HashSet<string> that)
+        {
+            int index = 0;
+            foreach (
+                var item in Common.SetHelpers.Sorted(
+                    that,
+                    Common.SetHelpers.CompareByCodePoints))
+            {
+                foreach (var error in Verification.VerifyCode(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification

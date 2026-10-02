@@ -460,20 +460,13 @@ namespace dummy
             {
                 if (that.Children != null)
                 {
-                    int indexChildren = 0;
-                    foreach (var item in that.Children)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IParent(
+                            that.Children))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexChildren));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "children"));
-                            yield return error;
-                        }
-                        indexChildren++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("children"));
+                        yield return error;
                     }
                 }
             }
@@ -624,16 +617,14 @@ namespace dummy
                 foreach (var error in Verification.VerifyKind(that.Kind))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "kind"));
+                        new Reporting.NameSegment("kind"));
                     yield return error;
                 }
 
                 foreach (var error in Verification.Verify(that.Item))
                 {
                     error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "item"));
+                        new Reporting.NameSegment("item"));
                     yield return error;
                 }
 
@@ -642,28 +633,20 @@ namespace dummy
                     foreach (var error in Verification.Verify(that.OptionalParent))
                     {
                         error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "optionalParent"));
+                            new Reporting.NameSegment("optionalParent"));
                         yield return error;
                     }
                 }
 
                 if (that.Parents != null)
                 {
-                    int indexParents = 0;
-                    foreach (var item in that.Parents)
+                    foreach (
+                        var error in Verification.Verify_ListOf_IParent(
+                            that.Parents))
                     {
-                        foreach (var error in Verification.Verify(item))
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexParents));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "parents"));
-                            yield return error;
-                        }
-                        indexParents++;
+                        error.PrependSegment(
+                            new Reporting.NameSegment("parents"));
+                        yield return error;
                     }
                 }
             }
@@ -694,6 +677,25 @@ namespace dummy
             {
                 yield return new Reporting.Error(
                     $"Invalid Kind: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_ListOf_IParent(
+            List<Our.IParent> that)
+        {
+            int index = 0;
+            foreach (var item in that)
+            {
+                foreach (var error in Verification.Verify(item))
+                {
+                    error.PrependSegment(
+                        new Reporting.IndexSegment(index));
+                    yield return error;
+                }
+                index++;
             }
         }
     }  // public static class Verification
