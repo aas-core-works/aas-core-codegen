@@ -385,7 +385,7 @@ export class Container extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.items;
+    yield * descend_Container(this, false);
   }
 
   /**
@@ -394,11 +394,7 @@ export class Container extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.items) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
+    yield * descend_Container(this, true);
   }
 
   /**
@@ -460,6 +456,38 @@ export class Container extends Class {
     super();
     this.names = names;
     this.items = items;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Container(
+  that: Container,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_IItem(that.items, recurse);
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_IItem(
+  that: Array<IItem>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
   }
 }
 

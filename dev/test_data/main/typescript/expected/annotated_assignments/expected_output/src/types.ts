@@ -608,19 +608,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.item;
-
-    yield this.parent;
-
-    yield * this.parents;
-
-    if (this.optionalParent !== null) {
-      yield this.optionalParent;
-    }
-
-    if (this.optionalMember !== null) {
-      yield this.optionalMember;
-    }
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -629,31 +617,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.item;
-
-    yield * this.item.descend();
-
-    yield this.parent;
-
-    yield * this.parent.descend();
-
-    for (const anItem of this.parents) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
-
-    if (this.optionalParent !== null) {
-      yield this.optionalParent;
-
-      yield * this.optionalParent.descend();
-    }
-
-    if (this.optionalMember !== null) {
-      yield this.optionalMember;
-
-      yield * this.optionalMember.descend();
-    }
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -741,6 +705,66 @@ export class Something extends Class {
     this.optionalTexts = optionalTexts;
     this.optionalData = optionalData;
     this.optionalMember = optionalMember;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.item;
+
+  if (recurse) {
+    yield * that.item.descend();
+  }
+
+  yield that.parent;
+
+  if (recurse) {
+    yield * that.parent.descend();
+  }
+
+  yield * descend_ListOf_IParent(that.parents, recurse);
+
+  if (that.optionalParent !== null) {
+    yield that.optionalParent;
+
+    if (recurse) {
+      yield * that.optionalParent.descend();
+    }
+  }
+
+  if (that.optionalMember !== null) {
+    yield that.optionalMember;
+
+    if (recurse) {
+      yield * that.optionalMember.descend();
+    }
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_IParent(
+  that: Array<IParent>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
   }
 }
 

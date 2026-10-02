@@ -1012,39 +1012,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.structuralProperty;
-
-    yield this.mixedProperty;
-
-    yield this.modelTypedProperty;
-
-    yield * this.listStructuralProperty;
-
-    yield * this.listMixedProperty;
-
-    yield * this.listModelTypedProperty;
-
-    yield this.tupleProperty[0];
-
-    yield this.tupleProperty[1];
-
-    yield this.tupleProperty[2];
-
-    if (this.optionalStructuralProperty !== null) {
-      yield this.optionalStructuralProperty;
-    }
-
-    if (this.optionalMixedProperty !== null) {
-      yield this.optionalMixedProperty;
-    }
-
-    if (this.optionalModelTypedProperty !== null) {
-      yield this.optionalModelTypedProperty;
-    }
-
-    if (this.optionalListOverlappingProperty !== null) {
-      yield * this.optionalListOverlappingProperty;
-    }
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -1053,73 +1021,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.structuralProperty;
-
-    yield * this.structuralProperty.descend();
-
-    yield this.mixedProperty;
-
-    yield * this.mixedProperty.descend();
-
-    yield this.modelTypedProperty;
-
-    yield * this.modelTypedProperty.descend();
-
-    for (const anItem of this.listStructuralProperty) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
-
-    for (const anotherItem of this.listMixedProperty) {
-      yield anotherItem;
-
-      yield * anotherItem.descend();
-    }
-
-    for (const yetAnotherItem of this.listModelTypedProperty) {
-      yield yetAnotherItem;
-
-      yield * yetAnotherItem.descend();
-    }
-
-    yield this.tupleProperty[0];
-
-    yield * this.tupleProperty[0].descend();
-
-    yield this.tupleProperty[1];
-
-    yield * this.tupleProperty[1].descend();
-
-    yield this.tupleProperty[2];
-
-    yield * this.tupleProperty[2].descend();
-
-    if (this.optionalStructuralProperty !== null) {
-      yield this.optionalStructuralProperty;
-
-      yield * this.optionalStructuralProperty.descend();
-    }
-
-    if (this.optionalMixedProperty !== null) {
-      yield this.optionalMixedProperty;
-
-      yield * this.optionalMixedProperty.descend();
-    }
-
-    if (this.optionalModelTypedProperty !== null) {
-      yield this.optionalModelTypedProperty;
-
-      yield * this.optionalModelTypedProperty.descend();
-    }
-
-    if (this.optionalListOverlappingProperty !== null) {
-      for (const yetYetAnotherItem of this.optionalListOverlappingProperty) {
-        yield yetYetAnotherItem;
-
-        yield * yetYetAnotherItem.descend();
-      }
-    }
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -1199,6 +1101,193 @@ export class Something extends Class {
     this.optionalMixedProperty = optionalMixedProperty;
     this.optionalModelTypedProperty = optionalModelTypedProperty;
     this.optionalListOverlappingProperty = optionalListOverlappingProperty;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.structuralProperty;
+
+  if (recurse) {
+    yield * that.structuralProperty.descend();
+  }
+
+  yield that.mixedProperty;
+
+  if (recurse) {
+    yield * that.mixedProperty.descend();
+  }
+
+  yield that.modelTypedProperty;
+
+  if (recurse) {
+    yield * that.modelTypedProperty.descend();
+  }
+
+  yield * descend_ListOf_StructuralUnion(
+    that.listStructuralProperty,
+    recurse
+  );
+
+  yield * descend_ListOf_MixedUnion(that.listMixedProperty, recurse);
+
+  yield * descend_ListOf_ModelTypedUnion(
+    that.listModelTypedProperty,
+    recurse
+  );
+
+  yield * descend_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+    that.tupleProperty,
+    recurse
+  );
+
+  if (that.optionalStructuralProperty !== null) {
+    yield that.optionalStructuralProperty;
+
+    if (recurse) {
+      yield * that.optionalStructuralProperty.descend();
+    }
+  }
+
+  if (that.optionalMixedProperty !== null) {
+    yield that.optionalMixedProperty;
+
+    if (recurse) {
+      yield * that.optionalMixedProperty.descend();
+    }
+  }
+
+  if (that.optionalModelTypedProperty !== null) {
+    yield that.optionalModelTypedProperty;
+
+    if (recurse) {
+      yield * that.optionalModelTypedProperty.descend();
+    }
+  }
+
+  if (that.optionalListOverlappingProperty !== null) {
+    yield * descend_ListOf_OverlappingUnion(
+      that.optionalListOverlappingProperty,
+      recurse
+    );
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_StructuralUnion(
+  that: Array<StructuralUnion>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_MixedUnion(
+  that: Array<MixedUnion>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_ModelTypedUnion(
+  that: Array<ModelTypedUnion>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_TupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+  that: [StructuralUnion, MixedUnion, ModelTypedUnion],
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that[0];
+
+  if (recurse) {
+    yield * that[0].descend();
+  }
+
+  yield that[1];
+
+  if (recurse) {
+    yield * that[1].descend();
+  }
+
+  yield that[2];
+
+  if (recurse) {
+    yield * that[2].descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_OverlappingUnion(
+  that: Array<OverlappingUnion>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
   }
 }
 

@@ -331,19 +331,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.items[0];
-
-    yield this.items[1];
-
-    yield this.tricky[1];
-
-    yield this.tricky[2];
-
-    yield this.tricky[3];
-
-    if (this.optionalPair !== null) {
-      yield this.optionalPair[1];
-    }
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -352,31 +340,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.items[0];
-
-    yield * this.items[0].descend();
-
-    yield this.items[1];
-
-    yield * this.items[1].descend();
-
-    yield this.tricky[1];
-
-    yield * this.tricky[1].descend();
-
-    yield this.tricky[2];
-
-    yield * this.tricky[2].descend();
-
-    yield this.tricky[3];
-
-    yield * this.tricky[3].descend();
-
-    if (this.optionalPair !== null) {
-      yield this.optionalPair[1];
-
-      yield * this.optionalPair[1].descend();
-    }
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -442,6 +406,98 @@ export class Something extends Class {
     this.items = items;
     this.tricky = tricky;
     this.optionalPair = optionalPair;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_TupleOf2_IAbstractItem_IAbstractItem(
+    that.items,
+    recurse
+  );
+
+  yield * descend_TupleOf6_int_SomeItem_IAbstractItem_SomeItem_int_Result(
+    that.tricky,
+    recurse
+  );
+
+  if (that.optionalPair !== null) {
+    yield * descend_TupleOf2_str_IAbstractItem(
+      that.optionalPair,
+      recurse
+    );
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_TupleOf2_IAbstractItem_IAbstractItem(
+  that: [IAbstractItem, IAbstractItem],
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that[0];
+
+  if (recurse) {
+    yield * that[0].descend();
+  }
+
+  yield that[1];
+
+  if (recurse) {
+    yield * that[1].descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_TupleOf6_int_SomeItem_IAbstractItem_SomeItem_int_Result(
+  that: [number, SomeItem, IAbstractItem, SomeItem, number, Result],
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that[1];
+
+  if (recurse) {
+    yield * that[1].descend();
+  }
+
+  yield that[2];
+
+  if (recurse) {
+    yield * that[2].descend();
+  }
+
+  yield that[3];
+
+  if (recurse) {
+    yield * that[3].descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_TupleOf2_str_IAbstractItem(
+  that: [string, IAbstractItem],
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that[1];
+
+  if (recurse) {
+    yield * that[1].descend();
   }
 }
 

@@ -214,7 +214,7 @@ export class LangStringSet extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.langStrings;
+    yield * descend_LangStringSet(this, false);
   }
 
   /**
@@ -223,11 +223,7 @@ export class LangStringSet extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.langStrings) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
+    yield * descend_LangStringSet(this, true);
   }
 
   /**
@@ -288,6 +284,17 @@ export class LangStringSet extends Class {
   }
 }
 
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_LangStringSet(
+  that: LangStringSet,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_LangString(that.langStrings, recurse);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IContent extends Class {
   // Intentionally empty.
@@ -326,9 +333,7 @@ export class IecContent
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    if (this.definition !== null) {
-      yield * this.definition;
-    }
+    yield * descend_IecContent(this, false);
   }
 
   /**
@@ -337,13 +342,7 @@ export class IecContent
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    if (this.definition !== null) {
-      for (const anItem of this.definition) {
-        yield anItem;
-
-        yield * anItem.descend();
-      }
-    }
+    yield * descend_IecContent(this, true);
   }
 
   /**
@@ -401,6 +400,19 @@ export class IecContent
   constructor(definition: Array<LangString> | null = null) {
     super();
     this.definition = definition;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_IecContent(
+  that: IecContent,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (that.definition !== null) {
+    yield * descend_ListOf_LangString(that.definition, recurse);
   }
 }
 
@@ -511,7 +523,7 @@ export class Specification extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield this.content;
+    yield * descend_Specification(this, false);
   }
 
   /**
@@ -520,9 +532,7 @@ export class Specification extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    yield this.content;
-
-    yield * this.content.descend();
+    yield * descend_Specification(this, true);
   }
 
   /**
@@ -583,6 +593,21 @@ export class Specification extends Class {
   }
 }
 
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Specification(
+  that: Specification,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield that.content;
+
+  if (recurse) {
+    yield * that.content.descend();
+  }
+}
+
 export class Something extends Class {
   /**
    * Indicate the runtime model type of the instance.
@@ -618,11 +643,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descendOnce(): IterableIterator<Class> {
-    yield * this.langStringSets;
-
-    if (this.specifications !== null) {
-      yield * this.specifications;
-    }
+    yield * descend_Something(this, false);
   }
 
   /**
@@ -631,19 +652,7 @@ export class Something extends Class {
    * @returns Iterator over the referenced instances
    */
   *descend(): IterableIterator<Class> {
-    for (const anItem of this.langStringSets) {
-      yield anItem;
-
-      yield * anItem.descend();
-    }
-
-    if (this.specifications !== null) {
-      for (const anotherItem of this.specifications) {
-        yield anotherItem;
-
-        yield * anotherItem.descend();
-      }
-    }
+    yield * descend_Something(this, true);
   }
 
   /**
@@ -707,6 +716,84 @@ export class Something extends Class {
     this.defaultLanguage = defaultLanguage;
     this.langStringSets = langStringSets;
     this.specifications = specifications;
+  }
+}
+
+/**
+ * Iterate over the instances referenced from `that`, and recursively
+ * over their descendants if `recurse` is set.
+ */
+function *descend_Something(
+  that: Something,
+  recurse: boolean
+): IterableIterator<Class> {
+  yield * descend_ListOf_LangStringSet(that.langStringSets, recurse);
+
+  if (that.specifications !== null) {
+    yield * descend_ListOf_Specification(that.specifications, recurse);
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_LangString(
+  that: Array<LangString>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_LangStringSet(
+  that: Array<LangStringSet>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
+  }
+}
+
+/**
+ * Iterate over the class instances held by `that`.
+ *
+ * If `recurse` is set, descend recursively into the instances as well.
+ */
+function *descend_ListOf_Specification(
+  that: Array<Specification>,
+  recurse: boolean
+): IterableIterator<Class> {
+  if (!recurse) {
+    yield * that;
+    return;
+  }
+
+  for (const item of that) {
+    yield item;
+
+    yield * item.descend();
   }
 }
 
