@@ -48,6 +48,18 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<byte[]> deepListOf_bytes(
+        List<byte[]> that) {
+        List<byte[]> result = new ArrayList<>(that.size());
+        for (byte[] item : that) {
+            result.add(item.clone());
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -70,27 +82,12 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<Boolean> theSomeBools = new ArrayList<>(
-                that.getSomeBools());
-
-            List<Long> theSomeInts = new ArrayList<>(
-                that.getSomeInts());
-
-            List<Double> theSomeFloats = new ArrayList<>(
-                that.getSomeFloats());
-
-            List<String> theSomeStrings = new ArrayList<>(
-                that.getSomeStrings());
-
-            List<byte[]> theSomeBytes = new ArrayList<>(
-                that.getSomeBytes());
-
             return new Something(
-                theSomeBools,
-                theSomeInts,
-                theSomeFloats,
-                theSomeStrings,
-                theSomeBytes
+                new ArrayList<>(that.getSomeBools()),
+                new ArrayList<>(that.getSomeInts()),
+                new ArrayList<>(that.getSomeFloats()),
+                new ArrayList<>(that.getSomeStrings()),
+                deepListOf_bytes(that.getSomeBytes())
             );
         }
     }

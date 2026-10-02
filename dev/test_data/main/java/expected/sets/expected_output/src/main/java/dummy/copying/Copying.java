@@ -90,35 +90,18 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
-            List<Long> theNumbers = new ArrayList<>(
-                that.getNumbers());
-
-            List<Kind> theKinds = new ArrayList<>(
-                that.getKinds());
-
-            List<String> theCodes = new ArrayList<>(
-                that.getCodes());
-
-            List<Boolean> theFlags = new ArrayList<>(
-                that.getFlags());
-
-            List<String> theOptionalTexts = that.getOptionalTexts().isPresent()
-                ? new ArrayList<>(that.getOptionalTexts().get())
-                : null;
-
             return new Something(
                 that.getText(),
                 that.getNumber(),
                 that.getKind(),
-                theTexts,
-                theNumbers,
-                theKinds,
-                theCodes,
-                theFlags,
-                theOptionalTexts,
+                new ArrayList<>(that.getTexts()),
+                new ArrayList<>(that.getNumbers()),
+                new ArrayList<>(that.getKinds()),
+                new ArrayList<>(that.getCodes()),
+                new ArrayList<>(that.getFlags()),
+                that.getOptionalTexts().isPresent()
+                    ? new ArrayList<>(that.getOptionalTexts().get())
+                    : null,
                 that.getOptionalKind().orElse(null)
             );
         }

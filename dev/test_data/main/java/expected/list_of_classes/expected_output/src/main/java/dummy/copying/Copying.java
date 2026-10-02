@@ -48,6 +48,30 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IAbstractItem> deepListOf_IAbstractItem(
+        List<IAbstractItem> that) {
+        List<IAbstractItem> result = new ArrayList<>(that.size());
+        for (IAbstractItem item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ISimple> deepListOf_ISimple(
+        List<ISimple> that) {
+        List<ISimple> result = new ArrayList<>(that.size());
+        for (ISimple item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -116,22 +140,10 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<IAbstractItem> theSomeItems = new ArrayList<>(
-                that.getSomeItems().size());
-            for (IAbstractItem item : that.getSomeItems()) {
-                theSomeItems.add(deep(item));
-            }
-
-            List<ISimple> theSomeSimples = new ArrayList<>(
-                that.getSomeSimples().size());
-            for (ISimple item : that.getSomeSimples()) {
-                theSomeSimples.add(deep(item));
-            }
-
             return new Something(
                 deep(that.getItem()),
-                theSomeItems,
-                theSomeSimples
+                deepListOf_IAbstractItem(that.getSomeItems()),
+                deepListOf_ISimple(that.getSomeSimples())
             );
         }
     }

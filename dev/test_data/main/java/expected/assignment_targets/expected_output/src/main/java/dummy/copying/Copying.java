@@ -48,6 +48,18 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IItem> deepListOf_IItem(
+        List<IItem> that) {
+        List<IItem> result = new ArrayList<>(that.size());
+        for (IItem item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -79,19 +91,14 @@ public class Copying
         public IClass transformItem (
             IItem that
         ) {
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
-            List<String> theMaybeTexts = that.getMaybeTexts().isPresent()
-                ? new ArrayList<>(that.getMaybeTexts().get())
-                : null;
-
             return new Item(
                 that.getText(),
-                theTexts,
+                new ArrayList<>(that.getTexts()),
                 that.getMaybeText().orElse(null),
                 that.getMaybeKind().orElse(null),
-                theMaybeTexts
+                that.getMaybeTexts().isPresent()
+                    ? new ArrayList<>(that.getMaybeTexts().get())
+                    : null
             );
         }
 
@@ -99,15 +106,11 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<IItem> theItems = new ArrayList<>(
-                that.getItems().size());
-            for (IItem item : that.getItems()) {
-                theItems.add(deep(item));
-            }
-
             return new Something(
-                theItems,
-                that.getMaybeItem().orElse(null)
+                deepListOf_IItem(that.getItems()),
+                that.getMaybeItem().isPresent()
+                    ? deep(that.getMaybeItem().get())
+                    : null
             );
         }
     }

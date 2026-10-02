@@ -65,11 +65,8 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<String> theSomeNames = new ArrayList<>(
-                that.getSomeNames());
-
             return new Something(
-                theSomeNames
+                new ArrayList<>(that.getSomeNames())
             );
         }
     }

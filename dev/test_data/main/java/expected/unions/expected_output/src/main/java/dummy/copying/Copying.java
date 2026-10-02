@@ -58,6 +58,65 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<StructuralUnion> deepListOf_StructuralUnion(
+        List<StructuralUnion> that) {
+        List<StructuralUnion> result = new ArrayList<>(that.size());
+        for (StructuralUnion item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<MixedUnion> deepListOf_MixedUnion(
+        List<MixedUnion> that) {
+        List<MixedUnion> result = new ArrayList<>(that.size());
+        for (MixedUnion item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ModelTypedUnion> deepListOf_ModelTypedUnion(
+        List<ModelTypedUnion> that) {
+        List<ModelTypedUnion> result = new ArrayList<>(that.size());
+        for (ModelTypedUnion item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> deepTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+        Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> that) {
+        return new Tuple3<>(
+          deep(that.item1()),
+          deep(that.item2()),
+          deep(that.item3()));
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<OverlappingUnion> deepListOf_OverlappingUnion(
+        List<OverlappingUnion> that) {
+        List<OverlappingUnion> result = new ArrayList<>(that.size());
+        for (OverlappingUnion item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -235,49 +294,14 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<StructuralUnion> theListStructuralProperty = new ArrayList<>(
-                that.getListStructuralProperty().size());
-            for (StructuralUnion item : that.getListStructuralProperty()) {
-                theListStructuralProperty.add(deep(item));
-            }
-
-            List<MixedUnion> theListMixedProperty = new ArrayList<>(
-                that.getListMixedProperty().size());
-            for (MixedUnion item : that.getListMixedProperty()) {
-                theListMixedProperty.add(deep(item));
-            }
-
-            List<ModelTypedUnion> theListModelTypedProperty = new ArrayList<>(
-                that.getListModelTypedProperty().size());
-            for (ModelTypedUnion item : that.getListModelTypedProperty()) {
-                theListModelTypedProperty.add(deep(item));
-            }
-
-            Tuple3<StructuralUnion, MixedUnion, ModelTypedUnion> theTupleProperty = new Tuple3<>(
-                  deep(that.getTupleProperty().item1()),
-                  deep(that.getTupleProperty().item2()),
-                  deep(that.getTupleProperty().item3()));
-
-            List<OverlappingUnion> thatOptionalListOverlappingProperty =
-                that.getOptionalListOverlappingProperty().orElse(null);
-            List<OverlappingUnion> theOptionalListOverlappingProperty = null;
-            if (thatOptionalListOverlappingProperty != null) {
-                theOptionalListOverlappingProperty = new ArrayList<>(
-                    thatOptionalListOverlappingProperty.size());
-                for (OverlappingUnion item : thatOptionalListOverlappingProperty)
-                {
-                    theOptionalListOverlappingProperty.add(deep(item));
-                }
-            }
-
             return new Something(
                 deep(that.getStructuralProperty()),
                 deep(that.getMixedProperty()),
                 deep(that.getModelTypedProperty()),
-                theListStructuralProperty,
-                theListMixedProperty,
-                theListModelTypedProperty,
-                theTupleProperty,
+                deepListOf_StructuralUnion(that.getListStructuralProperty()),
+                deepListOf_MixedUnion(that.getListMixedProperty()),
+                deepListOf_ModelTypedUnion(that.getListModelTypedProperty()),
+                deepTupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(that.getTupleProperty()),
                 that.getOptionalStructuralProperty().isPresent()
                     ? deep(that.getOptionalStructuralProperty().get())
                     : null,
@@ -287,7 +311,9 @@ public class Copying
                 that.getOptionalModelTypedProperty().isPresent()
                     ? deep(that.getOptionalModelTypedProperty().get())
                     : null,
-                theOptionalListOverlappingProperty
+                that.getOptionalListOverlappingProperty().isPresent()
+                    ? deepListOf_OverlappingUnion(that.getOptionalListOverlappingProperty().get())
+                    : null
             );
         }
     }

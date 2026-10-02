@@ -48,6 +48,52 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static Tuple2<IAbstractItem, IAbstractItem> deepTupleOf2_IAbstractItem_IAbstractItem(
+        Tuple2<IAbstractItem, IAbstractItem> that) {
+        return new Tuple2<>(
+          deep(that.item1()),
+          deep(that.item2()));
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static Tuple6<
+      Long,
+      ISomeItem,
+      IAbstractItem,
+      ISomeItem,
+      Long,
+      Result> deepTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(
+        Tuple6<
+          Long,
+          ISomeItem,
+          IAbstractItem,
+          ISomeItem,
+          Long,
+          Result> that) {
+        return new Tuple6<>(
+          that.item1(),
+          deep(that.item2()),
+          deep(that.item3()),
+          deep(that.item4()),
+          that.item5(),
+          that.item6());
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static Tuple2<String, IAbstractItem> deepTupleOf2_string_IAbstractItem(
+        Tuple2<String, IAbstractItem> that) {
+        return new Tuple2<>(
+          that.item1(),
+          deep(that.item2()));
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -101,37 +147,13 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            Tuple2<IAbstractItem, IAbstractItem> theItems = new Tuple2<>(
-                  deep(that.getItems().item1()),
-                  deep(that.getItems().item2()));
-
-            Tuple6<
-              Long,
-              ISomeItem,
-              IAbstractItem,
-              ISomeItem,
-              Long,
-              Result> theTricky = new Tuple6<>(
-                  that.getTricky().item1(),
-                  deep(that.getTricky().item2()),
-                  deep(that.getTricky().item3()),
-                  deep(that.getTricky().item4()),
-                  that.getTricky().item5(),
-                  that.getTricky().item6());
-
-            Tuple2<String, IAbstractItem> thatOptionalPair =
-                that.getOptionalPair().orElse(null);
-            Tuple2<String, IAbstractItem> theOptionalPair = (thatOptionalPair == null)
-                ? null
-                : new Tuple2<>(
-                  thatOptionalPair.item1(),
-                  deep(thatOptionalPair.item2()));
-
             return new Something(
                 that.getPair(),
-                theItems,
-                theTricky,
-                theOptionalPair
+                deepTupleOf2_IAbstractItem_IAbstractItem(that.getItems()),
+                deepTupleOf6_long_ISomeItem_IAbstractItem_ISomeItem_long_Result(that.getTricky()),
+                that.getOptionalPair().isPresent()
+                    ? deepTupleOf2_string_IAbstractItem(that.getOptionalPair().get())
+                    : null
             );
         }
     }

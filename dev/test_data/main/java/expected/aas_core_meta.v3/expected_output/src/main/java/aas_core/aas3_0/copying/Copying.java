@@ -48,6 +48,222 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IReference> deepListOf_IReference(
+        List<IReference> that) {
+        List<IReference> result = new ArrayList<>(that.size());
+        for (IReference item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IEmbeddedDataSpecification> deepListOf_IEmbeddedDataSpecification(
+        List<IEmbeddedDataSpecification> that) {
+        List<IEmbeddedDataSpecification> result = new ArrayList<>(that.size());
+        for (IEmbeddedDataSpecification item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IExtension> deepListOf_IExtension(
+        List<IExtension> that) {
+        List<IExtension> result = new ArrayList<>(that.size());
+        for (IExtension item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ILangStringNameType> deepListOf_ILangStringNameType(
+        List<ILangStringNameType> that) {
+        List<ILangStringNameType> result = new ArrayList<>(that.size());
+        for (ILangStringNameType item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ILangStringTextType> deepListOf_ILangStringTextType(
+        List<ILangStringTextType> that) {
+        List<ILangStringTextType> result = new ArrayList<>(that.size());
+        for (ILangStringTextType item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ISpecificAssetId> deepListOf_ISpecificAssetId(
+        List<ISpecificAssetId> that) {
+        List<ISpecificAssetId> result = new ArrayList<>(that.size());
+        for (ISpecificAssetId item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IQualifier> deepListOf_IQualifier(
+        List<IQualifier> that) {
+        List<IQualifier> result = new ArrayList<>(that.size());
+        for (IQualifier item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ISubmodelElement> deepListOf_ISubmodelElement(
+        List<ISubmodelElement> that) {
+        List<ISubmodelElement> result = new ArrayList<>(that.size());
+        for (ISubmodelElement item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IDataElement> deepListOf_IDataElement(
+        List<IDataElement> that) {
+        List<IDataElement> result = new ArrayList<>(that.size());
+        for (IDataElement item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IOperationVariable> deepListOf_IOperationVariable(
+        List<IOperationVariable> that) {
+        List<IOperationVariable> result = new ArrayList<>(that.size());
+        for (IOperationVariable item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IKey> deepListOf_IKey(
+        List<IKey> that) {
+        List<IKey> result = new ArrayList<>(that.size());
+        for (IKey item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IAssetAdministrationShell> deepListOf_IAssetAdministrationShell(
+        List<IAssetAdministrationShell> that) {
+        List<IAssetAdministrationShell> result = new ArrayList<>(that.size());
+        for (IAssetAdministrationShell item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ISubmodel> deepListOf_ISubmodel(
+        List<ISubmodel> that) {
+        List<ISubmodel> result = new ArrayList<>(that.size());
+        for (ISubmodel item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IConceptDescription> deepListOf_IConceptDescription(
+        List<IConceptDescription> that) {
+        List<IConceptDescription> result = new ArrayList<>(that.size());
+        for (IConceptDescription item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IValueReferencePair> deepListOf_IValueReferencePair(
+        List<IValueReferencePair> that) {
+        List<IValueReferencePair> result = new ArrayList<>(that.size());
+        for (IValueReferencePair item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ILangStringPreferredNameTypeIec61360> deepListOf_ILangStringPreferredNameTypeIec61360(
+        List<ILangStringPreferredNameTypeIec61360> that) {
+        List<ILangStringPreferredNameTypeIec61360> result = new ArrayList<>(that.size());
+        for (ILangStringPreferredNameTypeIec61360 item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ILangStringShortNameTypeIec61360> deepListOf_ILangStringShortNameTypeIec61360(
+        List<ILangStringShortNameTypeIec61360> that) {
+        List<ILangStringShortNameTypeIec61360> result = new ArrayList<>(that.size());
+        for (ILangStringShortNameTypeIec61360 item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ILangStringDefinitionTypeIec61360> deepListOf_ILangStringDefinitionTypeIec61360(
+        List<ILangStringDefinitionTypeIec61360> that) {
+        List<ILangStringDefinitionTypeIec61360> result = new ArrayList<>(that.size());
+        for (ILangStringDefinitionTypeIec61360 item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -590,37 +806,19 @@ public class Copying
         public IClass transformExtension (
             IExtension that
         ) {
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IReference> thatRefersTo =
-                that.getRefersTo().orElse(null);
-            List<IReference> theRefersTo = null;
-            if (thatRefersTo != null) {
-                theRefersTo = new ArrayList<>(
-                    thatRefersTo.size());
-                for (IReference item : thatRefersTo)
-                {
-                    theRefersTo.add(deep(item));
-                }
-            }
-
             return new Extension(
                 that.getName(),
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
                 that.getValueType().orElse(null),
                 that.getValue().orElse(null),
-                theRefersTo
+                that.getRefersTo().isPresent()
+                    ? deepListOf_IReference(that.getRefersTo().get())
+                    : null
             );
         }
 
@@ -628,23 +826,15 @@ public class Copying
         public IClass transformAdministrativeInformation (
             IAdministrativeInformation that
         ) {
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new AdministrativeInformation(
-                theEmbeddedDataSpecifications,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
                 that.getVersion().orElse(null),
                 that.getRevision().orElse(null),
-                that.getCreator().orElse(null),
+                that.getCreator().isPresent()
+                    ? deep(that.getCreator().get())
+                    : null,
                 that.getTemplateId().orElse(null)
             );
         }
@@ -653,26 +843,20 @@ public class Copying
         public IClass transformQualifier (
             IQualifier that
         ) {
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
             return new Qualifier(
                 that.getType(),
                 that.getValueType(),
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
                 that.getKind().orElse(null),
                 that.getValue().orElse(null),
-                that.getValueId().orElse(null)
+                that.getValueId().isPresent()
+                    ? deep(that.getValueId().get())
+                    : null
             );
         }
 
@@ -680,78 +864,32 @@ public class Copying
         public IClass transformAssetAdministrationShell (
             IAssetAdministrationShell that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSubmodels =
-                that.getSubmodels().orElse(null);
-            List<IReference> theSubmodels = null;
-            if (thatSubmodels != null) {
-                theSubmodels = new ArrayList<>(
-                    thatSubmodels.size());
-                for (IReference item : thatSubmodels)
-                {
-                    theSubmodels.add(deep(item));
-                }
-            }
-
             return new AssetAdministrationShell(
                 that.getId(),
                 deep(that.getAssetInformation()),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getAdministration().orElse(null),
-                theEmbeddedDataSpecifications,
-                that.getDerivedFrom().orElse(null),
-                theSubmodels
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getAdministration().isPresent()
+                    ? deep(that.getAdministration().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getDerivedFrom().isPresent()
+                    ? deep(that.getDerivedFrom().get())
+                    : null,
+                that.getSubmodels().isPresent()
+                    ? deepListOf_IReference(that.getSubmodels().get())
+                    : null
             );
         }
 
@@ -759,24 +897,16 @@ public class Copying
         public IClass transformAssetInformation (
             IAssetInformation that
         ) {
-            List<ISpecificAssetId> thatSpecificAssetIds =
-                that.getSpecificAssetIds().orElse(null);
-            List<ISpecificAssetId> theSpecificAssetIds = null;
-            if (thatSpecificAssetIds != null) {
-                theSpecificAssetIds = new ArrayList<>(
-                    thatSpecificAssetIds.size());
-                for (ISpecificAssetId item : thatSpecificAssetIds)
-                {
-                    theSpecificAssetIds.add(deep(item));
-                }
-            }
-
             return new AssetInformation(
                 that.getAssetKind(),
                 that.getGlobalAssetId().orElse(null),
-                theSpecificAssetIds,
+                that.getSpecificAssetIds().isPresent()
+                    ? deepListOf_ISpecificAssetId(that.getSpecificAssetIds().get())
+                    : null,
                 that.getAssetType().orElse(null),
-                that.getDefaultThumbnail().orElse(null)
+                that.getDefaultThumbnail().isPresent()
+                    ? deep(that.getDefaultThumbnail().get())
+                    : null
             );
         }
 
@@ -794,24 +924,18 @@ public class Copying
         public IClass transformSpecificAssetId (
             ISpecificAssetId that
         ) {
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
             return new SpecificAssetId(
                 that.getName(),
                 that.getValue(),
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                that.getExternalSubjectId().orElse(null)
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getExternalSubjectId().isPresent()
+                    ? deep(that.getExternalSubjectId().get())
+                    : null
             );
         }
 
@@ -819,104 +943,38 @@ public class Copying
         public IClass transformSubmodel (
             ISubmodel that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<ISubmodelElement> thatSubmodelElements =
-                that.getSubmodelElements().orElse(null);
-            List<ISubmodelElement> theSubmodelElements = null;
-            if (thatSubmodelElements != null) {
-                theSubmodelElements = new ArrayList<>(
-                    thatSubmodelElements.size());
-                for (ISubmodelElement item : thatSubmodelElements)
-                {
-                    theSubmodelElements.add(deep(item));
-                }
-            }
-
             return new Submodel(
                 that.getId(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getAdministration().orElse(null),
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getAdministration().isPresent()
+                    ? deep(that.getAdministration().get())
+                    : null,
                 that.getKind().orElse(null),
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                theSubmodelElements
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getSubmodelElements().isPresent()
+                    ? deepListOf_ISubmodelElement(that.getSubmodelElements().get())
+                    : null
             );
         }
 
@@ -924,90 +982,32 @@ public class Copying
         public IClass transformRelationshipElement (
             IRelationshipElement that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new RelationshipElement(
                 deep(that.getFirst()),
                 deep(that.getSecond()),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null
             );
         }
 
@@ -1015,105 +1015,39 @@ public class Copying
         public IClass transformSubmodelElementList (
             ISubmodelElementList that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<ISubmodelElement> thatValue =
-                that.getValue().orElse(null);
-            List<ISubmodelElement> theValue = null;
-            if (thatValue != null) {
-                theValue = new ArrayList<>(
-                    thatValue.size());
-                for (ISubmodelElement item : thatValue)
-                {
-                    theValue.add(deep(item));
-                }
-            }
-
             return new SubmodelElementList(
                 that.getTypeValueListElement(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
                 that.getOrderRelevant().orElse(null),
-                that.getSemanticIdListElement().orElse(null),
+                that.getSemanticIdListElement().isPresent()
+                    ? deep(that.getSemanticIdListElement().get())
+                    : null,
                 that.getValueTypeListElement().orElse(null),
-                theValue
+                that.getValue().isPresent()
+                    ? deepListOf_ISubmodelElement(that.getValue().get())
+                    : null
             );
         }
 
@@ -1121,101 +1055,33 @@ public class Copying
         public IClass transformSubmodelElementCollection (
             ISubmodelElementCollection that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<ISubmodelElement> thatValue =
-                that.getValue().orElse(null);
-            List<ISubmodelElement> theValue = null;
-            if (thatValue != null) {
-                theValue = new ArrayList<>(
-                    thatValue.size());
-                for (ISubmodelElement item : thatValue)
-                {
-                    theValue.add(deep(item));
-                }
-            }
-
             return new SubmodelElementCollection(
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                theValue
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getValue().isPresent()
+                    ? deepListOf_ISubmodelElement(that.getValue().get())
+                    : null
             );
         }
 
@@ -1223,91 +1089,35 @@ public class Copying
         public IClass transformProperty (
             IProperty that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new Property(
                 that.getValueType(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
                 that.getValue().orElse(null),
-                that.getValueId().orElse(null)
+                that.getValueId().isPresent()
+                    ? deep(that.getValueId().get())
+                    : null
             );
         }
 
@@ -1315,102 +1125,36 @@ public class Copying
         public IClass transformMultiLanguageProperty (
             IMultiLanguageProperty that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatValue =
-                that.getValue().orElse(null);
-            List<ILangStringTextType> theValue = null;
-            if (thatValue != null) {
-                theValue = new ArrayList<>(
-                    thatValue.size());
-                for (ILangStringTextType item : thatValue)
-                {
-                    theValue.add(deep(item));
-                }
-            }
-
             return new MultiLanguageProperty(
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                theValue,
-                that.getValueId().orElse(null)
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getValue().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getValue().get())
+                    : null,
+                that.getValueId().isPresent()
+                    ? deep(that.getValueId().get())
+                    : null
             );
         }
 
@@ -1418,89 +1162,31 @@ public class Copying
         public IClass transformRange (
             IRange that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new Range(
                 that.getValueType(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
                 that.getMin().orElse(null),
                 that.getMax().orElse(null)
             );
@@ -1510,89 +1196,33 @@ public class Copying
         public IClass transformReferenceElement (
             IReferenceElement that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new ReferenceElement(
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                that.getValue().orElse(null)
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getValue().isPresent()
+                    ? deep(that.getValue().get())
+                    : null
             );
         }
 
@@ -1600,90 +1230,34 @@ public class Copying
         public IClass transformBlob (
             IBlob that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new Blob(
                 that.getContentType(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                that.getValue().orElse(null)
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getValue().isPresent()
+                    ? that.getValue().get().clone()
+                    : null
             );
         }
 
@@ -1691,89 +1265,31 @@ public class Copying
         public IClass transformFile (
             IFile that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new File(
                 that.getContentType(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
                 that.getValue().orElse(null)
             );
         }
@@ -1782,103 +1298,35 @@ public class Copying
         public IClass transformAnnotatedRelationshipElement (
             IAnnotatedRelationshipElement that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<IDataElement> thatAnnotations =
-                that.getAnnotations().orElse(null);
-            List<IDataElement> theAnnotations = null;
-            if (thatAnnotations != null) {
-                theAnnotations = new ArrayList<>(
-                    thatAnnotations.size());
-                for (IDataElement item : thatAnnotations)
-                {
-                    theAnnotations.add(deep(item));
-                }
-            }
-
             return new AnnotatedRelationshipElement(
                 deep(that.getFirst()),
                 deep(that.getSecond()),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                theAnnotations
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getAnnotations().isPresent()
+                    ? deepListOf_IDataElement(that.getAnnotations().get())
+                    : null
             );
         }
 
@@ -1886,116 +1334,38 @@ public class Copying
         public IClass transformEntity (
             IEntity that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<ISubmodelElement> thatStatements =
-                that.getStatements().orElse(null);
-            List<ISubmodelElement> theStatements = null;
-            if (thatStatements != null) {
-                theStatements = new ArrayList<>(
-                    thatStatements.size());
-                for (ISubmodelElement item : thatStatements)
-                {
-                    theStatements.add(deep(item));
-                }
-            }
-
-            List<ISpecificAssetId> thatSpecificAssetIds =
-                that.getSpecificAssetIds().orElse(null);
-            List<ISpecificAssetId> theSpecificAssetIds = null;
-            if (thatSpecificAssetIds != null) {
-                theSpecificAssetIds = new ArrayList<>(
-                    thatSpecificAssetIds.size());
-                for (ISpecificAssetId item : thatSpecificAssetIds)
-                {
-                    theSpecificAssetIds.add(deep(item));
-                }
-            }
-
             return new Entity(
                 that.getEntityType(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                theStatements,
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getStatements().isPresent()
+                    ? deepListOf_ISubmodelElement(that.getStatements().get())
+                    : null,
                 that.getGlobalAssetId().orElse(null),
-                theSpecificAssetIds
+                that.getSpecificAssetIds().isPresent()
+                    ? deepListOf_ISpecificAssetId(that.getSpecificAssetIds().get())
+                    : null
             );
         }
 
@@ -2007,11 +1377,19 @@ public class Copying
                 deep(that.getSource()),
                 deep(that.getObservableReference()),
                 that.getTimeStamp(),
-                that.getSourceSemanticId().orElse(null),
-                that.getObservableSemanticId().orElse(null),
+                that.getSourceSemanticId().isPresent()
+                    ? deep(that.getSourceSemanticId().get())
+                    : null,
+                that.getObservableSemanticId().isPresent()
+                    ? deep(that.getObservableSemanticId().get())
+                    : null,
                 that.getTopic().orElse(null),
-                that.getSubjectId().orElse(null),
-                that.getPayload().orElse(null)
+                that.getSubjectId().isPresent()
+                    ? deep(that.getSubjectId().get())
+                    : null,
+                that.getPayload().isPresent()
+                    ? that.getPayload().get().clone()
+                    : null
             );
         }
 
@@ -2019,93 +1397,37 @@ public class Copying
         public IClass transformBasicEventElement (
             IBasicEventElement that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new BasicEventElement(
                 deep(that.getObserved()),
                 that.getDirection(),
                 that.getState(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
                 that.getMessageTopic().orElse(null),
-                that.getMessageBroker().orElse(null),
+                that.getMessageBroker().isPresent()
+                    ? deep(that.getMessageBroker().get())
+                    : null,
                 that.getLastUpdate().orElse(null),
                 that.getMinInterval().orElse(null),
                 that.getMaxInterval().orElse(null)
@@ -2116,127 +1438,39 @@ public class Copying
         public IClass transformOperation (
             IOperation that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<IOperationVariable> thatInputVariables =
-                that.getInputVariables().orElse(null);
-            List<IOperationVariable> theInputVariables = null;
-            if (thatInputVariables != null) {
-                theInputVariables = new ArrayList<>(
-                    thatInputVariables.size());
-                for (IOperationVariable item : thatInputVariables)
-                {
-                    theInputVariables.add(deep(item));
-                }
-            }
-
-            List<IOperationVariable> thatOutputVariables =
-                that.getOutputVariables().orElse(null);
-            List<IOperationVariable> theOutputVariables = null;
-            if (thatOutputVariables != null) {
-                theOutputVariables = new ArrayList<>(
-                    thatOutputVariables.size());
-                for (IOperationVariable item : thatOutputVariables)
-                {
-                    theOutputVariables.add(deep(item));
-                }
-            }
-
-            List<IOperationVariable> thatInoutputVariables =
-                that.getInoutputVariables().orElse(null);
-            List<IOperationVariable> theInoutputVariables = null;
-            if (thatInoutputVariables != null) {
-                theInoutputVariables = new ArrayList<>(
-                    thatInoutputVariables.size());
-                for (IOperationVariable item : thatInoutputVariables)
-                {
-                    theInoutputVariables.add(deep(item));
-                }
-            }
-
             return new Operation(
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications,
-                theInputVariables,
-                theOutputVariables,
-                theInoutputVariables
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getInputVariables().isPresent()
+                    ? deepListOf_IOperationVariable(that.getInputVariables().get())
+                    : null,
+                that.getOutputVariables().isPresent()
+                    ? deepListOf_IOperationVariable(that.getOutputVariables().get())
+                    : null,
+                that.getInoutputVariables().isPresent()
+                    ? deepListOf_IOperationVariable(that.getInoutputVariables().get())
+                    : null
             );
         }
 
@@ -2253,88 +1487,30 @@ public class Copying
         public IClass transformCapability (
             ICapability that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IReference> thatSupplementalSemanticIds =
-                that.getSupplementalSemanticIds().orElse(null);
-            List<IReference> theSupplementalSemanticIds = null;
-            if (thatSupplementalSemanticIds != null) {
-                theSupplementalSemanticIds = new ArrayList<>(
-                    thatSupplementalSemanticIds.size());
-                for (IReference item : thatSupplementalSemanticIds)
-                {
-                    theSupplementalSemanticIds.add(deep(item));
-                }
-            }
-
-            List<IQualifier> thatQualifiers =
-                that.getQualifiers().orElse(null);
-            List<IQualifier> theQualifiers = null;
-            if (thatQualifiers != null) {
-                theQualifiers = new ArrayList<>(
-                    thatQualifiers.size());
-                for (IQualifier item : thatQualifiers)
-                {
-                    theQualifiers.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
             return new Capability(
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getSemanticId().orElse(null),
-                theSupplementalSemanticIds,
-                theQualifiers,
-                theEmbeddedDataSpecifications
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getSemanticId().isPresent()
+                    ? deep(that.getSemanticId().get())
+                    : null,
+                that.getSupplementalSemanticIds().isPresent()
+                    ? deepListOf_IReference(that.getSupplementalSemanticIds().get())
+                    : null,
+                that.getQualifiers().isPresent()
+                    ? deepListOf_IQualifier(that.getQualifiers().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null
             );
         }
 
@@ -2342,76 +1518,28 @@ public class Copying
         public IClass transformConceptDescription (
             IConceptDescription that
         ) {
-            List<IExtension> thatExtensions =
-                that.getExtensions().orElse(null);
-            List<IExtension> theExtensions = null;
-            if (thatExtensions != null) {
-                theExtensions = new ArrayList<>(
-                    thatExtensions.size());
-                for (IExtension item : thatExtensions)
-                {
-                    theExtensions.add(deep(item));
-                }
-            }
-
-            List<ILangStringNameType> thatDisplayName =
-                that.getDisplayName().orElse(null);
-            List<ILangStringNameType> theDisplayName = null;
-            if (thatDisplayName != null) {
-                theDisplayName = new ArrayList<>(
-                    thatDisplayName.size());
-                for (ILangStringNameType item : thatDisplayName)
-                {
-                    theDisplayName.add(deep(item));
-                }
-            }
-
-            List<ILangStringTextType> thatDescription =
-                that.getDescription().orElse(null);
-            List<ILangStringTextType> theDescription = null;
-            if (thatDescription != null) {
-                theDescription = new ArrayList<>(
-                    thatDescription.size());
-                for (ILangStringTextType item : thatDescription)
-                {
-                    theDescription.add(deep(item));
-                }
-            }
-
-            List<IEmbeddedDataSpecification> thatEmbeddedDataSpecifications =
-                that.getEmbeddedDataSpecifications().orElse(null);
-            List<IEmbeddedDataSpecification> theEmbeddedDataSpecifications = null;
-            if (thatEmbeddedDataSpecifications != null) {
-                theEmbeddedDataSpecifications = new ArrayList<>(
-                    thatEmbeddedDataSpecifications.size());
-                for (IEmbeddedDataSpecification item : thatEmbeddedDataSpecifications)
-                {
-                    theEmbeddedDataSpecifications.add(deep(item));
-                }
-            }
-
-            List<IReference> thatIsCaseOf =
-                that.getIsCaseOf().orElse(null);
-            List<IReference> theIsCaseOf = null;
-            if (thatIsCaseOf != null) {
-                theIsCaseOf = new ArrayList<>(
-                    thatIsCaseOf.size());
-                for (IReference item : thatIsCaseOf)
-                {
-                    theIsCaseOf.add(deep(item));
-                }
-            }
-
             return new ConceptDescription(
                 that.getId(),
-                theExtensions,
+                that.getExtensions().isPresent()
+                    ? deepListOf_IExtension(that.getExtensions().get())
+                    : null,
                 that.getCategory().orElse(null),
                 that.getIdShort().orElse(null),
-                theDisplayName,
-                theDescription,
-                that.getAdministration().orElse(null),
-                theEmbeddedDataSpecifications,
-                theIsCaseOf
+                that.getDisplayName().isPresent()
+                    ? deepListOf_ILangStringNameType(that.getDisplayName().get())
+                    : null,
+                that.getDescription().isPresent()
+                    ? deepListOf_ILangStringTextType(that.getDescription().get())
+                    : null,
+                that.getAdministration().isPresent()
+                    ? deep(that.getAdministration().get())
+                    : null,
+                that.getEmbeddedDataSpecifications().isPresent()
+                    ? deepListOf_IEmbeddedDataSpecification(that.getEmbeddedDataSpecifications().get())
+                    : null,
+                that.getIsCaseOf().isPresent()
+                    ? deepListOf_IReference(that.getIsCaseOf().get())
+                    : null
             );
         }
 
@@ -2419,16 +1547,12 @@ public class Copying
         public IClass transformReference (
             IReference that
         ) {
-            List<IKey> theKeys = new ArrayList<>(
-                that.getKeys().size());
-            for (IKey item : that.getKeys()) {
-                theKeys.add(deep(item));
-            }
-
             return new Reference(
                 that.getType(),
-                theKeys,
-                that.getReferredSemanticId().orElse(null)
+                deepListOf_IKey(that.getKeys()),
+                that.getReferredSemanticId().isPresent()
+                    ? deep(that.getReferredSemanticId().get())
+                    : null
             );
         }
 
@@ -2466,46 +1590,16 @@ public class Copying
         public IClass transformEnvironment (
             IEnvironment that
         ) {
-            List<IAssetAdministrationShell> thatAssetAdministrationShells =
-                that.getAssetAdministrationShells().orElse(null);
-            List<IAssetAdministrationShell> theAssetAdministrationShells = null;
-            if (thatAssetAdministrationShells != null) {
-                theAssetAdministrationShells = new ArrayList<>(
-                    thatAssetAdministrationShells.size());
-                for (IAssetAdministrationShell item : thatAssetAdministrationShells)
-                {
-                    theAssetAdministrationShells.add(deep(item));
-                }
-            }
-
-            List<ISubmodel> thatSubmodels =
-                that.getSubmodels().orElse(null);
-            List<ISubmodel> theSubmodels = null;
-            if (thatSubmodels != null) {
-                theSubmodels = new ArrayList<>(
-                    thatSubmodels.size());
-                for (ISubmodel item : thatSubmodels)
-                {
-                    theSubmodels.add(deep(item));
-                }
-            }
-
-            List<IConceptDescription> thatConceptDescriptions =
-                that.getConceptDescriptions().orElse(null);
-            List<IConceptDescription> theConceptDescriptions = null;
-            if (thatConceptDescriptions != null) {
-                theConceptDescriptions = new ArrayList<>(
-                    thatConceptDescriptions.size());
-                for (IConceptDescription item : thatConceptDescriptions)
-                {
-                    theConceptDescriptions.add(deep(item));
-                }
-            }
-
             return new Environment(
-                theAssetAdministrationShells,
-                theSubmodels,
-                theConceptDescriptions
+                that.getAssetAdministrationShells().isPresent()
+                    ? deepListOf_IAssetAdministrationShell(that.getAssetAdministrationShells().get())
+                    : null,
+                that.getSubmodels().isPresent()
+                    ? deepListOf_ISubmodel(that.getSubmodels().get())
+                    : null,
+                that.getConceptDescriptions().isPresent()
+                    ? deepListOf_IConceptDescription(that.getConceptDescriptions().get())
+                    : null
             );
         }
 
@@ -2545,14 +1639,8 @@ public class Copying
         public IClass transformValueList (
             IValueList that
         ) {
-            List<IValueReferencePair> theValueReferencePairs = new ArrayList<>(
-                that.getValueReferencePairs().size());
-            for (IValueReferencePair item : that.getValueReferencePairs()) {
-                theValueReferencePairs.add(deep(item));
-            }
-
             return new ValueList(
-                theValueReferencePairs
+                deepListOf_IValueReferencePair(that.getValueReferencePairs())
             );
         }
 
@@ -2590,49 +1678,29 @@ public class Copying
         public IClass transformDataSpecificationIec61360 (
             IDataSpecificationIec61360 that
         ) {
-            List<ILangStringPreferredNameTypeIec61360> thePreferredName = new ArrayList<>(
-                that.getPreferredName().size());
-            for (ILangStringPreferredNameTypeIec61360 item : that.getPreferredName()) {
-                thePreferredName.add(deep(item));
-            }
-
-            List<ILangStringShortNameTypeIec61360> thatShortName =
-                that.getShortName().orElse(null);
-            List<ILangStringShortNameTypeIec61360> theShortName = null;
-            if (thatShortName != null) {
-                theShortName = new ArrayList<>(
-                    thatShortName.size());
-                for (ILangStringShortNameTypeIec61360 item : thatShortName)
-                {
-                    theShortName.add(deep(item));
-                }
-            }
-
-            List<ILangStringDefinitionTypeIec61360> thatDefinition =
-                that.getDefinition().orElse(null);
-            List<ILangStringDefinitionTypeIec61360> theDefinition = null;
-            if (thatDefinition != null) {
-                theDefinition = new ArrayList<>(
-                    thatDefinition.size());
-                for (ILangStringDefinitionTypeIec61360 item : thatDefinition)
-                {
-                    theDefinition.add(deep(item));
-                }
-            }
-
             return new DataSpecificationIec61360(
-                thePreferredName,
-                theShortName,
+                deepListOf_ILangStringPreferredNameTypeIec61360(that.getPreferredName()),
+                that.getShortName().isPresent()
+                    ? deepListOf_ILangStringShortNameTypeIec61360(that.getShortName().get())
+                    : null,
                 that.getUnit().orElse(null),
-                that.getUnitId().orElse(null),
+                that.getUnitId().isPresent()
+                    ? deep(that.getUnitId().get())
+                    : null,
                 that.getSourceOfDefinition().orElse(null),
                 that.getSymbol().orElse(null),
                 that.getDataType().orElse(null),
-                theDefinition,
+                that.getDefinition().isPresent()
+                    ? deepListOf_ILangStringDefinitionTypeIec61360(that.getDefinition().get())
+                    : null,
                 that.getValueFormat().orElse(null),
-                that.getValueList().orElse(null),
+                that.getValueList().isPresent()
+                    ? deep(that.getValueList().get())
+                    : null,
                 that.getValue().orElse(null),
-                that.getLevelType().orElse(null)
+                that.getLevelType().isPresent()
+                    ? deep(that.getLevelType().get())
+                    : null
             );
         }
     }

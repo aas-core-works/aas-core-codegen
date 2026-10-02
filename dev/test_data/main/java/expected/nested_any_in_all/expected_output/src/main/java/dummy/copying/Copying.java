@@ -48,6 +48,42 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ILangString> deepListOf_ILangString(
+        List<ILangString> that) {
+        List<ILangString> result = new ArrayList<>(that.size());
+        for (ILangString item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ILangStringSet> deepListOf_ILangStringSet(
+        List<ILangStringSet> that) {
+        List<ILangStringSet> result = new ArrayList<>(that.size());
+        for (ILangStringSet item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<ISpecification> deepListOf_ISpecification(
+        List<ISpecification> that) {
+        List<ISpecification> result = new ArrayList<>(that.size());
+        for (ISpecification item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -113,14 +149,8 @@ public class Copying
         public IClass transformLangStringSet (
             ILangStringSet that
         ) {
-            List<ILangString> theLangStrings = new ArrayList<>(
-                that.getLangStrings().size());
-            for (ILangString item : that.getLangStrings()) {
-                theLangStrings.add(deep(item));
-            }
-
             return new LangStringSet(
-                theLangStrings
+                deepListOf_ILangString(that.getLangStrings())
             );
         }
 
@@ -128,20 +158,10 @@ public class Copying
         public IClass transformIecContent (
             IIecContent that
         ) {
-            List<ILangString> thatDefinition =
-                that.getDefinition().orElse(null);
-            List<ILangString> theDefinition = null;
-            if (thatDefinition != null) {
-                theDefinition = new ArrayList<>(
-                    thatDefinition.size());
-                for (ILangString item : thatDefinition)
-                {
-                    theDefinition.add(deep(item));
-                }
-            }
-
             return new IecContent(
-                theDefinition
+                that.getDefinition().isPresent()
+                    ? deepListOf_ILangString(that.getDefinition().get())
+                    : null
             );
         }
 
@@ -165,28 +185,12 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<ILangStringSet> theLangStringSets = new ArrayList<>(
-                that.getLangStringSets().size());
-            for (ILangStringSet item : that.getLangStringSets()) {
-                theLangStringSets.add(deep(item));
-            }
-
-            List<ISpecification> thatSpecifications =
-                that.getSpecifications().orElse(null);
-            List<ISpecification> theSpecifications = null;
-            if (thatSpecifications != null) {
-                theSpecifications = new ArrayList<>(
-                    thatSpecifications.size());
-                for (ISpecification item : thatSpecifications)
-                {
-                    theSpecifications.add(deep(item));
-                }
-            }
-
             return new Something(
                 that.getDefaultLanguage(),
-                theLangStringSets,
-                theSpecifications
+                deepListOf_ILangStringSet(that.getLangStringSets()),
+                that.getSpecifications().isPresent()
+                    ? deepListOf_ISpecification(that.getSpecifications().get())
+                    : null
             );
         }
     }

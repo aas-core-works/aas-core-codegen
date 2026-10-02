@@ -58,6 +58,18 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<IParent> deepListOf_IParent(
+        List<IParent> that) {
+        List<IParent> result = new ArrayList<>(that.size());
+        for (IParent item : that) {
+            result.add(deep(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -144,19 +156,6 @@ public class Copying
         public IClass transformSomething (
             ISomething that
         ) {
-            List<IParent> theParents = new ArrayList<>(
-                that.getParents().size());
-            for (IParent item : that.getParents()) {
-                theParents.add(deep(item));
-            }
-
-            List<String> theTexts = new ArrayList<>(
-                that.getTexts());
-
-            List<String> theOptionalTexts = that.getOptionalTexts().isPresent()
-                ? new ArrayList<>(that.getOptionalTexts().get())
-                : null;
-
             return new Something(
                 that.getText(),
                 that.getNumber(),
@@ -165,13 +164,19 @@ public class Copying
                 that.getCode(),
                 deep(that.getItem()),
                 deep(that.getParent()),
-                theParents,
-                theTexts,
+                deepListOf_IParent(that.getParents()),
+                new ArrayList<>(that.getTexts()),
                 that.getOptionalText().orElse(null),
                 that.getOptionalKind().orElse(null),
-                that.getOptionalParent().orElse(null),
-                theOptionalTexts,
-                that.getOptionalData().orElse(null),
+                that.getOptionalParent().isPresent()
+                    ? deep(that.getOptionalParent().get())
+                    : null,
+                that.getOptionalTexts().isPresent()
+                    ? new ArrayList<>(that.getOptionalTexts().get())
+                    : null,
+                that.getOptionalData().isPresent()
+                    ? that.getOptionalData().get().clone()
+                    : null,
                 that.getOptionalMember().isPresent()
                     ? deep(that.getOptionalMember().get())
                     : null
