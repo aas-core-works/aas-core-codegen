@@ -82,6 +82,65 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_LangString(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ILangString>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ILangString>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_LangStringSet(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ILangStringSet>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ILangStringSet>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Specification(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ISpecification>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ISpecification>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitLangString(
@@ -94,12 +153,10 @@ void PassThroughVisitor::VisitLangStringSet(
   const std::shared_ptr<types::ILangStringSet>& that
 ) {
   // mutable_lang_strings
-  for (
-    const std::shared_ptr<types::ILangString>& item :
+  PassThrough_listOf_LangString(
+    this,
     that->mutable_lang_strings()
-  ) {
-    Visit(item);
-  }
+  );
 }
 
 void PassThroughVisitor::VisitIecContent(
@@ -114,12 +171,10 @@ void PassThroughVisitor::VisitIecContent(
     that->mutable_definition()
   );
   if (maybe_definition.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangString>& item :
+    PassThrough_listOf_LangString(
+      this,
       maybe_definition.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -134,21 +189,17 @@ void PassThroughVisitor::VisitSpecification(
   const std::shared_ptr<types::ISpecification>& that
 ) {
   // mutable_content
-  Visit(
-    that->mutable_content()
-  );
+  this->Visit(that->mutable_content());
 }
 
 void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_lang_string_sets
-  for (
-    const std::shared_ptr<types::ILangStringSet>& item :
+  PassThrough_listOf_LangStringSet(
+    this,
     that->mutable_lang_string_sets()
-  ) {
-    Visit(item);
-  }
+  );
 
   // region mutable_specifications
   const common::optional<
@@ -159,12 +210,10 @@ void PassThroughVisitor::VisitSomething(
     that->mutable_specifications()
   );
   if (maybe_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::ISpecification>& item :
+    PassThrough_listOf_Specification(
+      this,
       maybe_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }

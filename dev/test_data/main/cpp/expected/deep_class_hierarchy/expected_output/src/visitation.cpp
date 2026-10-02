@@ -99,28 +99,20 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_some_choice
-  Visit(
-    that->mutable_some_choice()
-  );
+  this->Visit(that->mutable_some_choice());
 
   // mutable_something_without_choice
-  Visit(
-    that->mutable_something_without_choice()
-  );
+  this->Visit(that->mutable_something_without_choice());
 }
 
 void PassThroughVisitor::VisitContainer(
   const std::shared_ptr<types::IContainer>& that
 ) {
   // mutable_node
-  Visit(
-    that->mutable_node()
-  );
+  this->Visit(that->mutable_node());
 
   // mutable_something
-  Visit(
-    that->mutable_something()
-  );
+  this->Visit(that->mutable_something());
 }
 
 // endregion

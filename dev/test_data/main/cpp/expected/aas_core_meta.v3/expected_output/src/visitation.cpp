@@ -307,6 +307,320 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Reference(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IReference>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IReference>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_EmbeddedDataSpecification(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IEmbeddedDataSpecification>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Extension(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IExtension>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IExtension>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_LangStringNameType(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ILangStringNameType>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ILangStringNameType>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_LangStringTextType(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ILangStringTextType>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ILangStringTextType>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_SpecificAssetId(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ISpecificAssetId>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ISpecificAssetId>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Qualifier(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IQualifier>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IQualifier>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_SubmodelElement(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ISubmodelElement>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ISubmodelElement>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_DataElement(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IDataElement>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IDataElement>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_OperationVariable(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IOperationVariable>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IOperationVariable>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Key(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IKey>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IKey>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_AssetAdministrationShell(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IAssetAdministrationShell>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IAssetAdministrationShell>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Submodel(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ISubmodel>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ISubmodel>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_ConceptDescription(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IConceptDescription>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IConceptDescription>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_ValueReferencePair(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IValueReferencePair>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IValueReferencePair>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_LangStringPreferredNameTypeIec61360(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_LangStringShortNameTypeIec61360(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_LangStringDefinitionTypeIec61360(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitExtension(
@@ -319,9 +633,7 @@ void PassThroughVisitor::VisitExtension(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -334,12 +646,10 @@ void PassThroughVisitor::VisitExtension(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -352,12 +662,7 @@ void PassThroughVisitor::VisitExtension(
     that->mutable_refers_to()
   );
   if (maybe_refers_to.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
-      maybe_refers_to.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Reference(this, maybe_refers_to.value());
   }
   // endregion
 }
@@ -374,12 +679,10 @@ void PassThroughVisitor::VisitAdministrativeInformation(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -390,9 +693,7 @@ void PassThroughVisitor::VisitAdministrativeInformation(
     that->mutable_creator()
   );
   if (maybe_creator.has_value()) {
-    Visit(
-      maybe_creator.value()
-    );
+    this->Visit(maybe_creator.value());
   }
   // endregion
 }
@@ -407,9 +708,7 @@ void PassThroughVisitor::VisitQualifier(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -422,12 +721,10 @@ void PassThroughVisitor::VisitQualifier(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -438,9 +735,7 @@ void PassThroughVisitor::VisitQualifier(
     that->mutable_value_id()
   );
   if (maybe_value_id.has_value()) {
-    Visit(
-      maybe_value_id.value()
-    );
+    this->Visit(maybe_value_id.value());
   }
   // endregion
 }
@@ -457,12 +752,7 @@ void PassThroughVisitor::VisitAssetAdministrationShell(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -475,12 +765,10 @@ void PassThroughVisitor::VisitAssetAdministrationShell(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -493,12 +781,10 @@ void PassThroughVisitor::VisitAssetAdministrationShell(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -509,9 +795,7 @@ void PassThroughVisitor::VisitAssetAdministrationShell(
     that->mutable_administration()
   );
   if (maybe_administration.has_value()) {
-    Visit(
-      maybe_administration.value()
-    );
+    this->Visit(maybe_administration.value());
   }
   // endregion
 
@@ -524,12 +808,10 @@ void PassThroughVisitor::VisitAssetAdministrationShell(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -540,16 +822,12 @@ void PassThroughVisitor::VisitAssetAdministrationShell(
     that->mutable_derived_from()
   );
   if (maybe_derived_from.has_value()) {
-    Visit(
-      maybe_derived_from.value()
-    );
+    this->Visit(maybe_derived_from.value());
   }
   // endregion
 
   // mutable_asset_information
-  Visit(
-    that->mutable_asset_information()
-  );
+  this->Visit(that->mutable_asset_information());
 
   // region mutable_submodels
   const common::optional<
@@ -560,12 +838,7 @@ void PassThroughVisitor::VisitAssetAdministrationShell(
     that->mutable_submodels()
   );
   if (maybe_submodels.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
-      maybe_submodels.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Reference(this, maybe_submodels.value());
   }
   // endregion
 }
@@ -582,12 +855,10 @@ void PassThroughVisitor::VisitAssetInformation(
     that->mutable_specific_asset_ids()
   );
   if (maybe_specific_asset_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::ISpecificAssetId>& item :
+    PassThrough_listOf_SpecificAssetId(
+      this,
       maybe_specific_asset_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -598,9 +869,7 @@ void PassThroughVisitor::VisitAssetInformation(
     that->mutable_default_thumbnail()
   );
   if (maybe_default_thumbnail.has_value()) {
-    Visit(
-      maybe_default_thumbnail.value()
-    );
+    this->Visit(maybe_default_thumbnail.value());
   }
   // endregion
 }
@@ -621,9 +890,7 @@ void PassThroughVisitor::VisitSpecificAssetId(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -636,12 +903,10 @@ void PassThroughVisitor::VisitSpecificAssetId(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -652,9 +917,7 @@ void PassThroughVisitor::VisitSpecificAssetId(
     that->mutable_external_subject_id()
   );
   if (maybe_external_subject_id.has_value()) {
-    Visit(
-      maybe_external_subject_id.value()
-    );
+    this->Visit(maybe_external_subject_id.value());
   }
   // endregion
 }
@@ -671,12 +934,7 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -689,12 +947,10 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -707,12 +963,10 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -723,9 +977,7 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_administration()
   );
   if (maybe_administration.has_value()) {
-    Visit(
-      maybe_administration.value()
-    );
+    this->Visit(maybe_administration.value());
   }
   // endregion
 
@@ -736,9 +988,7 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -751,12 +1001,10 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -769,12 +1017,7 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -787,12 +1030,10 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -805,12 +1046,10 @@ void PassThroughVisitor::VisitSubmodel(
     that->mutable_submodel_elements()
   );
   if (maybe_submodel_elements.has_value()) {
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item :
+    PassThrough_listOf_SubmodelElement(
+      this,
       maybe_submodel_elements.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -827,12 +1066,7 @@ void PassThroughVisitor::VisitRelationshipElement(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -845,12 +1079,10 @@ void PassThroughVisitor::VisitRelationshipElement(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -863,12 +1095,10 @@ void PassThroughVisitor::VisitRelationshipElement(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -879,9 +1109,7 @@ void PassThroughVisitor::VisitRelationshipElement(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -894,12 +1122,10 @@ void PassThroughVisitor::VisitRelationshipElement(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -912,12 +1138,7 @@ void PassThroughVisitor::VisitRelationshipElement(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -930,24 +1151,18 @@ void PassThroughVisitor::VisitRelationshipElement(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
   // mutable_first
-  Visit(
-    that->mutable_first()
-  );
+  this->Visit(that->mutable_first());
 
   // mutable_second
-  Visit(
-    that->mutable_second()
-  );
+  this->Visit(that->mutable_second());
 }
 
 void PassThroughVisitor::VisitSubmodelElementList(
@@ -962,12 +1177,7 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -980,12 +1190,10 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -998,12 +1206,10 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1014,9 +1220,7 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -1029,12 +1233,10 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1047,12 +1249,7 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -1065,12 +1262,10 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1081,9 +1276,7 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_semantic_id_list_element()
   );
   if (maybe_semantic_id_list_element.has_value()) {
-    Visit(
-      maybe_semantic_id_list_element.value()
-    );
+    this->Visit(maybe_semantic_id_list_element.value());
   }
   // endregion
 
@@ -1096,12 +1289,10 @@ void PassThroughVisitor::VisitSubmodelElementList(
     that->mutable_value()
   );
   if (maybe_value.has_value()) {
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item :
+    PassThrough_listOf_SubmodelElement(
+      this,
       maybe_value.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -1118,12 +1309,7 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -1136,12 +1322,10 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1154,12 +1338,10 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1170,9 +1352,7 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -1185,12 +1365,10 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1203,12 +1381,7 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -1221,12 +1394,10 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1239,12 +1410,10 @@ void PassThroughVisitor::VisitSubmodelElementCollection(
     that->mutable_value()
   );
   if (maybe_value.has_value()) {
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item :
+    PassThrough_listOf_SubmodelElement(
+      this,
       maybe_value.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -1261,12 +1430,7 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -1279,12 +1443,10 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1297,12 +1459,10 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1313,9 +1473,7 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -1328,12 +1486,10 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1346,12 +1502,7 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -1364,12 +1515,10 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1380,9 +1529,7 @@ void PassThroughVisitor::VisitProperty(
     that->mutable_value_id()
   );
   if (maybe_value_id.has_value()) {
-    Visit(
-      maybe_value_id.value()
-    );
+    this->Visit(maybe_value_id.value());
   }
   // endregion
 }
@@ -1399,12 +1546,7 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -1417,12 +1559,10 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1435,12 +1575,10 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1451,9 +1589,7 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -1466,12 +1602,10 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1484,12 +1618,7 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -1502,12 +1631,10 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1520,12 +1647,10 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_value()
   );
   if (maybe_value.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_value.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1536,9 +1661,7 @@ void PassThroughVisitor::VisitMultiLanguageProperty(
     that->mutable_value_id()
   );
   if (maybe_value_id.has_value()) {
-    Visit(
-      maybe_value_id.value()
-    );
+    this->Visit(maybe_value_id.value());
   }
   // endregion
 }
@@ -1555,12 +1678,7 @@ void PassThroughVisitor::VisitRange(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -1573,12 +1691,10 @@ void PassThroughVisitor::VisitRange(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1591,12 +1707,10 @@ void PassThroughVisitor::VisitRange(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1607,9 +1721,7 @@ void PassThroughVisitor::VisitRange(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -1622,12 +1734,10 @@ void PassThroughVisitor::VisitRange(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1640,12 +1750,7 @@ void PassThroughVisitor::VisitRange(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -1658,12 +1763,10 @@ void PassThroughVisitor::VisitRange(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -1680,12 +1783,7 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -1698,12 +1796,10 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1716,12 +1812,10 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1732,9 +1826,7 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -1747,12 +1839,10 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1765,12 +1855,7 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -1783,12 +1868,10 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1799,9 +1882,7 @@ void PassThroughVisitor::VisitReferenceElement(
     that->mutable_value()
   );
   if (maybe_value.has_value()) {
-    Visit(
-      maybe_value.value()
-    );
+    this->Visit(maybe_value.value());
   }
   // endregion
 }
@@ -1818,12 +1899,7 @@ void PassThroughVisitor::VisitBlob(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -1836,12 +1912,10 @@ void PassThroughVisitor::VisitBlob(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1854,12 +1928,10 @@ void PassThroughVisitor::VisitBlob(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1870,9 +1942,7 @@ void PassThroughVisitor::VisitBlob(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -1885,12 +1955,10 @@ void PassThroughVisitor::VisitBlob(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1903,12 +1971,7 @@ void PassThroughVisitor::VisitBlob(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -1921,12 +1984,10 @@ void PassThroughVisitor::VisitBlob(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -1943,12 +2004,7 @@ void PassThroughVisitor::VisitFile(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -1961,12 +2017,10 @@ void PassThroughVisitor::VisitFile(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1979,12 +2033,10 @@ void PassThroughVisitor::VisitFile(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -1995,9 +2047,7 @@ void PassThroughVisitor::VisitFile(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -2010,12 +2060,10 @@ void PassThroughVisitor::VisitFile(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2028,12 +2076,7 @@ void PassThroughVisitor::VisitFile(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -2046,12 +2089,10 @@ void PassThroughVisitor::VisitFile(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -2068,12 +2109,7 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -2086,12 +2122,10 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2104,12 +2138,10 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2120,9 +2152,7 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -2135,12 +2165,10 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2153,12 +2181,7 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -2171,24 +2194,18 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
   // mutable_first
-  Visit(
-    that->mutable_first()
-  );
+  this->Visit(that->mutable_first());
 
   // mutable_second
-  Visit(
-    that->mutable_second()
-  );
+  this->Visit(that->mutable_second());
 
   // region mutable_annotations
   const common::optional<
@@ -2199,12 +2216,10 @@ void PassThroughVisitor::VisitAnnotatedRelationshipElement(
     that->mutable_annotations()
   );
   if (maybe_annotations.has_value()) {
-    for (
-      const std::shared_ptr<types::IDataElement>& item :
+    PassThrough_listOf_DataElement(
+      this,
       maybe_annotations.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -2221,12 +2236,7 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -2239,12 +2249,10 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2257,12 +2265,10 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2273,9 +2279,7 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -2288,12 +2292,10 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2306,12 +2308,7 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -2324,12 +2321,10 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2342,12 +2337,10 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_statements()
   );
   if (maybe_statements.has_value()) {
-    for (
-      const std::shared_ptr<types::ISubmodelElement>& item :
+    PassThrough_listOf_SubmodelElement(
+      this,
       maybe_statements.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2360,12 +2353,10 @@ void PassThroughVisitor::VisitEntity(
     that->mutable_specific_asset_ids()
   );
   if (maybe_specific_asset_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::ISpecificAssetId>& item :
+    PassThrough_listOf_SpecificAssetId(
+      this,
       maybe_specific_asset_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -2374,9 +2365,7 @@ void PassThroughVisitor::VisitEventPayload(
   const std::shared_ptr<types::IEventPayload>& that
 ) {
   // mutable_source
-  Visit(
-    that->mutable_source()
-  );
+  this->Visit(that->mutable_source());
 
   // region mutable_source_semantic_id
   const common::optional<
@@ -2385,16 +2374,12 @@ void PassThroughVisitor::VisitEventPayload(
     that->mutable_source_semantic_id()
   );
   if (maybe_source_semantic_id.has_value()) {
-    Visit(
-      maybe_source_semantic_id.value()
-    );
+    this->Visit(maybe_source_semantic_id.value());
   }
   // endregion
 
   // mutable_observable_reference
-  Visit(
-    that->mutable_observable_reference()
-  );
+  this->Visit(that->mutable_observable_reference());
 
   // region mutable_observable_semantic_id
   const common::optional<
@@ -2403,9 +2388,7 @@ void PassThroughVisitor::VisitEventPayload(
     that->mutable_observable_semantic_id()
   );
   if (maybe_observable_semantic_id.has_value()) {
-    Visit(
-      maybe_observable_semantic_id.value()
-    );
+    this->Visit(maybe_observable_semantic_id.value());
   }
   // endregion
 
@@ -2416,9 +2399,7 @@ void PassThroughVisitor::VisitEventPayload(
     that->mutable_subject_id()
   );
   if (maybe_subject_id.has_value()) {
-    Visit(
-      maybe_subject_id.value()
-    );
+    this->Visit(maybe_subject_id.value());
   }
   // endregion
 }
@@ -2435,12 +2416,7 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -2453,12 +2429,10 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2471,12 +2445,10 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2487,9 +2459,7 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -2502,12 +2472,10 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2520,12 +2488,7 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -2538,19 +2501,15 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
   // mutable_observed
-  Visit(
-    that->mutable_observed()
-  );
+  this->Visit(that->mutable_observed());
 
   // region mutable_message_broker
   const common::optional<
@@ -2559,9 +2518,7 @@ void PassThroughVisitor::VisitBasicEventElement(
     that->mutable_message_broker()
   );
   if (maybe_message_broker.has_value()) {
-    Visit(
-      maybe_message_broker.value()
-    );
+    this->Visit(maybe_message_broker.value());
   }
   // endregion
 }
@@ -2578,12 +2535,7 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -2596,12 +2548,10 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2614,12 +2564,10 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2630,9 +2578,7 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -2645,12 +2591,10 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2663,12 +2607,7 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -2681,12 +2620,10 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2699,12 +2636,10 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_input_variables()
   );
   if (maybe_input_variables.has_value()) {
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item :
+    PassThrough_listOf_OperationVariable(
+      this,
       maybe_input_variables.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2717,12 +2652,10 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_output_variables()
   );
   if (maybe_output_variables.has_value()) {
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item :
+    PassThrough_listOf_OperationVariable(
+      this,
       maybe_output_variables.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2735,12 +2668,10 @@ void PassThroughVisitor::VisitOperation(
     that->mutable_inoutput_variables()
   );
   if (maybe_inoutput_variables.has_value()) {
-    for (
-      const std::shared_ptr<types::IOperationVariable>& item :
+    PassThrough_listOf_OperationVariable(
+      this,
       maybe_inoutput_variables.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -2749,9 +2680,7 @@ void PassThroughVisitor::VisitOperationVariable(
   const std::shared_ptr<types::IOperationVariable>& that
 ) {
   // mutable_value
-  Visit(
-    that->mutable_value()
-  );
+  this->Visit(that->mutable_value());
 }
 
 void PassThroughVisitor::VisitCapability(
@@ -2766,12 +2695,7 @@ void PassThroughVisitor::VisitCapability(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -2784,12 +2708,10 @@ void PassThroughVisitor::VisitCapability(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2802,12 +2724,10 @@ void PassThroughVisitor::VisitCapability(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2818,9 +2738,7 @@ void PassThroughVisitor::VisitCapability(
     that->mutable_semantic_id()
   );
   if (maybe_semantic_id.has_value()) {
-    Visit(
-      maybe_semantic_id.value()
-    );
+    this->Visit(maybe_semantic_id.value());
   }
   // endregion
 
@@ -2833,12 +2751,10 @@ void PassThroughVisitor::VisitCapability(
     that->mutable_supplemental_semantic_ids()
   );
   if (maybe_supplemental_semantic_ids.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
+    PassThrough_listOf_Reference(
+      this,
       maybe_supplemental_semantic_ids.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2851,12 +2767,7 @@ void PassThroughVisitor::VisitCapability(
     that->mutable_qualifiers()
   );
   if (maybe_qualifiers.has_value()) {
-    for (
-      const std::shared_ptr<types::IQualifier>& item :
-      maybe_qualifiers.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Qualifier(this, maybe_qualifiers.value());
   }
   // endregion
 
@@ -2869,12 +2780,10 @@ void PassThroughVisitor::VisitCapability(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -2891,12 +2800,7 @@ void PassThroughVisitor::VisitConceptDescription(
     that->mutable_extensions()
   );
   if (maybe_extensions.has_value()) {
-    for (
-      const std::shared_ptr<types::IExtension>& item :
-      maybe_extensions.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Extension(this, maybe_extensions.value());
   }
   // endregion
 
@@ -2909,12 +2813,10 @@ void PassThroughVisitor::VisitConceptDescription(
     that->mutable_display_name()
   );
   if (maybe_display_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringNameType>& item :
+    PassThrough_listOf_LangStringNameType(
+      this,
       maybe_display_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2927,12 +2829,10 @@ void PassThroughVisitor::VisitConceptDescription(
     that->mutable_description()
   );
   if (maybe_description.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringTextType>& item :
+    PassThrough_listOf_LangStringTextType(
+      this,
       maybe_description.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2943,9 +2843,7 @@ void PassThroughVisitor::VisitConceptDescription(
     that->mutable_administration()
   );
   if (maybe_administration.has_value()) {
-    Visit(
-      maybe_administration.value()
-    );
+    this->Visit(maybe_administration.value());
   }
   // endregion
 
@@ -2958,12 +2856,10 @@ void PassThroughVisitor::VisitConceptDescription(
     that->mutable_embedded_data_specifications()
   );
   if (maybe_embedded_data_specifications.has_value()) {
-    for (
-      const std::shared_ptr<types::IEmbeddedDataSpecification>& item :
+    PassThrough_listOf_EmbeddedDataSpecification(
+      this,
       maybe_embedded_data_specifications.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -2976,12 +2872,7 @@ void PassThroughVisitor::VisitConceptDescription(
     that->mutable_is_case_of()
   );
   if (maybe_is_case_of.has_value()) {
-    for (
-      const std::shared_ptr<types::IReference>& item :
-      maybe_is_case_of.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Reference(this, maybe_is_case_of.value());
   }
   // endregion
 }
@@ -2996,19 +2887,12 @@ void PassThroughVisitor::VisitReference(
     that->mutable_referred_semantic_id()
   );
   if (maybe_referred_semantic_id.has_value()) {
-    Visit(
-      maybe_referred_semantic_id.value()
-    );
+    this->Visit(maybe_referred_semantic_id.value());
   }
   // endregion
 
   // mutable_keys
-  for (
-    const std::shared_ptr<types::IKey>& item :
-    that->mutable_keys()
-  ) {
-    Visit(item);
-  }
+  PassThrough_listOf_Key(this, that->mutable_keys());
 }
 
 void PassThroughVisitor::VisitKey(
@@ -3041,12 +2925,10 @@ void PassThroughVisitor::VisitEnvironment(
     that->mutable_asset_administration_shells()
   );
   if (maybe_asset_administration_shells.has_value()) {
-    for (
-      const std::shared_ptr<types::IAssetAdministrationShell>& item :
+    PassThrough_listOf_AssetAdministrationShell(
+      this,
       maybe_asset_administration_shells.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -3059,12 +2941,7 @@ void PassThroughVisitor::VisitEnvironment(
     that->mutable_submodels()
   );
   if (maybe_submodels.has_value()) {
-    for (
-      const std::shared_ptr<types::ISubmodel>& item :
-      maybe_submodels.value()
-    ) {
-      Visit(item);
-    }
+    PassThrough_listOf_Submodel(this, maybe_submodels.value());
   }
   // endregion
 
@@ -3077,12 +2954,10 @@ void PassThroughVisitor::VisitEnvironment(
     that->mutable_concept_descriptions()
   );
   if (maybe_concept_descriptions.has_value()) {
-    for (
-      const std::shared_ptr<types::IConceptDescription>& item :
+    PassThrough_listOf_ConceptDescription(
+      this,
       maybe_concept_descriptions.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 }
@@ -3091,14 +2966,10 @@ void PassThroughVisitor::VisitEmbeddedDataSpecification(
   const std::shared_ptr<types::IEmbeddedDataSpecification>& that
 ) {
   // mutable_data_specification
-  Visit(
-    that->mutable_data_specification()
-  );
+  this->Visit(that->mutable_data_specification());
 
   // mutable_data_specification_content
-  Visit(
-    that->mutable_data_specification_content()
-  );
+  this->Visit(that->mutable_data_specification_content());
 }
 
 void PassThroughVisitor::VisitLevelType(
@@ -3111,21 +2982,17 @@ void PassThroughVisitor::VisitValueReferencePair(
   const std::shared_ptr<types::IValueReferencePair>& that
 ) {
   // mutable_value_id
-  Visit(
-    that->mutable_value_id()
-  );
+  this->Visit(that->mutable_value_id());
 }
 
 void PassThroughVisitor::VisitValueList(
   const std::shared_ptr<types::IValueList>& that
 ) {
   // mutable_value_reference_pairs
-  for (
-    const std::shared_ptr<types::IValueReferencePair>& item :
+  PassThrough_listOf_ValueReferencePair(
+    this,
     that->mutable_value_reference_pairs()
-  ) {
-    Visit(item);
-  }
+  );
 }
 
 void PassThroughVisitor::VisitLangStringPreferredNameTypeIec61360(
@@ -3150,12 +3017,10 @@ void PassThroughVisitor::VisitDataSpecificationIec61360(
   const std::shared_ptr<types::IDataSpecificationIec61360>& that
 ) {
   // mutable_preferred_name
-  for (
-    const std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>& item :
+  PassThrough_listOf_LangStringPreferredNameTypeIec61360(
+    this,
     that->mutable_preferred_name()
-  ) {
-    Visit(item);
-  }
+  );
 
   // region mutable_short_name
   const common::optional<
@@ -3166,12 +3031,10 @@ void PassThroughVisitor::VisitDataSpecificationIec61360(
     that->mutable_short_name()
   );
   if (maybe_short_name.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringShortNameTypeIec61360>& item :
+    PassThrough_listOf_LangStringShortNameTypeIec61360(
+      this,
       maybe_short_name.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -3182,9 +3045,7 @@ void PassThroughVisitor::VisitDataSpecificationIec61360(
     that->mutable_unit_id()
   );
   if (maybe_unit_id.has_value()) {
-    Visit(
-      maybe_unit_id.value()
-    );
+    this->Visit(maybe_unit_id.value());
   }
   // endregion
 
@@ -3197,12 +3058,10 @@ void PassThroughVisitor::VisitDataSpecificationIec61360(
     that->mutable_definition()
   );
   if (maybe_definition.has_value()) {
-    for (
-      const std::shared_ptr<types::ILangStringDefinitionTypeIec61360>& item :
+    PassThrough_listOf_LangStringDefinitionTypeIec61360(
+      this,
       maybe_definition.value()
-    ) {
-      Visit(item);
-    }
+    );
   }
   // endregion
 
@@ -3213,9 +3072,7 @@ void PassThroughVisitor::VisitDataSpecificationIec61360(
     that->mutable_value_list()
   );
   if (maybe_value_list.has_value()) {
-    Visit(
-      maybe_value_list.value()
-    );
+    this->Visit(maybe_value_list.value());
   }
   // endregion
 
@@ -3226,9 +3083,7 @@ void PassThroughVisitor::VisitDataSpecificationIec61360(
     that->mutable_level_type()
   );
   if (maybe_level_type.has_value()) {
-    Visit(
-      maybe_level_type.value()
-    );
+    this->Visit(maybe_level_type.value());
   }
   // endregion
 }

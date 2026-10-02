@@ -75,6 +75,31 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_AbstractWithoutNumbers(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IAbstractWithoutNumbers>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IAbstractWithoutNumbers>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitAbstractDescendantWithoutNumbers(
@@ -105,22 +130,16 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_abstract_property
-  Visit(
-    that->mutable_abstract_property()
-  );
+  this->Visit(that->mutable_abstract_property());
 
   // mutable_parent_property
-  Visit(
-    that->mutable_parent_property()
-  );
+  this->Visit(that->mutable_parent_property());
 
   // mutable_list_abstract_property
-  for (
-    const std::shared_ptr<types::IAbstractWithoutNumbers>& item :
+  PassThrough_listOf_AbstractWithoutNumbers(
+    this,
     that->mutable_list_abstract_property()
-  ) {
-    Visit(item);
-  }
+  );
 
   // region mutable_optional_parent_property
   const common::optional<
@@ -129,9 +148,7 @@ void PassThroughVisitor::VisitSomething(
     that->mutable_optional_parent_property()
   );
   if (maybe_optional_parent_property.has_value()) {
-    Visit(
-      maybe_optional_parent_property.value()
-    );
+    this->Visit(maybe_optional_parent_property.value());
   }
   // endregion
 
@@ -140,14 +157,14 @@ void PassThroughVisitor::VisitSomething(
     (that->mutable_union_without_numbers_property()).index()
   ) {
     case 0:
-      Visit(
+      this->Visit(
         common::get<0>(
           that->mutable_union_without_numbers_property()
         )
       );
       break;
     case 1:
-      Visit(
+      this->Visit(
         common::get<1>(
           that->mutable_union_without_numbers_property()
         )
@@ -162,14 +179,14 @@ void PassThroughVisitor::VisitSomething(
     (that->mutable_union_with_numbers_property()).index()
   ) {
     case 0:
-      Visit(
+      this->Visit(
         common::get<0>(
           that->mutable_union_with_numbers_property()
         )
       );
       break;
     case 1:
-      Visit(
+      this->Visit(
         common::get<1>(
           that->mutable_union_with_numbers_property()
         )

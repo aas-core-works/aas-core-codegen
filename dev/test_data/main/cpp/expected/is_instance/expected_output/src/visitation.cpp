@@ -103,6 +103,72 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Element(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IElement>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IElement>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Value(
+  IVisitor* visitor,
+  const std::vector<types::Value>& that
+) {
+  for (
+    const types::Value& item :
+    that
+  ) {
+    switch (
+      (item).index()
+    ) {
+      case 0:
+        visitor->Visit(
+          common::get<0>(
+            item
+          )
+        );
+        break;
+      case 1:
+        visitor->Visit(
+          common::get<1>(
+            item
+          )
+        );
+        break;
+      case 2:
+        visitor->Visit(
+          common::get<2>(
+            item
+          )
+        );
+        break;
+      default:
+        throw std::logic_error("Invalid variant index");
+    }
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitLeaf(
@@ -115,24 +181,14 @@ void PassThroughVisitor::VisitOrderedContainer(
   const std::shared_ptr<types::IOrderedContainer>& that
 ) {
   // mutable_children
-  for (
-    const std::shared_ptr<types::IElement>& item :
-    that->mutable_children()
-  ) {
-    Visit(item);
-  }
+  PassThrough_listOf_Element(this, that->mutable_children());
 }
 
 void PassThroughVisitor::VisitUnorderedContainer(
   const std::shared_ptr<types::IUnorderedContainer>& that
 ) {
   // mutable_children
-  for (
-    const std::shared_ptr<types::IElement>& item :
-    that->mutable_children()
-  ) {
-    Visit(item);
-  }
+  PassThrough_listOf_Element(this, that->mutable_children());
 }
 
 void PassThroughVisitor::VisitGlobalAttribute(
@@ -155,14 +211,14 @@ void PassThroughVisitor::VisitAttributeOperand(
     (that->mutable_attribute()).index()
   ) {
     case 0:
-      Visit(
+      this->Visit(
         common::get<0>(
           that->mutable_attribute()
         )
       );
       break;
     case 1:
-      Visit(
+      this->Visit(
         common::get<1>(
           that->mutable_attribute()
         )
@@ -189,9 +245,7 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_root
-  Visit(
-    that->mutable_root()
-  );
+  this->Visit(that->mutable_root());
 
   // region mutable_optional_element
   const common::optional<
@@ -200,9 +254,7 @@ void PassThroughVisitor::VisitSomething(
     that->mutable_optional_element()
   );
   if (maybe_optional_element.has_value()) {
-    Visit(
-      maybe_optional_element.value()
-    );
+    this->Visit(maybe_optional_element.value());
   }
   // endregion
 
@@ -211,21 +263,21 @@ void PassThroughVisitor::VisitSomething(
     (that->mutable_value()).index()
   ) {
     case 0:
-      Visit(
+      this->Visit(
         common::get<0>(
           that->mutable_value()
         )
       );
       break;
     case 1:
-      Visit(
+      this->Visit(
         common::get<1>(
           that->mutable_value()
         )
       );
       break;
     case 2:
-      Visit(
+      this->Visit(
         common::get<2>(
           that->mutable_value()
         )
@@ -236,38 +288,7 @@ void PassThroughVisitor::VisitSomething(
   }
 
   // mutable_values
-  for (
-    const types::Value& item :
-    that->mutable_values()
-  ) {
-    switch (
-      (item).index()
-    ) {
-      case 0:
-        Visit(
-          common::get<0>(
-            item
-          )
-        );
-        break;
-      case 1:
-        Visit(
-          common::get<1>(
-            item
-          )
-        );
-        break;
-      case 2:
-        Visit(
-          common::get<2>(
-            item
-          )
-        );
-        break;
-      default:
-        throw std::logic_error("Invalid variant index");
-    }
-  }
+  PassThrough_listOf_Value(this, that->mutable_values());
 }
 
 // endregion

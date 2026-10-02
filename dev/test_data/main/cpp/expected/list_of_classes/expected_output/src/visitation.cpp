@@ -68,6 +68,48 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_AbstractItem(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IAbstractItem>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IAbstractItem>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Simple(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::ISimple>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitSomeItem(
@@ -92,25 +134,19 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_item
-  Visit(
-    that->mutable_item()
-  );
+  this->Visit(that->mutable_item());
 
   // mutable_some_items
-  for (
-    const std::shared_ptr<types::IAbstractItem>& item :
+  PassThrough_listOf_AbstractItem(
+    this,
     that->mutable_some_items()
-  ) {
-    Visit(item);
-  }
+  );
 
   // mutable_some_simples
-  for (
-    const std::shared_ptr<types::ISimple>& item :
+  PassThrough_listOf_Simple(
+    this,
     that->mutable_some_simples()
-  ) {
-    Visit(item);
-  }
+  );
 }
 
 // endregion

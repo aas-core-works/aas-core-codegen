@@ -110,6 +110,253 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_StructuralUnion(
+  IVisitor* visitor,
+  const std::vector<types::StructuralUnion>& that
+) {
+  for (
+    const types::StructuralUnion& item :
+    that
+  ) {
+    switch (
+      (item).index()
+    ) {
+      case 0:
+        visitor->Visit(
+          common::get<0>(
+            item
+          )
+        );
+        break;
+      case 1:
+        visitor->Visit(
+          common::get<1>(
+            item
+          )
+        );
+        break;
+      default:
+        throw std::logic_error("Invalid variant index");
+    }
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_MixedUnion(
+  IVisitor* visitor,
+  const std::vector<types::MixedUnion>& that
+) {
+  for (
+    const types::MixedUnion& item :
+    that
+  ) {
+    switch (
+      (item).index()
+    ) {
+      case 0:
+        visitor->Visit(
+          common::get<0>(
+            item
+          )
+        );
+        break;
+      case 1:
+        visitor->Visit(
+          common::get<1>(
+            item
+          )
+        );
+        break;
+      case 2:
+        visitor->Visit(
+          common::get<2>(
+            item
+          )
+        );
+        break;
+      default:
+        throw std::logic_error("Invalid variant index");
+    }
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_ModelTypedUnion(
+  IVisitor* visitor,
+  const std::vector<types::ModelTypedUnion>& that
+) {
+  for (
+    const types::ModelTypedUnion& item :
+    that
+  ) {
+    switch (
+      (item).index()
+    ) {
+      case 0:
+        visitor->Visit(
+          common::get<0>(
+            item
+          )
+        );
+        break;
+      case 1:
+        visitor->Visit(
+          common::get<1>(
+            item
+          )
+        );
+        break;
+      default:
+        throw std::logic_error("Invalid variant index");
+    }
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_tupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+  IVisitor* visitor,
+  const std::tuple<
+    types::StructuralUnion,
+    types::MixedUnion,
+    types::ModelTypedUnion
+  >& that
+) {
+  switch (
+    (std::get<0>(that)).index()
+  ) {
+    case 0:
+      visitor->Visit(
+        common::get<0>(
+          std::get<0>(that)
+        )
+      );
+      break;
+    case 1:
+      visitor->Visit(
+        common::get<1>(
+          std::get<0>(that)
+        )
+      );
+      break;
+    default:
+      throw std::logic_error("Invalid variant index");
+  }
+
+  switch (
+    (std::get<1>(that)).index()
+  ) {
+    case 0:
+      visitor->Visit(
+        common::get<0>(
+          std::get<1>(that)
+        )
+      );
+      break;
+    case 1:
+      visitor->Visit(
+        common::get<1>(
+          std::get<1>(that)
+        )
+      );
+      break;
+    case 2:
+      visitor->Visit(
+        common::get<2>(
+          std::get<1>(that)
+        )
+      );
+      break;
+    default:
+      throw std::logic_error("Invalid variant index");
+  }
+
+  switch (
+    (std::get<2>(that)).index()
+  ) {
+    case 0:
+      visitor->Visit(
+        common::get<0>(
+          std::get<2>(that)
+        )
+      );
+      break;
+    case 1:
+      visitor->Visit(
+        common::get<1>(
+          std::get<2>(that)
+        )
+      );
+      break;
+    default:
+      throw std::logic_error("Invalid variant index");
+  }
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_OverlappingUnion(
+  IVisitor* visitor,
+  const std::vector<types::OverlappingUnion>& that
+) {
+  for (
+    const types::OverlappingUnion& item :
+    that
+  ) {
+    switch (
+      (item).index()
+    ) {
+      case 0:
+        visitor->Visit(
+          common::get<0>(
+            item
+          )
+        );
+        break;
+      case 1:
+        visitor->Visit(
+          common::get<1>(
+            item
+          )
+        );
+        break;
+      case 2:
+        visitor->Visit(
+          common::get<2>(
+            item
+          )
+        );
+        break;
+      case 3:
+        visitor->Visit(
+          common::get<3>(
+            item
+          )
+        );
+        break;
+      default:
+        throw std::logic_error("Invalid variant index");
+    }
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitStructuralFirst(
@@ -174,14 +421,14 @@ void PassThroughVisitor::VisitSomething(
     (that->mutable_structural_property()).index()
   ) {
     case 0:
-      Visit(
+      this->Visit(
         common::get<0>(
           that->mutable_structural_property()
         )
       );
       break;
     case 1:
-      Visit(
+      this->Visit(
         common::get<1>(
           that->mutable_structural_property()
         )
@@ -196,21 +443,21 @@ void PassThroughVisitor::VisitSomething(
     (that->mutable_mixed_property()).index()
   ) {
     case 0:
-      Visit(
+      this->Visit(
         common::get<0>(
           that->mutable_mixed_property()
         )
       );
       break;
     case 1:
-      Visit(
+      this->Visit(
         common::get<1>(
           that->mutable_mixed_property()
         )
       );
       break;
     case 2:
-      Visit(
+      this->Visit(
         common::get<2>(
           that->mutable_mixed_property()
         )
@@ -225,14 +472,14 @@ void PassThroughVisitor::VisitSomething(
     (that->mutable_model_typed_property()).index()
   ) {
     case 0:
-      Visit(
+      this->Visit(
         common::get<0>(
           that->mutable_model_typed_property()
         )
       );
       break;
     case 1:
-      Visit(
+      this->Visit(
         common::get<1>(
           that->mutable_model_typed_property()
         )
@@ -243,181 +490,28 @@ void PassThroughVisitor::VisitSomething(
   }
 
   // mutable_list_structural_property
-  for (
-    const types::StructuralUnion& item :
+  PassThrough_listOf_StructuralUnion(
+    this,
     that->mutable_list_structural_property()
-  ) {
-    switch (
-      (item).index()
-    ) {
-      case 0:
-        Visit(
-          common::get<0>(
-            item
-          )
-        );
-        break;
-      case 1:
-        Visit(
-          common::get<1>(
-            item
-          )
-        );
-        break;
-      default:
-        throw std::logic_error("Invalid variant index");
-    }
-  }
+  );
 
   // mutable_list_mixed_property
-  for (
-    const types::MixedUnion& item :
+  PassThrough_listOf_MixedUnion(
+    this,
     that->mutable_list_mixed_property()
-  ) {
-    switch (
-      (item).index()
-    ) {
-      case 0:
-        Visit(
-          common::get<0>(
-            item
-          )
-        );
-        break;
-      case 1:
-        Visit(
-          common::get<1>(
-            item
-          )
-        );
-        break;
-      case 2:
-        Visit(
-          common::get<2>(
-            item
-          )
-        );
-        break;
-      default:
-        throw std::logic_error("Invalid variant index");
-    }
-  }
+  );
 
   // mutable_list_model_typed_property
-  for (
-    const types::ModelTypedUnion& item :
+  PassThrough_listOf_ModelTypedUnion(
+    this,
     that->mutable_list_model_typed_property()
-  ) {
-    switch (
-      (item).index()
-    ) {
-      case 0:
-        Visit(
-          common::get<0>(
-            item
-          )
-        );
-        break;
-      case 1:
-        Visit(
-          common::get<1>(
-            item
-          )
-        );
-        break;
-      default:
-        throw std::logic_error("Invalid variant index");
-    }
-  }
+  );
 
   // mutable_tuple_property
-  switch (
-    (std::get<0>(
-      that->mutable_tuple_property()
-    )).index()
-  ) {
-    case 0:
-      Visit(
-        common::get<0>(
-          std::get<0>(
-            that->mutable_tuple_property()
-          )
-        )
-      );
-      break;
-    case 1:
-      Visit(
-        common::get<1>(
-          std::get<0>(
-            that->mutable_tuple_property()
-          )
-        )
-      );
-      break;
-    default:
-      throw std::logic_error("Invalid variant index");
-  }
-  switch (
-    (std::get<1>(
-      that->mutable_tuple_property()
-    )).index()
-  ) {
-    case 0:
-      Visit(
-        common::get<0>(
-          std::get<1>(
-            that->mutable_tuple_property()
-          )
-        )
-      );
-      break;
-    case 1:
-      Visit(
-        common::get<1>(
-          std::get<1>(
-            that->mutable_tuple_property()
-          )
-        )
-      );
-      break;
-    case 2:
-      Visit(
-        common::get<2>(
-          std::get<1>(
-            that->mutable_tuple_property()
-          )
-        )
-      );
-      break;
-    default:
-      throw std::logic_error("Invalid variant index");
-  }
-  switch (
-    (std::get<2>(
-      that->mutable_tuple_property()
-    )).index()
-  ) {
-    case 0:
-      Visit(
-        common::get<0>(
-          std::get<2>(
-            that->mutable_tuple_property()
-          )
-        )
-      );
-      break;
-    case 1:
-      Visit(
-        common::get<1>(
-          std::get<2>(
-            that->mutable_tuple_property()
-          )
-        )
-      );
-      break;
-    default:
-      throw std::logic_error("Invalid variant index");
-  }
+  PassThrough_tupleOf3_StructuralUnion_MixedUnion_ModelTypedUnion(
+    this,
+    that->mutable_tuple_property()
+  );
 
   // region mutable_optional_structural_property
   const common::optional<types::StructuralUnion>& maybe_optional_structural_property(
@@ -428,14 +522,14 @@ void PassThroughVisitor::VisitSomething(
       (maybe_optional_structural_property.value()).index()
     ) {
       case 0:
-        Visit(
+        this->Visit(
           common::get<0>(
             maybe_optional_structural_property.value()
           )
         );
         break;
       case 1:
-        Visit(
+        this->Visit(
           common::get<1>(
             maybe_optional_structural_property.value()
           )
@@ -456,21 +550,21 @@ void PassThroughVisitor::VisitSomething(
       (maybe_optional_mixed_property.value()).index()
     ) {
       case 0:
-        Visit(
+        this->Visit(
           common::get<0>(
             maybe_optional_mixed_property.value()
           )
         );
         break;
       case 1:
-        Visit(
+        this->Visit(
           common::get<1>(
             maybe_optional_mixed_property.value()
           )
         );
         break;
       case 2:
-        Visit(
+        this->Visit(
           common::get<2>(
             maybe_optional_mixed_property.value()
           )
@@ -491,14 +585,14 @@ void PassThroughVisitor::VisitSomething(
       (maybe_optional_model_typed_property.value()).index()
     ) {
       case 0:
-        Visit(
+        this->Visit(
           common::get<0>(
             maybe_optional_model_typed_property.value()
           )
         );
         break;
       case 1:
-        Visit(
+        this->Visit(
           common::get<1>(
             maybe_optional_model_typed_property.value()
           )
@@ -517,45 +611,10 @@ void PassThroughVisitor::VisitSomething(
     that->mutable_optional_list_overlapping_property()
   );
   if (maybe_optional_list_overlapping_property.has_value()) {
-    for (
-      const types::OverlappingUnion& item :
+    PassThrough_listOf_OverlappingUnion(
+      this,
       maybe_optional_list_overlapping_property.value()
-    ) {
-      switch (
-        (item).index()
-      ) {
-        case 0:
-          Visit(
-            common::get<0>(
-              item
-            )
-          );
-          break;
-        case 1:
-          Visit(
-            common::get<1>(
-              item
-            )
-          );
-          break;
-        case 2:
-          Visit(
-            common::get<2>(
-              item
-            )
-          );
-          break;
-        case 3:
-          Visit(
-            common::get<3>(
-              item
-            )
-          );
-          break;
-        default:
-          throw std::logic_error("Invalid variant index");
-      }
-    }
+    );
   }
   // endregion
 }

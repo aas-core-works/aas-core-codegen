@@ -61,6 +61,63 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_tupleOf2_AbstractItem_AbstractItem(
+  IVisitor* visitor,
+  const std::tuple<
+    std::shared_ptr<types::IAbstractItem>,
+    std::shared_ptr<types::IAbstractItem>
+  >& that
+) {
+  visitor->Visit(std::get<0>(that));
+
+  visitor->Visit(std::get<1>(that));
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_tupleOf6_int_SomeItem_AbstractItem_SomeItem_PositiveInt_Result(
+  IVisitor* visitor,
+  const std::tuple<
+    int64_t,
+    std::shared_ptr<types::ISomeItem>,
+    std::shared_ptr<types::IAbstractItem>,
+    std::shared_ptr<types::ISomeItem>,
+    int64_t,
+    types::Result
+  >& that
+) {
+  visitor->Visit(std::get<1>(that));
+
+  visitor->Visit(std::get<2>(that));
+
+  visitor->Visit(std::get<3>(that));
+}
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_tupleOf2_str_AbstractItem(
+  IVisitor* visitor,
+  const std::tuple<
+    std::wstring,
+    std::shared_ptr<types::IAbstractItem>
+  >& that
+) {
+  visitor->Visit(std::get<1>(that));
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitSomeItem(
@@ -79,32 +136,15 @@ void PassThroughVisitor::VisitSomething(
   const std::shared_ptr<types::ISomething>& that
 ) {
   // mutable_items
-  Visit(
-    std::get<0>(
-      that->mutable_items()
-    )
-  );
-  Visit(
-    std::get<1>(
-      that->mutable_items()
-    )
+  PassThrough_tupleOf2_AbstractItem_AbstractItem(
+    this,
+    that->mutable_items()
   );
 
   // mutable_tricky
-  Visit(
-    std::get<1>(
-      that->mutable_tricky()
-    )
-  );
-  Visit(
-    std::get<2>(
-      that->mutable_tricky()
-    )
-  );
-  Visit(
-    std::get<3>(
-      that->mutable_tricky()
-    )
+  PassThrough_tupleOf6_int_SomeItem_AbstractItem_SomeItem_PositiveInt_Result(
+    this,
+    that->mutable_tricky()
   );
 
   // region mutable_optional_pair
@@ -117,10 +157,9 @@ void PassThroughVisitor::VisitSomething(
     that->mutable_optional_pair()
   );
   if (maybe_optional_pair.has_value()) {
-    Visit(
-      std::get<1>(
-        maybe_optional_pair.value()
-      )
+    PassThrough_tupleOf2_str_AbstractItem(
+      this,
+      maybe_optional_pair.value()
     );
   }
   // endregion

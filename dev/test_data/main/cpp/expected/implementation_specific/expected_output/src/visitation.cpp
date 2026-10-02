@@ -61,6 +61,31 @@ void AbstractVisitor::Visit(
 
 // endregion
 
+namespace {
+
+// region Pass-through over the containers
+
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_listOf_Item(
+  IVisitor* visitor,
+  const std::vector<
+    std::shared_ptr<types::IItem>
+  >& that
+) {
+  for (
+    const std::shared_ptr<types::IItem>& item :
+    that
+  ) {
+    visitor->Visit(item);
+  }
+}
+
+// endregion Pass-through over the containers
+
+}  // namespace
+
 // region PassThroughVisitor
 
 void PassThroughVisitor::VisitBox(
@@ -79,12 +104,7 @@ void PassThroughVisitor::VisitContainer(
   const std::shared_ptr<types::IContainer>& that
 ) {
   // mutable_items
-  for (
-    const std::shared_ptr<types::IItem>& item :
-    that->mutable_items()
-  ) {
-    Visit(item);
-  }
+  PassThrough_listOf_Item(this, that->mutable_items());
 }
 
 // endregion
