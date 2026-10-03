@@ -27,6 +27,7 @@ import dummy.reporting.Reporting;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.Optional;
 
 public class Verification {
   public static Boolean someVerification(
@@ -38,6 +39,21 @@ public class Verification {
     && (new Tuple2<>(
       x,
       y)).size() == 2;
+  }
+
+  /**
+   * Pack a narrowed optional value type into a tuple.
+   */
+  public static Boolean narrowedPairIsPositive(
+    String x,
+    Optional<Long> y) {
+    if (!y.isPresent()) {
+        return false;
+    }
+    Tuple2<String, Long> pair = new Tuple2<>(
+      x,
+      y.get());
+    return pair.item2() > 0;
   }
 
   /**

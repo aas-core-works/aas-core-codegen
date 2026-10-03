@@ -219,6 +219,12 @@ bool SomeVerification(
   int64_t y
 );
 
+/// \brief Pack a narrowed optional value type into a tuple.
+bool NarrowedPairIsPositive(
+  const std::wstring& x,
+  const common::optional<int64_t>& y
+);
+
 // endregion Verification functions
 
 // region Verification of constrained primitives

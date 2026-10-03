@@ -74,6 +74,18 @@ def some_verification(
         ))
 
 
+def narrowed_pair_is_positive(
+    x: str,
+    y: Optional[int]
+) -> bool:
+    """Pack a narrowed optional value type into a tuple."""
+    # pylint: disable=all
+    if y is None:
+        return False
+    pair: Tuple[str, int] = (x, y)
+    return pair[1] > 0
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]

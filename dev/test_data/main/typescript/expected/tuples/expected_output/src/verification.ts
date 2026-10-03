@@ -200,6 +200,20 @@ export function someVerification(
 }
 
 /**
+ * Pack a narrowed optional value type into a tuple.
+ */
+export function narrowedPairIsPositive(
+  x: string,
+  y: number | null
+): boolean {
+  if (y === null) {
+    return false;
+  }
+  const pair: [string, number] = [x, y];
+  return pair[1] > 0;
+}
+
+/**
  * Verify the items of `that` recursively.
  */
 function *verify_TupleOf2_class_class(
