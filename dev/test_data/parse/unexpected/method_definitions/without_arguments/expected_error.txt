@@ -1,1 +1,1 @@
-Unexpected no arguments
+A ``self`` argument is expected, but no arguments were specified in the method 'do_something'

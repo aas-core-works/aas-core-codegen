@@ -407,7 +407,14 @@ export function uniqueTextsAreAllShort(
 }
 
 /**
- * Check `all` over a local set.
+ * Check the constant set of lucky numbers without any arguments.
+ */
+export function sevenIsLucky(): boolean {
+  return OurConstants.LUCKY_NUMBERS.has(7);
+}
+
+/**
+ * Check `all` over a local set, and call a function without arguments.
  */
 export function numbersAreAllSmall(
   numbers: Array<number>
@@ -416,11 +423,16 @@ export function numbersAreAllSmall(
   for (const number of numbers) {
     seen.add(number);
   }
-  return OurCommon.every(
-    OurCommon.map(
-      seen,
-      number =>
-        number < 1000
+  return (
+    sevenIsLucky()
+    && (
+      OurCommon.every(
+        OurCommon.map(
+          seen,
+          number =>
+            number < 1000
+        )
+      )
     )
   );
 }

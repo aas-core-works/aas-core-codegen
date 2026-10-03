@@ -280,7 +280,15 @@ namespace dummy
         }  // public static bool UniqueTextsAreAllShort
 
         /// <summary>
-        /// Check <c>all</c> over a local set.
+        /// Check the constant set of lucky numbers without any arguments.
+        /// </summary>
+        public static bool SevenIsLucky()
+        {
+            return Our.Constants.LuckyNumbers.Contains(7);
+        }  // public static bool SevenIsLucky
+
+        /// <summary>
+        /// Check <c>all</c> over a local set, and call a function without arguments.
         /// </summary>
         public static bool NumbersAreAllSmall(
             List<long> numbers
@@ -291,8 +299,11 @@ namespace dummy
             {
                 seen.Add(number);
             }
-            return seen.All(
-                number => number < 1000);
+            return Verification.SevenIsLucky()
+            && (
+                seen.All(
+                    number => number < 1000)
+            );
         }  // public static bool NumbersAreAllSmall
 
         /// <summary>

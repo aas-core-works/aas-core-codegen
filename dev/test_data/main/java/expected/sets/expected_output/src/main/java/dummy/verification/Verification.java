@@ -229,7 +229,14 @@ public class Verification {
   }
 
   /**
-   * Check {@code all} over a local set.
+   * Check the constant set of lucky numbers without any arguments.
+   */
+  public static Boolean sevenIsLucky() {
+    return Constants.luckyNumbers.contains(7L);
+  }
+
+  /**
+   * Check {@code all} over a local set, and call a function without arguments.
    */
   public static Boolean numbersAreAllSmall(
     List<Long> numbers) {
@@ -237,8 +244,11 @@ public class Verification {
     for (var number : numbers) {
         seen.add(number);
     }
-    return seen.stream().allMatch(
-        number -> number < 1000);
+    return sevenIsLucky()
+    && (
+        seen.stream().allMatch(
+            number -> number < 1000)
+    );
   }
 
   /**

@@ -119,14 +119,17 @@ def _generate_verification_function_definition(
 
     return_type = _generate_return_type(verification)
 
-    blocks.append(
-        Stripped(
+    if len(arg_types_names) == 0:
+        signature = Stripped(f"{return_type} {function_name}()")
+    else:
+        signature = Stripped(
             f"""\
 {return_type} {function_name}(
 {I}{indent_but_first_line(arg_definitions_joined, I)}
-);"""
+)"""
         )
-    )
+
+    blocks.append(Stripped(f"{signature};"))
 
     return Stripped("\n".join(blocks)), None
 
@@ -839,12 +842,20 @@ def _generate_implementation_of_transpilable_verification(
 
     return_type = _generate_return_type(verification)
 
-    return (
-        Stripped(
+    if len(arg_types_names) == 0:
+        signature = Stripped(f"{return_type} {function_name}()")
+    else:
+        signature = Stripped(
             f"""\
 {return_type} {function_name}(
 {I}{indent_but_first_line(arg_definitions_joined, I)}
-) {{
+)"""
+        )
+
+    return (
+        Stripped(
+            f"""\
+{signature} {{
 {I}{indent_but_first_line(body_joined, I)}
 }}"""
         ),

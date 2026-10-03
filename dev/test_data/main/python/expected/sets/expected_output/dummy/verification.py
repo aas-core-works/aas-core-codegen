@@ -263,18 +263,31 @@ def unique_texts_are_all_short(
     return texts_are_all_short(seen)
 
 
+def seven_is_lucky() -> bool:
+    """Check the constant set of lucky numbers without any arguments."""
+    # pylint: disable=all
+    return 7 in our_constants.LUCKY_NUMBERS
+
+
 def numbers_are_all_small(
     numbers: Sequence[int]
 ) -> bool:
-    """Check ``all`` over a local set."""
+    """
+    Check ``all`` over a local set, and call a function without arguments.
+    """
     # pylint: disable=all
     seen: Set[int] = set()
     for number in numbers:
         seen.add(number)
     return (
-        all(
-            number < 1000
-            for number in seen
+        (
+            seven_is_lucky()
+            and (
+                all(
+                    number < 1000
+                    for number in seen
+                )
+            )
         ))
 
 

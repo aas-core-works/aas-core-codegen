@@ -563,7 +563,7 @@ def _transpile_transpilable_verification(
     if len(arg_defs) == 0:
         writer.write(
             f"""\
-{export}function {function_name}(): {return_type}:"""
+{export}function {function_name}(): {return_type} {{"""
         )
     else:
         writer.write(
