@@ -624,6 +624,52 @@ public class Xmlization {
     }
 
     /**
+     * Deserialize an instance of IMarker from an XML element.
+     */
+    private static Reporting.Result<? extends IMarker> readIMarkerFromElement(
+      XMLEventReader reader) {
+      // NOTE (mristin):
+      // We only peek the name, so that the whole element can be handed on to
+      // the reader which we select below.
+      final Reporting.Result<String> tryElementName = XmlCommon.peekElementName(reader);
+      if (tryElementName.isError()) {
+        return Reporting.Result.failure(tryElementName.getError());
+      }
+
+      switch (tryElementName.getResult()) {
+        case "plainMarker":
+          return readPlainMarkerFromElement(reader);
+        default:
+          return Reporting.Result.failure(new Reporting.Error(
+            "Unexpected element with the name " + tryElementName.getResult()));
+      }
+    }
+
+    /**
+     * Deserialize an instance of class PlainMarker from a sequence of XML elements.
+     *
+     * <p>If {@code isEmptySequence} is set, we should try to deserialize
+     * the instance from an empty sequence. That is, the parent element
+     * was a self-closing element.
+     */
+    private static Reporting.Result<PlainMarker> readPlainMarkerFromSequence(
+      XMLEventReader reader,
+      boolean isEmptySequence) {
+      return Reporting.Result.success(new PlainMarker());
+    }
+
+    /**
+     * Deserialize an instance of class PlainMarker from an XML element.
+     */
+    private static Reporting.Result<? extends PlainMarker> readPlainMarkerFromElement(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "plainMarker",
+        _DeserializeImplementation::readPlainMarkerFromSequence);
+    }
+
+    /**
      * Deserialize an instance of class Something from a sequence of XML elements.
      *
      * <p>If {@code isEmptySequence} is set, we should try to deserialize
@@ -992,6 +1038,52 @@ public class Xmlization {
     }
 
     /**
+     * Deserialize an instance of IMarker from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static IMarker deserializeIMarker(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends IMarker> result =
+        _DeserializeImplementation.readIMarkerFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("imarker"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
+     * Deserialize an instance of PlainMarker from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static PlainMarker deserializePlainMarker(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends PlainMarker> result =
+        _DeserializeImplementation.readPlainMarkerFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("plainmarker"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
      * Deserialize an instance of Something from {@code reader}.
      *
      * @param reader Initialized XML reader with reader.peek() set to the element
@@ -1229,6 +1321,24 @@ public class Xmlization {
         writer,
         withNamespace,
         _VisitorWithWriter::writeBlossomAsSequence);
+    }
+
+    private static void writePlainMarkerAsSequence(
+      IPlainMarker that,
+      XMLStreamWriter writer) {
+      // Intentionally empty.
+    }
+
+    @Override
+    public void visitPlainMarker(
+      IPlainMarker that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "plainMarker",
+        that,
+        writer,
+        withNamespace,
+        _VisitorWithWriter::writePlainMarkerAsSequence);
     }
 
     private static void writeSomethingAsSequence(

@@ -236,6 +236,57 @@ namespace dummy
             }
         }
 
+        public class EnhancedPlainMarker<TEnhancement>
+            : Enhanced<TEnhancement>, Our.IPlainMarker
+            where TEnhancement : class
+        {
+            private readonly Our.IPlainMarker _instance;
+
+            public EnhancedPlainMarker(
+                Our.IPlainMarker instance,
+                TEnhancement enhancement
+            ) : base(enhancement)
+            {
+                _instance = instance;
+            }
+
+            public IEnumerable<Our.IClass> DescendOnce()
+            {
+                return _instance.DescendOnce();
+            }
+
+            public IEnumerable<Our.IClass> Descend()
+            {
+                return _instance.Descend();
+            }
+
+            public void Accept(Our.Visitation.IVisitor visitor)
+            {
+                visitor.VisitPlainMarker(_instance);
+            }
+
+            public void Accept<TContext>(
+                Visitation.IVisitorWithContext<TContext> visitor,
+                TContext context
+            )
+            {
+                visitor.VisitPlainMarker(_instance, context);
+            }
+
+            public T Transform<T>(Visitation.ITransformer<T> transformer)
+            {
+                return transformer.TransformPlainMarker(_instance);
+            }
+
+            public T Transform<TContext, T>(
+                Visitation.ITransformerWithContext<TContext, T> transformer,
+                TContext context
+            )
+            {
+                return transformer.TransformPlainMarker(_instance, context);
+            }
+        }
+
         public class EnhancedSomething<TEnhancement>
             : Enhanced<TEnhancement>, Our.ISomething
             where TEnhancement : class
@@ -430,6 +481,26 @@ namespace dummy
                 return (enhancement == null)
                     ? that
                     : new EnhancedBlossom<TEnhancement>(
+                        that,
+                        enhancement
+                    );
+            }
+
+            public override Our.IClass TransformPlainMarker(
+                Our.IPlainMarker that
+            )
+            {
+                if (that is Enhanced<TEnhancement>)
+                {
+                    throw new System.ArgumentException(
+                        $"The instance has been already enhanced: {that}"
+                    );
+                }
+
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedPlainMarker<TEnhancement>(
                         that,
                         enhancement
                     );

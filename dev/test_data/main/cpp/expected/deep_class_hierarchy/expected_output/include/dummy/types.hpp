@@ -33,8 +33,9 @@ enum class ModelType : std::uint32_t {
   kBranch = 0,
   kLeaf = 1,
   kBlossom = 2,
-  kSomething = 3,
-  kContainer = 4
+  kPlainMarker = 3,
+  kSomething = 4,
+  kContainer = 5
 };
 
 // endregion Enumerations
@@ -50,6 +51,10 @@ class IBranch;
 class ILeaf;
 
 class IBlossom;
+
+class IMarker;
+
+class IPlainMarker;
 
 class ISomething;
 
@@ -123,6 +128,18 @@ class IBlossom
   ) = 0;
 
   virtual ~IBlossom() = default;
+};
+
+class IMarker
+    : virtual public IClass {
+ public:
+  virtual ~IMarker() = default;
+};
+
+class IPlainMarker
+    : virtual public IMarker {
+ public:
+  virtual ~IPlainMarker() = default;
 };
 
 class ISomething
@@ -344,6 +361,16 @@ class Blossom
   std::wstring details_;
 };
 
+class PlainMarker
+    : public IPlainMarker {
+ public:
+  PlainMarker();
+
+  ModelType model_type() const override;
+
+  ~PlainMarker() override = default;
+};
+
 class Something
     : public ISomething {
  public:
@@ -489,6 +516,36 @@ bool IsLeaf(
  * an instance of \ref IBlossom
  */
 bool IsBlossom(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref IMarker.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref IMarker
+ */
+bool IsMarker(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref IPlainMarker.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref IPlainMarker
+ */
+bool IsPlainMarker(
   const IClass& that
 );
 

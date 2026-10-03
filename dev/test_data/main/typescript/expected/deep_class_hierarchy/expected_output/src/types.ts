@@ -8,8 +8,9 @@ export enum ModelType {
   Branch = 0,
   Leaf = 1,
   Blossom = 2,
-  Something = 3,
-  Container = 4
+  PlainMarker = 3,
+  Something = 4,
+  Container = 5
 }
 
 /**
@@ -29,8 +30,9 @@ export function *overModelType (
   yield <ModelType>0;  // Branch
   yield <ModelType>1;  // Leaf
   yield <ModelType>2;  // Blossom
-  yield <ModelType>3;  // Something
-  yield <ModelType>4;  // Container
+  yield <ModelType>3;  // PlainMarker
+  yield <ModelType>4;  // Something
+  yield <ModelType>5;  // Container
 }
 
 /**
@@ -417,6 +419,97 @@ export class Blossom
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IMarker extends Class {
+  // Intentionally empty.
+}
+
+export class PlainMarker
+  extends Class
+  implements IMarker {
+  /**
+   * Indicate the runtime model type of the instance.
+   */
+  modelType(): ModelType {
+    // NOTE (mristin):
+    // We yield numbers instead of literals to avoid name lookups on platforms
+    // which do not provide JIT compilation of hot paths.
+    return <ModelType>3;  // PlainMarker
+  }
+
+  /**
+   * Iterate over the instances referenced from this instance.
+   *
+   * We do not recurse into the referenced instances.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descendOnce(): IterableIterator<Class> {
+    // No descendable properties
+  }
+
+  /**
+   * Iterate recursively over the instances referenced from this instance.
+   *
+   * @returns Iterator over the referenced instances
+   */
+  *descend(): IterableIterator<Class> {
+    // No descendable properties
+  }
+
+  /**
+   * Dispatch `visitor` on this instance.
+   *
+   * @param visitor - to visit this instance
+   */
+  accept(visitor: AbstractVisitor): void {
+    visitor.visitPlainMarker(this);
+  }
+
+  /**
+   * Dispatch `visitor` with `context` on this instance.
+   *
+   * @param visitor - to visit this instance
+   * @param context - to be passed along to the dispatched visitor method
+   * @typeParam ContextT - type of the context
+   */
+  acceptWithContext<ContextT>(
+    visitor: AbstractVisitorWithContext<ContextT>,
+    context: ContextT
+  ) {
+    visitor.visitPlainMarkerWithContext(this, context);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance.
+   *
+   * @param transformer - to transform this instance
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   */
+  transform<T>(transformer: AbstractTransformer<T>): T {
+    return transformer.transformPlainMarker(this);
+  }
+
+  /**
+   * Dispatch the `transformer` on this instance in `context`.
+   *
+   * @param transformer - to transform this instance
+   * @param context - to be passed along to the `transformer`
+   * @returns transformation of this instance
+   * @paramType T - type of the transformation result
+   * @paramType ContextT - type of the transformation context
+   */
+  transformWithContext<ContextT, T>(
+    transformer: AbstractTransformerWithContext<ContextT, T>,
+    context: ContextT
+  ): T {
+    return transformer.transformPlainMarkerWithContext(
+      this, context
+    );
+  }
+}
+
 export class Something extends Class {
   /**
    * Indicate the runtime model type of the instance.
@@ -425,7 +518,7 @@ export class Something extends Class {
     // NOTE (mristin):
     // We yield numbers instead of literals to avoid name lookups on platforms
     // which do not provide JIT compilation of hot paths.
-    return <ModelType>3;  // Something
+    return <ModelType>4;  // Something
   }
 
   someChoice: INode;
@@ -543,7 +636,7 @@ export class Container extends Class {
     // NOTE (mristin):
     // We yield numbers instead of literals to avoid name lookups on platforms
     // which do not provide JIT compilation of hot paths.
-    return <ModelType>4;  // Container
+    return <ModelType>5;  // Container
   }
 
   node: INode;
@@ -696,6 +789,15 @@ export abstract class AbstractVisitor {
    *
    * @param that - instance to be visited
    */
+  abstract visitPlainMarker(
+    that: PlainMarker
+  ): void;
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
   abstract visitSomething(
     that: Something
   ): void;
@@ -768,6 +870,17 @@ export abstract class AbstractVisitorWithContext<ContextT> {
    * @param that - instance to be visited
    * @param context - of the visitation
    */
+  abstract visitPlainMarkerWithContext(
+    that: PlainMarker,
+    context: ContextT
+  ): void;
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
   abstract visitSomethingWithContext(
     that: Something,
     context: ContextT
@@ -826,6 +939,19 @@ export class PassThroughVisitor extends AbstractVisitor {
    */
   visitBlossom(
     that: Blossom
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visit(another);
+    }
+  }
+
+  /**
+   * Visit `that`.
+   *
+   * @param that - instance to be visited
+   */
+  visitPlainMarker(
+    that: PlainMarker
   ): void {
     for (const another of that.descendOnce()) {
       this.visit(another);
@@ -929,6 +1055,21 @@ export class PassThroughVisitorWithContext<ContextT>
    * @param that - instance to be visited
    * @param context - of the visitation
    */
+  visitPlainMarkerWithContext(
+    that: PlainMarker,
+    context: ContextT
+  ): void {
+    for (const another of that.descendOnce()) {
+      this.visitWithContext(another, context);
+    }
+  }
+
+  /**
+   * Visit `that` in `context`.
+   *
+   * @param that - instance to be visited
+   * @param context - of the visitation
+   */
   visitSomethingWithContext(
     that: Something,
     context: ContextT
@@ -995,6 +1136,16 @@ export abstract class AbstractTransformer<T> {
    */
   abstract transformBlossom(
     that: Blossom
+  ): T;
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  abstract transformPlainMarker(
+    that: PlainMarker
   ): T;
 
   /**
@@ -1072,6 +1223,18 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
    */
   abstract transformBlossomWithContext(
     that: Blossom,
+    context: ContextT
+  ): T;
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the transformation
+   * @returns transformed `that`
+   */
+  abstract transformPlainMarkerWithContext(
+    that: PlainMarker,
     context: ContextT
   ): T;
 
@@ -1162,6 +1325,20 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   transformBlossom(
     that: Blossom
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that`.
+   *
+   * @param that - instance to be transformed
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformPlainMarker(
+    that: PlainMarker
   ): T {
     return this.defaultResult;
   }
@@ -1279,6 +1456,22 @@ export class TransformerWithDefaultAndContext<ContextT, T>
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformPlainMarkerWithContext(
+    that: PlainMarker,
+    context: ContextT
+  ): T {
+    return this.defaultResult;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /**
+   * Transform `that` in `context`.
+   *
+   * @param that - instance to be transformed
+   * @param context - of the visitation
+   * @returns transformed `that`
+   */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   transformSomethingWithContext(
     that: Something,
     context: ContextT
@@ -1326,6 +1519,14 @@ class AsNodeTransformer
   ): INode | null {
     return that as INode;
   }
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformPlainMarker(
+    that: PlainMarker
+  ): INode | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
   transformSomething(
@@ -1394,6 +1595,14 @@ class AsBranchTransformer
   ): IBranch | null {
     return that as IBranch;
   }
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformPlainMarker(
+    that: PlainMarker
+  ): IBranch | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
   transformSomething(
@@ -1466,6 +1675,14 @@ class AsLeafTransformer
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformPlainMarker(
+    that: PlainMarker
+  ): ILeaf | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   transformSomething(
     that: Something
   ): ILeaf | null {
@@ -1535,6 +1752,113 @@ export function isBlossom(
   that: Class
 ): that is Blossom {
   return that instanceof Blossom;
+}
+
+/**
+ * Try to cast an instance of the model to {@link IMarker}.
+ */
+class AsMarkerTransformer
+    extends AbstractTransformer<IMarker | null> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformBranch(
+    that: Branch
+  ): IMarker | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformLeaf(
+    that: Leaf
+  ): IMarker | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformBlossom(
+    that: Blossom
+  ): IMarker | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  transformPlainMarker(
+    that: PlainMarker
+  ): IMarker | null {
+    return that as IMarker;
+  }
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformSomething(
+    that: Something
+  ): IMarker | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformContainer(
+    that: Container
+  ): IMarker | null {
+    return null;
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+}
+
+const AS_MARKER_TRANSFORMER =
+  new AsMarkerTransformer();
+
+/**
+ * Try to cast `that` instance to
+ * the interface {@link IMarker}.
+ *
+ * @param that - instance to be casted
+ * @returns - casted `that` if cast successful, or `null`
+ */
+export function asMarker(
+  that: Class
+): IMarker | null {
+  return AS_MARKER_TRANSFORMER.transform(that);
+}
+
+/**
+ * Check the type of `that` instance.
+ *
+ * @param that - instance to be type-checked
+ * @returns `true` if the type check is successful
+ */
+export function isMarker(
+  that: Class
+): that is IMarker {
+  return asMarker(that) !== null;
+}
+
+/**
+ * Try to cast `that` instance to
+ * the class {@link PlainMarker}.
+ *
+ * @param that - instance to be casted
+ * @returns - casted `that` if cast successful, or `null`
+ */
+export function asPlainMarker(
+  that: Class
+): PlainMarker | null {
+  return (that instanceof PlainMarker)
+    ? <PlainMarker>that
+    : null;
+}
+
+/**
+ * Check the type of `that` instance.
+ *
+ * @param that - instance to be type-checked
+ * @returns `true` if the type check is successful
+ */
+export function isPlainMarker(
+  that: Class
+): that is PlainMarker {
+  return that instanceof PlainMarker;
 }
 
 /**
@@ -1619,6 +1943,15 @@ class TypeMatcher extends AbstractTransformerWithContext<
     other: Class
   ): boolean {
     return isBlossom(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformPlainMarkerWithContext(
+    that: PlainMarker,
+    other: Class
+  ): boolean {
+    return isPlainMarker(other);
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */
 

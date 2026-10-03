@@ -242,6 +242,35 @@ namespace dummy.Tests
                 );
             }
         }  // void Test_round_trip_ILeaf_from_Leaf
+
+        [Test]
+        public void Test_round_trip_IMarker_from_PlainMarker()
+        {
+            var instance = Our.Tests.CommonJsonization.LoadMaximalPlainMarker();
+
+            var jsonObject = Our.Jsonization.Serialize.ToJsonObject(instance);
+
+            var anotherInstance = Our.Jsonization.Deserialize.IMarkerFrom(
+                jsonObject);
+
+            var anotherJsonObject = Our.Jsonization.Serialize.ToJsonObject(
+                anotherInstance);
+
+            Our.Tests.CommonJson.CheckJsonNodesEqual(
+                jsonObject,
+                anotherJsonObject,
+                out Our.Reporting.Error? error);
+
+            if (error != null)
+            {
+                Assert.Fail(
+                    "When we serialize the complete instance of PlainMarker " +
+                    "as IMarker, we get an error in the round trip: " +
+                    $"{Reporting.GenerateJsonPath(error.PathSegments)}: " +
+                    error.Cause
+                );
+            }
+        }  // void Test_round_trip_IMarker_from_PlainMarker
     }  // class TestJsonizationOfInterfaces
 }  // namespace dummy.Tests
 

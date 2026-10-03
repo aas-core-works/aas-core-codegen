@@ -386,6 +386,111 @@ func TestBlossomDeserializationFail(t *testing.T) {
 	}
 }
 
+func TestPlainMarkerRoundTripOK(t *testing.T) {
+	pths := ourtesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			ourtesting.TestDataDir,
+			"Json",
+			"Expected",
+			"PlainMarker",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := ourtesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := ourjsonization.PlainMarkerFromJsonable(
+			jsonable,
+		)
+		ok := assertNoDeserializationError(t, deseriaErr, pth)
+		if !ok {
+			return
+		}
+
+		anotherJsonable, seriaErr := ourjsonization.ToJsonable(deserialized)
+		ok = assertNoSerializationError(t, seriaErr, pth)
+		if !ok {
+			return
+		}
+
+		ok = assertSerializationEqualsDeserialization(
+			t,
+			jsonable,
+			anotherJsonable,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestPlainMarkerDeserializationFail(t *testing.T) {
+	pattern := filepath.Join(
+		ourtesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Unserializable",
+		"*",  // This asterisk represents the cause.
+		"PlainMarker",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := ourtesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := ourtesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						ourtesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				ourtesting.TestDataDir,
+				"DeserializationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".error",
+			)
+
+			_, deseriaErr := ourjsonization.PlainMarkerFromJsonable(
+				jsonable,
+			)
+			ok := assertDeserializationErrorEqualsExpectedOrRecord(
+				t, deseriaErr, pth, expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
 func TestSomethingRoundTripOK(t *testing.T) {
 	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(

@@ -223,6 +223,15 @@ class Verifier
     // No verification has been defined for Blossom.
   }
 
+  *transformPlainMarkerWithContext(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    that: OurTypes.PlainMarker,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    context: boolean
+  ): IterableIterator<VerificationError> {
+    // No verification has been defined for PlainMarker.
+  }
+
   *transformSomethingWithContext(
     that: OurTypes.Something,
     context: boolean

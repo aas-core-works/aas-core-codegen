@@ -27,6 +27,9 @@ namespace dummy
             public void VisitBlossom(
                 IBlossom that
             );
+            public void VisitPlainMarker(
+                IPlainMarker that
+            );
             public void VisitSomething(
                 ISomething that
             );
@@ -83,6 +86,17 @@ namespace dummy
                 }
             }
 
+            public virtual void VisitPlainMarker(
+                IPlainMarker that
+            )
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
             public virtual void VisitSomething(
                 ISomething that
             )
@@ -124,6 +138,9 @@ namespace dummy
             public abstract void VisitBlossom(
                 IBlossom that
             );
+            public abstract void VisitPlainMarker(
+                IPlainMarker that
+            );
             public abstract void VisitSomething(
                 ISomething that
             );
@@ -154,6 +171,10 @@ namespace dummy
             );
             public void VisitBlossom(
                 IBlossom that,
+                TContext context
+            );
+            public void VisitPlainMarker(
+                IPlainMarker that,
                 TContext context
             );
             public void VisitSomething(
@@ -190,6 +211,10 @@ namespace dummy
                 IBlossom that,
                 TContext context
             );
+            public abstract void VisitPlainMarker(
+                IPlainMarker that,
+                TContext context
+            );
             public abstract void VisitSomething(
                 ISomething that,
                 TContext context
@@ -222,6 +247,9 @@ namespace dummy
             public T TransformBlossom(
                 IBlossom that
             );
+            public T TransformPlainMarker(
+                IPlainMarker that
+            );
             public T TransformSomething(
                 ISomething that
             );
@@ -252,6 +280,10 @@ namespace dummy
 
             public abstract T TransformBlossom(
                 IBlossom that
+            );
+
+            public abstract T TransformPlainMarker(
+                IPlainMarker that
             );
 
             public abstract T TransformSomething(
@@ -287,6 +319,10 @@ namespace dummy
             );
             public T TransformBlossom(
                 IBlossom that,
+                TContext context
+            );
+            public T TransformPlainMarker(
+                IPlainMarker that,
                 TContext context
             );
             public T TransformSomething(
@@ -330,6 +366,11 @@ namespace dummy
 
             public abstract T TransformBlossom(
                 IBlossom that,
+                TContext context
+            );
+
+            public abstract T TransformPlainMarker(
+                IPlainMarker that,
                 TContext context
             );
 

@@ -13,6 +13,7 @@ var modelTypeFromStringMap = map[string]ourtypes.ModelType {
 	"Branch": ourtypes.ModelTypeBranch,
 	"Leaf": ourtypes.ModelTypeLeaf,
 	"Blossom": ourtypes.ModelTypeBlossom,
+	"PlainMarker": ourtypes.ModelTypePlainMarker,
 	"Something": ourtypes.ModelTypeSomething,
 	"Container": ourtypes.ModelTypeContainer,
 }
@@ -31,6 +32,7 @@ var modelTypeToStringArray = [...]string {
 	"Branch",
 	"Leaf",
 	"Blossom",
+	"PlainMarker",
 	"Something",
 	"Container",
 }

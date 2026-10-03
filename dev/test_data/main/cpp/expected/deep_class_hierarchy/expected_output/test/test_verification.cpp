@@ -271,6 +271,54 @@ TEST_CASE("Test verification of invalid cases for Blossom") {
   }
 }
 
+TEST_CASE("Test verification of a valid PlainMarker") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "plainMarker",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertNoVerificationError(path);
+  }
+}
+
+TEST_CASE("Test verification of invalid cases for PlainMarker") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineXmlDir()
+        / "Unexpected"
+        / "Invalid"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "plainMarker",
+        ".xml"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+            / std::filesystem::relative(path, DetermineXmlDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+          / (path.filename().string() + ".errors")
+      );
+
+      AssertVerificationFailure(path, error_path);
+    }
+  }
+}
+
 TEST_CASE("Test verification of a valid Something") {
   const std::deque<std::filesystem::path> paths(
     test::common::FindFilesBySuffixRecursively(

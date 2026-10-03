@@ -346,6 +346,84 @@ class Blossom(Leaf):
         self.details = details
 
 
+class Marker(Class):
+    # pylint: disable=missing-class-docstring
+    pass
+
+
+class PlainMarker(Marker):
+    # pylint: disable=missing-class-docstring
+
+    def descend_once(self) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this instance.
+
+        We do not recurse into the referenced instance.
+
+        :yield: instances directly referenced from this instance
+        """
+        return self._descend(recurse=False)
+
+    def descend(self) -> Iterator[Class]:
+        """
+        Iterate recursively over the instances referenced from this one.
+
+        :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        # No descendable properties
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    def accept(self, visitor: "AbstractVisitor") -> None:
+        """Dispatch the :paramref:`visitor` on this instance."""
+        visitor.visit_plain_marker(self)
+
+    def accept_with_context(
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
+    ) -> None:
+        """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
+        visitor.visit_plain_marker_with_context(self, context)
+
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
+        """Dispatch the :paramref:`transformer` on this instance."""
+        return transformer.transform_plain_marker(self)
+
+    def transform_with_context(
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
+    ) -> T:
+        """
+        Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
+        """
+        return transformer.transform_plain_marker_with_context(
+            self, context)
+
+    def __init__(self) -> None:
+        """Initialize with the given values."""
+        Marker.__init__(
+            self
+        )
+
+
 class Something(Class):
     # pylint: disable=missing-class-docstring
 
@@ -546,6 +624,14 @@ class AbstractVisitor:
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def visit_plain_marker(
+            self,
+            that: PlainMarker
+    ) -> None:
+        """Visit :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def visit_something(
             self,
             that: Something
@@ -594,6 +680,15 @@ class AbstractVisitorWithContext(Generic[ContextT]):
     def visit_blossom_with_context(
             self,
             that: Blossom,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def visit_plain_marker_with_context(
+            self,
+            that: PlainMarker,
             context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
@@ -651,6 +746,14 @@ class PassThroughVisitor(AbstractVisitor):
     def visit_blossom(
             self,
             that: Blossom
+    ) -> None:
+        """Visit :paramref:`that`."""
+        for another in that.descend_once():
+            self.visit(another)
+
+    def visit_plain_marker(
+            self,
+            that: PlainMarker
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
@@ -717,6 +820,15 @@ class PassThroughVisitorWithContext(
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
+    def visit_plain_marker_with_context(
+            self,
+            that: PlainMarker,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        for another in that.descend_once():
+            self.visit_with_context(another, context)
+
     def visit_something_with_context(
             self,
             that: Something,
@@ -765,6 +877,14 @@ class AbstractTransformer(Generic[T]):
     def transform_blossom(
             self,
             that: Blossom
+    ) -> T:
+        """Transform :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_plain_marker(
+            self,
+            that: PlainMarker
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
@@ -820,6 +940,15 @@ class AbstractTransformerWithContext(
     def transform_blossom_with_context(
             self,
             that: Blossom,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_plain_marker_with_context(
+            self,
+            that: PlainMarker,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
@@ -886,6 +1015,13 @@ class TransformerWithDefault(AbstractTransformer[T]):
         """Transform :paramref:`that`."""
         return self.default
 
+    def transform_plain_marker(
+            self,
+            that: PlainMarker
+    ) -> T:
+        """Transform :paramref:`that`."""
+        return self.default
+
     def transform_something(
             self,
             that: Something
@@ -944,6 +1080,14 @@ class TransformerWithDefaultAndContext(
     def transform_blossom_with_context(
             self,
             that: Blossom,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        return self.default
+
+    def transform_plain_marker_with_context(
+            self,
+            that: PlainMarker,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""

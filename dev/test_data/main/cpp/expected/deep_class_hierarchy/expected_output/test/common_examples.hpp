@@ -63,6 +63,22 @@ std::shared_ptr<
 > LoadMaxBlossom();
 
 /**
+ * Load a minimal example of IPlainMarker by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IPlainMarker
+> LoadMinPlainMarker();
+
+/**
+ * Load a maximal example of IPlainMarker by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IPlainMarker
+> LoadMaxPlainMarker();
+
+/**
  * Load a minimal example of ISomething by
  * de-serializing it from an XML file.
  */

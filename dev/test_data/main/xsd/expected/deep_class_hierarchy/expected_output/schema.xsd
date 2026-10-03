@@ -43,6 +43,14 @@
       <xs:element name="blossom" type="blossom_t"/>
     </xs:choice>
   </xs:group>
+  <xs:group name="marker">
+    <xs:sequence/>
+  </xs:group>
+  <xs:group name="marker_choice">
+    <xs:choice>
+      <xs:element name="plainMarker" type="plainMarker_t"/>
+    </xs:choice>
+  </xs:group>
   <xs:group name="node">
     <xs:sequence>
       <xs:element name="identifier" type="xs:string"/>
@@ -54,6 +62,11 @@
       <xs:element name="leaf" type="leaf_t"/>
       <xs:element name="blossom" type="blossom_t"/>
     </xs:choice>
+  </xs:group>
+  <xs:group name="plainMarker">
+    <xs:sequence>
+      <xs:group ref="marker"/>
+    </xs:sequence>
   </xs:group>
   <xs:group name="something">
     <xs:sequence>
@@ -93,9 +106,19 @@
       <xs:group ref="leaf"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="marker_t">
+    <xs:sequence>
+      <xs:group ref="marker"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="node_t">
     <xs:sequence>
       <xs:group ref="node"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="plainMarker_t">
+    <xs:sequence>
+      <xs:group ref="plainMarker"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="something_t">

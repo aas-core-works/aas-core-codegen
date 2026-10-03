@@ -230,6 +230,78 @@ test("Blossom XML deserialization fail", () => {
   }
 });
 
+test("PlainMarker XML round-trip OK", () => {
+  const pths = Array.from(
+    TestCommon.findFilesBySuffixRecursively(
+      path.join(
+        TestCommon.TEST_DATA_DIR,
+        "Xml",
+        "Expected",
+        "plainMarker"
+      ),
+      ".xml"
+    )
+  );
+  pths.sort();
+
+  for (const pth of pths) {
+    const text = fs.readFileSync(pth, "utf-8");
+
+    const instanceOrError = OurXmlization.fromXmlString(text);
+    expect(instanceOrError.error).toBeNull();
+    const instance = instanceOrError.mustValue();
+
+    const casted = OurTypes.asPlainMarker(instance);
+    if (casted === null) {
+      throw new Error(
+        `Expected instance of PlainMarker in ${pth}, ` +
+        `but got: ${typeof instance}`
+      );
+    }
+
+    TestCommon.assertNoVerificationErrors(OurVerification.verify(casted), pth);
+
+    const roundTripText = OurXmlization.toXmlString(casted);
+    expect(roundTripText.length).toBeGreaterThan(0);
+  }
+});
+
+test("PlainMarker XML deserialization fail", () => {
+  for (
+    const causeDir of
+    TestCommon.findImmediateSubdirectories(
+      path.join(
+        TestCommon.TEST_DATA_DIR,
+        "Xml",
+        "Unexpected",
+        "Unserializable"
+      )
+    )
+  ) {
+    const clsDir = path.join(
+      causeDir,
+      "plainMarker"
+    );
+    if (!fs.existsSync(clsDir)) {
+      continue;
+    }
+
+    const pths = Array.from(
+      TestCommon.findFilesBySuffixRecursively(
+        clsDir,
+        ".xml"
+      )
+    );
+    pths.sort();
+
+    for (const pth of pths) {
+      const text = fs.readFileSync(pth, "utf-8");
+      const instanceOrError = OurXmlization.fromXmlString(text);
+      expect(instanceOrError.error).not.toBeNull();
+    }
+  }
+});
+
 test("Something XML round-trip OK", () => {
   const pths = Array.from(
     TestCommon.findFilesBySuffixRecursively(

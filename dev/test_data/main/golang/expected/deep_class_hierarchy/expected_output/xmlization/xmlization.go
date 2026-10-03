@@ -606,6 +606,53 @@ func readBlossomAsSequence(
 	return
 }
 
+// De-serialize the instance of [ourtypes.IPlainMarker]
+// as a sequence of XML elements, each representing a property
+// of [ourtypes.IPlainMarker].
+//
+// The reading stops as soon as we encounter a non-start element, and we return
+// that token as the `next` token.
+func readPlainMarkerAsSequence(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance ourtypes.IPlainMarker,
+	next xml.Token,
+	err error,
+) {
+	// No initialization as there are no properties
+	// in IPlainMarker.
+
+	for {
+		var local string
+		var ok bool
+		local, current, ok, err = nextProperty(decoder, current, "IPlainMarker")
+		if err != nil {
+			return
+		}
+		if !ok {
+			break
+		}
+
+		var valueErr error
+		switch local {
+		default:
+			valueErr = xmlcommon.NewDeserializationError(
+				"Unexpected property",
+			)
+		}
+
+		current, err = concludeProperty(decoder, current, local, valueErr)
+		if err != nil {
+			return
+		}
+	}
+
+	next = current
+
+	instance = ourtypes.NewPlainMarker()
+	return
+}
+
 // De-serialize the instance of [ourtypes.ISomething]
 // as a sequence of XML elements, each representing a property
 // of [ourtypes.ISomething].
@@ -788,6 +835,8 @@ func readClassDispatched(
 		instance, next, err = readLeafAsSequence(decoder, current)
 	case "blossom":
 		instance, next, err = readBlossomAsSequence(decoder, current)
+	case "plainMarker":
+		instance, next, err = readPlainMarkerAsSequence(decoder, current)
 	case "something":
 		instance, next, err = readSomethingAsSequence(decoder, current)
 	case "container":
@@ -1153,6 +1202,23 @@ func writeBlossomAsSequence(
 }
 
 // Serialize the instance
+// of [ourtypes.IPlainMarker]
+// as a sequence of properties, each represented as an XML element.
+//
+// The XML namespace is expected to be set in the one of the parent elements
+// enclosing the sequence.
+//
+// Do not flush.
+func writePlainMarkerAsSequence(
+	encoder *xml.Encoder,
+	that ourtypes.IPlainMarker,
+) (err error) {
+	// Intentionally empty.
+
+	return
+}
+
+// Serialize the instance
 // of [ourtypes.ISomething]
 // as a sequence of properties, each represented as an XML element.
 //
@@ -1256,6 +1322,14 @@ func writeClass(
 			withNamespace,
 			that.(ourtypes.IBlossom),
 			writeBlossomAsSequence,
+		)
+	case ourtypes.ModelTypePlainMarker:
+		err = writeClassElement(
+			encoder,
+			"plainMarker",
+			withNamespace,
+			that.(ourtypes.IPlainMarker),
+			writePlainMarkerAsSequence,
 		)
 	case ourtypes.ModelTypeSomething:
 		err = writeClassElement(

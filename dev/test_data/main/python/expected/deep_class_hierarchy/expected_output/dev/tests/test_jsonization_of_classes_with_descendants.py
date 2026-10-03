@@ -107,6 +107,34 @@ class TestRoundTrips(unittest.TestCase):
 
                 self.assertListEqual([], list(map(str, mismatch)))
 
+    def test_marker(self) -> None:
+        for descendant_model_type in [
+            'PlainMarker'
+        ]:
+            for path in sorted(
+                (
+                    tests.common.TEST_DATA_DIR
+                    / "Json"
+                    / "Expected"
+                    / descendant_model_type
+                ).glob("**/*.json")
+            ):
+                with path.open("rt") as fid:
+                    original_jsonable = json.load(fid)
+
+                instance = our_jsonization.marker_from_jsonable(
+                    original_jsonable
+                )
+
+                another_jsonable = our_jsonization.to_jsonable(instance)
+
+                mismatch = tests.common_jsonization.check_equal(
+                    original_jsonable,
+                    another_jsonable
+                )
+
+                self.assertListEqual([], list(map(str, mismatch)))
+
 
 if __name__ == "__main__":
     unittest.main()

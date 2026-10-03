@@ -26,6 +26,9 @@ public interface IVisitor
   void visitBlossom(
     IBlossom that
   );
+  void visitPlainMarker(
+    IPlainMarker that
+  );
   void visitSomething(
     ISomething that
   );

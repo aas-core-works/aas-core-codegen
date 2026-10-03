@@ -875,6 +875,364 @@ def blossom_from_str(
     )
 
 
+def marker_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Marker:
+    """
+    Read an instance of :py:class:`.types.Marker` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as our_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = our_xmlization.marker_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Marker` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_marker_as_element,
+        'Marker'
+    )
+
+
+def marker_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.Marker:
+    """
+    Read an instance of :py:class:`.types.Marker` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as our_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = our_xmlization.marker_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.Marker` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Marker` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return marker_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def marker_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.Marker:
+    """
+    Read an instance of :py:class:`.types.Marker` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as our_xmlization
+
+        path = pathlib.Path(...)
+        instance = our_xmlization.marker_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.Marker` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Marker` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return marker_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def marker_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.Marker:
+    """
+    Read an instance of :py:class:`.types.Marker` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as our_xmlization
+
+        text = "<...>...</...>"
+        instance = our_xmlization.marker_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.Marker` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Marker` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return marker_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def plain_marker_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.PlainMarker:
+    """
+    Read an instance of :py:class:`.types.PlainMarker` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as our_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = our_xmlization.plain_marker_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.PlainMarker` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_plain_marker_as_element,
+        'PlainMarker'
+    )
+
+
+def plain_marker_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.PlainMarker:
+    """
+    Read an instance of :py:class:`.types.PlainMarker` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as our_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = our_xmlization.plain_marker_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.PlainMarker` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.PlainMarker` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return plain_marker_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def plain_marker_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.PlainMarker:
+    """
+    Read an instance of :py:class:`.types.PlainMarker` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as our_xmlization
+
+        path = pathlib.Path(...)
+        instance = our_xmlization.plain_marker_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.PlainMarker` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.PlainMarker` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return plain_marker_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def plain_marker_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.PlainMarker:
+    """
+    Read an instance of :py:class:`.types.PlainMarker` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as our_xmlization
+
+        text = "<...>...</...>"
+        instance = our_xmlization.plain_marker_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.PlainMarker` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.PlainMarker` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return plain_marker_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
 def something_from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
 ) -> our_types.Something:
@@ -2037,6 +2395,82 @@ def _read_blossom_as_element(
     )
 
 
+def _read_marker_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Marker:
+    """
+    Read an instance of :py:class:`.types.Marker` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_dispatched(
+        element,
+        iterator,
+        _DISPATCH_FOR_MARKER,
+        "a concrete instance of 'Marker'"
+    )
+
+
+def _read_plain_marker_as_sequence(
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+) -> our_types.PlainMarker:
+    """
+    Read an instance of :py:class:`.types.PlainMarker`
+    as a sequence of XML-encoded properties.
+
+    The end element corresponding to the :paramref:`element` will be
+    read as well.
+
+    :param element: start element, parent of the sequence
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    _read_properties(
+        element,
+        iterator,
+        _READERS_FOR_PLAIN_MARKER
+    )
+
+    return our_types.PlainMarker()
+
+
+def _read_plain_marker_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.PlainMarker:
+    """
+    Read an instance of :py:class:`.types.PlainMarker` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'plainMarker',
+        _read_plain_marker_as_sequence
+    )
+
+
 def _read_something_as_sequence(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
@@ -2252,6 +2686,22 @@ _DISPATCH_FOR_LEAF: Mapping[
 
 
 #: Dispatch XML class names to read-as-sequence functions
+#: corresponding to concrete descendants of Marker
+_DISPATCH_FOR_MARKER: Mapping[
+    str,
+    Callable[
+        [
+            Element,
+            Iterator[Tuple[str, Element]]
+        ],
+        our_types.Marker
+    ]
+] = {
+    'plainMarker': _read_plain_marker_as_sequence,
+}
+
+
+#: Dispatch XML class names to read-as-sequence functions
 #: corresponding to the concrete classes
 _GENERAL_DISPATCH: Mapping[
     str,
@@ -2266,6 +2716,7 @@ _GENERAL_DISPATCH: Mapping[
     'branch': _read_branch_as_sequence,
     'leaf': _read_leaf_as_sequence,
     'blossom': _read_blossom_as_sequence,
+    'plainMarker': _read_plain_marker_as_sequence,
     'something': _read_something_as_sequence,
     'container': _read_container_as_sequence,
 }
@@ -2304,6 +2755,15 @@ _READERS_FOR_BLOSSOM: Mapping[
     'description': read_str_from_element_text,
     'value': _read_int_from_element_text,
     'details': read_str_from_element_text,
+}
+
+
+#: Read the content of a property of
+#: :py:class:`.types.PlainMarker`, by the XML name of the property
+_READERS_FOR_PLAIN_MARKER: Mapping[
+    str,
+    _ContentReader[Any]
+] = {
 }
 
 
@@ -2605,6 +3065,32 @@ def _write_blossom_as_element(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_plain_marker_as_element(
+    name: str,
+    prop_name: Optional[str],
+    that: our_types.PlainMarker,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`that` enclosed in the :paramref:`name` element.
+
+    There are no properties specified for this class, so the element is always
+    empty.
+
+    :param name: of the element tag. Expected to contain no XML special characters.
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param that: instance to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        serializer.writer.write_empty_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 def _write_something_as_element(
     name: str,
     prop_name: Optional[str],
@@ -2725,6 +3211,20 @@ class _Serializer(our_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         _write_blossom_as_element('blossom', None, that, self)
+
+    def visit_plain_marker(
+        self,
+        that: our_types.PlainMarker
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
+
+        The enclosing XML element designates the class of the instance, where its
+        children correspond to the properties of the instance.
+
+        :param that: instance to be serialized
+        """
+        _write_plain_marker_as_element('plainMarker', None, that, self)
 
     def visit_something(
         self,

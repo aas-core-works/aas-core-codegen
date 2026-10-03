@@ -381,6 +381,62 @@ TEST_CASE("Test the de-serialization failure on an unexpected Blossom") {
   }
 }
 
+TEST_CASE("Test the round-trip of an expected PlainMarker") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineJsonDir()
+        / "Expected"
+        / "PlainMarker",
+      ".json"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertRoundTrip<
+      our::types::IPlainMarker
+    >(path, our::jsonization::PlainMarkerFrom);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected PlainMarker") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineJsonDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "PlainMarker",
+        ".json"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineJsonDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure<
+        our::types::IPlainMarker
+      >(
+        path,
+        our::jsonization::PlainMarkerFrom,
+        error_path
+      );
+    }
+  }
+}
+
 TEST_CASE("Test the round-trip of an expected Something") {
   const std::deque<std::filesystem::path> paths(
     test::common::FindFilesBySuffixRecursively(

@@ -32,6 +32,10 @@ public interface ITransformerWithContext<ContextT, T> {
     IBlossom that,
     ContextT context
   );
+  T transformPlainMarker(
+    IPlainMarker that,
+    ContextT context
+  );
   T transformSomething(
     ISomething that,
     ContextT context

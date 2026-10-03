@@ -205,6 +205,70 @@ export function loadMinimalBlossom(
 }
 
 /**
+ * Load a maximal example of {@link types.PlainMarker} from
+ * the test data directory.
+ */
+export function loadMaximalPlainMarker(
+): OurTypes.PlainMarker {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "PlainMarker",
+    "maximal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = OurJsonization.plainMarkerFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = OurTypes.asPlainMarker(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of PlainMarker in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal example of {@link types.PlainMarker} from
+ * the test data directory.
+ */
+export function loadMinimalPlainMarker(
+): OurTypes.PlainMarker {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Json",
+    "Expected",
+    "PlainMarker",
+    "minimal.json"
+  );
+
+  const jsonable = TestCommon.readJsonFromFileSync(aPath);
+
+  const instanceOrError = OurJsonization.plainMarkerFromJsonable(
+    jsonable
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = OurTypes.asPlainMarker(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of PlainMarker in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
  * Load a maximal example of {@link types.Something} from
  * the test data directory.
  */

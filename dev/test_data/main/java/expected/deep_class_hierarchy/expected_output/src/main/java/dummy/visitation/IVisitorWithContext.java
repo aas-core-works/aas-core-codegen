@@ -31,6 +31,10 @@ public interface IVisitorWithContext<ContextT>
     IBlossom that,
     ContextT context
   );
+  void visitPlainMarker(
+    IPlainMarker that,
+    ContextT context
+  );
   void visitSomething(
     ISomething that,
     ContextT context

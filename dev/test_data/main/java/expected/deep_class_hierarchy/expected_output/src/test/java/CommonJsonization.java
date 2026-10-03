@@ -94,6 +94,32 @@ public final class CommonJsonization {
     return Jsonization.Deserialize.deserializeBlossom(node);
   } // public static Blossom loadMinimalBlossom
 
+  public static PlainMarker loadMaximalPlainMarker() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "PlainMarker",
+      "maximal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializePlainMarker(node);
+  } // public static PlainMarker loadMaximalPlainMarker
+
+  public static PlainMarker loadMinimalPlainMarker() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "PlainMarker",
+      "minimal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializePlainMarker(node);
+  } // public static PlainMarker loadMinimalPlainMarker
+
   public static Something loadMaximalSomething() throws IOException {
     final Path path = Paths.get(
       Common.TEST_DATA_DIR,

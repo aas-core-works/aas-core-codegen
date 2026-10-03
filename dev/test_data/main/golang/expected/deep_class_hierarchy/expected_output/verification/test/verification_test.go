@@ -558,6 +558,136 @@ func TestBlossomFail(t *testing.T) {
 	}
 }
 
+func TestPlainMarkerOK(t *testing.T) {
+	pths := ourtesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			ourtesting.TestDataDir,
+			"Json",
+			"Expected",
+			"PlainMarker",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := ourtesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := ourjsonization.PlainMarkerFromJsonable(
+			jsonable,
+		)
+		if deseriaErr != nil {
+			t.Fatalf(
+				"Unexpected deserialization error from %s: %s",
+				pth, deseriaErr.Error(),
+			)
+			return
+		}
+
+		var errors []*ourverification.VerificationError
+		ourverification.Verify(
+			deserialized,
+			func(veriErr *ourverification.VerificationError) (abort bool) {
+				errors = append(errors, veriErr)
+				return
+			},
+		)
+
+		ok := assertNoVerificationErrors(
+			t,
+			deserialized,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestPlainMarkerFail(t *testing.T) {
+	pattern := filepath.Join(
+		ourtesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Invalid",
+		"*",  // This asterisk represents the cause.
+		"PlainMarker",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := ourtesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := ourtesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						ourtesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				ourtesting.TestDataDir,
+				"VerificationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".errors",
+			)
+
+			deserialized, deseriaErr := ourjsonization.PlainMarkerFromJsonable(
+				jsonable,
+			)
+			if deseriaErr != nil {
+				t.Fatalf(
+					"Unexpected deserialization error from %s: %s",
+					pth, deseriaErr.Error(),
+				)
+				return
+			}
+
+			var errors []*ourverification.VerificationError
+			ourverification.Verify(
+				deserialized,
+				func(err *ourverification.VerificationError) (abort bool) {
+					errors = append(errors, err)
+					return
+				},
+			)
+
+			ok := assertEqualsExpectedOrRerecordVerificationErrors(
+				t,
+				errors,
+				pth,
+				expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
 func TestSomethingOK(t *testing.T) {
 	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(

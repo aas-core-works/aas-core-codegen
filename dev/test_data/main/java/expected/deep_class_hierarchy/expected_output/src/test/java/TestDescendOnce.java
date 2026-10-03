@@ -84,6 +84,19 @@ public class TestDescendOnce {
   } // public void testBlossom
 
   @Test
+  public void testPlainMarker() throws IOException {
+    PlainMarker instance = CommonJsonization.loadMaximalPlainMarker();
+
+    compareOrRerecordTrace(
+      instance,
+      Paths.get(
+        Common.TEST_DATA_DIR,
+        "DescendOnce",
+        "PlainMarker",
+        "maximal.json.trace"));
+  } // public void testPlainMarker
+
+  @Test
   public void testSomething() throws IOException {
     Something instance = CommonJsonization.loadMaximalSomething();
 

@@ -823,7 +823,7 @@ self.{python_naming.property_name(stmt.name)} = (
 
     if len(arg_codes) == 0:
         writer.write("def __init__(self) -> None:\n")
-    if len(arg_codes) == 1:
+    elif len(arg_codes) == 1:
         writer.write(f"def __init__(self, {arg_codes[0]}) -> None:\n")
     else:
         arg_block = ",\n".join(["self"] + arg_codes)

@@ -579,6 +579,74 @@ public class Jsonization {
       }
 
       /**
+       * Deserialize an instance of IMarker by dispatching
+       * based on {@code modelType} property of the {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static Reporting.Result<? extends IMarker> tryIMarkerFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        final Reporting.Result<String> modelTypeResult = tryModelTypeFrom(node);
+        if (modelTypeResult.isError()) {
+          return modelTypeResult.castTo(IMarker.class);
+        }
+
+        switch (modelTypeResult.getResult()) {
+          case "PlainMarker":
+            return tryPlainMarkerFromObject(node);
+          default: {
+            final Reporting.Error error = new Reporting.Error(
+              "Unexpected model type for IMarker: " + modelTypeResult.getResult());
+            return Reporting.Result.failure(error);
+          }
+        }
+      }
+
+      /**
+       * Deserialize an instance of PlainMarker from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<PlainMarker> tryPlainMarkerFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        final Reporting.Error modelTypeError = checkModelType(node, "PlainMarker");
+        if (modelTypeError != null) {
+          return Reporting.Result.failure(modelTypeError);
+        }
+
+        return tryPlainMarkerFromObject(node);
+      }
+
+      /**
+       * Deserialize an instance of PlainMarker from the JSON object {@code node} whose
+       * model type has already been checked.
+       *
+       * @param node JSON object to be parsed
+       */
+      private static Reporting.Result<PlainMarker> tryPlainMarkerFromObject(JsonNode node) {
+        for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
+          final Map.Entry<String, JsonNode> keyValue = iterator.next();
+          final String key = keyValue.getKey();
+
+          switch (key) {
+            case "modelType":
+              // The model type has already been checked before the loop.
+              break;
+            default:
+              return unexpectedProperty(key);
+          }
+        }
+
+        return Reporting.Result.success(new PlainMarker());
+      }
+
+      /**
        * Deserialize an instance of Something from {@code node}.
        *
        * @param node JSON node to be parsed
@@ -872,6 +940,40 @@ public class Jsonization {
       }
 
       /**
+       * Deserialize an instance of IMarker from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static IMarker deserializeIMarker(JsonNode node) {
+        final Reporting.Result<? extends IMarker> result =
+          _DeserializeImplementation.tryIMarkerFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
+       * Deserialize an instance of PlainMarker from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static PlainMarker deserializePlainMarker(JsonNode node) {
+        final Reporting.Result<? extends PlainMarker> result =
+          _DeserializeImplementation.tryPlainMarkerFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
        * Deserialize an instance of Something from {@code node}.
        *
        * @param node JSON node to be parsed
@@ -1077,6 +1179,17 @@ public class Jsonization {
           that.getDetails(), _Transformer::stringToJsonNode);
 
         result.put("modelType", "Blossom");
+
+        return result;
+      }
+
+      @Override
+      public JsonNode transformPlainMarker(
+        IPlainMarker that
+      ) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        result.put("modelType", "PlainMarker");
 
         return result;
       }

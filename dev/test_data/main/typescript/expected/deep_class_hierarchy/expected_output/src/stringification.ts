@@ -21,6 +21,10 @@ const MODEL_TYPE_FROM_STRING = new Map<string, OurTypes.ModelType>([
     OurTypes.ModelType.Blossom
   ],
   [
+    "PlainMarker",
+    OurTypes.ModelType.PlainMarker
+  ],
+  [
     "Something",
     OurTypes.ModelType.Something
   ],
@@ -50,6 +54,7 @@ const MODEL_TYPE_TO_STRING: readonly string[] = [
   "Branch",
   "Leaf",
   "Blossom",
+  "PlainMarker",
   "Something",
   "Container"
 ];

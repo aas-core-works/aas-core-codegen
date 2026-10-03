@@ -84,6 +84,26 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
   }
 
   @Override
+  public IClass transformPlainMarker(
+    IPlainMarker that
+  ) {
+    if (that instanceof Enhanced)
+    {
+      throw new IllegalArgumentException(
+        "The instance has been already enhanced: " + that
+      );
+    }
+
+    Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
+    return !enhancement.isPresent()
+      ? that
+      : new EnhancedPlainMarker<>(
+        that,
+        enhancement.get()
+      );
+  }
+
+  @Override
   public IClass transformSomething(
     ISomething that
   ) {

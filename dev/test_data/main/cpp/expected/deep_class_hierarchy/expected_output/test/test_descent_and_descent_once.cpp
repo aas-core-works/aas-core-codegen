@@ -219,6 +219,48 @@ TEST_CASE("Test DescentOnce over an Blossom") {
   AssertOrRerecordDescentOnce(instance, trace_path);
 }
 
+TEST_CASE("Test Descent over an PlainMarker") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineXmlDir()
+        / "Expected"
+        / "plainMarker",
+      ".xml"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    const std::filesystem::path parent(
+      (
+        DetermineDescentDir()
+          / std::filesystem::relative(path, DetermineXmlDir())
+      ).parent_path()
+    );
+
+    const std::filesystem::path trace_path(
+      parent
+        / (path.filename().string() + ".trace")
+    );
+
+    AssertOrRerecordDescent(path, trace_path);
+  }
+}
+
+TEST_CASE("Test DescentOnce over an PlainMarker") {
+  const std::shared_ptr<
+    our::types::IPlainMarker
+  > instance(
+    test::common::examples::LoadMaxPlainMarker()
+  );
+
+  const std::filesystem::path trace_path(
+    DetermineDescentOnceDir()
+      / "MaxPlainMarker.trace"
+  );
+
+  AssertOrRerecordDescentOnce(instance, trace_path);
+}
+
 TEST_CASE("Test Descent over an Something") {
   const std::deque<std::filesystem::path> paths(
     test::common::FindFilesBySuffixRecursively(

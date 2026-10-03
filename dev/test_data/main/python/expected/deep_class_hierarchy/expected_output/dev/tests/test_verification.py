@@ -95,6 +95,31 @@ class TestVerificationOfValidInstances(unittest.TestCase):
                     )
                 )
 
+    def test_plain_marker(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'PlainMarker'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                jsonable = json.load(fid)
+
+            instance = our_jsonization.plain_marker_from_jsonable(jsonable)
+
+            errors = list(our_verification.verify(instance))
+
+            if len(errors) > 0:
+                self.fail(
+                    f"Expected no errors when verifying the instance de-serialized "
+                    f"from {path}, but got {len(errors)} error(s):\n"
+                    + "\n".join(
+                        f"{error.path}: {error.cause}" for error in errors
+                    )
+                )
+
     def test_something(self) -> None:
         for path in sorted(
             (
@@ -254,6 +279,47 @@ class TestVerificationOfInvalidInstances(unittest.TestCase):
                     jsonable = json.load(fid)
 
                 instance = our_jsonization.blossom_from_jsonable(jsonable)
+
+                errors = list(our_verification.verify(instance))
+
+                if len(errors) == 0:
+                    self.fail(
+                        f"Expected at least one verification error "
+                        f"when verifying the instance de-serialized "
+                        f"from {path}, but got none"
+                    )
+
+                got = "\n".join(
+                    f"{error.path}: {error.cause}" for error in errors
+                ) + "\n"
+
+                tests.common.record_or_check(expected_path, got)
+
+    def test_plain_marker(self) -> None:
+        for cause_dir in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Unexpected"
+                / "Invalid"
+            ).iterdir()
+        ):
+            for path in sorted(
+                (cause_dir / 'PlainMarker').glob("**/*.json")
+            ):
+                rel_path = path.relative_to(tests.common.TEST_DATA_DIR)
+
+                expected_path = (
+                    tests.common.TEST_DATA_DIR
+                    / "VerificationError"
+                    / rel_path.parent
+                    / f"{rel_path.name}.errors"
+                )
+
+                with path.open("rt") as fid:
+                    jsonable = json.load(fid)
+
+                instance = our_jsonization.plain_marker_from_jsonable(jsonable)
 
                 errors = list(our_verification.verify(instance))
 

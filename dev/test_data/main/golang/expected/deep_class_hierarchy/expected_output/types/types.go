@@ -13,6 +13,7 @@ const (
 	ModelTypeBranch ModelType = iota
 	ModelTypeLeaf
 	ModelTypeBlossom
+	ModelTypePlainMarker
 	ModelTypeSomething
 	ModelTypeContainer
 )
@@ -456,6 +457,101 @@ func NewBlossom(
 		value: value,
 		details: details,
 	}
+}
+
+type IMarker interface {
+	IClass
+}
+
+// Check whether the instance corresponds to [ourtypes.IMarker]
+// based on its run-time model type.
+//
+// The implementation uses a switch statements which is
+// most probably compiled as an efficient jump table by the compiler.
+func IsMarker(
+	that IClass,
+) (ok bool) {
+	switch that.ModelType() {
+	case ModelTypePlainMarker:
+		ok = true
+	}
+	return
+}
+
+type IPlainMarker interface {
+	IMarker
+}
+
+// Check whether the instance corresponds to [ourtypes.IPlainMarker]
+// based on its run-time model type.
+//
+// The implementation uses a switch statements which is
+// most probably compiled as an efficient jump table by the compiler.
+func IsPlainMarker(
+	that IClass,
+) (ok bool) {
+	ok = that.ModelType() == ModelTypePlainMarker
+	return
+}
+
+// Implements IPlainMarker.
+type PlainMarker struct {
+	
+}
+
+func (pm *PlainMarker) ModelType(
+) ModelType {
+	return ModelTypePlainMarker
+}
+
+// Apply the action on the instances referenced from pm.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// We do not recurse into the referenced instances.
+//
+// The action is not applied on pm.
+func (pm *PlainMarker) DescendOnce(
+	action func(IClass) bool,
+) (abort bool) {
+	return descend_PlainMarker(pm, action, false)
+}
+
+// Apply the action recursively on the instances referenced from pm.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on pm.
+func (pm *PlainMarker) Descend(
+	action func(IClass) bool,
+) (abort bool) {
+	return descend_PlainMarker(pm, action, true)
+}
+
+// Apply the action on the instances referenced from that, and recursively
+// on their descendants if recurse is set.
+//
+// If any of the actions returns abort `true`, the descent is immediately
+// stopped, and abort `true` is also returned. Otherwise, return abort `false`.
+//
+// The action is not applied on that.
+func descend_PlainMarker(
+	that *PlainMarker,
+	action func(IClass) bool,
+	recurse bool,
+) (abort bool) {
+	// No descendable properties
+
+	return
+}
+
+// Create a new instance of PlainMarker with
+// the given properties.
+func NewPlainMarker() *PlainMarker {
+	// Intentionally empty.
+	return &PlainMarker{}
 }
 
 type ISomething interface {

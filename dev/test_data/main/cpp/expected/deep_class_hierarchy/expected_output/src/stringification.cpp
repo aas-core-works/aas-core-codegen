@@ -27,6 +27,10 @@ const std::unordered_map<
     types::ModelType::kBlossom
   },
   {
+    "PlainMarker",
+    types::ModelType::kPlainMarker
+  },
+  {
     "Something",
     types::ModelType::kSomething
   },
@@ -75,6 +79,8 @@ std::string to_string(
     return "Leaf";
     case types::ModelType::kBlossom:
     return "Blossom";
+    case types::ModelType::kPlainMarker:
+    return "PlainMarker";
     case types::ModelType::kSomething:
     return "Something";
     case types::ModelType::kContainer:

@@ -33,6 +33,10 @@ public abstract class AbstractVisitorWithContext<ContextT>
     IBlossom that,
     ContextT context
   );
+  public abstract void visitPlainMarker(
+    IPlainMarker that,
+    ContextT context
+  );
   public abstract void visitSomething(
     ISomething that,
     ContextT context

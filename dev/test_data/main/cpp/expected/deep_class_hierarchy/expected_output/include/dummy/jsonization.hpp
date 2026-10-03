@@ -184,6 +184,40 @@ common::expected<
 
 /**
  * \brief Deserialize \p json value to an instance
+ * of types::IMarker.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return The deserialized instance, or a de-serialization error, if any.
+ */
+common::expected<
+  std::shared_ptr<types::IMarker>,
+  DeserializationError
+> MarkerFrom(
+  const nlohmann::json& json,
+  bool additional_properties = false
+);
+
+/**
+ * \brief Deserialize \p json value to an instance
+ * of types::IPlainMarker.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return The deserialized instance, or a de-serialization error, if any.
+ */
+common::expected<
+  std::shared_ptr<types::IPlainMarker>,
+  DeserializationError
+> PlainMarkerFrom(
+  const nlohmann::json& json,
+  bool additional_properties = false
+);
+
+/**
+ * \brief Deserialize \p json value to an instance
  * of types::ISomething.
  *
  * \param json value to be de-serialized

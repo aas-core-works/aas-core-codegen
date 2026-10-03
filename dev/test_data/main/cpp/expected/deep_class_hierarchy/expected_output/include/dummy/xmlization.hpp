@@ -151,6 +151,40 @@ common::expected<
 );
 
 /**
+ * Deserialize an instance of types::IMarker from an XML
+ * read from the stream \p is.
+ *
+ * \param is stream to read XML from
+ * \param options reading options to be tweaked for special cases. The defaults should
+ * work in most cases.
+ * \return the parsed types::IMarker, or an error if any
+ */
+common::expected<
+  std::shared_ptr<types::IMarker>,
+  DeserializationError
+> MarkerFrom(
+  std::istream& is,
+  const ReadingOptions& options = {}
+);
+
+/**
+ * Deserialize an instance of types::IPlainMarker from an XML
+ * read from the stream \p is.
+ *
+ * \param is stream to read XML from
+ * \param options reading options to be tweaked for special cases. The defaults should
+ * work in most cases.
+ * \return the parsed types::IPlainMarker, or an error if any
+ */
+common::expected<
+  std::shared_ptr<types::IPlainMarker>,
+  DeserializationError
+> PlainMarkerFrom(
+  std::istream& is,
+  const ReadingOptions& options = {}
+);
+
+/**
  * Deserialize an instance of types::ISomething from an XML
  * read from the stream \p is.
  *

@@ -14,6 +14,8 @@ const THE_LEAF = TestCommonJsonization.loadMinimalLeaf();
 
 const THE_BLOSSOM = TestCommonJsonization.loadMinimalBlossom();
 
+const THE_PLAIN_MARKER = TestCommonJsonization.loadMinimalPlainMarker();
+
 const THE_SOMETHING = TestCommonJsonization.loadMinimalSomething();
 
 const THE_CONTAINER = TestCommonJsonization.loadMinimalContainer();
@@ -39,6 +41,13 @@ test("type matches for Branch", () => {
       THE_BLOSSOM
     )
   ).toStrictEqual(true);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_BRANCH,
+      THE_PLAIN_MARKER
+    )
+  ).toStrictEqual(false);
 
   expect(
     OurTypes.typesMatch(
@@ -80,6 +89,13 @@ test("type matches for Leaf", () => {
   expect(
     OurTypes.typesMatch(
       THE_LEAF,
+      THE_PLAIN_MARKER
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_LEAF,
       THE_SOMETHING
     )
   ).toStrictEqual(false);
@@ -117,6 +133,13 @@ test("type matches for Blossom", () => {
   expect(
     OurTypes.typesMatch(
       THE_BLOSSOM,
+      THE_PLAIN_MARKER
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_BLOSSOM,
       THE_SOMETHING
     )
   ).toStrictEqual(false);
@@ -124,6 +147,50 @@ test("type matches for Blossom", () => {
   expect(
     OurTypes.typesMatch(
       THE_BLOSSOM,
+      THE_CONTAINER
+    )
+  ).toStrictEqual(false);
+});
+
+test("type matches for PlainMarker", () => {
+  expect(
+    OurTypes.typesMatch(
+      THE_PLAIN_MARKER,
+      THE_BRANCH
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_PLAIN_MARKER,
+      THE_LEAF
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_PLAIN_MARKER,
+      THE_BLOSSOM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_PLAIN_MARKER,
+      THE_PLAIN_MARKER
+    )
+  ).toStrictEqual(true);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_PLAIN_MARKER,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_PLAIN_MARKER,
       THE_CONTAINER
     )
   ).toStrictEqual(false);
@@ -148,6 +215,13 @@ test("type matches for Something", () => {
     OurTypes.typesMatch(
       THE_SOMETHING,
       THE_BLOSSOM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_SOMETHING,
+      THE_PLAIN_MARKER
     )
   ).toStrictEqual(false);
 
@@ -185,6 +259,13 @@ test("type matches for Container", () => {
     OurTypes.typesMatch(
       THE_CONTAINER,
       THE_BLOSSOM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_CONTAINER,
+      THE_PLAIN_MARKER
     )
   ).toStrictEqual(false);
 

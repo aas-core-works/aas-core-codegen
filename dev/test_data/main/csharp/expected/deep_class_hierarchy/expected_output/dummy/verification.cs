@@ -74,6 +74,15 @@ namespace dummy
             }
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> TransformPlainMarker(
+                Our.IPlainMarker that
+            )
+            {
+                // No verification has been defined for PlainMarker.
+                yield break;
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> TransformSomething(
                 Our.ISomething that
             )
