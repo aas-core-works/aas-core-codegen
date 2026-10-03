@@ -57,6 +57,25 @@ bool SomeVerification(
   );
 }
 
+bool NarrowedPairIsPositive(
+  const std::wstring& x,
+  const common::optional<int64_t>& y
+) {
+  if (!(y.has_value())) {
+    return false;
+  }
+  std::tuple<
+    std::wstring,
+    int64_t
+  > pair = (
+    std::make_tuple(
+      x,
+      (*y)
+    )
+  );
+  return std::get<1>(pair) > 0;
+}
+
 // endregion Verification functions
 
 namespace {

@@ -59,6 +59,22 @@ func SomeVerification(
 		}).Len() == 2
 }
 
+// Pack a narrowed optional value type into a tuple.
+func NarrowedPairIsPositive(
+	x string,
+	y *int64,
+) bool {
+	if y == nil {
+		return false
+	}
+	var pair ourcommon.Tuple2[string, int64] =
+		ourcommon.Tuple2[string, int64]{
+			x,
+			*y,
+		}
+	return pair.Item2 > 0
+}
+
 // Verify `that` instance of [ourtypes.ISomeItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.

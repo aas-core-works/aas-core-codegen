@@ -11,6 +11,16 @@ def some_verification(x: str, y: int) -> bool:
     return (x, y)[0] == x and len((x, y)) == 2
 
 
+@verification
+def narrowed_pair_is_positive(x: str, y: Optional[int]) -> bool:
+    """Pack a narrowed optional value type into a tuple."""
+    if y is None:
+        return False
+
+    pair: Tuple[str, int] = (x, y)
+    return pair[1] > 0
+
+
 @invariant(lambda self: self > 0, "Larger than zero")
 class Positive_int(int, DBC):
     pass

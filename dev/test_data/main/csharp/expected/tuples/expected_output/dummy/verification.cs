@@ -47,6 +47,25 @@ namespace dummy
         }  // public static bool SomeVerification
 
         /// <summary>
+        /// Pack a narrowed optional value type into a tuple.
+        /// </summary>
+        public static bool NarrowedPairIsPositive(
+            string x,
+            long? y
+        )
+        {
+            if (y == null)
+            {
+                return false;
+            }
+            (string, long) pair = (
+                x,
+                y.Value
+            );
+            return pair.Item2 > 0;
+        }  // public static bool NarrowedPairIsPositive
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet

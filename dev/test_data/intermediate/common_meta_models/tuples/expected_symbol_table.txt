@@ -582,6 +582,43 @@ SymbolTable(
         snapshots=[],
         postconditions=[]),
       parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='narrowed_pair_is_positive',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='x',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='y',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Pack a narrowed optional value type into a tuple.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
       arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(

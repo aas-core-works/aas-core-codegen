@@ -532,6 +532,27 @@ class Transpiler(
             None,
         )
 
+    def _transform_and_unwrap_narrowed_nullable_value(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` and unwrap it if it is a narrowed nullable value type.
+
+        A value type such as ``long?`` stays nullable in C# even if the type
+        inference narrowed it down to non-null, so we need to unwrap it with
+        ``.Value`` before we assign it to a non-nullable or return it.
+        """
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if self._is_declared_nullable(node) and _is_value_type(self.type_map[node]):
+            return Stripped(f"{code}.Value"), None
+
+        return code, None
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_tuple(
         self, node: parse_tree.Tuple
@@ -539,8 +560,13 @@ class Transpiler(
         errors = []  # type: List[Error]
         value_reprs = []  # type: List[Stripped]
 
+        # NOTE (mristin):
+        # A tuple of ``long`` does not accept a ``long?``, so we unwrap a narrowed
+        # nullable value type.
         for value_node in node.values:
-            value_repr, error = self.transform(value_node)
+            value_repr, error = self._transform_and_unwrap_narrowed_nullable_value(
+                value_node
+            )
             if error is not None:
                 errors.append(error)
                 continue
@@ -593,27 +619,6 @@ class Transpiler(
             return Stripped(f"{left} {comparator} {right}"), None
 
         return Stripped(f"({left}) {comparator} ({right})"), None
-
-    def _transform_and_unwrap_narrowed_nullable_value(
-        self, node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` and unwrap it if it is a narrowed nullable value type.
-
-        A value type such as ``long?`` stays nullable in C# even if the type
-        inference narrowed it down to non-null, so we need to unwrap it with
-        ``.Value`` before we assign it to a non-nullable or return it.
-        """
-        code, error = self.transform(node)
-        if error is not None:
-            return None, error
-
-        assert code is not None
-
-        if self._is_declared_nullable(node) and _is_value_type(self.type_map[node]):
-            return Stripped(f"{code}.Value"), None
-
-        return code, None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(
