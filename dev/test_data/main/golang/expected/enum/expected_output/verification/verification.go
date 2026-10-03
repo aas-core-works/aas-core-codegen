@@ -44,6 +44,16 @@ func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
 }
 
+// Negate result, returning an enumeration literal.
+func Negated(
+	result ourtypes.Result,
+) ourtypes.Result {
+	if result == ourtypes.ResultOk {
+		return ourtypes.ResultNotOk
+	}
+	return ourtypes.ResultOk
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -55,6 +65,17 @@ func VerifySomething(
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
+
+	if !(
+		Negated(Negated(that.SomeResult())) == that.SomeResult()) {
+		abort = onError(
+			newVerificationError(
+				"Negating the result twice must give the result.",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	abort = VerifyResult(
 		that.SomeResult(),

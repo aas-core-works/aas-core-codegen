@@ -73,7 +73,35 @@ SymbolTable(
               name='some_result',
               argument='some_result',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Negating the result twice must give the result.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='negated',
+                args=[
+                  FunctionCall(
+                    name='negated',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_result',
+                        original_node=...)],
+                    original_node=...)],
+                original_node=...),
+              op='EQ',
+              right=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='some_result',
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       description=None,
@@ -95,7 +123,34 @@ SymbolTable(
   named_unions=[],
   constants=[],
   constants_by_name=...,
-  verification_functions=[],
+  verification_functions=[
+    TranspilableVerification(
+      name='negated',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='result',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Result',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=OurTypeAnnotation(
+        our_type='Reference to our type Result',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Negate <ReferenceToArgument refuri="result">result</ReferenceToArgument>, returning an enumeration literal.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,

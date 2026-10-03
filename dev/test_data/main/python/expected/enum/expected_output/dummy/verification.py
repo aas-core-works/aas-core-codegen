@@ -62,6 +62,16 @@ Path = our_reporting.Path
 Error = our_reporting.Error
 
 
+def negated(
+    result: our_types.Result
+) -> our_types.Result:
+    """Negate :paramref:`result`, returning an enumeration literal."""
+    # pylint: disable=all
+    if result == our_types.Result.OK:
+        return our_types.Result.NOT_OK
+    return our_types.Result.OK
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -72,12 +82,12 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
-        # No verification has been defined for Something.
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        if not (
+            negated(negated(that.some_result)) == that.some_result
+        ):
+            yield Error(
+                'Negating the result twice must give the result.'
+            )
 
 
 _TRANSFORMER = _Transformer()

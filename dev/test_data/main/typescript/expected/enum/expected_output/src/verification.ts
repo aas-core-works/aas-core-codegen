@@ -190,6 +190,18 @@ export class VerificationError {
 }
 
 /**
+ * Negate `result`, returning an enumeration literal.
+ */
+export function negated(
+  result: OurTypes.Result
+): OurTypes.Result {
+  if (result == OurTypes.Result.Ok) {
+    return OurTypes.Result.NotOk;
+  }
+  return OurTypes.Result.Ok;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -197,12 +209,17 @@ class Verifier
     boolean, IterableIterator<VerificationError>
   > {
   *transformSomethingWithContext(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     that: OurTypes.Something,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
-    // No verification has been defined for Something.
+    if (!(
+      negated(negated(that.someResult)) == that.someResult
+    )) {
+      yield new VerificationError(
+        "Negating the result twice must give the result."
+      )
+    }
   }
 }
 
