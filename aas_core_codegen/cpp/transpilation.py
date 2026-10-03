@@ -303,6 +303,9 @@ def determine_whether_referencable(
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         return True, None
 
+    elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+        return True, None
+
     elif isinstance(
         type_annotation, intermediate_type_inference.OptionalTypeAnnotation
     ):
@@ -919,6 +922,10 @@ class Transpiler(
                 continue
 
             assert value_repr is not None
+
+            if self._aliasing is not None and value_node in self._aliasing.moved_set:
+                value_repr = Stripped(f"std::move({value_repr})")
+
             value_reprs.append(value_repr)
 
         if len(errors) > 0:

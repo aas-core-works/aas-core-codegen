@@ -5129,8 +5129,9 @@ def some_func(text: str) -> bool:
                 "We support a set only as the container of ``in``, the collection "
                 "or the variable of a for-loop, the receiver of its methods, "
                 "an argument of a call, "
-                "the target of an assignment, the value of a nullness check, and a "
-                "new set as the assigned value. Elsewhere, the targets would need "
+                "the target of an assignment, the value of a nullness check, "
+                "the returned value, and a new set or the result of a call as "
+                "the assigned value. Elsewhere, the targets would need "
                 "to either copy or share the set, and they disagree on that: C++ "
                 "copies it, while the other targets share it."
             ),
@@ -5246,6 +5247,125 @@ def some_func(texts: AbstractSet[str]) -> bool:
                 "We inferred the target type of the assignment to be Set[int], "
                 "while the value type is inferred to be Set[str]. We do not know "
                 "how to model this assignment."
+            ),
+        )
+
+    def test_returned_set_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Set[str]) -> Set[str]:
+    return texts
+""",
+            expected_message=(
+                "The returned value texts holds lists or sets, which Python "
+                "would share with the caller, but C++ would copy. We can not "
+                "transpile the sharing to C++, so please return fresh values: "
+                "a list copied with ``list(...)`` whose items hold no lists and "
+                "no sets, a local set variable, a new set, the result of a call, "
+                "or a tuple literal of them."
+            ),
+        )
+
+    def test_returned_constant_set_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> Set[str]:
+    return Reserved_texts
+""",
+            expected_message=(
+                "The returned value Reserved_texts holds lists or sets, which Python "
+                "would share with the caller, but C++ would copy. We can not "
+                "transpile the sharing to C++, so please return fresh values: "
+                "a list copied with ``list(...)`` whose items hold no lists and "
+                "no sets, a local set variable, a new set, the result of a call, "
+                "or a tuple literal of them."
+            ),
+        )
+
+    def test_returned_loop_variable_over_list_of_sets_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(groups: List[Set[str]]) -> Set[str]:
+    for group in groups:
+        return group
+
+    result: Set[str] = set()
+    return result
+""",
+            expected_message=(
+                "The returned value group holds lists or sets, which Python "
+                "would share with the caller, but C++ would copy. We can not "
+                "transpile the sharing to C++, so please return fresh values: "
+                "a list copied with ``list(...)`` whose items hold no lists and "
+                "no sets, a local set variable, a new set, the result of a call, "
+                "or a tuple literal of them."
+            ),
+        )
+
+    def test_returned_list_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: List[str]) -> List[str]:
+    return texts
+""",
+            expected_message=(
+                "The returned value texts holds lists or sets, which Python "
+                "would share with the caller, but C++ would copy. We can not "
+                "transpile the sharing to C++, so please return fresh values: "
+                "a list copied with ``list(...)`` whose items hold no lists and "
+                "no sets, a local set variable, a new set, the result of a call, "
+                "or a tuple literal of them."
+            ),
+        )
+
+    def test_returned_tuple_with_set_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Set[str]) -> Tuple[Set[str], int]:
+    return (texts, 1)
+""",
+            expected_message=(
+                "The returned value (texts, 1) holds lists or sets, which Python "
+                "would share with the caller, but C++ would copy. We can not "
+                "transpile the sharing to C++, so please return fresh values: "
+                "a list copied with ``list(...)`` whose items hold no lists and "
+                "no sets, a local set variable, a new set, the result of a call, "
+                "or a tuple literal of them."
+            ),
+        )
+
+    def test_returned_value_of_another_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: AbstractSet[str]) -> List[str]:
+    result: Set[str] = set()
+    return result
+""",
+            expected_message=(
+                "Expected the returned value to be assignable to the return type "
+                "List[str], but got Set[str]."
+            ),
+        )
+
+    def test_returned_tuple_with_length_fails(self) -> None:
+        # NOTE (mristin):
+        # The tuples are invariant, so the length needs to be assigned to
+        # an integer variable first.
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> Tuple[str, int]:
+    return (text, len(text))
+""",
+            expected_message=(
+                "Expected the returned value to be assignable to the return type "
+                "Tuple[str, int], but got Tuple[str, length]."
             ),
         )
 

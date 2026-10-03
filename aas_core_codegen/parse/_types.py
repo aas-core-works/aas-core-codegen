@@ -42,9 +42,8 @@ MUTABILITY_TYPES = {
     Identifier("Mutable"),
 }
 
-#: Generic types of the sets, which are allowed at any depth in the arguments of
-#: the verification functions and of the methods and in the properties, and in
-#: the constant sets, but not in the return values.
+#: Generic types of the sets, which are allowed at any depth in the arguments,
+#: the return values and the properties, and in the constant sets.
 #:
 #: A ``Set`` is mutable, while an ``AbstractSet`` is read-only, just as
 #: a ``List`` and a ``Sequence``, respectively.

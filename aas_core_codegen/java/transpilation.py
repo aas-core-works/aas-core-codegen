@@ -404,6 +404,49 @@ class Transpiler(
         return Stripped(f"{collection}.get({index})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_as_long(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` such that an integer literal or a length is a ``long``.
+
+        We represent the integers as ``Long`` in Java, while we transpile the integer
+        literals as ``int`` literals, and the lengths are ``int``'s. Java does not
+        convert an ``int`` to ``Long`` implicitly, *e.g.*, when passing an integer
+        literal or a length as an argument to a method expecting a ``Long``, so we
+        need to suffix the literal with ``L``, and cast the length to ``long``.
+        """
+        if Transpiler._is_int_literal(node):
+            assert isinstance(node, parse_tree.Constant)
+            return Stripped(f"{node.value}L"), None
+
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            if isinstance(
+                node,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                return Stripped(f"(long) {code}"), None
+
+            return Stripped(f"(long) ({code})"), None
+
+        return code, None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_tuple(
         self, node: parse_tree.Tuple
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -411,7 +454,9 @@ class Transpiler(
         item_exprs = []  # type: List[Stripped]
 
         for value_node in node.values:
-            item_expr, error = self.transform(value_node)
+            # NOTE (mristin):
+            # Java does not box an ``int`` to a ``Long`` item of a tuple.
+            item_expr, error = self._transform_as_long(value_node)
             if error is not None:
                 errors.append(error)
                 continue
@@ -520,49 +565,6 @@ class Transpiler(
             return Stripped(f"{left} {comparator} {right}"), None
 
         return Stripped(f"({left}) {comparator} ({right})"), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def _transform_as_long(
-        self, node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` such that an integer literal or a length is a ``long``.
-
-        We represent the integers as ``Long`` in Java, while we transpile the integer
-        literals as ``int`` literals, and the lengths are ``int``'s. Java does not
-        convert an ``int`` to ``Long`` implicitly, *e.g.*, when passing an integer
-        literal or a length as an argument to a method expecting a ``Long``, so we
-        need to suffix the literal with ``L``, and cast the length to ``long``.
-        """
-        if Transpiler._is_int_literal(node):
-            assert isinstance(node, parse_tree.Constant)
-            return Stripped(f"{node.value}L"), None
-
-        code, error = self.transform(node)
-        if error is not None:
-            return None, error
-
-        assert code is not None
-
-        if (
-            intermediate_type_inference.try_primitive_type(self.type_map[node])
-            is intermediate_type_inference.PrimitiveType.LENGTH
-        ):
-            if isinstance(
-                node,
-                (
-                    parse_tree.Member,
-                    parse_tree.FunctionCall,
-                    parse_tree.MethodCall,
-                    parse_tree.Name,
-                    parse_tree.Index,
-                ),
-            ):
-                return Stripped(f"(long) {code}"), None
-
-            return Stripped(f"(long) ({code})"), None
-
-        return code, None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_as_set_member(

@@ -2642,6 +2642,51 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             "of a list or a tuple"
         )
 
+    def _is_fresh(self, node: parse_tree.Expression) -> bool:
+        """
+        Check that all the lists and the sets held by ``node`` are fresh.
+
+        A fresh list or set is shared with no other value. These are:
+
+        * ``None``,
+        * a list copied with ``list(...)``, if its items hold no lists and no sets,
+          since the copy is shallow,
+        * a new set,
+        * a local set variable, which is neither a loop variable nor read-only,
+          since the local set variables can be assigned only the new sets and
+          the results of the calls, see :py:func:`_check_sets`,
+        * the result of a call, since the verification functions and the methods
+          return only the fresh values themselves, and
+        * a tuple literal of fresh values.
+        """
+        if isinstance(node, parse_tree.Constant) and node.value is None:
+            return True
+
+        if _is_list_copy(node, self.type_map):
+            list_type = beneath_optional(self.type_map[node])
+            return isinstance(list_type, ListTypeAnnotation) and not _holds_list_or_set(
+                list_type.items
+            )
+
+        if isinstance(node, (parse_tree.FunctionCall, parse_tree.MethodCall)):
+            return True
+
+        if isinstance(node, parse_tree.Name):
+            return (
+                isinstance(beneath_optional(self.type_map[node]), SetTypeAnnotation)
+                and node.identifier not in self._argument_by_name
+                and node.identifier not in self._loop_variable_set
+                and self._read_only_reason(node) is None
+            )
+
+        if isinstance(node, parse_tree.Tuple):
+            return all(
+                not _holds_list_or_set(self.type_map[value]) or self._is_fresh(value)
+                for value in node.values
+            )
+
+        return False
+
     def _strip_optional_if_non_null(
         self, node: parse_tree.Node, type_annotation: "TypeAnnotationUnion"
     ) -> "TypeAnnotationUnion":
@@ -5864,7 +5909,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             elif _can_be_mutated(variable_type):
                 # NOTE (mristin):
                 # An optional set declared with ``None`` is mutable, since it can
-                # later be assigned only a new set, see :py:func:`_check_sets`.
+                # later be assigned only a new set or the result of a call, which
+                # is fresh, see :py:func:`_check_sets`.
                 reason = (
                     None
                     if (
@@ -5992,11 +6038,49 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
     def transform_return(
         self, node: parse_tree.Return
     ) -> Optional["TypeAnnotationUnion"]:
-        # Just recurse to fill ``type_map`` on ``value`` even though we know the type
-        # in advance
         if node.value is not None:
-            success = self.transform(node.value) is not None
-            if not success:
+            value_type = self.transform(node.value)
+            if value_type is None:
+                return None
+
+            # NOTE (mristin):
+            # A ``return None`` is checked with a more specific error in
+            # :py:func:`_check_nones`.
+            returns_none = (
+                isinstance(node.value, parse_tree.Constant) and node.value.value is None
+            )
+
+            if not returns_none and not _assignable(
+                target_type=self._returns, value_type=value_type
+            ):
+                self.errors.append(
+                    Error(
+                        node.value.original_node,
+                        f"Expected the returned value to be assignable to "
+                        f"the return type {self._returns}, but got {value_type}.",
+                    )
+                )
+                return None
+
+            # NOTE (mristin):
+            # Python shares a returned list or set with the caller, while C++ copies
+            # it, as its lists and sets are values. We can not faithfully transpile
+            # the sharing to C++, so we require fresh lists and sets in the returned
+            # values, in all the targets.
+            if _holds_list_or_set(self._returns) and not self._is_fresh(node.value):
+                self.errors.append(
+                    Error(
+                        node.value.original_node,
+                        f"The returned value "
+                        f"{self._representation_map[node.value]} holds lists or "
+                        f"sets, which Python would share with the caller, but C++ "
+                        f"would copy. We can not transpile the sharing to C++, so "
+                        f"please return fresh values: a list copied with "
+                        f"``list(...)`` whose items hold no lists and no sets, "
+                        f"a local set variable, a new set, the result of a call, or "
+                        f"a tuple literal of them.",
+                    )
+                )
                 return None
 
         # NOTE (mristin):
@@ -6781,8 +6865,10 @@ def _check_sets(
 
     A set can be the container of ``in``, the collection or the variable of
     a for-loop, the receiver of its methods, an argument of a call, the target of
-    an assignment and the value of a nullness check. A new set, *e.g.*, from
-    ``set()`` or ``intersection``, can also be assigned. Elsewhere, *e.g.*, in
+    an assignment, the value of a nullness check, and the returned value or its
+    item in a returned tuple literal. A new set, *e.g.*, from ``set()`` or
+    ``intersection``, and the result of a call can also be assigned. Elsewhere,
+    *e.g.*, in
     ``b = a``, the targets would need to either copy or share the set, and they
     disagree on that: C++ copies it, while the other targets share it. The type
     inference checks the arguments of the calls with more specific errors, *e.g.*,
@@ -6848,8 +6934,24 @@ def _check_sets(
 
             elif isinstance(node, parse_tree.Assignment):
                 allowed_set.add(node.target)
-                if _is_new_set(node.value, type_map):
+
+                # NOTE (mristin):
+                # The result of a call is a fresh set, as the returned values hold
+                # only the fresh sets, see :py:meth:`_Inferrer._is_fresh`.
+                if _is_new_set(node.value, type_map) or isinstance(
+                    node.value, (parse_tree.FunctionCall, parse_tree.MethodCall)
+                ):
                     allowed_set.add(node.value)
+
+            elif isinstance(node, parse_tree.Return):
+                # NOTE (mristin):
+                # The returned sets are checked to be fresh in
+                # :py:meth:`_Inferrer.transform_return`.
+                if node.value is not None:
+                    allowed_set.add(node.value)
+
+                    if isinstance(node.value, parse_tree.Tuple):
+                        allowed_set.update(node.value.values)
 
             elif isinstance(node, parse_tree.ExpressionStatement):
                 statement_calls.add(node.expression)
@@ -6890,8 +6992,9 @@ def _check_sets(
             node.original_node,
             "We support a set only as the container of ``in``, the collection "
             "or the variable of a for-loop, the receiver of its methods, "
-            "an argument of a call, the target of an assignment, the value of a nullness check, and "
-            "a new set as the assigned value. Elsewhere, the targets would need "
+            "an argument of a call, the target of an assignment, the value of a nullness check, "
+            "the returned value, and a new set or the result of a call as "
+            "the assigned value. Elsewhere, the targets would need "
             "to either copy or share the set, and they disagree on that: C++ "
             "copies it, while the other targets share it.",
         )

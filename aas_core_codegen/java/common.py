@@ -171,15 +171,18 @@ def set_imports_if_necessary(
     """
     Give the imports of the sets if the properties or the methods of ``cls`` use them.
 
-    We need ``Set`` for the set properties and the set arguments. If
-    ``with_bodies`` is set, we also consider the local sets declared in the bodies
-    of the methods, which need ``HashSet`` as well.
+    We need ``Set`` for the set properties, the set arguments and the set return
+    values. If ``with_bodies`` is set, we also consider the local sets declared in
+    the bodies of the methods, which need ``HashSet`` as well.
     """
     uses_set = any(_holds_set(prop.type_annotation) for prop in cls.properties)
     uses_hash_set = False
 
     for method in cls.methods:
         if any(_holds_set(argument.type_annotation) for argument in method.arguments):
+            uses_set = True
+
+        if method.returns is not None and _holds_set(method.returns):
             uses_set = True
 
         if with_bodies and intermediate.declares_local_set(method):

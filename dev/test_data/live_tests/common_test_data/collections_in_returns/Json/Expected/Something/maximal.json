@@ -1,0 +1,16 @@
+{
+  "texts": [
+    "a",
+    "b",
+    "c"
+  ],
+  "kinds": [
+    "alpha",
+    "beta",
+    "alpha"
+  ],
+  "optionalTexts": [
+    "x",
+    "y"
+  ]
+}

@@ -8,8 +8,10 @@ a reference would diverge. If neither is faithful, we report an error instead of
 silently miscompiling the meta-model.
 """
 
+import collections
 import enum
 from typing import (
+    AbstractSet,
     Final,
     List,
     Mapping,
@@ -196,6 +198,9 @@ class _Collector(parse_tree.Visitor):
         #: Nodes whose values are copied in C++ from an access path, while Python
         #: shares them
         self.copies = []  # type: List[Tuple[parse_tree.Node, str]]
+
+        #: Local sets which we move into a returned tuple literal
+        self.moved = set()  # type: Set[parse_tree.Node]
 
         #: Generators of the ``any`` and ``all`` expressions, whose loop variables
         #: are parameters of lambdas in C++
@@ -391,6 +396,50 @@ class _Collector(parse_tree.Visitor):
             ) is _Category.CONTAINER and _is_access_path(value):
                 self.copies.append((value, "constructing a tuple"))
 
+    def visit_return(self, node: parse_tree.Return) -> None:
+        if node.value is None:
+            return
+
+        # NOTE (mristin):
+        # The function ends with the return, so no in-place mutation can follow
+        # which the copies of the lists in a returned tuple literal would miss.
+        # The type inference requires the returned lists and sets to be fresh,
+        # so the caller can not observe the sharing either.
+        if not isinstance(node.value, parse_tree.Tuple):
+            self.visit(node.value)
+            return
+
+        for value in node.value.values:
+            self.visit(value)
+
+        # NOTE (mristin):
+        # C++ moves a local variable implicitly only if it is returned on its own,
+        # but not as an item of a tuple, so we move the local sets explicitly.
+        # They are fresh, and the function ends here. We must not move a variable
+        # which occurs more than once in the returned value, as its later
+        # occurrences would see the moved-from variable.
+        occurrences_by_identifier = collections.Counter(
+            name_node.identifier
+            for name_node in parse_tree.over_nodes(node.value)
+            if isinstance(name_node, parse_tree.Name)
+        )
+
+        for value in node.value.values:
+            if not isinstance(value, parse_tree.Name):
+                continue
+
+            binding = self.binding_by_name.get(value, None)
+            if (
+                binding is not None
+                and binding.kind is _BindingKind.LOCAL
+                and isinstance(
+                    intermediate_type_inference.beneath_optional(self.type_map[value]),
+                    intermediate_type_inference.SetTypeAnnotation,
+                )
+                and occurrences_by_identifier[value.identifier] == 1
+            ):
+                self.moved.add(value)
+
     def _visit_generator_expression(
         self, node: Union[parse_tree.Any, parse_tree.All]
     ) -> None:
@@ -455,10 +504,16 @@ class Aliasing:
     #: the loop variables by their generators
     declaration_by_definition: Final[Mapping[parse_tree.Node, Declaration]]
 
+    #: Items of the returned tuple literals which we move instead of copying
+    moved_set: Final[AbstractSet[parse_tree.Node]]
+
     def __init__(
-        self, declaration_by_definition: Mapping[parse_tree.Node, Declaration]
+        self,
+        declaration_by_definition: Mapping[parse_tree.Node, Declaration],
+        moved_set: AbstractSet[parse_tree.Node],
     ) -> None:
         self.declaration_by_definition = declaration_by_definition
+        self.moved_set = moved_set
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -774,4 +829,10 @@ def analyze(
     if len(errors) > 0:
         return None, errors
 
-    return Aliasing(declaration_by_definition=declaration_by_definition), None
+    return (
+        Aliasing(
+            declaration_by_definition=declaration_by_definition,
+            moved_set=collector.moved,
+        ),
+        None,
+    )

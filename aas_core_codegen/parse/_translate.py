@@ -67,7 +67,6 @@ from aas_core_codegen.parse._types import (
     PRIMITIVE_TYPES,
     GENERIC_TYPES,
     MUTABILITY_TYPES,
-    SET_TYPES,
     JSON_VALUE_TYPE_NAME,
     JSON_ARRAY_TYPE_NAME,
     Description,
@@ -2726,33 +2725,6 @@ def _verify_optionals_only_at_top(
     return None
 
 
-def _verify_no_sets_in_return(
-    type_annotation: TypeAnnotation, where: str
-) -> Optional[Error]:
-    """
-    Check that the return ``type_annotation`` neither is nor holds a set.
-
-    We support the sets at any depth of the type annotation of an argument or
-    of a property, but not in the return values.
-
-    The ``where`` describes the place of ``type_annotation`` in the error message,
-    *e.g.*, ``the return type of the method 'x' of the class 'Y'``.
-    """
-    for subscripted in _over_subscripted_type_annotations(type_annotation):
-        if subscripted.identifier in SET_TYPES:
-            return Error(
-                subscripted.node,
-                f"The type annotation {subscripted} is not allowed "
-                f"in {where}. We support the sets only in the arguments of "
-                f"the verification functions and of the methods, in "
-                f"the properties, and in the constant sets. The return values "
-                f"can neither be nor hold sets at the moment. "
-                f"Please contact the developers if you need this feature.",
-            )
-
-    return None
-
-
 def _verify_no_declared_mutability(
     type_annotation: TypeAnnotation, where: str
 ) -> Optional[Error]:
@@ -3550,10 +3522,7 @@ def _verify_symbol_table(
 
     # NOTE (mristin):
     # We report only the first error of each type annotation, as the later checks
-    # assume that the earlier ones passed. We check the sets in the return values
-    # before the mutability, since an ``AbstractSet`` in a return value is
-    # primarily a misplaced set, and only then a misplaced declaration of
-    # the mutability.
+    # assume that the earlier ones passed.
 
     for our_type in symbol_table.our_types:
         if not isinstance(our_type, Class):
@@ -3604,9 +3573,6 @@ def _verify_symbol_table(
                 error = _verify_optionals_only_at_top(method.returns, where)
 
                 if error is None:
-                    error = _verify_no_sets_in_return(method.returns, where)
-
-                if error is None:
                     error = _verify_no_declared_mutability(method.returns, where)
 
                 if error is not None:
@@ -3633,9 +3599,6 @@ def _verify_symbol_table(
             where = f"the return type of the verification function {func.name!r}"
 
             error = _verify_optionals_only_at_top(func.returns, where)
-
-            if error is None:
-                error = _verify_no_sets_in_return(func.returns, where)
 
             if error is None:
                 error = _verify_no_declared_mutability(func.returns, where)
