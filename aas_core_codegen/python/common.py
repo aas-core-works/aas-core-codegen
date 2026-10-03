@@ -718,8 +718,8 @@ def typing_imports_for_sets(
     List the generic types from ``typing`` needed by the sets in ``functions``.
 
     We need ``AbstractSet`` for the read-only set arguments and the final local
-    sets, and ``Set`` for the mutable set arguments and for the declarations of
-    the other local sets. We list
+    sets, and ``Set`` for the mutable set arguments, the set return values and
+    for the declarations of the other local sets. We list
     them only if needed so that the imports are never unused.
     """
     uses_abstract_set = False
@@ -737,6 +737,14 @@ def typing_imports_for_sets(
                     uses_set = True
                 else:
                     uses_abstract_set = True
+
+        if function.returns is not None and any(
+            isinstance(type_anno, intermediate.SetTypeAnnotation)
+            for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+                function.returns
+            )
+        ):
+            uses_set = True
 
         # NOTE (mristin):
         # A local set is declared either as ``Set[...]``, or as

@@ -1601,25 +1601,32 @@ def generate(
                 own_method_type_annos.append(type_anno)
 
     # NOTE (mristin):
-    # A verification function which takes a list or an optional as an argument
-    # needs the import of ``List`` or ``Optional``, respectively, in its signature.
+    # A verification function which takes or returns a list or an optional needs
+    # the import of ``List`` or ``Optional``, respectively, in its signature.
     # The signatures of the implementation-specific functions are written by hand,
     # but follow the same types. The same holds for the methods verifying
     # the lists.
-    argument_type_annotations = [
-        arg.type_annotation
-        for verification in symbol_table.verification_functions
-        for arg in verification.arguments
-    ]
+    signature_type_annotations = [
+        *(
+            arg.type_annotation
+            for verification in symbol_table.verification_functions
+            for arg in verification.arguments
+        ),
+        *(
+            verification.returns
+            for verification in symbol_table.verification_functions
+            if verification.returns is not None
+        ),
+    ]  # type: List[intermediate.TypeAnnotationUnion]
 
     if (
         intermediate_uses.json_types(symbol_table)
         or any(
-            isinstance(
-                intermediate.beneath_optional(type_annotation),
-                intermediate.ListTypeAnnotation,
+            isinstance(type_anno, intermediate.ListTypeAnnotation)
+            for type_annotation in signature_type_annotations
+            for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+                type_annotation
             )
-            for type_annotation in argument_type_annotations
         )
         or any(
             isinstance(type_anno, intermediate.ListTypeAnnotation)
@@ -1630,7 +1637,7 @@ def generate(
 
     if any(
         isinstance(type_annotation, intermediate.OptionalTypeAnnotation)
-        for type_annotation in argument_type_annotations
+        for type_annotation in signature_type_annotations
     ):
         imports.append(Stripped("import java.util.Optional;"))
 

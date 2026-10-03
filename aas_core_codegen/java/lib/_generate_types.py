@@ -736,7 +736,10 @@ def _generate_imports_for_interface(
 
             imports.append(import_name)
 
-    if any(prop for prop in cls.properties if prop.specified_for is cls):
+    if any(prop for prop in cls.properties if prop.specified_for is cls) or any(
+        isinstance(method.returns, intermediate.OptionalTypeAnnotation)
+        for method in cls.methods
+    ):
         imports.append(Stripped("java.util.Optional"))
 
     return Stripped("\n".join(map(lambda imp: f"import {imp};", imports)))

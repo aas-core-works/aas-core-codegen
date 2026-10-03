@@ -549,7 +549,7 @@ def _transpile_transpilable_verification(
         return_type = "void"
     else:
         return_type = typescript_common.generate_type(
-            type_annotation=verification.returns, types_module=Identifier("our_types")
+            type_annotation=verification.returns, types_module=Identifier("OurTypes")
         )
 
     arg_defs = []  # type: List[Stripped]

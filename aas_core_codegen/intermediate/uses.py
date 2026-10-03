@@ -216,7 +216,7 @@ def _nested_sets(
 
 def sets_in(functions: Sequence[Union[_types.Verification, _types.Method]]) -> bool:
     """
-    Check whether the ``functions`` take the sets as arguments or declare local sets.
+    Check whether the ``functions`` take, return or declare local sets.
 
     The C++ generator uses this check to include ``<unordered_set>`` only where
     it is needed.
@@ -225,6 +225,10 @@ def sets_in(functions: Sequence[Union[_types.Verification, _types.Method]]) -> b
         any(
             any(True for _ in _nested_sets(argument.type_annotation))
             for argument in function.arguments
+        )
+        or (
+            function.returns is not None
+            and any(True for _ in _nested_sets(function.returns))
         )
         or _types.declares_local_set(function)
         for function in functions
@@ -235,7 +239,8 @@ def sets(symbol_table: _types.SymbolTable) -> bool:
     """
     Check whether the meta-model might use the sets in transpilable code.
 
-    The sets are the constant sets, the set arguments and the local sets.
+    The sets are the constant sets, the set arguments, the set return values and
+    the local sets.
     The generators use this function to decide whether they need to generate
     the helper functions for the sets.
     """

@@ -1,1 +1,0 @@
-The type annotation Set[str] is not allowed in the return type of the verification function 'texts_of'. We support the sets only in the arguments of the verification functions and of the methods, in the properties, and in the constant sets. The return values can neither be nor hold sets at the moment. Please contact the developers if you need this feature.

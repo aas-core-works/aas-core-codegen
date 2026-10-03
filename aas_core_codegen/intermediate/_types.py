@@ -330,9 +330,8 @@ class SetTypeAnnotation(TypeAnnotation):
     the argument, see :py:attr:`Argument.mutable`, so that the generators need
     not distinguish the two.
 
-    The sets are allowed at any depth in the arguments of the verification
-    functions and of the methods, and in the properties, but not in the return
-    values.
+    The sets are allowed at any depth in the arguments and the return values of
+    the verification functions and of the methods, and in the properties.
 
     The sets hold only booleans, integers, strings, constrained primitives of them
     and enumeration literals. A set in a property is serialized as an array whose

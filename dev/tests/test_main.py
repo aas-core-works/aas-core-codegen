@@ -285,6 +285,12 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="assignment_targets"
         )
 
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="collections_in_returns",
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="constrained_primitives"
@@ -519,6 +525,12 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="assignment_targets"
         )
 
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="collections_in_returns",
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP,
@@ -729,6 +741,12 @@ class Test_golang(_TestCase):
     def test_expected_assignment_targets(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="assignment_targets"
+        )
+
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="collections_in_returns",
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -943,6 +961,12 @@ class Test_java(_TestCase):
     def test_expected_assignment_targets(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="assignment_targets"
+        )
+
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="collections_in_returns",
         )
 
     def test_expected_constants(self) -> None:
@@ -1161,6 +1185,12 @@ class Test_jsonschema(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
             case_name="assignment_targets",
+        )
+
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="collections_in_returns",
         )
 
     def test_expected_constrained_primitives(self) -> None:
@@ -1389,6 +1419,12 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="assignment_targets"
         )
 
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="collections_in_returns",
+        )
+
     def test_expected_constrained_primitives(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON,
@@ -1594,6 +1630,12 @@ class Test_typescript(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
             case_name="assignment_targets",
+        )
+
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="collections_in_returns",
         )
 
     def test_expected_conflict_with_utility_types(self) -> None:
@@ -1818,6 +1860,12 @@ class Test_xsd(_TestCase):
     def test_expected_assignment_targets(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="assignment_targets"
+        )
+
+    def test_expected_collections_in_returns(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="collections_in_returns",
         )
 
     def test_expected_constrained_primitives(self) -> None:
