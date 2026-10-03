@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Something"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "AbstractItem": {
+      "type": "object",
+      "properties": {
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "modelType"
+      ]
+    },
+    "AbstractItem_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AnotherItem"
+        },
+        {
+          "$ref": "#/definitions/SomeItem"
+        }
+      ]
+    },
+    "AnotherItem": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/AbstractItem"
+        },
+        {
+          "properties": {
+            "serialNumber": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "AnotherItem"
+            }
+          },
+          "required": [
+            "serialNumber"
+          ]
+        }
+      ]
+    },
+    "Color": {
+      "type": "string",
+      "enum": [
+        "blue",
+        "green",
+        "red"
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "AnotherItem",
+        "SomeItem"
+      ]
+    },
+    "SomeItem": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/AbstractItem"
+        },
+        {
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "modelType": {
+              "const": "SomeItem"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "SomeUnion_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/SomeItem"
+        },
+        {
+          "$ref": "#/definitions/AnotherItem"
+        }
+      ]
+    },
+    "Something": {
+      "type": "object",
+      "properties": {
+        "grid": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        },
+        "rowsOfPairs": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "uniqueItems": true
+                }
+              ],
+              "minItems": 2,
+              "maxItems": 2,
+              "additionalItems": false
+            }
+          }
+        },
+        "mixed": {
+          "type": "array",
+          "items": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AbstractItem_choice"
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Color"
+              },
+              "uniqueItems": true
+            },
+            {
+              "type": "array",
+              "items": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ],
+              "minItems": 2,
+              "maxItems": 2,
+              "additionalItems": false
+            }
+          ],
+          "minItems": 3,
+          "maxItems": 3,
+          "additionalItems": false
+        },
+        "setsOfColors": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Color"
+            },
+            "uniqueItems": true
+          }
+        },
+        "gridOfUnions": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/SomeUnion_choice"
+            }
+          }
+        },
+        "optionalGridOfItems": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/AbstractItem_choice"
+            }
+          }
+        }
+      },
+      "required": [
+        "grid",
+        "rowsOfPairs",
+        "mixed",
+        "setsOfColors",
+        "gridOfUnions"
+      ]
+    }
+  }
+}

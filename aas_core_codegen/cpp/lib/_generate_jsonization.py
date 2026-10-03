@@ -13,7 +13,11 @@ from aas_core_codegen.common import (
     Identifier,
     assert_never,
 )
-from aas_core_codegen.cpp import common as cpp_common, naming as cpp_naming
+from aas_core_codegen.cpp import (
+    common as cpp_common,
+    naming as cpp_naming,
+    over as cpp_over,
+)
 from aas_core_codegen.cpp.common import (
     INDENT as I,
     INDENT2 as II,
@@ -2368,20 +2372,67 @@ def _json_parse_item_expr(
     raise AssertionError("Should not have gotten here")
 
 
-def _json_parse_expr(prop: intermediate.Property) -> Stripped:
-    """
-    Generate the expression parsing the value of the given property.
+def _holds_instances(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+    """Check whether a value of ``type_annotation`` holds instances at any depth."""
+    return any(
+        isinstance(type_anno, intermediate.OurTypeAnnotation)
+        and isinstance(
+            type_anno.our_type,
+            (
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+                intermediate.NamedUnion,
+            ),
+        )
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
+    )
 
-    The expression evaluates to a pair of the optional value and the optional
-    error, which :py:func:`_generate_parse_properties_of_cls` hands over to
-    ``ParseInto``.
-    """
-    type_anno = intermediate.beneath_optional(prop.type_annotation)
 
+def _deserialize_nested_name(type_anno: intermediate.ContainerTypeAnnotation) -> str:
+    """Name the function de-serializing a list, a set or a tuple nested in another one."""
+    return f"Deserialize_{cpp_over.moniker(type_anno)}"
+
+
+def _deserialize_nested_item_expr(
+    item_type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the callable de-serializing a container nested as a tuple item.
+
+    A tuple item is de-serialized from the JSON value alone, so we bind
+    ``additional_properties`` if the nested container holds instances, just as we
+    do for the instances themselves, see :py:func:`_deserialize_expr_for_atomic_item`.
+    """
+    name = _deserialize_nested_name(item_type_anno)
+
+    if not _holds_instances(item_type_anno):
+        return Stripped(name)
+
+    return Stripped(
+        f"""\
+[&additional_properties](const nlohmann::json& a_json) {{
+{I}return {name}(a_json, additional_properties);
+}}"""
+    )
+
+
+def _json_parse_value_expr(
+    type_anno: intermediate.TypeAnnotationExceptOptional, json_expr: str
+) -> Stripped:
+    """
+    Generate the expression parsing ``json_expr`` as a value of ``type_anno``.
+
+    The lists, the sets and the tuples nested as items are parsed by functions of
+    their own, see :py:func:`_generate_deserialize_nested`.
+    """
     primitive_type = intermediate.try_primitive_type(type_anno)
 
     if primitive_type is not None:
-        return Stripped(f"{_PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]}(value)")
+        return Stripped(
+            f"{_PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]}({json_expr})"
+        )
 
     deserialize_function: Stripped
 
@@ -2394,7 +2445,7 @@ def _json_parse_expr(prop: intermediate.Property) -> Stripped:
                 Identifier(f"deserialize_{type_anno.our_type.name}")
             )
 
-            return Stripped(f"{deserialize_function}(value)")
+            return Stripped(f"{deserialize_function}({json_expr})")
 
         elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
             raise AssertionError("This case should have been handled before.")
@@ -2410,7 +2461,7 @@ def _json_parse_expr(prop: intermediate.Property) -> Stripped:
             return Stripped(
                 f"""\
 {deserialize_function}(
-{I}value,
+{I}{json_expr},
 {I}additional_properties
 )"""
             )
@@ -2427,7 +2478,7 @@ def _json_parse_expr(prop: intermediate.Property) -> Stripped:
             return Stripped(
                 f"""\
 {deserialize_function}(
-{I}value,
+{I}{json_expr},
 {I}additional_properties
 )"""
             )
@@ -2437,19 +2488,19 @@ def _json_parse_expr(prop: intermediate.Property) -> Stripped:
             assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "List items are restricted to atomic types (primitives, "
-            "constrained primitives, classes, enumerations and JSON-able values), "
-            "so no nested optionals, lists or tuples are expected here."
-        )
+        items_type_anno = type_anno.items
 
         item_type = cpp_common.generate_type(
-            type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
+            items_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
         )
 
-        parse_item, takes_options = _json_parse_item_expr(type_anno.items)
+        if isinstance(items_type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+            parse_item = Stripped(_deserialize_nested_name(items_type_anno))
+            takes_options = _holds_instances(items_type_anno)
+        else:
+            parse_item, takes_options = _json_parse_item_expr(items_type_anno)
 
-        arguments = [Stripped("value")]
+        arguments = [Stripped(json_expr)]
         if takes_options:
             arguments.append(Stripped("additional_properties"))
         arguments.append(parse_item)
@@ -2470,21 +2521,17 @@ DeserializeList<
         item_exprs = []  # type: List[Stripped]
 
         for item_type_anno in type_anno.items:
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
-            )
 
             item_types.append(
                 cpp_common.generate_type(
                     item_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
                 )
             )
-            item_exprs.append(_deserialize_expr_for_atomic_item(item_type_anno))
+
+            if isinstance(item_type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+                item_exprs.append(_deserialize_nested_item_expr(item_type_anno))
+            else:
+                item_exprs.append(_deserialize_expr_for_atomic_item(item_type_anno))
 
         item_types_joined = ",\n".join(item_types)
         item_exprs_joined = ",\n".join(item_exprs)
@@ -2496,7 +2543,7 @@ DeserializeList<
 {function_name}<
 {I}{indent_but_first_line(item_types_joined, I)}
 >(
-{I}value,
+{I}{json_expr},
 {I}{indent_but_first_line(item_exprs_joined, I)}
 )"""
         )
@@ -2511,7 +2558,7 @@ DeserializeList<
     ):
         deserialize_function = _json_deserialize_function_for(type_anno)
 
-        return Stripped(f"{deserialize_function}(value)")
+        return Stripped(f"{deserialize_function}({json_expr})")
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
         assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
@@ -2534,7 +2581,7 @@ DeserializeList<
 DeserializeSet<
 {I}{indent_but_first_line(set_type, I)}
 >(
-{I}value,
+{I}{json_expr},
 {I}{indent_but_first_line(parse_item, I)}
 )"""
         )
@@ -2544,6 +2591,58 @@ DeserializeSet<
         assert_never(type_anno)
 
     raise AssertionError("Should not have gotten here")
+
+
+def _generate_deserialize_nested(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the function de-serializing a list, a set or a tuple nested in another one.
+
+    The function takes ``additional_properties`` only if the container holds
+    instances, just as the functions de-serializing the instances do.
+    """
+    value_type = cpp_common.generate_type(
+        type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
+
+    options = f",\n{I}bool additional_properties" if _holds_instances(type_anno) else ""
+
+    parse_expr = _json_parse_value_expr(type_anno=type_anno, json_expr="json")
+
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize a nested collection from \\p json.
+ *
+ * \\param json value to be de-serialized
+ * \\return the de-serialized value, or an error, if any
+ */
+std::pair<
+{I}common::optional<
+{II}{indent_but_first_line(value_type, II)}
+{I}>,
+{I}common::optional<DeserializationError>
+> {_deserialize_nested_name(type_anno)}(
+{I}const nlohmann::json& json{options}
+) {{
+{I}return {indent_but_first_line(parse_expr, I)};
+}}"""
+    )
+
+
+def _json_parse_expr(prop: intermediate.Property) -> Stripped:
+    """
+    Generate the expression parsing the value of the given property.
+
+    The expression evaluates to a pair of the optional value and the optional
+    error, which :py:func:`_generate_parse_properties_of_cls` hands over to
+    ``ParseInto``.
+    """
+    return _json_parse_value_expr(
+        type_anno=intermediate.beneath_optional(prop.type_annotation),
+        json_expr="value",
+    )
 
 
 def _cls_template_prefix(cls: intermediate.ClassUnion, with_default: bool) -> Stripped:
@@ -4424,6 +4523,11 @@ def _serialize_item_expr(
     raise AssertionError("Should not have gotten here")
 
 
+def _serialize_nested_name(type_anno: intermediate.ContainerTypeAnnotation) -> str:
+    """Name the function serializing a list, a set or a tuple nested in another one."""
+    return f"Serialize_{cpp_over.moniker(type_anno)}"
+
+
 def _serialize_value_expr(
     type_anno: intermediate.TypeAnnotationUnion,
     value_expr: Stripped,
@@ -4495,11 +4599,26 @@ Serialize{union_name}(
             assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "List items are restricted to atomic types (primitives, "
-            "constrained primitives, classes, enumerations and JSON-able values), "
-            "so no nested optionals, lists or tuples are expected here."
-        )
+        items_type_anno = type_anno.items
+
+        if isinstance(items_type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+            serialize_list = (
+                "SerializeListWithFallible"
+                if _serialization_is_fallible(items_type_anno, ids_of_fallible_types)
+                else "SerializeListWithInfallible"
+            )
+
+            serialize_nested_item = _serialize_nested_name(items_type_anno)
+
+            return Stripped(
+                f"""\
+{serialize_list}(
+{I}{indent_but_first_line(value_expr, I)},
+{I}{indent_but_first_line(serialize_nested_item, I)}
+)"""
+            )
+
+        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple)
 
         # NOTE (mristin):
         # A list of instances holds pointers, so it is served by the functions
@@ -4524,7 +4643,7 @@ Serialize{union_name}(
                 else "SerializeListWithInfallible"
             )
 
-        serialize_item = _serialize_item_expr(type_anno.items)
+        serialize_item = _serialize_item_expr(items_type_anno)
 
         return Stripped(
             f"""\
@@ -4538,16 +4657,14 @@ Serialize{union_name}(
         item_exprs = []  # type: List[Stripped]
 
         for item_type_anno in type_anno.items:
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
-            )
 
-            item_exprs.append(_serialize_item_expr(item_type_anno))
+            if isinstance(item_type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+                item_exprs.append(Stripped(_serialize_nested_name(item_type_anno)))
+            else:
+                assert isinstance(
+                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
+                )
+                item_exprs.append(_serialize_item_expr(item_type_anno))
 
         item_exprs_joined = ",\n".join(item_exprs)
 
@@ -4613,6 +4730,60 @@ Serialize{union_name}(
         assert_never(type_anno)
 
     raise AssertionError("Should not have gotten here")
+
+
+def _serialize_cls_return_type(fallible: bool) -> Stripped:
+    """
+    Generate the return type of a serializer.
+
+    A serializer which can not fail gives the JSON value out plainly, so that
+    neither it nor its caller carries an error which could never be set.
+    """
+    if not fallible:
+        return Stripped("nlohmann::json")
+
+    return Stripped(
+        f"""\
+std::pair<
+{I}common::optional<nlohmann::json>,
+{I}common::optional<SerializationError>
+>"""
+    )
+
+
+def _generate_serialize_nested(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    ids_of_fallible_types: Set[intermediate.IdOfOurType],
+) -> Stripped:
+    """
+    Generate the function serializing a list, a set or a tuple nested in another one.
+
+    The function returns the pair of the optional value and the optional error if
+    :py:func:`_serialization_is_fallible` says so for ``type_anno``, and
+    a ``nlohmann::json`` otherwise, exactly as the enclosing serializer expects.
+    """
+    value_type = cpp_common.generate_type(
+        type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
+
+    serialize_expr = _serialize_value_expr(
+        type_anno=type_anno,
+        value_expr=Stripped("that"),
+        ids_of_fallible_types=ids_of_fallible_types,
+    )
+
+    return_type = _serialize_cls_return_type(
+        _serialization_is_fallible(type_anno, ids_of_fallible_types)
+    )
+
+    return Stripped(
+        f"""\
+{return_type} {_serialize_nested_name(type_anno)}(
+{I}const {indent_but_first_line(value_type, I)}& that
+) {{
+{I}return {indent_but_first_line(serialize_expr, I)};
+}}"""
+    )
 
 
 def _generate_serialize_property(
@@ -4687,25 +4858,6 @@ if ({maybe_var}.has_value()) {{
         )
 
     return code
-
-
-def _serialize_cls_return_type(fallible: bool) -> Stripped:
-    """
-    Generate the return type of a serializer.
-
-    A serializer which can not fail gives the JSON value out plainly, so that
-    neither it nor its caller carries an error which could never be set.
-    """
-    if not fallible:
-        return Stripped("nlohmann::json")
-
-    return Stripped(
-        f"""\
-std::pair<
-{I}common::optional<nlohmann::json>,
-{I}common::optional<SerializationError>
->"""
-    )
 
 
 def _generate_serialize_cls(
@@ -5382,65 +5534,34 @@ def _type_annotation_contains_list_of_instances(
     type_annotation: intermediate.TypeAnnotationUnion,
 ) -> bool:
     """
-    Check whether the type annotation holds a list of instances.
+    Check whether the type annotation holds a list of instances at any depth.
 
     Only such a list needs the ``SerializeListWith*`` overloads which
     dereference a ``std::shared_ptr`` item.
     """
-    type_anno = intermediate.beneath_optional(type_annotation)
-
-    if not isinstance(type_anno, intermediate.ListTypeAnnotation):
-        return False
-
-    if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
-        return False
-
-    return isinstance(
-        type_anno.items.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass),
+    return any(
+        isinstance(type_anno, intermediate.ListTypeAnnotation)
+        and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
+        and isinstance(
+            type_anno.items.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        )
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
     )
 
 
 def _type_annotation_contains_list(
     type_annotation: intermediate.TypeAnnotationUnion,
 ) -> bool:
-    """Check whether the type annotation has a list type annotation."""
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        return True
-
-    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
-        # NOTE (mristin):
-        # Tuples are heterogeneous and fixed-length, so we never de-serialize them
-        # with the generic ``DeserializeList``.
-        return False
-
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return _type_annotation_contains_list(type_annotation.value)
-
-    elif isinstance(
-        type_annotation,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        return False
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # A set is de-serialized with ``DeserializeSet``, not ``DeserializeList``.
-        return False
-
-    else:
-        # noinspection PyTypeChecker
-        assert_never(type_annotation)
+    """Check whether the type annotation holds a list at any depth."""
+    return any(
+        isinstance(type_anno, intermediate.ListTypeAnnotation)
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
+    )
 
 
 # fmt: off
@@ -5560,6 +5681,13 @@ def generate_implementation(
                 named_union=named_union
             )
         )
+
+    nested_containers = cpp_over.collect_nested_containers(
+        symbol_table.concrete_classes
+    )
+
+    for nested_container in nested_containers:
+        blocks.append(_generate_deserialize_nested(nested_container))
 
     for cls in symbol_table.classes:
         if isinstance(cls, intermediate.ConcreteClass):
@@ -5712,6 +5840,14 @@ struct SerializationError {{
         blocks.append(
             _generate_serialize_named_union_declaration(
                 named_union=named_union,
+                ids_of_fallible_types=ids_of_fallible_types,
+            )
+        )
+
+    for nested_container in nested_containers:
+        blocks.append(
+            _generate_serialize_nested(
+                type_anno=nested_container,
                 ids_of_fallible_types=ids_of_fallible_types,
             )
         )

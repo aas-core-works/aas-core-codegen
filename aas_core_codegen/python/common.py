@@ -4,7 +4,6 @@ import io
 import re
 from typing import (
     List,
-    Set,
     cast,
     Tuple,
     Optional,
@@ -367,6 +366,33 @@ def atomic_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> Identif
     return Identifier(naming.lower_snake_case(type_annotation.our_type.name))
 
 
+def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> Identifier:
+    """
+    Determine the moniker of ``type_annotation`` at any depth.
+
+    A list is ``list_of__{items}``, a set ``set_of__{items}`` and a tuple
+    ``tuple{arity}_of__{item}__...``, where the monikers of the items are nested
+    recursively. The name is in Polish notation: the arity of every prefix is
+    known, so the name can always be split back into its parts. The optionals
+    appear only at the top, so we look beneath them.
+    """
+    type_anno = intermediate.beneath_optional(type_annotation)
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return Identifier(f"list_of__{type_moniker(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return Identifier(f"set_of__{type_moniker(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return Identifier(
+            f"tuple{len(type_anno.items)}_of__"
+            + "__".join(type_moniker(item) for item in type_anno.items)
+        )
+
+    return atomic_moniker(type_anno)
+
+
 def errors_in_monikers(symbol_table: intermediate.SymbolTable) -> List[Error]:
     """
     Check that no type of the meta-model gives the moniker of a primitive.
@@ -387,7 +413,22 @@ def errors_in_monikers(symbol_table: intermediate.SymbolTable) -> List[Error]:
         if isinstance(our_type, intermediate.ConstrainedPrimitive):
             continue
 
-        if naming.lower_snake_case(our_type.name) in reserved_monikers:
+        moniker = naming.lower_snake_case(our_type.name)
+
+        if moniker in ("list_of", "set_of") or re.fullmatch(r"tuple[0-9]+_of", moniker):
+            errors.append(
+                Error(
+                    our_type.parsed.node,
+                    f"The name of the type {our_type.name!r} gives the moniker "
+                    f"{moniker!r}, which is reserved for the composed "
+                    f"de/serializers of the lists, the sets and the tuples. "
+                    f"Please rename the type, or contact the developers if you "
+                    f"need this feature.",
+                )
+            )
+            continue
+
+        if moniker in reserved_monikers:
             errors.append(
                 Error(
                     our_type.parsed.node,
@@ -435,6 +476,43 @@ def describe_atomic_type(type_annotation: intermediate.TypeAnnotationUnion) -> S
     return Stripped(f":py:class:`.types.{type_name}`")
 
 
+def describe_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped:
+    """
+    Describe ``type_annotation`` at any depth for a docstring.
+
+    The collections are described in plural, as they follow ``a list of``,
+    ``a set of`` and alike.
+    """
+    type_anno = intermediate.beneath_optional(type_annotation)
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return Stripped(f"lists of {describe_type(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return Stripped(f"sets of {describe_type(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return Stripped(f"tuples of {len(type_anno.items)} item(s)")
+
+    return describe_atomic_type(type_anno)
+
+
+def describe_value_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped:
+    """Describe a single value of ``type_annotation`` at any depth for a docstring."""
+    type_anno = intermediate.beneath_optional(type_annotation)
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return Stripped(f"a list of {describe_type(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return Stripped(f"a set of {describe_type(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return Stripped(f"a tuple of {len(type_anno.items)} item(s)")
+
+    return describe_atomic_type(type_anno)
+
+
 INDENT = "    "
 
 
@@ -451,11 +529,15 @@ _JSON_TYPE_ANNOTATION_NAME: Final[
 def generate_type(
     type_annotation: intermediate.TypeAnnotationUnion,
     types_module: Optional[Identifier] = None,
+    read_only: bool = False,
 ) -> Stripped:
     """
     Generate the type for the given type annotation.
 
     If ``types_module`` is specified, it is used as prefix for the composite types.
+
+    If ``read_only`` is set, the lists and the sets are generated as read-only
+    ``Sequence``'s and ``AbstractSet``'s, respectively, at any depth.
     """
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
@@ -504,21 +586,35 @@ def generate_type(
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         item_type = generate_type(
-            type_annotation=type_annotation.items, types_module=types_module
+            type_annotation=type_annotation.items,
+            types_module=types_module,
+            read_only=read_only,
         )
+
+        if read_only:
+            return Stripped(f"Sequence[{item_type}]")
 
         return Stripped(f"List[{item_type}]")
 
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
         item_type = generate_type(
-            type_annotation=type_annotation.items, types_module=types_module
+            type_annotation=type_annotation.items,
+            types_module=types_module,
+            read_only=read_only,
         )
+
+        if read_only:
+            return Stripped(f"AbstractSet[{item_type}]")
 
         return Stripped(f"Set[{item_type}]")
 
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
-            generate_type(type_annotation=item, types_module=types_module)
+            generate_type(
+                type_annotation=item,
+                types_module=types_module,
+                read_only=read_only,
+            )
             for item in type_annotation.items
         ]
 
@@ -571,7 +667,9 @@ Tuple[
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         value = generate_type(
-            type_annotation=type_annotation.value, types_module=types_module
+            type_annotation=type_annotation.value,
+            types_module=types_module,
+            read_only=read_only,
         )
 
         if "\n" not in value:
@@ -601,19 +699,16 @@ def generate_argument_type(
     """
     Generate the type of the ``argument``.
 
-    We generate a read-only set as an ``AbstractSet``, so that the constant sets,
-    which are read-only, can be passed to it. Otherwise, the argument type is
-    generated as :py:func:`generate_type` does.
+    The mutability of an argument is deep, so we generate the lists and the sets
+    of a read-only argument as ``Sequence``'s and ``AbstractSet``'s at any depth.
+    This way, the read-only values, such as the constant sets, can be passed to it,
+    and mypy refuses to mutate the argument, just as the type inference does.
     """
-    type_anno = intermediate.beneath_optional(argument.type_annotation)
-    if not isinstance(type_anno, intermediate.SetTypeAnnotation) or argument.mutable:
-        return generate_type(argument.type_annotation, types_module=types_module)
-
-    items_type = generate_type(type_anno.items, types_module=types_module)
-    if isinstance(argument.type_annotation, intermediate.OptionalTypeAnnotation):
-        return Stripped(f"Optional[AbstractSet[{items_type}]]")
-
-    return Stripped(f"AbstractSet[{items_type}]")
+    return generate_type(
+        argument.type_annotation,
+        types_module=types_module,
+        read_only=not argument.mutable,
+    )
 
 
 def typing_imports_for_sets(
@@ -632,9 +727,11 @@ def typing_imports_for_sets(
 
     for function in functions:
         for argument in function.arguments:
-            if isinstance(
-                intermediate.beneath_optional(argument.type_annotation),
-                intermediate.SetTypeAnnotation,
+            if any(
+                isinstance(type_anno, intermediate.SetTypeAnnotation)
+                for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+                    argument.type_annotation
+                )
             ):
                 if argument.mutable:
                     uses_set = True
@@ -660,33 +757,6 @@ def typing_imports_for_sets(
         result.append(Identifier("Set"))
 
     return result
-
-
-def enumerations_in_set_properties(
-    symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.Enumeration]:
-    """
-    List the enumerations whose literals are held in the set properties.
-
-    The enumerations are listed in the order of their definition in
-    the meta-model, each only once.
-    """
-    ids_in_sets = set()  # type: Set[int]
-    for cls in symbol_table.concrete_classes:
-        for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
-            if (
-                isinstance(type_anno, intermediate.SetTypeAnnotation)
-                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
-            ):
-                ids_in_sets.add(id(type_anno.items.our_type))
-
-    return [
-        enumeration
-        for enumeration in symbol_table.enumerations
-        if id(enumeration) in ids_in_sets
-    ]
 
 
 def rank_function_name(enumeration: intermediate.Enumeration) -> Identifier:

@@ -6,6 +6,7 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 from aas_core_codegen import intermediate
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.common import Error, Stripped, Identifier
 from aas_core_codegen.python import common as python_common, naming as python_naming
 from aas_core_codegen.python.common import INDENT as I, INDENT2 as II
@@ -157,7 +158,7 @@ def generate(
 
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
-    ranked_enumerations = python_common.enumerations_in_set_properties(symbol_table)
+    ranked_enumerations = intermediate_uses.enumerations_in_set_properties(symbol_table)
 
     # NOTE (mristin):
     # We import ``Final`` only for the ranks so that the import is never unused.

@@ -246,7 +246,7 @@ def _deep_copy_container_name(
 @require(
     lambda type_anno: not isinstance(type_anno, intermediate.OptionalTypeAnnotation),
     "The optionals are unwrapped at the properties, and nested optionals "
-    "have been refused in intermediate._translate._verify_only_simple_type_patterns",
+    "have been refused in parse._translate._verify_symbol_table",
 )
 def _generate_deep_copy_expr(
     expr: str, type_anno: intermediate.TypeAnnotationUnion

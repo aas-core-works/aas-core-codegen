@@ -433,7 +433,7 @@ Descent.{name}(
     raise AssertionError(
         f"Unexpected type annotation holding instances: {type_anno}. "
         f"The optionals nested in the containers should have been refused in "
-        f"intermediate._translate._verify_only_simple_type_patterns."
+        f"parse._translate._verify_symbol_table."
     )
 
 
@@ -2574,7 +2574,16 @@ def generate(
 
                 if isinstance(type_anno, intermediate.ListTypeAnnotation):
                     descent_imports.add(Stripped("java.util.List"))
-                elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+
+                # NOTE (mristin):
+                # The method spells out the type of the container, so we need to
+                # import the sets nested in it as well.
+                if any(
+                    isinstance(nested, intermediate.SetTypeAnnotation)
+                    for nested in intermediate.over_type_annotation_and_nested_type_annotations(
+                        type_anno
+                    )
+                ):
                     descent_imports.add(Stripped("java.util.Set"))
 
                 descent_methods.append(

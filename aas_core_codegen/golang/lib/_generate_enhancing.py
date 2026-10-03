@@ -262,7 +262,7 @@ def _generate_wrap_stmt(
     raise AssertionError(
         f"Unexpected type annotation holding instances: {type_anno}. "
         f"The optionals nested in the containers should have been refused in "
-        f"intermediate._translate._verify_only_simple_type_patterns, and the sets "
+        f"parse._translate._verify_symbol_table, and the sets "
         f"never hold instances."
     )
 

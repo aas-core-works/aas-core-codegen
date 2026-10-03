@@ -110,11 +110,11 @@ def set_text_through_alias(
 
 def set_texts(
     item: our_types.Item,
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """Check the assignment of a copy of a list to a property."""
     # pylint: disable=all
-    item.texts = texts[:]
+    item.texts = list(texts)
     return True
 
 
@@ -310,13 +310,13 @@ def number_copy_is_independent(
 
 def set_maybe_texts(
     item: our_types.Item,
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """
     Check the assignment of a copy of a list to an optional property.
     """
     # pylint: disable=all
-    item.maybe_texts = texts[:]
+    item.maybe_texts = list(texts)
     return True
 
 
@@ -354,7 +354,7 @@ def first_text_through_alias_is(
 
 
 def texts_are_not_empty(
-    items: List[our_types.Item]
+    items: Sequence[our_types.Item]
 ) -> bool:
     """Check that no text is empty through a read-only list argument."""
     # pylint: disable=all

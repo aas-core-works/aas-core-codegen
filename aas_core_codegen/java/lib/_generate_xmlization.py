@@ -3,7 +3,7 @@
 import io
 import textwrap
 
-from typing import Final, List, Mapping, MutableMapping, Optional, Set, Tuple
+from typing import Final, List, Mapping, MutableMapping, Optional, Sequence, Set, Tuple
 
 from icontract import ensure, require
 
@@ -260,9 +260,58 @@ def _written_leaf_moniker(type_anno: intermediate.AtomicTypeAnnotation) -> str:
     return "IClass"
 
 
-def _written_value_type(type_anno: intermediate.AtomicTypeAnnotation) -> Stripped:
+def _item_type_annotations(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Sequence[intermediate.TypeAnnotationExceptOptional]:
+    """Give the items of the list, the set or the tuple ``type_anno``, in order."""
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        return [type_anno.items]
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return type_anno.items
+
+    assert_never(type_anno)
+
+
+def _written_moniker(type_anno: intermediate.TypeAnnotationExceptOptional) -> str:
+    """
+    Name what ``type_anno`` is written *as*, at any depth.
+
+    The monikers follow the grammar of
+    :py:func:`aas_core_codegen.java.common.type_moniker` over the leaves named by
+    :py:func:`_written_leaf_moniker`, so the encoding stays injective.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return java_common.list_moniker(_written_moniker(type_anno.items))
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # The items of a set are sorted before they are written, and they are
+        # sorted each in their own way, so we can not name the writer after
+        # what the items are written as.
+        return java_common.set_moniker(java_common.set_items_moniker(type_anno.items))
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return java_common.tuple_moniker(
+            [
+                _written_moniker(item_type_anno)
+                for item_type_anno in _item_type_annotations(type_anno)
+            ]
+        )
+
+    return _written_leaf_moniker(type_anno)
+
+
+def _written_value_type(
+    type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
     """
     Render the type of a value of ``type_anno`` as its writer takes it.
+
+    A list, a set and a tuple are rendered as their writers take them, see
+    :py:func:`_container_type`.
 
     Everything widens to what it is written through: a scalar to ``Object``,
     whose ``toString`` renders it, and an instance to the interface over which
@@ -273,6 +322,13 @@ def _written_value_type(type_anno: intermediate.AtomicTypeAnnotation) -> Strippe
     a ``Double``: widening it to ``Object`` would leave ``writeElement`` to
     infer a ``T`` bounded below by both, and there is no such type.
     """
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return _container_type(type_anno)
+
+    assert isinstance(
+        type_anno, intermediate.AtomicTypeAnnotationAsTuple
+    ), f"Expected an atomic type annotation, but got: {type_anno}"
+
     primitive_type = intermediate.try_primitive_type(type_anno)
 
     if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
@@ -306,42 +362,6 @@ def _written_value_type(type_anno: intermediate.AtomicTypeAnnotation) -> Strippe
     return Stripped("IUnion<?>" if moniker == "IUnion" else moniker)
 
 
-def _item_type_annotations(
-    type_anno: intermediate.ContainerTypeAnnotation,
-) -> List[intermediate.AtomicTypeAnnotation]:
-    """
-    Give the items of the list or of the tuple ``type_anno``, in order.
-
-    An item is atomic, which
-    :py:func:`aas_core_codegen.intermediate._translate._verify_only_simple_type_patterns`
-    guarantees for a tuple and which the code generators assume for a list. We
-    narrow it here, once, so that everything downstream can simply say so in
-    its signature.
-    """
-    items: List[intermediate.TypeAnnotationUnion]
-    if isinstance(
-        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
-    ):
-        items = [type_anno.items]
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        items = list(type_anno.items)
-    else:
-        assert_never(type_anno)
-
-    result = []  # type: List[intermediate.AtomicTypeAnnotation]
-    for item in items:
-        assert isinstance(item, intermediate.AtomicTypeAnnotationAsTuple), (
-            f"We only support lists and tuples of atomic values (primitives, "
-            f"constrained primitives, enumeration literals), of classes or of "
-            f"named unions when de/serializing to XML, but got the nested "
-            f"type {item}. Please contact the developers if you need this "
-            f"feature."
-        )
-        result.append(item)
-
-    return result
-
-
 def _as_sequence_name(cls: intermediate.ConcreteClass) -> Identifier:
     """Name the function writing the properties of ``cls`` as their sequence."""
     return Identifier(f"write{java_naming.class_name(cls.name)}AsSequence")
@@ -358,24 +378,8 @@ def _content_writer_name(type_anno: intermediate.TypeAnnotationUnion) -> Identif
     function serves every type which is written the same way -- see
     :py:func:`_written_leaf_moniker`.
     """
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        moniker = _written_leaf_moniker(_item_type_annotations(type_anno)[0])
-        return Identifier(f"write{java_common.list_moniker(moniker)}")
-
-    if isinstance(type_anno, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # The items of a set are sorted before they are written, and they are
-        # sorted each in their own way, so we can not name the writer after
-        # what the items are written as.
-        moniker = java_common.set_items_moniker(type_anno.items)
-        return Identifier(f"write{java_common.set_moniker(moniker)}")
-
-    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        monikers = [
-            _written_leaf_moniker(item_type_anno)
-            for item_type_anno in _item_type_annotations(type_anno)
-        ]
-        return Identifier(f"write{java_common.tuple_moniker(monikers)}")
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return Identifier(f"write{_written_moniker(type_anno)}")
 
     assert isinstance(
         type_anno, intermediate.AtomicTypeAnnotationAsTuple
@@ -414,14 +418,14 @@ def _content_writer_name(type_anno: intermediate.TypeAnnotationUnion) -> Identif
 @require(lambda v_name: v_name.startswith("v"))
 @require(lambda type_anno: not _is_instance_type(type_anno))
 def _at_v_writer_name(
-    type_anno: intermediate.AtomicTypeAnnotation, v_name: str
+    type_anno: intermediate.TypeAnnotationExceptOptional, v_name: str
 ) -> Identifier:
     """Name the function writing ``type_anno`` as an element called ``v_name``."""
-    return Identifier(f"writeAtV{v_name[1:]}_{_written_leaf_moniker(type_anno)}")
+    return Identifier(f"writeAtV{v_name[1:]}_{_written_moniker(type_anno)}")
 
 
 def _element_writer_name(
-    type_anno: intermediate.AtomicTypeAnnotation, v_name: str
+    type_anno: intermediate.TypeAnnotationExceptOptional, v_name: str
 ) -> Identifier:
     """
     Name the function writing a single element holding ``type_anno``.
@@ -531,7 +535,7 @@ class _Needed:
         #: Positional item writers to emit, keyed by their function name
         self.at_v_writers = (
             dict()
-        )  # type: MutableMapping[str, Tuple[intermediate.AtomicTypeAnnotation, str]]
+        )  # type: MutableMapping[str, Tuple[intermediate.TypeAnnotationExceptOptional, str]]
 
         #: Shared content writers which something calls, be it for
         #: a property, for a list item or for a tuple item
@@ -565,7 +569,7 @@ def _collect_needed(symbol_table: intermediate.SymbolTable) -> _Needed:
     needed = _Needed()
 
     def register_item(
-        type_anno: intermediate.AtomicTypeAnnotation, v_name: str
+        type_anno: intermediate.TypeAnnotationExceptOptional, v_name: str
     ) -> None:
         """Register the de/serialization of a single element of ``type_anno``."""
         if _is_instance_type(type_anno):
@@ -2674,7 +2678,7 @@ private static void {name}(
 
 @require(lambda type_anno: not _is_instance_type(type_anno))
 def _generate_at_v_writer(
-    type_anno: intermediate.AtomicTypeAnnotation, v_name: str
+    type_anno: intermediate.TypeAnnotationExceptOptional, v_name: str
 ) -> Stripped:
     """
     Generate the function writing ``type_anno`` as a ``v``-element.
@@ -2691,7 +2695,7 @@ def _generate_at_v_writer(
     return Stripped(
         f"""\
 private static void {name}(
-{I}{value_type} that,
+{I}{indent_but_first_line(value_type, I)} that,
 {I}XMLStreamWriter writer) {{
 {I}XmlCommon.writeElement(
 {II}{v_name_literal},

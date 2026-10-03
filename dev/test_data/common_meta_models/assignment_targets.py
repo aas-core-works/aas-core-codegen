@@ -64,7 +64,7 @@ def set_text_through_alias(item: Mutable["Item"], text: str) -> bool:
 @verification
 def set_texts(item: Mutable["Item"], texts: Sequence[str]) -> bool:
     """Check the assignment of a copy of a list to a property."""
-    item.texts = texts[:]
+    item.texts = list(texts)
     return True
 
 
@@ -208,7 +208,7 @@ def number_copy_is_independent(numbers: List[int]) -> bool:
 @verification
 def set_maybe_texts(item: Mutable["Item"], texts: Sequence[str]) -> bool:
     """Check the assignment of a copy of a list to an optional property."""
-    item.maybe_texts = texts[:]
+    item.maybe_texts = list(texts)
     return True
 
 

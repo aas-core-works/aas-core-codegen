@@ -1,6 +1,6 @@
 """Provide common functions shared among different Java code generation modules."""
 
-from typing import Final, Iterable, List, Mapping, cast, Optional, Sequence, Set
+from typing import Final, Iterable, List, Mapping, cast, Optional, Sequence
 import re
 
 from icontract import ensure, require
@@ -155,6 +155,16 @@ def json_imports_if_necessary(
     return []
 
 
+def _holds_set(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+    """Check whether a value of ``type_annotation`` holds a set at any depth."""
+    return any(
+        isinstance(type_anno, intermediate.SetTypeAnnotation)
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
+    )
+
+
 def set_imports_if_necessary(
     cls: intermediate.Class, with_bodies: bool
 ) -> List[Stripped]:
@@ -165,23 +175,11 @@ def set_imports_if_necessary(
     ``with_bodies`` is set, we also consider the local sets declared in the bodies
     of the methods, which need ``HashSet`` as well.
     """
-    uses_set = any(
-        isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.SetTypeAnnotation,
-        )
-        for prop in cls.properties
-    )
+    uses_set = any(_holds_set(prop.type_annotation) for prop in cls.properties)
     uses_hash_set = False
 
     for method in cls.methods:
-        if any(
-            isinstance(
-                intermediate.beneath_optional(argument.type_annotation),
-                intermediate.SetTypeAnnotation,
-            )
-            for argument in method.arguments
-        ):
+        if any(_holds_set(argument.type_annotation) for argument in method.arguments):
             uses_set = True
 
         if with_bodies and intermediate.declares_local_set(method):
@@ -597,39 +595,10 @@ def set_items_moniker(items: intermediate.TypeAnnotationUnion) -> str:
     return leaf_moniker(items)
 
 
-def enumerations_in_set_properties(
-    symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.Enumeration]:
-    """List the enumerations held by the set properties, in the order of the classes."""
-    result = []  # type: List[intermediate.Enumeration]
-    observed = set()  # type: Set[Identifier]
-
-    for cls in symbol_table.classes:
-        for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
-            if not isinstance(type_anno, intermediate.SetTypeAnnotation):
-                continue
-
-            if not isinstance(
-                type_anno.items, intermediate.OurTypeAnnotation
-            ) or not isinstance(type_anno.items.our_type, intermediate.Enumeration):
-                continue
-
-            enumeration = type_anno.items.our_type
-            if enumeration.name not in observed:
-                observed.add(enumeration.name)
-                result.append(enumeration)
-
-    return result
-
-
 def has_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
-    """Check whether any class of the meta-model has a set property."""
+    """Check whether any property of the meta-model holds a set at any depth."""
     return any(
-        isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.SetTypeAnnotation,
-        )
+        _holds_set(prop.type_annotation)
         for cls in symbol_table.classes
         for prop in cls.properties
     )

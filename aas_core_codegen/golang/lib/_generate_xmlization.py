@@ -31,21 +31,22 @@ from aas_core_codegen.intermediate import uses as intermediate_uses
 # region Shared between the de-serialization and the serialization
 
 
-class _ScalarItem:
+class _PositionalItem:
     """
-    Specify a scalar value wrapped in an element of a fixed name.
+    Specify a value wrapped in an element of a fixed name.
 
-    A scalar element is not self-describing: its name denotes its *position*, ``v``
-    in a list and ``v1``, ``v2``, *etc.* in a tuple, and never its type. Both sides
+    The value is a scalar, or a list, a set or a tuple nested in another one.
+    Such an element is not self-describing: its name denotes its *position*,
+    ``v`` in a list and ``v1``, ``v2``, *etc.* in a tuple, and never its type. Both sides
     therefore need a function per scalar type *and* element name: the reader checks
-    the name (see :py:func:`_generate_read_scalar_item`), the writer writes it (see
-    :py:func:`_generate_write_scalar_item`), so that neither a container nor its
+    the name (see :py:func:`_generate_read_positional_item`), the writer writes it (see
+    :py:func:`_generate_write_positional_item`), so that neither a container nor its
     items need to know anything about the other.
     """
 
     def __init__(
         self,
-        type_anno: intermediate.AtomicTypeAnnotation,
+        type_anno: intermediate.TypeAnnotationExceptOptional,
         element_name: str,
     ) -> None:
         """Initialize with the given values."""
@@ -70,22 +71,22 @@ class _ScalarItem:
 
 
 @require(lambda element_name: element_name.startswith("v"))
-def _scalar_item_reader_name(
-    type_anno: intermediate.AtomicTypeAnnotation, element_name: str
+def _positional_item_reader_name(
+    type_anno: intermediate.TypeAnnotationExceptOptional, element_name: str
 ) -> Identifier:
-    """Name the function reading a scalar ``type_anno`` in ``element_name``."""
+    """Name the function reading ``type_anno`` in ``element_name``."""
     return Identifier(
-        f"readAtV{element_name[1:]}_{golang_common.leaf_moniker(type_anno)}"
+        f"readAtV{element_name[1:]}_{golang_common.type_moniker(type_anno)}"
     )
 
 
 @require(lambda element_name: element_name.startswith("v"))
-def _scalar_item_writer_name(
-    type_anno: intermediate.AtomicTypeAnnotation, element_name: str
+def _positional_item_writer_name(
+    type_anno: intermediate.TypeAnnotationExceptOptional, element_name: str
 ) -> Identifier:
-    """Name the function writing a scalar ``type_anno`` in ``element_name``."""
+    """Name the function writing ``type_anno`` in ``element_name``."""
     return Identifier(
-        f"writeAtV{element_name[1:]}_{golang_common.leaf_moniker(type_anno)}"
+        f"writeAtV{element_name[1:]}_{golang_common.type_moniker(type_anno)}"
     )
 
 
@@ -100,22 +101,32 @@ def _enum_text_writer_name(enumeration: intermediate.Enumeration) -> Identifier:
 
 
 def _list_content_writer_name(
-    items_type_anno: intermediate.AtomicTypeAnnotation,
+    items_type_anno: intermediate.TypeAnnotationExceptOptional,
 ) -> Stripped:
     """Name the function which writes the content of a list of ``items_type_anno``."""
-    return Stripped(f"writeListOf_{golang_common.leaf_moniker(items_type_anno)}")
+    return Stripped(f"writeListOf_{golang_common.type_moniker(items_type_anno)}")
+
+
+def _set_content_writer_name(type_anno: intermediate.SetTypeAnnotation) -> Stripped:
+    """
+    Name the function which writes the content of a set nested in a collection.
+
+    A set property is written as the slice of its sorted items, see
+    :py:func:`_generate_snippet_to_serialize_property`, so it needs no such writer.
+    """
+    return Stripped(f"write{golang_common.type_moniker(type_anno)}")
 
 
 def _tuple_content_writer_name(type_anno: intermediate.TupleTypeAnnotation) -> Stripped:
     """Name the function which writes the content of a tuple of ``type_anno``."""
-    monikers = []  # type: List[str]
-    for item_type_anno in type_anno.items:
-        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple)
-        monikers.append(golang_common.leaf_moniker(item_type_anno))
+    return Stripped(f"write{golang_common.type_moniker(type_anno)}")
 
-    joined = "_".join(monikers)
 
-    return Stripped(f"writeTupleOf{len(monikers)}_{joined}")
+def _nested_content_reader_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Name the function which reads the content of a collection nested in another."""
+    return Stripped(f"readAs_{golang_common.type_moniker(type_anno)}")
 
 
 def _requires_dispatch(type_anno: intermediate.TypeAnnotation) -> bool:
@@ -145,22 +156,32 @@ class _Requirements:
     def __init__(
         self,
         dispatched_type_ids: Set[intermediate.IdOfOurType],
-        scalar_items: List[_ScalarItem],
-        list_items_type_annos: List[intermediate.AtomicTypeAnnotation],
+        positional_items: List[_PositionalItem],
+        list_items_type_annos: List[intermediate.TypeAnnotationExceptOptional],
+        nested_set_type_annos: List[intermediate.SetTypeAnnotation],
         tuple_type_annos: List[intermediate.TupleTypeAnnotation],
+        nested_container_type_annos: List[intermediate.ContainerTypeAnnotation],
     ) -> None:
         """Initialize with the given values."""
         #: IDs of our types for which a ``read*Dispatched`` function must be generated
         self.dispatched_type_ids = dispatched_type_ids
 
         #: Scalar items to be de/serialized, in the order of the first occurrence
-        self.scalar_items = scalar_items
+        self.positional_items = positional_items
 
         #: Items of the lists to be serialized, in the order of the first occurrence
         self.list_items_type_annos = list_items_type_annos
 
+        #: Sets nested in a collection to be serialized, in the order of
+        #: the first occurrence
+        self.nested_set_type_annos = nested_set_type_annos
+
         #: Tuples to be serialized, in the order of the first occurrence
         self.tuple_type_annos = tuple_type_annos
+
+        #: Collections nested in another one to be de-serialized, in the order of
+        #: the first occurrence
+        self.nested_container_type_annos = nested_container_type_annos
 
 
 def _collect_requirements(
@@ -177,17 +198,23 @@ def _collect_requirements(
     """
     dispatched_type_ids = set()  # type: Set[intermediate.IdOfOurType]
 
-    scalar_items = []  # type: List[_ScalarItem]
-    observed_scalar_items = set()  # type: Set[Tuple[str, str]]
+    positional_items = []  # type: List[_PositionalItem]
+    observed_positional_items = set()  # type: Set[Tuple[str, str]]
 
-    list_items_type_annos = []  # type: List[intermediate.AtomicTypeAnnotation]
+    list_items_type_annos = []  # type: List[intermediate.TypeAnnotationExceptOptional]
     observed_list_writers = set()  # type: Set[str]
+
+    nested_set_type_annos = []  # type: List[intermediate.SetTypeAnnotation]
+    observed_set_writers = set()  # type: Set[str]
 
     tuple_type_annos = []  # type: List[intermediate.TupleTypeAnnotation]
     observed_tuple_writers = set()  # type: Set[str]
 
+    nested_container_type_annos = []  # type: List[intermediate.ContainerTypeAnnotation]
+    observed_nested_readers = set()  # type: Set[str]
+
     def require_item(
-        item_type_anno: intermediate.AtomicTypeAnnotation, element_name: str
+        item_type_anno: intermediate.TypeAnnotationExceptOptional, element_name: str
     ) -> None:
         """Require the de/serialization of an item in ``element_name``."""
         if isinstance(item_type_anno, intermediate.OurTypeAnnotation) and isinstance(
@@ -201,52 +228,70 @@ def _collect_requirements(
             dispatched_type_ids.add(intermediate.runtime_id(item_type_anno.our_type))
             return
 
-        key = (golang_common.leaf_moniker(item_type_anno), element_name)
-        if key not in observed_scalar_items:
-            observed_scalar_items.add(key)
-            scalar_items.append(
-                _ScalarItem(type_anno=item_type_anno, element_name=element_name)
+        key = (golang_common.type_moniker(item_type_anno), element_name)
+        if key not in observed_positional_items:
+            observed_positional_items.add(key)
+            positional_items.append(
+                _PositionalItem(type_anno=item_type_anno, element_name=element_name)
             )
+
+        if isinstance(item_type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+            require_container(item_type_anno, nested=True)
+
+    def require_container(
+        type_anno: intermediate.ContainerTypeAnnotation, nested: bool
+    ) -> None:
+        """Require the de/serialization of a list, a set or a tuple."""
+        if nested:
+            reader_name = _nested_content_reader_name(type_anno)
+            if reader_name not in observed_nested_readers:
+                observed_nested_readers.add(reader_name)
+                nested_container_type_annos.append(type_anno)
+
+        if isinstance(type_anno, intermediate.ListTypeAnnotation):
+            items_type_anno = type_anno.items
+            require_item(items_type_anno, "v")
+
+            writer_name = _list_content_writer_name(items_type_anno)
+            if writer_name not in observed_list_writers:
+                observed_list_writers.add(writer_name)
+                list_items_type_annos.append(items_type_anno)
+
+        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+            items_type_anno = type_anno.items
+            require_item(items_type_anno, "v")
+
+            if nested:
+                writer_name = _set_content_writer_name(type_anno)
+                if writer_name not in observed_set_writers:
+                    observed_set_writers.add(writer_name)
+                    nested_set_type_annos.append(type_anno)
+            else:
+                # NOTE (mristin):
+                # We write a set property exactly as a list of its sorted items.
+                writer_name = _list_content_writer_name(items_type_anno)
+                if writer_name not in observed_list_writers:
+                    observed_list_writers.add(writer_name)
+                    list_items_type_annos.append(items_type_anno)
+
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            for i, item in enumerate(type_anno.items):
+                require_item(item, f"v{i + 1}")
+
+            writer_name = _tuple_content_writer_name(type_anno)
+            if writer_name not in observed_tuple_writers:
+                observed_tuple_writers.add(writer_name)
+                tuple_type_annos.append(type_anno)
+
+        else:
+            assert_never(type_anno)
 
     for cls in symbol_table.concrete_classes:
         for prop in cls.properties:
             type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-            if isinstance(type_anno, intermediate.ListTypeAnnotation):
-                assert isinstance(
-                    type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-                )
-                require_item(type_anno.items, "v")
-
-                writer_name = _list_content_writer_name(type_anno.items)
-                if writer_name not in observed_list_writers:
-                    observed_list_writers.add(writer_name)
-                    list_items_type_annos.append(type_anno.items)
-
-            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-                # NOTE (mristin):
-                # We write a set exactly as a list of its sorted items.
-                assert isinstance(
-                    type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-                )
-                require_item(type_anno.items, "v")
-
-                writer_name = _list_content_writer_name(type_anno.items)
-                if writer_name not in observed_list_writers:
-                    observed_list_writers.add(writer_name)
-                    list_items_type_annos.append(type_anno.items)
-
-            elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-                for i, item_type_anno in enumerate(type_anno.items):
-                    assert isinstance(
-                        item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-                    )
-                    require_item(item_type_anno, f"v{i + 1}")
-
-                writer_name = _tuple_content_writer_name(type_anno)
-                if writer_name not in observed_tuple_writers:
-                    observed_tuple_writers.add(writer_name)
-                    tuple_type_annos.append(type_anno)
+            if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+                require_container(type_anno, nested=False)
 
             elif _requires_dispatch(type_anno):
                 assert isinstance(type_anno, intermediate.OurTypeAnnotation)
@@ -254,9 +299,11 @@ def _collect_requirements(
 
     return _Requirements(
         dispatched_type_ids=dispatched_type_ids,
-        scalar_items=scalar_items,
+        positional_items=positional_items,
         list_items_type_annos=list_items_type_annos,
+        nested_set_type_annos=nested_set_type_annos,
         tuple_type_annos=tuple_type_annos,
+        nested_container_type_annos=nested_container_type_annos,
     )
 
 
@@ -881,7 +928,7 @@ func writeOptionalJsonObject(
 
 
 def _item_reader_name(
-    type_anno: intermediate.AtomicTypeAnnotation, element_name: str
+    type_anno: intermediate.TypeAnnotationExceptOptional, element_name: str
 ) -> Stripped:
     """
     Determine the reader of an item of ``type_anno`` wrapped in ``element_name``.
@@ -903,17 +950,23 @@ def _item_reader_name(
             )
         )
 
-    return Stripped(_scalar_item_reader_name(type_anno, element_name))
+    return Stripped(_positional_item_reader_name(type_anno, element_name))
 
 
-def _scalar_content_reader(type_anno: intermediate.AtomicTypeAnnotation) -> Stripped:
+def _scalar_content_reader(
+    type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
     """
     Determine the reader of the content of an element holding ``type_anno``.
 
     A primitive, a constrained primitive and an enumeration are read from
     the element's text; a JSON-able value is read over the XML-RPC subset -- see
-    :py:func:`_generate_json_value_readers`.
+    :py:func:`_generate_json_value_readers`. A collection nested in another one is
+    read by a reader of its own, see :py:func:`_generate_read_nested_content`.
     """
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return _nested_content_reader_name(type_anno)
+
     if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
         return Stripped("readJsonValue")
 
@@ -926,21 +979,75 @@ def _scalar_content_reader(type_anno: intermediate.AtomicTypeAnnotation) -> Stri
     return _read_text_function(type_anno)
 
 
-def _generate_read_scalar_item(scalar_item: _ScalarItem) -> Stripped:
-    """Generate the function to read a scalar item at a fixed element name."""
-    function_name = _scalar_item_reader_name(
-        scalar_item.type_anno, scalar_item.element_name
-    )
+def _generate_read_nested_content(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the function reading the content of a collection nested in another.
 
+    The generic ``readListOf``, ``readSetOf`` and ``readTuple*`` take the readers
+    of the items, so they can not be passed on as a content reader themselves --
+    and Golang gives no partial application which would bind the item readers in
+    without allocating a closure. This function binds them at the package level.
+    """
     value_type = golang_common.generate_type(
-        type_annotation=scalar_item.type_anno, types_package=Identifier("ourtypes")
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
     )
 
-    element_name_literal = golang_common.string_literal(scalar_item.element_name)
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        function = "readListOf"
+        item_readers = [_item_reader_name(type_anno.items, "v")]
+    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
+        function = "readSetOf"
+        item_readers = [_item_reader_name(type_anno.items, "v")]
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        function = f"readTuple{len(type_anno.items)}"
+        item_readers = [
+            _item_reader_name(item, f"v{i + 1}")
+            for i, item in enumerate(type_anno.items)
+        ]
+    else:
+        assert_never(type_anno)
+
+    arguments_joined = golang_common.join_arguments(
+        ["decoder", "current", *item_readers], indention=2
+    )
 
     return Stripped(
         f"""\
-// Read a scalar item expected in the element `{scalar_item.element_name}`.
+// Read the content of an element as a collection nested in another one.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func {_nested_content_reader_name(type_anno)}(
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+) (value {value_type},
+{I}next xml.Token,
+{I}err error,
+) {{
+{I}return {function}(
+{II}{indent_but_first_line(arguments_joined, II)}
+{I})
+}}"""
+    )
+
+
+def _generate_read_positional_item(positional_item: _PositionalItem) -> Stripped:
+    """Generate the function to read a scalar item at a fixed element name."""
+    function_name = _positional_item_reader_name(
+        positional_item.type_anno, positional_item.element_name
+    )
+
+    value_type = golang_common.generate_type(
+        type_annotation=positional_item.type_anno, types_package=Identifier("ourtypes")
+    )
+
+    element_name_literal = golang_common.string_literal(positional_item.element_name)
+
+    return Stripped(
+        f"""\
+// Read a scalar item expected in the element `{positional_item.element_name}`.
 //
 // The `current` token is expected to point to the content of that element, and
 // the resulting `next` token points to its end element.
@@ -957,7 +1064,7 @@ func {function_name}(
 {II}return
 {I}}}
 
-{I}return {_scalar_content_reader(scalar_item.type_anno)}(decoder, current)
+{I}return {_scalar_content_reader(positional_item.type_anno)}(decoder, current)
 }}"""
     )
 
@@ -1057,14 +1164,6 @@ def _generate_snippet_to_switch_on_property_deserialization(
                 assert_never(our_type)
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We expect only lists of atomic values "
-                f"at the moment, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
             read_item = _item_reader_name(type_anno.items, "v")
 
             case_body = Stripped(
@@ -1078,16 +1177,8 @@ def _generate_snippet_to_switch_on_property_deserialization(
             arity = len(type_anno.items)
 
             item_readers = []  # type: List[Stripped]
-            for i, item_type_anno in enumerate(type_anno.items):
-                assert isinstance(
-                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-                ), (
-                    f"NOTE (mristin): We expect only tuples of atomic values "
-                    f"at the moment, but you specified {type_anno}. "
-                    f"Please contact the developers if you need this feature."
-                )
-
-                item_readers.append(_item_reader_name(item_type_anno, f"v{i + 1}"))
+            for i, item in enumerate(type_anno.items):
+                item_readers.append(_item_reader_name(item, f"v{i + 1}"))
 
             item_readers_joined = "\n".join(
                 f"{item_reader}," for item_reader in item_readers
@@ -1142,15 +1233,6 @@ readTuple{arity}(
             )
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We expect only sets of atomic values, "
-                f"as we refuse the others in "
-                f"intermediate._translate._verify_items_of_sets, "
-                f"but you specified {type_anno}."
-            )
-
             read_item = _item_reader_name(type_anno.items, "v")
 
             case_body = Stripped(
@@ -2008,7 +2090,9 @@ def _write_text_function(type_anno: intermediate.AtomicTypeAnnotation) -> Stripp
     return Stripped(_enum_text_writer_name(type_anno.our_type))
 
 
-def _content_writer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
+def _content_writer_expr(
+    type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
     """
     Determine the writer of the content of an XML element holding ``type_anno``.
 
@@ -2021,14 +2105,12 @@ def _content_writer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Strippe
         return Stripped(_WRITE_FUNCTION_BY_PRIMITIVE_TYPE[primitive_type])
 
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple)
         return _list_content_writer_name(type_anno.items)
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         # NOTE (mristin):
-        # We write a set exactly as a list of its sorted items, see
+        # We write a set property exactly as a list of its sorted items, see
         # :py:func:`_generate_snippet_to_serialize_property`.
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple)
         return _list_content_writer_name(type_anno.items)
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
@@ -2076,31 +2158,40 @@ def _content_writer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Strippe
     )
 
 
-def _generate_write_scalar_item(scalar_item: _ScalarItem) -> Stripped:
+def _generate_write_positional_item(positional_item: _PositionalItem) -> Stripped:
     """Generate the function to write a scalar item in a fixed element name."""
-    function_name = _scalar_item_writer_name(
-        scalar_item.type_anno, scalar_item.element_name
+    function_name = _positional_item_writer_name(
+        positional_item.type_anno, positional_item.element_name
     )
 
     value_type = golang_common.generate_type(
-        type_annotation=scalar_item.type_anno, types_package=Identifier("ourtypes")
+        type_annotation=positional_item.type_anno, types_package=Identifier("ourtypes")
     )
 
-    element_name_literal = golang_common.string_literal(scalar_item.element_name)
+    element_name_literal = golang_common.string_literal(positional_item.element_name)
+
+    # NOTE (mristin):
+    # A set nested in a collection is written by a writer of its own which sorts
+    # its items, as there is nobody else to sort them.
+    content_writer = (
+        _set_content_writer_name(positional_item.type_anno)
+        if isinstance(positional_item.type_anno, intermediate.SetTypeAnnotation)
+        else _content_writer_expr(positional_item.type_anno)
+    )
 
     arguments_joined = golang_common.join_arguments(
         [
             "encoder",
             element_name_literal,
             "value",
-            _content_writer_expr(scalar_item.type_anno),
+            content_writer,
         ],
         indention=2,
     )
 
     return Stripped(
         f"""\
-// Write the scalar `value` in the element `{scalar_item.element_name}`.
+// Write the scalar `value` in the element `{positional_item.element_name}`.
 //
 // Do not flush.
 func {function_name}(
@@ -2115,7 +2206,7 @@ func {function_name}(
 
 
 def _item_writer_expr(
-    type_anno: intermediate.AtomicTypeAnnotation, element_name: str
+    type_anno: intermediate.TypeAnnotationExceptOptional, element_name: str
 ) -> Stripped:
     """
     Determine the writer of an item of ``type_anno`` in a list or in a tuple.
@@ -2138,11 +2229,11 @@ def _item_writer_expr(
         if isinstance(our_type, intermediate.NamedUnion):
             return Stripped(f"writeUnion[{item_type}]")
 
-    return Stripped(_scalar_item_writer_name(type_anno, element_name))
+    return Stripped(_positional_item_writer_name(type_anno, element_name))
 
 
 def _generate_write_list_content_writer(
-    items_type_anno: intermediate.AtomicTypeAnnotation,
+    items_type_anno: intermediate.TypeAnnotationExceptOptional,
 ) -> Stripped:
     """
     Generate the writer of the content of a list of ``items_type_anno``.
@@ -2177,6 +2268,48 @@ func {_list_content_writer_name(items_type_anno)}(
     )
 
 
+def _generate_write_set_content_writer(
+    type_anno: intermediate.SetTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the writer of the content of a set nested in a collection.
+
+    The items are written sorted in the same order in all the SDKs, exactly as
+    the items of a set property.
+    """
+    set_type = golang_common.generate_type(
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
+    )
+
+    items_type_anno = type_anno.items
+
+    arguments_joined = golang_common.join_arguments(
+        [
+            "encoder",
+            golang_common.sorted_set_items_expr(
+                "set", items_type_anno, column=2 * golang_common.TAB_WIDTH
+            ),
+            _item_writer_expr(items_type_anno, "v"),
+        ],
+        indention=2,
+    )
+
+    return Stripped(
+        f"""\
+// Write the sorted items of the `set` as a sequence of XML elements.
+//
+// Do not flush.
+func {_set_content_writer_name(type_anno)}(
+{I}encoder *xml.Encoder,
+{I}set {set_type},
+) error {{
+{I}return writeList(
+{II}{indent_but_first_line(arguments_joined, II)}
+{I})
+}}"""
+    )
+
+
 def _generate_write_tuple_content_writer(
     type_anno: intermediate.TupleTypeAnnotation,
 ) -> Stripped:
@@ -2193,10 +2326,9 @@ def _generate_write_tuple_content_writer(
         type_annotation=type_anno, types_package=Identifier("ourtypes")
     )
 
-    item_writer_exprs = []  # type: List[Stripped]
-    for i, item_type_anno in enumerate(type_anno.items):
-        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple)
-        item_writer_exprs.append(_item_writer_expr(item_type_anno, f"v{i + 1}"))
+    item_writer_exprs = [
+        _item_writer_expr(item, f"v{i + 1}") for i, item in enumerate(type_anno.items)
+    ]
 
     arguments_joined = golang_common.join_arguments(
         ["encoder", "that", *item_writer_exprs], indention=2
@@ -2253,17 +2385,6 @@ def _generate_snippet_to_serialize_property(
     differ.
     """
     type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-    if isinstance(type_anno, intermediate.ListTypeAnnotation) and not isinstance(
-        type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-    ):
-        return None, Error(
-            prop.parsed.node,
-            f"(mristin) We only handle the XML serialization of lists of "
-            f"atomic values, but you want to generate the code for a list of "
-            f"type {type_anno}. Please contact the developers if you need "
-            f"this feature.",
-        )
 
     optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
 
@@ -2590,8 +2711,11 @@ type DeserializationError = xmlcommon.DeserializationError"""
 
     blocks.extend(_generate_json_value_readers(symbol_table=symbol_table))
 
-    for scalar_item in requirements.scalar_items:
-        blocks.append(_generate_read_scalar_item(scalar_item=scalar_item))
+    for positional_item in requirements.positional_items:
+        blocks.append(_generate_read_positional_item(positional_item=positional_item))
+
+    for nested_type_anno in requirements.nested_container_type_annos:
+        blocks.append(_generate_read_nested_content(type_anno=nested_type_anno))
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_read_tuple_helper(arity))
@@ -2656,8 +2780,8 @@ type SerializationError = xmlcommon.SerializationError"""
 
     blocks.extend(_generate_json_value_writers(symbol_table=symbol_table))
 
-    for scalar_item in requirements.scalar_items:
-        blocks.append(_generate_write_scalar_item(scalar_item=scalar_item))
+    for positional_item in requirements.positional_items:
+        blocks.append(_generate_write_positional_item(positional_item=positional_item))
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_write_tuple_helper(arity))
@@ -2665,6 +2789,11 @@ type SerializationError = xmlcommon.SerializationError"""
     for items_type_anno in requirements.list_items_type_annos:
         blocks.append(
             _generate_write_list_content_writer(items_type_anno=items_type_anno)
+        )
+
+    for nested_set_type_anno in requirements.nested_set_type_annos:
+        blocks.append(
+            _generate_write_set_content_writer(type_anno=nested_set_type_anno)
         )
 
     for tuple_type_anno in requirements.tuple_type_annos:

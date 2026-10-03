@@ -536,27 +536,6 @@ OurCommon.at(
 
         assert collection is not None
 
-        if isinstance(
-            self.type_map[node.collection],
-            intermediate_type_inference.ListTypeAnnotation,
-        ):
-            # NOTE (mristin):
-            # The type inference allows slicing a list only to copy it as a whole,
-            # ``[:]``, which we transpile as the spread syntax.
-            if not isinstance(
-                node.collection,
-                (
-                    parse_tree.Member,
-                    parse_tree.FunctionCall,
-                    parse_tree.MethodCall,
-                    parse_tree.Name,
-                    parse_tree.Index,
-                ),
-            ):
-                collection = Stripped(f"({collection})")
-
-            return Stripped(f"[...{collection}]"), None
-
         # NOTE (mristin):
         # We do not use the native ``substring`` as it counts the UTF-16 code units
         # instead of the characters, swaps the positions and does not count
@@ -1093,6 +1072,42 @@ OurCommon.at(
                 assert arg is not None
 
                 return Stripped(f"Math.abs({arg})"), None
+
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LIST
+            ):
+                assert len(node.args) == 1, (
+                    f"Expected exactly one argument, but got: {node.args}; "
+                    f"this should have been caught before."
+                )
+
+                the_list, error = self.transform(node.args[0])
+                if error is not None:
+                    return None, Error(
+                        node.original_node,
+                        "Failed to transpile the argument of list",
+                        [error],
+                    )
+
+                assert the_list is not None
+
+                # NOTE (mristin):
+                # The type inference allows ``list(...)`` only to copy a list,
+                # which we transpile as the spread syntax.
+                if not isinstance(
+                    node.args[0],
+                    (
+                        parse_tree.Member,
+                        parse_tree.FunctionCall,
+                        parse_tree.MethodCall,
+                        parse_tree.Name,
+                        parse_tree.Index,
+                    ),
+                ):
+                    the_list = Stripped(f"({the_list})")
+
+                return Stripped(f"[...{the_list}]"), None
 
             elif (
                 func_type.func.kind

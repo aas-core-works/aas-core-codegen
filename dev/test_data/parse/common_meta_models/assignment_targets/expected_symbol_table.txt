@@ -567,12 +567,12 @@ UnverifiedSymbolTable(
                 original_node=...),
               name='texts',
               original_node=...),
-            value=Slice(
-              collection=Name(
-                identifier='texts',
-                original_node=...),
-              start=None,
-              end=None,
+            value=FunctionCall(
+              name='list',
+              args=[
+                Name(
+                  identifier='texts',
+                  original_node=...)],
               original_node=...),
             annotation=None,
             original_node=...)"""),
@@ -1865,12 +1865,12 @@ UnverifiedSymbolTable(
                 original_node=...),
               name='maybe_texts',
               original_node=...),
-            value=Slice(
-              collection=Name(
-                identifier='texts',
-                original_node=...),
-              start=None,
-              end=None,
+            value=FunctionCall(
+              name='list',
+              args=[
+                Name(
+                  identifier='texts',
+                  original_node=...)],
               original_node=...),
             annotation=None,
             original_node=...)"""),

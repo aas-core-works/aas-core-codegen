@@ -294,42 +294,6 @@ class NamespaceIdentifier(str):
 COMMON_CLASS: Final[Identifier] = Identifier("Common")
 
 
-def enumerations_in_set_properties(
-    symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.Enumeration]:
-    """
-    List the enumerations whose literals are held by a set property.
-
-    Each of them needs a comparison of its own, so that the set is serialized
-    sorted by the serialized values of its literals.
-    """
-    result = []  # type: List[intermediate.Enumeration]
-    for cls in symbol_table.classes:
-        for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
-            if (
-                isinstance(type_anno, intermediate.SetTypeAnnotation)
-                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
-                and type_anno.items.our_type not in result
-            ):
-                result.append(type_anno.items.our_type)
-
-    return result
-
-
-def has_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
-    """Check whether any class of the meta-model has a set property."""
-    return any(
-        isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.SetTypeAnnotation,
-        )
-        for cls in symbol_table.classes
-        for prop in cls.properties
-    )
-
-
 # NOTE (mristin):
 # The names of the helpers generated per enumeration in ``SetHelpers`` start with
 # a prefix, ``RankOf`` and ``CompareByRankOf``, with which no fixed helper there

@@ -3,7 +3,7 @@ import io
 import math
 import re
 import urllib.parse
-from typing import Final, List, Mapping, Sequence, Set, Tuple, Optional
+from typing import Final, List, Mapping, Sequence, Tuple, Optional
 
 from icontract import ensure, require
 
@@ -491,7 +491,7 @@ def join_arguments(arguments: Sequence[str], indention: int) -> str:
     """
     joined = ", ".join(arguments) + ","
 
-    if indention * TAB_WIDTH + len(joined) <= MAX_LINE_LENGTH:
+    if "\n" not in joined and indention * TAB_WIDTH + len(joined) <= MAX_LINE_LENGTH:
         return joined
 
     return ",\n".join(arguments) + ","
@@ -577,32 +577,6 @@ def names_package(blocks: Sequence[str], qualifier: str) -> bool:
     """
     pattern = re.compile(r"(?<![\w.])" + re.escape(qualifier) + r"\.")
     return any(pattern.search(block) is not None for block in blocks)
-
-
-def enumerations_in_set_properties(
-    symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.Enumeration]:
-    """
-    List the enumerations whose literals are held in a set property.
-
-    The enumerations are listed in the order of their definition.
-    """
-    ids = set()  # type: Set[int]
-    for cls in symbol_table.classes:
-        for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
-            if (
-                isinstance(type_anno, intermediate.SetTypeAnnotation)
-                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
-            ):
-                ids.add(intermediate.runtime_id(type_anno.items.our_type))
-
-    return [
-        enumeration
-        for enumeration in symbol_table.enumerations
-        if intermediate.runtime_id(enumeration) in ids
-    ]
 
 
 def sorted_set_items_expr(

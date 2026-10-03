@@ -153,7 +153,7 @@ def some_func(items: List[Item], other: Mutable["Item"], text: str) -> bool:
 @verification
 def some_func(item: Mutable["Item"], texts: Sequence[str]) -> bool:
     for text in item.texts:
-        item.texts = texts[:]
+        item.texts = list(texts)
     return True""",
             expected_message=(
                 "We can not iterate over the collection in C++, since the "
@@ -184,7 +184,7 @@ def some_func(lists: List[List[str]]) -> bool:
 def some_func(lists: List[List[str]], other: Sequence[str]) -> bool:
     for texts in lists:
         texts[0] = "x"
-    lists[0] = other[:]
+    lists[0] = list(other)
     return True""",
             expected_message=(
                 "The loop variable 'texts' is mutated in place, so we would "

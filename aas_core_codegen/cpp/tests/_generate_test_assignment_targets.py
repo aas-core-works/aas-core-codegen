@@ -104,7 +104,7 @@ def generate_implementation(
  * The meta-model is written in Python, so the assignments follow the Python
  * semantics: the objects and the lists are shared by reference, a negative
  * index counts from the end of the list, and a list is copied explicitly
- * with <code>[:]</code> when stored.
+ * with <code>list(...)</code> when stored.
  */"""
         ),
         Stripped(

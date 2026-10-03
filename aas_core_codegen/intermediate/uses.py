@@ -8,7 +8,7 @@ Import this module as ``intermediate_uses`` so that the checks read naturally,
 *e.g.*, ``intermediate_uses.modulo(symbol_table)``.
 """
 
-from typing import Iterator, List, Sequence, Union
+from typing import Iterator, List, Sequence, Set, Union
 
 from aas_core_codegen.intermediate import _types
 from aas_core_codegen.parse import tree as parse_tree
@@ -203,6 +203,17 @@ def int_call(symbol_table: _types.SymbolTable) -> bool:
     )
 
 
+def _nested_sets(
+    type_annotation: _types.TypeAnnotationUnion,
+) -> Iterator[_types.SetTypeAnnotation]:
+    """Iterate over the sets in ``type_annotation`` at any depth."""
+    for type_anno in _types.over_type_annotation_and_nested_type_annotations(
+        type_annotation
+    ):
+        if isinstance(type_anno, _types.SetTypeAnnotation):
+            yield type_anno
+
+
 def sets_in(functions: Sequence[Union[_types.Verification, _types.Method]]) -> bool:
     """
     Check whether the ``functions`` take the sets as arguments or declare local sets.
@@ -212,10 +223,7 @@ def sets_in(functions: Sequence[Union[_types.Verification, _types.Method]]) -> b
     """
     return any(
         any(
-            isinstance(
-                _types.beneath_optional(argument.type_annotation),
-                _types.SetTypeAnnotation,
-            )
+            any(True for _ in _nested_sets(argument.type_annotation))
             for argument in function.arguments
         )
         or _types.declares_local_set(function)
@@ -270,30 +278,85 @@ def set_operations(symbol_table: _types.SymbolTable) -> bool:
 
 def set_properties(symbol_table: _types.SymbolTable) -> bool:
     """
-    Check whether any class of the ``symbol_table`` has a set property.
+    Check whether any class of the ``symbol_table`` has a property holding a set.
 
-    The set properties are serialized as sorted arrays, so we need to generate
-    the helpers for sorting them only if there are any.
+    The set can be at any depth of the property's type annotation, *e.g.*,
+    ``List[Set[str]]``. The sets are serialized as sorted arrays, so we need to
+    generate the helpers for sorting them only if there are any.
     """
     return any(
-        isinstance(
-            _types.beneath_optional(prop.type_annotation),
-            _types.SetTypeAnnotation,
-        )
+        any(True for _ in _nested_sets(prop.type_annotation))
         for cls in symbol_table.classes
         for prop in cls.properties
     )
 
 
-def _is_set_of_enumeration_literals(
+def enumerations_in_set_properties(
+    symbol_table: _types.SymbolTable,
+) -> List[_types.Enumeration]:
+    """
+    List the enumerations whose literals are held in the sets of the properties.
+
+    The sets can be at any depth of the properties' type annotations. The targets
+    sort such a set by the ranks of its literals when they serialize it, so they
+    need the helpers ranking the literals of these enumerations.
+
+    The enumerations are listed in the order of their definition in
+    the meta-model, each only once.
+    """
+    ids_in_sets = set()  # type: Set[int]
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            for set_type_anno in _nested_sets(prop.type_annotation):
+                if isinstance(
+                    set_type_anno.items, _types.OurTypeAnnotation
+                ) and isinstance(set_type_anno.items.our_type, _types.Enumeration):
+                    ids_in_sets.add(id(set_type_anno.items.our_type))
+
+    return [
+        enumeration
+        for enumeration in symbol_table.enumerations
+        if id(enumeration) in ids_in_sets
+    ]
+
+
+def _items_of(
+    type_annotation: _types.TypeAnnotationExceptOptional,
+) -> Sequence[_types.TypeAnnotationUnion]:
+    """Give the items of a list or of a tuple, and nothing for anything else."""
+    if isinstance(type_annotation, _types.ListTypeAnnotation):
+        return [type_annotation.items]
+
+    if isinstance(type_annotation, _types.TupleTypeAnnotation):
+        return type_annotation.items
+
+    return []
+
+
+def sets_nested_in_properties(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether any property holds a set nested in a list or in a tuple.
+
+    The generators need this check to import the type of the set where they
+    spell out the types of such lists and tuples, but not those of the sets
+    themselves, *e.g.*, in the deep copies.
+    """
+    return any(
+        any(True for _ in _nested_sets(item_type_anno))
+        for cls in symbol_table.classes
+        for prop in cls.properties
+        for item_type_anno in _items_of(_types.beneath_optional(prop.type_annotation))
+    )
+
+
+def _holds_set_of_enumeration_literals(
     type_annotation: _types.TypeAnnotationUnion,
 ) -> bool:
-    """Check whether the ``type_annotation`` is a set of enumeration literals."""
-    type_anno = _types.beneath_optional(type_annotation)
-    return (
-        isinstance(type_anno, _types.SetTypeAnnotation)
-        and isinstance(type_anno.items, _types.OurTypeAnnotation)
-        and isinstance(type_anno.items.our_type, _types.Enumeration)
+    """Check whether ``type_annotation`` holds a set of enumeration literals at any depth."""
+    return any(
+        isinstance(set_type_anno.items, _types.OurTypeAnnotation)
+        and isinstance(set_type_anno.items.our_type, _types.Enumeration)
+        for set_type_anno in _nested_sets(type_annotation)
     )
 
 
@@ -313,7 +376,7 @@ def sets_of_enumeration_literals(symbol_table: _types.SymbolTable) -> bool:
         return True
 
     if any(
-        _is_set_of_enumeration_literals(prop.type_annotation)
+        _holds_set_of_enumeration_literals(prop.type_annotation)
         for cls in symbol_table.classes
         for prop in cls.properties
     ):
@@ -326,12 +389,12 @@ def sets_of_enumeration_literals(symbol_table: _types.SymbolTable) -> bool:
 
     for function in functions:
         if any(
-            _is_set_of_enumeration_literals(argument.type_annotation)
+            _holds_set_of_enumeration_literals(argument.type_annotation)
             for argument in function.arguments
         ):
             return True
 
-        if function.returns is not None and _is_set_of_enumeration_literals(
+        if function.returns is not None and _holds_set_of_enumeration_literals(
             function.returns
         ):
             return True
@@ -354,15 +417,10 @@ def sets_of_enumeration_literals(symbol_table: _types.SymbolTable) -> bool:
 
 
 def sets_of_strings_in_properties(symbol_table: _types.SymbolTable) -> bool:
-    """Check whether any class of the ``symbol_table`` has a set property of strings."""
-    for cls in symbol_table.classes:
-        for prop in cls.properties:
-            type_anno = _types.beneath_optional(prop.type_annotation)
-            if (
-                isinstance(type_anno, _types.SetTypeAnnotation)
-                and _types.try_primitive_type(type_anno.items)
-                is _types.PrimitiveType.STR
-            ):
-                return True
-
-    return False
+    """Check whether any class of the ``symbol_table`` has a property holding a set of strings."""
+    return any(
+        _types.try_primitive_type(set_type_anno.items) is _types.PrimitiveType.STR
+        for cls in symbol_table.classes
+        for prop in cls.properties
+        for set_type_anno in _nested_sets(prop.type_annotation)
+    )

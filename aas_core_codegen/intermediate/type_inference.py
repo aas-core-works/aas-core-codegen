@@ -210,6 +210,8 @@ class BuiltinFunctionKind(enum.Enum):
             ...
         elif func.kind is BuiltinFunctionKind.SET:
             ...
+        elif func.kind is BuiltinFunctionKind.LIST:
+            ...
         else:
             assert_never(func.kind)
     """
@@ -218,6 +220,7 @@ class BuiltinFunctionKind(enum.Enum):
     ABS = "abs"
     INT = "int"
     SET = "set"
+    LIST = "list"
 
 
 class BuiltinFunction:
@@ -2248,15 +2251,40 @@ def _can_be_mutated(type_annotation: "TypeAnnotationUnion") -> bool:
     return False
 
 
-def _holds_list(type_annotation: "TypeAnnotationUnion") -> bool:
-    """Check whether a value of ``type_annotation`` is or contains a list."""
+#: Type annotations of the collections which we do not compare, see
+#: :py:meth:`_Inferrer.transform_comparison` and :py:meth:`_Inferrer.transform_is_in`
+_COLLECTION_TYPE_ANNOTATIONS = (
+    ListTypeAnnotation,
+    TupleTypeAnnotation,
+    SetTypeAnnotation,
+)  # type: Final
+
+
+def _holds_set(type_annotation: "TypeAnnotationUnion") -> bool:
+    """Check whether a value of ``type_annotation`` is or contains a set at any depth."""
     type_anno = beneath_optional(type_annotation)
 
+    if isinstance(type_anno, SetTypeAnnotation):
+        return True
+
     if isinstance(type_anno, ListTypeAnnotation):
+        return _holds_set(type_anno.items)
+
+    if isinstance(type_anno, TupleTypeAnnotation):
+        return any(_holds_set(item) for item in type_anno.items)
+
+    return False
+
+
+def _holds_list_or_set(type_annotation: "TypeAnnotationUnion") -> bool:
+    """Check whether a value of ``type_annotation`` is or contains a list or a set."""
+    type_anno = beneath_optional(type_annotation)
+
+    if isinstance(type_anno, (ListTypeAnnotation, SetTypeAnnotation)):
         return True
 
     if isinstance(type_anno, TupleTypeAnnotation):
-        return any(_holds_list(item) for item in type_anno.items)
+        return any(_holds_list_or_set(item) for item in type_anno.items)
 
     return False
 
@@ -2272,6 +2300,21 @@ def _is_access_path(node: parse_tree.Expression) -> bool:
 def _is_set_call(node: parse_tree.Node) -> bool:
     """Check whether ``node`` is a call to the built-in ``set``."""
     return isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "set"
+
+
+def _is_list_copy(
+    node: parse_tree.Node,
+    type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
+) -> bool:
+    """Check whether ``node`` copies a list with the built-in ``list``."""
+    if not isinstance(node, parse_tree.FunctionCall):
+        return False
+
+    func_type = type_map.get(node.name, None)
+    return (
+        isinstance(func_type, BuiltinFunctionTypeAnnotation)
+        and func_type.func.kind is BuiltinFunctionKind.LIST
+    )
 
 
 def _is_new_set(
@@ -2465,18 +2508,19 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.downcast_map = dict()
         self.errors = []
 
-    def _is_copy_of_lists(self, node: parse_tree.Expression) -> bool:
+    def _is_copy(self, node: parse_tree.Expression) -> bool:
         """
-        Check that all the lists held by ``node`` are copies.
+        Check that all the lists and the sets held by ``node`` are copies.
 
-        A copy is a slice ``[:]``, possibly as an item of a tuple literal.
+        A copy is a list copied with ``list(...)`` or a new set, possibly as an item
+        of a tuple literal.
         """
-        if isinstance(node, parse_tree.Slice):
+        if _is_list_copy(node, self.type_map) or _is_new_set(node, self.type_map):
             return True
 
         if isinstance(node, parse_tree.Tuple):
             return all(
-                not _holds_list(self.type_map[value]) or self._is_copy_of_lists(value)
+                not _holds_list_or_set(self.type_map[value]) or self._is_copy(value)
                 for value in node.values
             )
 
@@ -2580,7 +2624,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             return None
 
-        if isinstance(node, parse_tree.Slice):
+        if _is_list_copy(node, self.type_map):
             # NOTE (mristin):
             # A copy of a list is a fresh value, and hence mutable.
             return None
@@ -3370,41 +3414,26 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if isinstance(collection_type, ListTypeAnnotation):
             # NOTE (mristin):
-            # We support slicing the lists only to copy them, as the lists need
-            # to be copied explicitly when they are stored, see
-            # :py:meth:`transform_assignment`.
-            if node.start is not None or node.end is not None:
-                self.errors.append(
-                    Error(
-                        node.original_node,
-                        "We support slicing a list only to copy it as a whole, "
-                        "with ``[:]``, but got a slice with a start or an end",
-                    )
+            # Python gives a ``Sequence`` when slicing a read-only list, so mypy
+            # refuses to store the slice as a ``List``. In contrast, mypy accepts
+            # ``list(...)`` of a ``Sequence``, so we copy the lists only with it.
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"We do not support slicing a list. If you want to copy "
+                    f"the list, please use "
+                    f"``list({self._representation_map[node.collection]})``, "
+                    f"which mypy accepts for a read-only ``Sequence`` as well.",
                 )
-                return None
-
-            if _holds_list(collection_type.items):
-                self.errors.append(
-                    Error(
-                        node.original_node,
-                        f"We can not copy the list of type {collection_type} with "
-                        f"``[:]``, since its items hold lists themselves. Python "
-                        f"copies the list shallowly, so that the copy shares "
-                        f"the inner lists, while C++ copies the inner lists as well.",
-                    )
-                )
-                return None
-
-            list_copy_type = ListTypeAnnotation(items=collection_type.items)
-            self.type_map[node] = list_copy_type
-            return list_copy_type
+            )
+            return None
 
         if try_primitive_type(collection_type) is not PrimitiveType.STR:
             self.errors.append(
                 Error(
                     node.collection.original_node,
-                    f"We support slicing only of non-None strings, and copying of "
-                    f"non-None lists with ``[:]``, but got: {collection_type}",
+                    f"We support slicing only of non-None strings, "
+                    f"but got: {collection_type}",
                 )
             )
             success = False
@@ -3443,6 +3472,21 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         for value in node.values:
             value_type = self.transform(value)
             if value_type is None:
+                failed = True
+            elif isinstance(value_type, OptionalTypeAnnotation):
+                # NOTE (mristin):
+                # A literal ``None`` has already been refused, as the targets need
+                # to know the type of the optional.
+                self.errors.append(
+                    Error(
+                        value.original_node,
+                        f"The items of a tuple can not be None, as we support "
+                        f"Optional only at the top of a type annotation, but "
+                        f"the item is inferred to be {value_type}. Please check "
+                        f"first that the item is not None, *e.g.*, with "
+                        f"``if {self._representation_map[value]} is not None:``.",
+                    )
+                )
                 failed = True
             else:
                 items.append(value_type)
@@ -3489,6 +3533,24 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
             )
             success = False
+
+        for operand, operand_type, what in (
+            (node.left, left_type, "left operand"),
+            (node.right, right_type, "right operand"),
+        ):
+            if isinstance(operand_type, _COLLECTION_TYPE_ANNOTATIONS):
+                self.errors.append(
+                    Error(
+                        operand.original_node,
+                        f"We do not support comparing the lists, the tuples or "
+                        f"the sets, but the {what} is inferred to "
+                        f"be {operand_type}. The targets disagree on the comparison: "
+                        f"Python compares them item by item, while C#, Java and "
+                        f"TypeScript compare their references. Please compare "
+                        f"their items instead, *e.g.*, in a for-loop.",
+                    )
+                )
+                success = False
 
         if not success:
             return None
@@ -3556,6 +3618,19 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     node.container.original_node,
                     f"Expected the container to be a non-None, "
                     f"but got: {container_type}",
+                )
+            )
+            success = False
+
+        if isinstance(member_type, _COLLECTION_TYPE_ANNOTATIONS):
+            self.errors.append(
+                Error(
+                    node.member.original_node,
+                    f"We do not support looking up a list, a tuple or a set "
+                    f"with ``in``, but the member is inferred to be {member_type}. "
+                    f"The targets disagree on the comparison: Python compares "
+                    f"the items item by item, while C#, Java and TypeScript "
+                    f"compare their references.",
                 )
             )
             success = False
@@ -3888,10 +3963,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             argument_type = convert_type_annotation(argument.type_annotation)
             if (
                 arg_type is not None
-                and (
-                    isinstance(beneath_optional(arg_type), SetTypeAnnotation)
-                    or isinstance(beneath_optional(argument_type), SetTypeAnnotation)
-                )
+                and (_holds_set(arg_type) or _holds_set(argument_type))
                 and not _assignable(target_type=argument_type, value_type=arg_type)
             ):
                 self.errors.append(
@@ -4283,6 +4355,58 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     )
                 )
                 return None
+
+        if (
+            isinstance(func_type, BuiltinFunctionTypeAnnotation)
+            and func_type.func.kind is BuiltinFunctionKind.LIST
+        ):
+            if len(arg_types) != 1:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"We support ``list(...)`` only to copy a list, so we "
+                        f"expect exactly one argument, but got {len(arg_types)}.",
+                    )
+                )
+                return None
+
+            arg_type = arg_types[0]
+            assert arg_type is not None
+
+            if not isinstance(arg_type, ListTypeAnnotation):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"We support ``list(...)`` only to copy a non-None list, "
+                        f"but got: {arg_type}"
+                        + (
+                            ". Please check for ``is not None`` first."
+                            if isinstance(arg_type, OptionalTypeAnnotation)
+                            else ""
+                        ),
+                    )
+                )
+                return None
+
+            if _holds_list_or_set(arg_type.items):
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"We can not copy the list of type {arg_type} with "
+                        f"``list(...)``, since its items hold lists or sets "
+                        f"themselves. Python copies the list shallowly, so that "
+                        f"the copy shares the inner lists and sets, while C++ "
+                        f"copies them as well. We do not support deep copies at "
+                        f"the moment. Please contact the developers if you need "
+                        f"this feature.",
+                    )
+                )
+                return None
+
+            # NOTE (mristin):
+            # The copy is a fresh list, and hence mutable, see
+            # :py:meth:`_read_only_reason`.
+            result = ListTypeAnnotation(items=arg_type.items)
 
         assert result is not None
 
@@ -5153,6 +5277,17 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 if items is None:
                     return None
 
+                if isinstance(items, OptionalTypeAnnotation):
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            f"We support Optional only at the top of a type "
+                            f"annotation, so the items of a list can not be "
+                            f"optional, but got: {generic}[{items}]",
+                        )
+                    )
+                    return None
+
                 return ListTypeAnnotation(items=items)
 
             if generic == "AbstractSet" and not read_only:
@@ -5192,6 +5327,17 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 for item_node in item_nodes:
                     item = self._resolve_annotation(item_node, read_only)
                     if item is None:
+                        return None
+
+                    if isinstance(item, OptionalTypeAnnotation):
+                        self.errors.append(
+                            Error(
+                                item_node.original_node,
+                                f"We support Optional only at the top of a type "
+                                f"annotation, so the items of a tuple can not be "
+                                f"optional, but got: {item}",
+                            )
+                        )
                         return None
 
                     tuple_items.append(item)
@@ -5612,21 +5758,47 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
             # NOTE (mristin):
-            # Python shares a stored list, while C++ copies it, as its lists are
-            # values. We can not faithfully transpile the sharing to C++, so we
-            # require an explicit copy of every stored list, in all the targets.
-            if _holds_list(value_type) and not self._is_copy_of_lists(node.value):
-                self.errors.append(
-                    Error(
-                        node.value.original_node,
-                        f"The value assigned to {what} "
-                        f"of {self._representation_map[receiver]} holds a list, "
-                        f"which Python would share, but C++ would copy. We can not "
-                        f"transpile the sharing to C++, so please assign an explicit "
-                        f"copy of the list, *e.g.*, "
-                        f"``{self._representation_map[node.value]}[:]``.",
+            # Python shares a stored list or set, while C++ copies it, as its lists
+            # and sets are values. We can not faithfully transpile the sharing to
+            # C++, so we require an explicit copy of every stored list and set, in
+            # all the targets. The sets at the top are checked in
+            # :py:func:`_check_sets`, so we do not report them twice.
+            value_type_beneath = beneath_optional(value_type)
+            if (
+                _holds_list_or_set(value_type)
+                and not isinstance(value_type_beneath, SetTypeAnnotation)
+                and not self._is_copy(node.value)
+            ):
+                if isinstance(
+                    value_type_beneath, ListTypeAnnotation
+                ) and not _holds_list_or_set(value_type_beneath.items):
+                    self.errors.append(
+                        Error(
+                            node.value.original_node,
+                            f"The value assigned to {what} "
+                            f"of {self._representation_map[receiver]} holds a list, "
+                            f"which Python would share, but C++ would copy. We can "
+                            f"not transpile the sharing to C++, so please assign "
+                            f"an explicit copy of the list, *e.g.*, "
+                            f"``list({self._representation_map[node.value]})``.",
+                        )
                     )
-                )
+                else:
+                    self.errors.append(
+                        Error(
+                            node.value.original_node,
+                            f"The value assigned to {what} "
+                            f"of {self._representation_map[receiver]} holds lists "
+                            f"or sets, which Python would share, but C++ would "
+                            f"copy. We can not transpile the sharing to C++, so "
+                            f"please assign explicit copies of them, *e.g.*, "
+                            f"a tuple literal of the lists copied with "
+                            f"``list(...)``. "
+                            f"We do not support deep copies of the nested lists "
+                            f"and sets at the moment. Please contact the developers "
+                            f"if you need this feature.",
+                        )
+                    )
                 return None
 
             # NOTE (mristin):
@@ -5705,6 +5877,31 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 if reason is None:
                     self._mutable_name_set.add(node.target.identifier)
                 else:
+                    # NOTE (mristin):
+                    # A variable declared with ``List[...]`` is mutable for mypy,
+                    # so mypy refuses to initialize it with a read-only
+                    # ``Sequence``. We refuse it as well, as otherwise the meta-model
+                    # would type-check here, but not with mypy.
+                    if node.annotation is not None and any(
+                        isinstance(annotation_node, parse_tree.Name)
+                        and annotation_node.identifier == "List"
+                        for annotation_node in parse_tree.over_nodes(node.annotation)
+                    ):
+                        self.errors.append(
+                            Error(
+                                node.value.original_node,
+                                f"The variable {node.target.identifier!r} is "
+                                f"declared as mutable with "
+                                f"``{ast.unparse(node.annotation.original_node)}``, "
+                                f"but {reason}. "
+                                f"Alternatively, please copy the list with "
+                                f"``list({self._representation_map[node.value]})``, "
+                                f"or declare the variable with ``Sequence[...]`` "
+                                f"instead of ``List[...]`` if you do not mutate it.",
+                            )
+                        )
+                        return None
+
                     self._read_only_reason_by_name[node.target.identifier] = reason
 
         # region Update the facts
@@ -6435,6 +6632,13 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         func=BuiltinFunction(kind=BuiltinFunctionKind.SET, returns=None)
     )
 
+    # NOTE (mristin):
+    # We support ``list(...)`` only to copy a list. The type of the copy is
+    # the type of the argument, so it is inferred at the call site.
+    mapping[Identifier("list")] = BuiltinFunctionTypeAnnotation(
+        func=BuiltinFunction(kind=BuiltinFunctionKind.LIST, returns=None)
+    )
+
     for constant in symbol_table.constants:
         if isinstance(constant, _types.ConstantPrimitive):
             mapping[constant.name] = PrimitiveTypeAnnotation(
@@ -6575,8 +6779,8 @@ def _check_sets(
     """
     Check that the sets in the ``body`` are used only where we can transpile them.
 
-    A set can be the container of ``in``, the collection of a for-loop,
-    the receiver of its methods, an argument of a call, the target of
+    A set can be the container of ``in``, the collection or the variable of
+    a for-loop, the receiver of its methods, an argument of a call, the target of
     an assignment and the value of a nullness check. A new set, *e.g.*, from
     ``set()`` or ``intersection``, can also be assigned. Elsewhere, *e.g.*, in
     ``b = a``, the targets would need to either copy or share the set, and they
@@ -6669,6 +6873,11 @@ def _check_sets(
             elif isinstance(node, parse_tree.ForEach):
                 allowed_set.add(node.iteration)
 
+                # NOTE (mristin):
+                # The loop variable over the nested sets, *e.g.*, in a list of
+                # sets, refers to the set in the collection in all the targets.
+                allowed_set.add(node.variable)
+
             if isinstance(node, parse_tree.Expression):
                 type_anno = type_map.get(node, None)
                 if type_anno is not None and isinstance(
@@ -6680,8 +6889,8 @@ def _check_sets(
         Error(
             node.original_node,
             "We support a set only as the container of ``in``, the collection "
-            "of a for-loop, the receiver of its methods, an argument of a call, "
-            "the target of an assignment, the value of a nullness check, and "
+            "or the variable of a for-loop, the receiver of its methods, "
+            "an argument of a call, the target of an assignment, the value of a nullness check, and "
             "a new set as the assigned value. Elsewhere, the targets would need "
             "to either copy or share the set, and they disagree on that: C++ "
             "copies it, while the other targets share it.",

@@ -7,6 +7,7 @@ from icontract import ensure
 
 import aas_core_codegen.naming
 from aas_core_codegen import intermediate
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.common import Error, Stripped, Identifier, indent_but_first_line
 from aas_core_codegen.golang import (
     common as golang_common,
@@ -378,7 +379,7 @@ import (
 
     enum_ids_in_set_properties = set(
         intermediate.runtime_id(enum)
-        for enum in golang_common.enumerations_in_set_properties(symbol_table)
+        for enum in intermediate_uses.enumerations_in_set_properties(symbol_table)
     )
 
     for enum in symbol_table.enumerations:

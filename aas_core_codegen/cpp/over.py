@@ -369,6 +369,48 @@ def collect_function_types(
     return function_types, None
 
 
+def collect_nested_containers(
+    classes: Sequence[intermediate.ConcreteClass],
+) -> List[intermediate.ContainerTypeAnnotation]:
+    """
+    Collect the lists, the sets and the tuples nested in other ones.
+
+    The de/serializers generate a named function for each of them, so that
+    the generated code has no nested lambdas. The containers are deduplicated by
+    their monikers, and ordered so that the inner ones come before the outer ones,
+    as C++ requires a function to be declared before it is called.
+    """
+    result = []  # type: List[intermediate.ContainerTypeAnnotation]
+    observed_monikers = set()  # type: Set[str]
+
+    def collect(
+        type_annotation: intermediate.TypeAnnotationExceptOptional, nested: bool
+    ) -> None:
+        """Collect the containers nested in ``type_annotation``, and itself if ``nested``."""
+        if not isinstance(type_annotation, intermediate.ContainerTypeAnnotationAsTuple):
+            return
+
+        items = (
+            type_annotation.items
+            if isinstance(type_annotation, intermediate.TupleTypeAnnotation)
+            else [type_annotation.items]
+        )
+        for item in items:
+            collect(item, True)
+
+        if nested:
+            type_moniker = moniker(type_annotation)
+            if type_moniker not in observed_monikers:
+                observed_monikers.add(type_moniker)
+                result.append(type_annotation)
+
+    for cls in classes:
+        for prop in cls.properties:
+            collect(intermediate.beneath_optional(prop.type_annotation), False)
+
+    return result
+
+
 _OVER_FUNCTION_NAME_RE = re.compile(r"\b(Over_\w+)\b")
 
 

@@ -71,7 +71,7 @@ def _check_container_name(
 @require(
     lambda type_anno: not isinstance(type_anno, intermediate.OptionalTypeAnnotation),
     "The optionals are unwrapped at the properties, and nested optionals "
-    "have been refused in intermediate._translate._verify_only_simple_type_patterns",
+    "have been refused in parse._translate._verify_symbol_table",
 )
 def _generate_check_expr(
     that_expr: str, other_expr: str, type_anno: intermediate.TypeAnnotationUnion

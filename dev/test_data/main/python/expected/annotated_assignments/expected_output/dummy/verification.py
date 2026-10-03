@@ -64,7 +64,7 @@ Error = our_reporting.Error
 
 
 def first_child_a_is_small(
-    parents: List[our_types.Parent]
+    parents: Sequence[our_types.Parent]
 ) -> bool:
     """
     Check an optional class declared with ``None`` and assigned in a loop.
@@ -119,7 +119,7 @@ def text_is_allowed_unless_long(
 
 def last_child_b_is_not_zero(
     parent: our_types.Parent,
-    parents: List[our_types.Parent]
+    parents: Sequence[our_types.Parent]
 ) -> bool:
     """Check a non-optional variable declared wider than its value."""
     # pylint: disable=all
@@ -247,13 +247,13 @@ def data_is_small(
 
 
 def texts_are_few(
-    texts: List[str],
-    optional_texts: Optional[List[str]]
+    texts: Sequence[str],
+    optional_texts: Optional[Sequence[str]]
 ) -> bool:
     """Check the declarations of the lists."""
     # pylint: disable=all
-    all_texts: List[str] = texts
-    maybe_texts: Optional[List[str]] = optional_texts
+    all_texts: Sequence[str] = texts
+    maybe_texts: Optional[Sequence[str]] = optional_texts
     if (
         (
             (maybe_texts is not None)
@@ -347,7 +347,7 @@ def wrap_into_member(
 def final_locals_are_consistent(
     text: str,
     number: int,
-    texts: List[str],
+    texts: Sequence[str],
     optional_text: Optional[str],
     parent: our_types.Parent
 ) -> bool:

@@ -1,0 +1,2 @@
+Expected 1 arguments of a subscripted type annotation 'List', but got 2: List[str, int]
+Expected 1 arguments of a subscripted type annotation 'List', but got 2: List[str, int]

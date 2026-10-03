@@ -645,7 +645,7 @@ if abort {{
     raise AssertionError(
         f"Unexpected type annotation holding instances: {type_anno}. "
         f"The optionals nested in the containers should have been refused in "
-        f"intermediate._translate._verify_only_simple_type_patterns."
+        f"parse._translate._verify_symbol_table."
     )
 
 

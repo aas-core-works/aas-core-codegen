@@ -1,7 +1,7 @@
 """Generate code for JSON de/serialization."""
 
 import io
-from typing import Tuple, Optional, List, Set, Union
+from typing import Tuple, Optional, List, Sequence, Set, Union
 
 from icontract import ensure, require
 
@@ -1111,6 +1111,133 @@ def _determine_parse_function_for_atomic_value(
     return Stripped(function_name)
 
 
+def _parse_function_reference(
+    type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
+    """
+    Reference the function parsing a value of ``type_anno`` from a JSON-able.
+
+    A generic Golang function can not be passed on uninstantiated, so a list,
+    a set or a tuple nested in another one is parsed by a function of its own,
+    named by its moniker, see :py:func:`_generate_parse_nested_container`.
+    """
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return Stripped(f"parse{golang_common.type_moniker(type_anno)}")
+
+    assert isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple)
+    return _determine_parse_function_for_atomic_value(type_anno)
+
+
+def _nested_containers(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.ContainerTypeAnnotation]:
+    """
+    List the lists, the sets and the tuples nested in other ones.
+
+    They are de-duplicated by their moniker, as different types of the meta-model,
+    *e.g.*, a constrained primitive and its constrainee, might map to the same
+    Golang type.
+    """
+    result = []  # type: List[intermediate.ContainerTypeAnnotation]
+    observed_monikers = set()  # type: Set[str]
+
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            top = intermediate.beneath_optional(prop.type_annotation)
+
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(top):
+                if type_anno is top or not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
+
+                moniker = golang_common.type_moniker(type_anno)
+                if moniker in observed_monikers:
+                    continue
+
+                observed_monikers.add(moniker)
+                result.append(type_anno)
+
+    return result
+
+
+def _parse_function_and_arguments(
+    type_anno: intermediate.TypeAnnotationExceptOptional,
+    jsonable_expr: str,
+) -> Tuple[str, List[str]]:
+    """Determine the function, and its arguments, parsing ``jsonable_expr``."""
+    if isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple):
+        return _determine_parse_function_for_atomic_value(type_anno), [jsonable_expr]
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return "parseArray", [
+            jsonable_expr,
+            _parse_function_reference(type_anno.items),
+        ]
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return "parseSet", [
+            jsonable_expr,
+            _parse_function_reference(type_anno.items),
+        ]
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return f"parseTuple{len(type_anno.items)}", [jsonable_expr] + [
+            _parse_function_reference(item) for item in type_anno.items
+        ]
+
+    assert_never(type_anno)
+
+
+def _generate_return_call(function: str, arguments: Sequence[str]) -> Stripped:
+    """
+    Generate the statement returning the call of ``function``.
+
+    The call is put on a single line if it fits in the body of a function, and
+    with each argument on a line of its own otherwise.
+    """
+    call = f"{function}({', '.join(arguments)})"
+    if (
+        "\n" not in call
+        and golang_common.TAB_WIDTH + len("return ") + len(call)
+        <= golang_common.MAX_LINE_LENGTH
+    ):
+        return Stripped(f"return {call}")
+
+    arguments_joined = ",\n".join(arguments)
+    return Stripped(
+        f"""\
+return {function}(
+{I}{indent_but_first_line(arguments_joined, I)},
+)"""
+    )
+
+
+def _generate_parse_nested_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the function parsing a list, a set or a tuple nested in another one."""
+    value_type = golang_common.generate_type(
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
+    )
+
+    function, arguments = _parse_function_and_arguments(
+        type_anno=type_anno, jsonable_expr="jsonable"
+    )
+
+    return Stripped(
+        f"""\
+// Parse `jsonable` as a nested collection.
+func {_parse_function_reference(type_anno)}(
+{I}jsonable interface{{}},
+) ({value_type}, error) {{
+{I}{indent_but_first_line(_generate_return_call(function, arguments), I)}
+}}"""
+    )
+
+
 #: Number of tabs the body of a ``case`` of the property switch is indented by, counted
 #: from the beginning of the line -- one for the function body, one for the ``for``
 #: loop and one for the ``case`` itself
@@ -1155,65 +1282,9 @@ def _generate_deserialization_switch_statement(
 
         json_prop_literal = golang_common.string_literal(prop.json_name)
 
-        function: str
-        arguments: List[str]
-
-        if isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple):
-            function = _determine_parse_function_for_atomic_value(type_anno)
-            arguments = ["v"]
-
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We expect only lists of atomic types "
-                f"at the moment, but you specified {type_anno}. "
-                f"Please contact the developers if you need this feature."
-            )
-
-            function = "parseArray"
-            arguments = [
-                "v",
-                _determine_parse_function_for_atomic_value(type_anno.items),
-            ]
-
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            function = f"parseTuple{len(type_anno.items)}"
-            arguments = ["v"]
-
-            for item_type_anno in type_anno.items:
-                assert isinstance(
-                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-                ), (
-                    f"NOTE (mristin): We expect only atomic items in a tuple "
-                    f"at the moment, but got {item_type_anno} in {type_anno}. "
-                    f"This should have already been verified in "
-                    f"intermediate._translate._verify_only_simple_type_patterns."
-                )
-
-                arguments.append(
-                    _determine_parse_function_for_atomic_value(item_type_anno)
-                )
-
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We expect only sets of atomic types, "
-                f"as we refuse the others in "
-                f"intermediate._translate._verify_items_of_sets, "
-                f"but you specified {type_anno}."
-            )
-
-            function = "parseSet"
-            arguments = [
-                "v",
-                _determine_parse_function_for_atomic_value(type_anno.items),
-            ]
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_anno)
+        function, arguments = _parse_function_and_arguments(
+            type_anno=type_anno, jsonable_expr="v"
+        )
 
         # NOTE (mristin):
         # An optional value which Go can not represent as nil on its own is modeled as
@@ -1230,7 +1301,8 @@ def _generate_deserialization_switch_statement(
 
         single_line = f"{prefix}parseOptional({call})" if pointer else f"{prefix}{call}"
         if (
-            _CASE_BODY_INDENTION * golang_common.TAB_WIDTH + len(single_line)
+            "\n" not in single_line
+            and _CASE_BODY_INDENTION * golang_common.TAB_WIDTH + len(single_line)
             <= golang_common.MAX_LINE_LENGTH
         ):
             case_body = Stripped(single_line)
@@ -1242,7 +1314,8 @@ def _generate_deserialization_switch_statement(
 
             inner: Stripped
             if (
-                inner_indention * golang_common.TAB_WIDTH + len(call)
+                "\n" not in call
+                and inner_indention * golang_common.TAB_WIDTH + len(call)
                 <= golang_common.MAX_LINE_LENGTH
             ):
                 inner = Stripped(call)
@@ -2129,6 +2202,88 @@ def _item_serializer_function(
         assert_never(our_type)
 
 
+def _item_or_nested_serializer_function(
+    type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
+    """
+    Determine the function to serialize an item, which might be a collection.
+
+    A list, a set or a tuple nested in another one is serialized by a function
+    of its own, named by its moniker, see
+    :py:func:`_generate_serialize_nested_container`.
+    """
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return Stripped(f"serialize{golang_common.type_moniker(type_anno)}")
+
+    assert isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple)
+    return _item_serializer_function(type_anno)
+
+
+def _serialize_container_function_and_arguments(
+    type_anno: intermediate.ContainerTypeAnnotation,
+    access_expression: str,
+    indention: int,
+) -> Tuple[str, List[str]]:
+    """
+    Determine the function, and its arguments, serializing a list, a set or a tuple.
+
+    The ``indention`` is the number of tabs the arguments are indented by.
+    """
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return "serializeArray", [
+            access_expression,
+            _item_or_nested_serializer_function(type_anno.items),
+        ]
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        # NOTE (mristin):
+        # We serialize a set as an array whose items are sorted in the same
+        # order in all the SDKs.
+        return "serializeArray", [
+            golang_common.sorted_set_items_expr(
+                access_expression,
+                type_anno.items,
+                column=indention * golang_common.TAB_WIDTH,
+            ),
+            _item_or_nested_serializer_function(type_anno.items),
+        ]
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return f"serializeTuple{len(type_anno.items)}", [access_expression] + [
+            _item_or_nested_serializer_function(item) for item in type_anno.items
+        ]
+
+    assert_never(type_anno)
+
+
+def _generate_serialize_nested_container(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the function serializing a list, a set or a tuple nested in another one.
+
+    The function has the uniform signature ``func(that T) (interface{}, error)``
+    of the item serializers.
+    """
+    value_type = golang_common.generate_type(
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
+    )
+
+    function, arguments = _serialize_container_function_and_arguments(
+        type_anno=type_anno, access_expression="that", indention=2
+    )
+
+    return Stripped(
+        f"""\
+// Serialize `that` nested collection to a JSON-able.
+func {_item_or_nested_serializer_function(type_anno)}(
+{I}that {value_type},
+) (interface{{}}, error) {{
+{I}{indent_but_first_line(_generate_return_call(function, arguments), I)}
+}}"""
+    )
+
+
 class _ItemSerializerWrappers:
     """
     Capture which item serializer wrappers the generated code needs.
@@ -2154,19 +2309,36 @@ def _determine_item_serializer_wrappers(
 
     enumeration_names = set()  # type: Set[Identifier]
 
+    # NOTE (mristin):
+    # We collect the atomic items of the lists, the sets and the tuples at any
+    # depth. A nested collection is serialized by a function of its own, which
+    # needs no wrapper, but its items do.
     item_type_annotations = []  # type: List[intermediate.TypeAnnotationUnion]
-    for cls in symbol_table.concrete_classes:
-        for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
+    stack = [
+        intermediate.beneath_optional(prop.type_annotation)
+        for cls in symbol_table.concrete_classes
+        for prop in cls.properties
+    ]  # type: List[intermediate.TypeAnnotationExceptOptional]
 
-            if isinstance(type_anno, intermediate.ListTypeAnnotation):
-                item_type_annotations.append(type_anno.items)
-            elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-                item_type_annotations.append(type_anno.items)
-            elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-                item_type_annotations.extend(type_anno.items)
+    while len(stack) > 0:
+        type_anno = stack.pop()
+
+        if isinstance(
+            type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+        ):
+            items = [
+                type_anno.items
+            ]  # type: Sequence[intermediate.TypeAnnotationUnion]
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            items = type_anno.items
+        else:
+            continue
+
+        for item in items:
+            if isinstance(item, intermediate.ContainerTypeAnnotationAsTuple):
+                stack.append(item)
             else:
-                pass
+                item_type_annotations.append(item)
 
     for item_type_anno in item_type_annotations:
         primitive_type = intermediate.try_primitive_type(item_type_anno)
@@ -2484,65 +2656,20 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
         arguments = None  # type: Optional[List[str]]
         block: Stripped
 
-        if isinstance(type_anno, intermediate.ListTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "(mristin): We currently generate only the code to serialize lists of "
-                "atomic values. If you need this feature, please contact "
-                "the developers."
-            )
-
-            function = "serializeArray"
-            arguments = [
-                access_expression,
-                _item_serializer_function(type_anno.items),
-            ]
-        elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-            assert isinstance(
-                type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"NOTE (mristin): We expect only sets of atomic types, "
-                f"as we refuse the others in "
-                f"intermediate._translate._verify_items_of_sets, "
-                f"but you specified {type_anno}."
-            )
-
-            # NOTE (mristin):
-            # We serialize a set as an array whose items are sorted in the same
-            # order in all the SDKs.
-            function = "serializeArray"
-            arguments = [
-                golang_common.sorted_set_items_expr(
-                    access_expression,
-                    type_anno.items,
-                    column=(indention + 1) * golang_common.TAB_WIDTH,
-                ),
-                _item_serializer_function(type_anno.items),
-            ]
-        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-            item_serializers = []  # type: List[str]
-
-            for item_type_anno in type_anno.items:
-                assert isinstance(
-                    item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-                ), (
-                    f"NOTE (mristin): We expect only atomic items in a tuple "
-                    f"at the moment, but got {item_type_anno} in {type_anno}. "
-                    f"This should have already been verified in "
-                    f"intermediate._translate._verify_only_simple_type_patterns."
-                )
-
-                item_serializers.append(_item_serializer_function(item_type_anno))
-
-            function = f"serializeTuple{len(type_anno.items)}"
-
+        if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
             # NOTE (mristin):
             # A tuple is represented as a Golang struct, which is not nilable, so
             # an optional tuple is modeled as a pointer and has to be dereferenced.
-            arguments = [
-                f"*({access_expression})" if optional else access_expression
-            ] + item_serializers
+            function, arguments = _serialize_container_function_and_arguments(
+                type_anno=type_anno,
+                access_expression=(
+                    f"*({access_expression})"
+                    if optional
+                    and isinstance(type_anno, intermediate.TupleTypeAnnotation)
+                    else access_expression
+                ),
+                indention=indention + 1,
+            )
         else:
             assert isinstance(
                 prop.type_annotation,
@@ -2581,7 +2708,8 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
 
             single_line = f"{target}, err = {function}({', '.join(arguments)})"
             if (
-                indention * golang_common.TAB_WIDTH + len(single_line)
+                "\n" not in single_line
+                and indention * golang_common.TAB_WIDTH + len(single_line)
                 <= golang_common.MAX_LINE_LENGTH
             ):
                 statement = Stripped(single_line)
@@ -2880,6 +3008,11 @@ func mustDeserializationError(err error) *DeserializationError {{
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_parse_tuple_helper(arity))
 
+    nested_containers = _nested_containers(symbol_table)
+
+    for nested_container in nested_containers:
+        blocks.append(_generate_parse_nested_container(nested_container))
+
     errors = []  # type: List[Error]
 
     for our_type in symbol_table.our_types:
@@ -3049,6 +3182,9 @@ func mustSerializationError(err error) *SerializationError {{
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_serialize_tuple_helper(arity))
+
+    for nested_container in nested_containers:
+        blocks.append(_generate_serialize_nested_container(nested_container))
 
     for enum in symbol_table.enumerations:
         blocks.append(_generate_enumeration_to_jsonable(enum))

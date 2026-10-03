@@ -1,0 +1,1 @@
+In the property 'pairs' of the class 'Something': We do not support the sets of tuples, but got the items of type Tuple[str, int]. Only some of the targets can hash a tuple out of the box. Please contact the developers if you need this feature.

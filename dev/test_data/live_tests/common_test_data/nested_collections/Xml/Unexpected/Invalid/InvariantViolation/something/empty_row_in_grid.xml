@@ -1,0 +1,1 @@
+<something xmlns="https://dummy.com"><grid><v><v>1</v></v><v/></grid><rowsOfPairs><v><v><v1>1</v1><v2><v>known</v></v2></v></v></rowsOfPairs><mixed><v1><someItem><name>first</name></someItem></v1><v2/><v3><v1>0</v1><v2>c</v2></v3></mixed><setsOfColors/><gridOfUnions/></something>

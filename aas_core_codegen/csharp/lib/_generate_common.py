@@ -492,7 +492,7 @@ public static int CompareByCodePoints(string that, string other)
         ),
     ]  # type: List[Stripped]
 
-    for enumeration in csharp_common.enumerations_in_set_properties(symbol_table):
+    for enumeration in intermediate_uses.enumerations_in_set_properties(symbol_table):
         enum_name = csharp_naming.enum_name(enumeration.name)
         # NOTE (mristin):
         # See the note above ``csharp_common.rank_of_enumeration_name`` why these
@@ -609,7 +609,7 @@ def generate(
     ) or intermediate_uses.lstrip_call(symbol_table):
         blocks.append(_generate_string_helpers(symbol_table))
 
-    if csharp_common.has_set_properties(symbol_table):
+    if intermediate_uses.set_properties(symbol_table):
         blocks.append(_generate_set_helpers(symbol_table))
 
     # NOTE (mristin):

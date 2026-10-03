@@ -7,6 +7,7 @@ from icontract import ensure
 
 import aas_core_codegen.naming
 from aas_core_codegen import intermediate
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.common import Stripped, Identifier, indent_but_first_line
 from aas_core_codegen.cpp import (
     common as cpp_common,
@@ -973,7 +974,7 @@ namespace stringification {"""
         blocks.extend(_generate_enum_from_string_definition(enum=enum))
         blocks.append(_generate_enum_to_string_definition(enum=enum))
 
-    for enum in cpp_common.enumerations_in_set_properties(symbol_table):
+    for enum in intermediate_uses.enumerations_in_set_properties(symbol_table):
         blocks.extend(_generate_rank_and_less_definitions(enum=enum))
 
     blocks.extend(
@@ -1033,7 +1034,7 @@ def generate_implementation(
         blocks.extend(_generate_enum_from_string_implementation(enum=enum))
         blocks.append(_generate_enum_to_string_implementation(enum=enum))
 
-    for enum in cpp_common.enumerations_in_set_properties(symbol_table):
+    for enum in intermediate_uses.enumerations_in_set_properties(symbol_table):
         blocks.extend(_generate_rank_and_less_implementations(enum=enum))
 
     blocks.extend(

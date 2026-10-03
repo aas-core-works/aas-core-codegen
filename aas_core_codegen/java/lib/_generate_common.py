@@ -623,7 +623,7 @@ def generate(
             package=package,
             with_operations=with_operations,
             with_sorting=with_sorting,
-            ranked_enumerations=java_common.enumerations_in_set_properties(
+            ranked_enumerations=intermediate_uses.enumerations_in_set_properties(
                 symbol_table
             ),
         )
