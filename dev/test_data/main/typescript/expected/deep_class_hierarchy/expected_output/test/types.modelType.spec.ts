@@ -96,6 +96,35 @@ test("model type to string of Blossom", () => {
   );
 });
 
+test("model type of PlainMarker", () => {
+  const instance = TestCommonJsonization.loadMinimalPlainMarker();
+
+  expect(instance.modelType()).toStrictEqual(
+    OurTypes.ModelType.PlainMarker
+  );
+});
+
+test("model type from string of PlainMarker", () => {
+  const text = "PlainMarker";
+  const literal = OurStringification.modelTypeFromString(
+    text
+  );
+
+  expect(literal).toStrictEqual(
+    OurTypes.ModelType.PlainMarker
+  );
+});
+
+test("model type to string of PlainMarker", () => {
+  const text = OurStringification.mustModelTypeToString(
+    OurTypes.ModelType.PlainMarker
+  );
+
+  expect(text).toStrictEqual(
+    "PlainMarker"
+  );
+});
+
 test("model type of Something", () => {
   const instance = TestCommonJsonization.loadMinimalSomething();
 

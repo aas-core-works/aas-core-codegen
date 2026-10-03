@@ -555,6 +555,135 @@ namespace dummy.Tests
         }  // public void Test_Blossom_verification_fail
 
         [Test]
+        public void Test_PlainMarker_ok()
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Our.Tests.Common.TestDataDir,
+                    "Xml",
+                    "Expected",
+                    "plainMarker"
+                ),
+                "*.xml",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            foreach (var path in paths)
+            {
+                using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                var instance = Our.Xmlization.Deserialize.PlainMarkerFrom(
+                    xmlReader);
+
+                var errors = Our.Verification.Verify(instance).ToList();
+                Our.Tests.Common.AssertNoVerificationErrors(errors, path);
+
+                AssertSerializeDeserializeEqualsOriginal(
+                    instance, path);
+            }
+        }  // public void Test_PlainMarker_ok
+
+        [Test]
+        public void Test_PlainMarker_deserialization_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Our.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Unserializable"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "plainMarker"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of PlainMarker for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    Our.Xmlization.Exception? exception = null;
+
+                    try
+                    {
+                        _ = Our.Xmlization.Deserialize.PlainMarkerFrom(
+                            xmlReader);
+                    }
+                    catch (Our.Xmlization.Exception observedException)
+                    {
+                        exception = observedException;
+                    }
+
+                    AssertEqualsExpectedOrRerecordDeserializationException(
+                        exception, path);
+                }
+            }
+        }  // public void Test_PlainMarker_deserialization_fail
+
+        [Test]
+        public void Test_PlainMarker_verification_fail()
+        {
+            foreach (
+                string causeDir in
+                Directory.GetDirectories(
+                    Path.Combine(
+                        Our.Tests.Common.TestDataDir,
+                        "Xml",
+                        "Unexpected",
+                        "Invalid"
+                    )
+                )
+            )
+            {
+                string clsDir = Path.Combine(
+                    causeDir,
+                    "plainMarker"
+                );
+
+                if (!Directory.Exists(clsDir))
+                {
+                    // No examples of PlainMarker for the failure cause.
+                    continue;
+                }
+
+                var paths = Directory.GetFiles(
+                    clsDir,
+                    "*.xml",
+                    System.IO.SearchOption.AllDirectories).ToList();
+                paths.Sort();
+
+                foreach (var path in paths)
+                {
+                    using var xmlReader = System.Xml.XmlReader.Create(path);
+
+                    var instance = Our.Xmlization.Deserialize.PlainMarkerFrom(
+                        xmlReader);
+
+                    var errors = Our.Verification.Verify(instance).ToList();
+                    Our.Tests.Common.AssertEqualsExpectedOrRerecordVerificationErrors(
+                        errors, path);
+                }
+            }
+        }  // public void Test_PlainMarker_verification_fail
+
+        [Test]
         public void Test_Something_ok()
         {
             var paths = Directory.GetFiles(

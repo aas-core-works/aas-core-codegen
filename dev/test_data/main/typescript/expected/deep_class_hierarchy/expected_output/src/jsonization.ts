@@ -1066,6 +1066,121 @@ export function blossomFromJsonable(
 }
 
 /**
+ * Parse `jsonable` as an instance
+ * of {@link types!IMarker}.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed instance, or error if `jsonable` is invalid
+ */
+export function markerFromJsonable(
+  jsonable: JsonValue
+): OurCommon.Either<
+  OurTypes.IMarker,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new OurCommon.Either<
+      OurTypes.IMarker,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  const modelTypeOrError = extractModelType(jsonObject);
+  if (modelTypeOrError.error !== null) {
+    return new OurCommon.Either<
+      OurTypes.IMarker,
+      DeserializationError
+    >(
+      null,
+      modelTypeOrError.error
+    );
+  }
+
+  const modelType = modelTypeOrError.mustValue();
+
+  switch (modelType) {
+    case "PlainMarker":
+      return parsePropertiesOfPlainMarker(jsonObject);
+
+    default:
+      return newDeserializationError<OurTypes.IMarker>(
+        `Unexpected model type for IMarker: ${modelType}`
+      );
+  }
+}
+
+/**
+ * Parse the properties of an instance
+ * of {@link types!PlainMarker} from `jsonObject`.
+ *
+ * The `modelType` is expected to have been already verified by the caller,
+ * and is therefore skipped here.
+ *
+ * @param jsonObject - JSON object to be parsed
+ * @returns parsed instance of {@link types!PlainMarker},
+ * or an error if any
+ */
+function parsePropertiesOfPlainMarker(
+  jsonObject: JsonObject
+): OurCommon.Either<
+  OurTypes.PlainMarker,
+  DeserializationError
+> {
+  return new OurCommon.Either<
+    OurTypes.PlainMarker,
+    DeserializationError
+  >(
+    new OurTypes.PlainMarker(),
+    null
+  );
+}
+
+/**
+ * Parse an instance of {@link types!PlainMarker} from the JSON-able
+ * structure `jsonable`.
+ *
+ * @param jsonable - structure to be parsed
+ * @returns parsed instance of {@link types!PlainMarker},
+ * or an error if any
+ */
+export function plainMarkerFromJsonable(
+  jsonable: JsonValue
+): OurCommon.Either<
+  OurTypes.PlainMarker,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new OurCommon.Either<
+      OurTypes.PlainMarker,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  const modelTypeError = checkModelType(jsonObject, "PlainMarker");
+  if (modelTypeError !== null) {
+    return new OurCommon.Either<
+      OurTypes.PlainMarker,
+      DeserializationError
+    >(
+      null,
+      modelTypeError
+    );
+  }
+
+  return parsePropertiesOfPlainMarker(jsonObject);
+}
+
+/**
  * Parse the properties of an instance
  * of {@link types!Something} from `jsonObject`.
  *
@@ -1499,6 +1614,22 @@ function serializeBlossom(
  * @param that - instance to be serialized
  * @returns JSON-able representation
  */
+function serializePlainMarker(
+  that: OurTypes.PlainMarker
+): JsonObject {
+  const jsonable: JsonObject = {};
+
+  jsonable["modelType"] = "PlainMarker";
+
+  return jsonable;
+}
+
+/**
+ * Serialize `that` to a JSON-able representation.
+ *
+ * @param that - instance to be serialized
+ * @returns JSON-able representation
+ */
 function serializeSomething(
   that: OurTypes.Something
 ): JsonObject {
@@ -1575,6 +1706,12 @@ class Serializer extends OurTypes.AbstractTransformer<JsonObject> {
     that: OurTypes.Blossom
   ): JsonObject {
     return serializeBlossom(that);
+  }
+
+  transformPlainMarker(
+    that: OurTypes.PlainMarker
+  ): JsonObject {
+    return serializePlainMarker(that);
   }
 
   transformSomething(

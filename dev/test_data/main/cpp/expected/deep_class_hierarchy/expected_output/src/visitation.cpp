@@ -47,6 +47,13 @@ void AbstractVisitor::Visit(
         >(that)
       );
       break;
+    case types::ModelType::kPlainMarker:
+      VisitPlainMarker(
+        std::dynamic_pointer_cast<
+          types::IPlainMarker
+        >(that)
+      );
+      break;
     case types::ModelType::kSomething:
       VisitSomething(
         std::dynamic_pointer_cast<
@@ -91,6 +98,12 @@ void PassThroughVisitor::VisitLeaf(
 
 void PassThroughVisitor::VisitBlossom(
   const std::shared_ptr<types::IBlossom>&
+) {
+  // No properties to be passed through.
+}
+
+void PassThroughVisitor::VisitPlainMarker(
+  const std::shared_ptr<types::IPlainMarker>&
 ) {
   // No properties to be passed through.
 }

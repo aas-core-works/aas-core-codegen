@@ -272,6 +272,38 @@ public class TestXmlizationOfInterfaces {
     // Compare
     assertEquals(outputText, anotherStringOut.toString());
   } // void testRoundTripILeafFromLeaf
+
+  @Test
+  public void testRoundTripIMarkerFromPlainMarker()
+    throws IOException, XMLStreamException {
+    // We load from JSON here just to jump-start the round trip.
+    // The round-trip goes then over XML.
+    final IMarker instance =
+      CommonJsonization.loadMaximalPlainMarker();
+
+    // The round-trip starts here.
+    final StringWriter stringOut = new StringWriter();
+    final XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
+    final XMLStreamWriter xmlWriter = outputFactory.createXMLStreamWriter(stringOut);
+
+    Xmlization.Serialize.to(instance, xmlWriter);
+    String outputText = stringOut.toString();
+
+    // De-serialize from XML
+    final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    final XMLEventReader xmlReader =
+      xmlInputFactory.createXMLEventReader(new StringReader(outputText));
+    final IMarker anotherInstance =
+      Xmlization.Deserialize.deserializeIMarker(xmlReader);
+
+    // Serialize back to XML
+    final StringWriter anotherStringOut = new StringWriter();
+    final XMLStreamWriter anotherXmlWriter = outputFactory.createXMLStreamWriter(anotherStringOut);
+    Xmlization.Serialize.to(anotherInstance, anotherXmlWriter);
+
+    // Compare
+    assertEquals(outputText, anotherStringOut.toString());
+  } // void testRoundTripIMarkerFromPlainMarker
 } // class TestXmlizationOfInterfaces
 
 // package dummy.tests

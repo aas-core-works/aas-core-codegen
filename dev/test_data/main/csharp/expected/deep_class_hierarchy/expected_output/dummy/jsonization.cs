@@ -705,6 +705,103 @@ namespace dummy
             }  // internal static BlossomFrom
 
             /// <summary>
+            /// Deserialize an instance of IMarker by dispatching
+            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            public static Our.IMarker IMarkerFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing IMarker, but got {Describe(node)}");
+                    return default!;
+                }
+
+                string modelType = ModelTypeFrom(obj, out error);
+                if (error != null)
+                {
+                    return default!;
+                }
+
+                switch (modelType)
+                {
+                case "PlainMarker":
+                    return PlainMarkerFrom(
+                        node, out error);
+                default:
+                    error = new Reporting.Error(
+                        $"Unexpected model type for IMarker: {modelType}");
+                    return default!;
+                }
+            }  // public static Our.IMarker IMarkerFrom
+
+            /// <summary>
+            /// Deserialize an instance of PlainMarker from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Our.PlainMarker PlainMarkerFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing PlainMarker, but got {Describe(node)}");
+                    return default!;
+                }
+
+                string? modelType = null;
+
+                foreach (var keyValue in obj)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case "modelType":
+                            modelType = StringFrom(
+                                keyValue.Value, out error);
+                            if (error == null && modelType != "PlainMarker")
+                            {
+                                error = new Reporting.Error(
+                                    "Expected the model type 'PlainMarker', " +
+                                    $"but got {modelType}");
+                            }
+                            break;
+                        default:
+                            error = new Reporting.Error(
+                                $"Unexpected property: {keyValue.Key}");
+                            return default!;
+                    }
+
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                keyValue.Key));
+                        return default!;
+                    }
+                }
+
+                if (modelType == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"modelType\" is missing");
+                    return default!;
+                }
+
+                return new Our.PlainMarker();
+            }  // internal static PlainMarkerFrom
+
+            /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -1056,6 +1153,53 @@ namespace dummy
             }
 
             /// <summary>
+            /// Deserialize an instance of IMarker from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of IMarker.
+            /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            public static Our.IMarker IMarkerFrom(
+                Nodes.JsonNode node)
+            {
+                Our.IMarker result = DeserializeImplementation.IMarkerFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of PlainMarker from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of PlainMarker.
+            /// </exception>
+            public static Our.PlainMarker PlainMarkerFrom(
+                Nodes.JsonNode node)
+            {
+                Our.PlainMarker result = DeserializeImplementation.PlainMarkerFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
             /// Deserialize an instance of Something from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -1299,6 +1443,17 @@ namespace dummy
                 SetProperty(result, "details", "Details", that.Details, Serialize_string);
 
                 result["modelType"] = "Blossom";
+
+                return result;
+            }
+
+            public override Nodes.JsonObject TransformPlainMarker(
+                Our.IPlainMarker that
+            )
+            {
+                var result = new Nodes.JsonObject();
+
+                result["modelType"] = "PlainMarker";
 
                 return result;
             }

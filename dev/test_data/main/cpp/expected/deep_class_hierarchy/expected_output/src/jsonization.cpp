@@ -585,6 +585,10 @@ const std::unordered_map<
     types::ModelType::kBlossom
   },
   {
+    "PlainMarker",
+    types::ModelType::kPlainMarker
+  },
+  {
     "Something",
     types::ModelType::kSomething
   },
@@ -627,6 +631,10 @@ enum class OfBlossom : std::uint32_t {
   kDetails,
   kModelType
 };  // enum class OfBlossom
+
+enum class OfPlainMarker : std::uint32_t {
+  kModelType
+};  // enum class OfPlainMarker
 
 enum class OfSomething : std::uint32_t {
   kSomeChoice,
@@ -701,6 +709,16 @@ const std::unordered_map<
   {
     "modelType",
     OfBlossom::kModelType
+  }
+};
+
+const std::unordered_map<
+  std::string,
+  OfPlainMarker
+> kMapOfPlainMarker = {
+  {
+    "modelType",
+    OfPlainMarker::kModelType
   }
 };
 
@@ -1096,6 +1114,75 @@ std::pair<
   common::optional<std::shared_ptr<T> >,
   common::optional<DeserializationError>
 > DeserializeBlossom(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Dispatch the deserialization for an instance
+ * of types::IMarker.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the deserialized instance, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IMarker>
+  >,
+  common::optional<DeserializationError>
+> DeserializeMarker(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Parse the properties of an instance of types::IPlainMarker.
+ *
+ * The model type, if the class carries one, is expected to have been verified
+ * by the caller, which is what lets a dispatcher avoid verifying it twice.
+ *
+ * \param json object whose properties are to be parsed
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IPlainMarker>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfPlainMarker(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Deserialize \p json to an instance of types::IPlainMarker.
+ *
+ * No dispatch is performed. The model type, if the class carries one, is
+ * verified here, since the caller has not read it.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IPlainMarker>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializePlainMarker(
   const nlohmann::json& json,
   bool additional_properties
 );
@@ -1741,6 +1828,158 @@ std::pair<
 
 std::pair<
   common::optional<
+    std::shared_ptr<types::IMarker>
+  >,
+  common::optional<DeserializationError>
+> DeserializeMarker(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  const std::string* model_type_str;
+  common::optional<DeserializationError> error;
+
+  std::tie(
+    model_type_str,
+    error
+  ) = GetModelTypeFrom(json);
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<types::IMarker>
+    >(
+      std::move(*error)
+    );
+  }
+
+  common::optional<types::ModelType> model_type(
+    ModelTypeFromModelTypeString(*model_type_str)
+  );
+
+  if (!model_type.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IMarker>
+    >(
+      common::Concat(
+        L"The model type does not correspond to any known class: ",
+        common::Utf8ToWstring(*model_type_str)
+      )
+    );
+  }
+
+  switch (*model_type) {
+    case types::ModelType::kPlainMarker:
+      return ParsePropertiesOfPlainMarker<
+        types::IMarker
+      >(json, additional_properties);
+    default:
+      return NoInstanceAndDeserializationErrorWithCause<
+        std::shared_ptr<types::IMarker>
+      >(
+        common::Concat(
+          L"The dispatch to the JSON de-serialization of "
+          L"types::IMarker "
+          L"is not defined for model type: ",
+          common::Utf8ToWstring(*model_type_str)
+        )
+      );
+  }
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IPlainMarker>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfPlainMarker(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<DeserializationError> error(
+    ParseProperties(
+      json,
+      properties::kMapOfPlainMarker,
+      additional_properties,
+      [&](
+        properties::OfPlainMarker property,
+        const nlohmann::json&
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfPlainMarker::kModelType:
+            // NOTE (mristin):
+            // The model type has been verified before the loop, so there is nothing
+            // left to do with it here.
+            return common::nullopt;
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfPlainMarker",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::PlainMarker()
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IPlainMarker>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> DeserializePlainMarker(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<DeserializationError> error(
+    CheckModelType(
+      json,
+      "PlainMarker"
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return ParsePropertiesOfPlainMarker<T>(
+    json,
+    additional_properties
+  );
+}
+
+std::pair<
+  common::optional<
     std::shared_ptr<types::ISomething>
   >,
   common::optional<DeserializationError>
@@ -2068,6 +2307,40 @@ common::expected<
     additional_properties,
     DeserializeBlossom<
       types::IBlossom
+    >
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IMarker>,
+  DeserializationError
+> MarkerFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IMarker>
+  >(
+    json,
+    additional_properties,
+    DeserializeMarker
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IPlainMarker>,
+  DeserializationError
+> PlainMarkerFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IPlainMarker>
+  >(
+    json,
+    additional_properties,
+    DeserializePlainMarker<
+      types::IPlainMarker
     >
   );
 }
@@ -2535,6 +2808,16 @@ std::pair<
 );
 
 /**
+ * \brief Serialize \p that instance of types::IPlainMarker to a JSON value.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value
+ */
+nlohmann::json SerializePlainMarker(
+  const types::IPlainMarker& that
+);
+
+/**
  * \brief Serialize \p that instance of types::ISomething to a JSON value.
  *
  * \param that instance to be serialized
@@ -2600,6 +2883,17 @@ std::pair<
   common::optional<SerializationError>
 > SerializeLeaf(
   const types::ILeaf& that
+);
+
+/**
+ * \brief Serialize \p that instance of types::IMarker to a JSON value,
+ * dispatching on its model type.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value
+ */
+nlohmann::json SerializeMarker(
+  const types::IMarker& that
 );
 
 nlohmann::json SerializeConcreteBranch(
@@ -2708,6 +3002,16 @@ std::pair<
     common::make_optional<nlohmann::json>(std::move(result)),
     common::nullopt
   );
+}
+
+nlohmann::json SerializePlainMarker(
+  const types::IPlainMarker& that
+) {
+  nlohmann::json result = nlohmann::json::object();
+
+  result["modelType"] = "PlainMarker";
+
+  return result;
 }
 
 std::pair<
@@ -2914,6 +3218,33 @@ std::pair<
   };
 }
 
+nlohmann::json SerializeMarker(
+  const types::IMarker& that
+) {
+  // NOTE (mristin):
+  // The dynamic casts are necessary due to virtual inheritance. Otherwise,
+  // we would have used static casts.
+
+  switch (that.model_type()) {
+    case types::ModelType::kPlainMarker:
+      return SerializePlainMarker(
+        dynamic_cast<const types::IPlainMarker&>(that)
+      );
+    default: {
+      std::string message = common::Concat(
+        "Unexpected model type: ",
+        std::to_string(
+          static_cast<std::uint32_t>(
+            that.model_type()
+          )
+        )
+      );
+
+      throw std::invalid_argument(message);
+    }
+  };
+}
+
 std::pair<
   common::optional<nlohmann::json>,
   common::optional<SerializationError>
@@ -2934,6 +3265,12 @@ std::pair<
     case types::ModelType::kBlossom:
       return SerializeBlossom(
         dynamic_cast<const types::IBlossom&>(that)
+      );
+    case types::ModelType::kPlainMarker:
+      return AsFallible(
+        SerializePlainMarker(
+          dynamic_cast<const types::IPlainMarker&>(that)
+        )
       );
     case types::ModelType::kSomething:
       return SerializeSomething(

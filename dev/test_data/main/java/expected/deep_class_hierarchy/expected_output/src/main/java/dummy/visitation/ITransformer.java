@@ -28,6 +28,9 @@ public interface ITransformer<T> {
   T transformBlossom(
     IBlossom that
   );
+  T transformPlainMarker(
+    IPlainMarker that
+  );
   T transformSomething(
     ISomething that
   );

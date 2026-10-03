@@ -131,6 +131,36 @@ namespace dummy.Tests
         }  // public void Test_Blossom
 
         [Test]
+        public void Test_PlainMarker()
+        {
+            var instance = (
+                Our.Tests.CommonJsonization.LoadMaximalPlainMarker()
+            );
+
+            var enhancer = CreateEnhancer();
+
+            Assert.IsNull(enhancer.Unwrap(instance));
+
+            var wrapped = enhancer.Wrap(instance);
+            Assert.IsNotNull(wrapped);
+
+            var idSet = new HashSet<long>();
+
+            idSet.Add(enhancer.MustUnwrap(wrapped).SomeCustomId);
+            idSet.UnionWith(
+                wrapped
+                    .Descend()
+                    .Select(
+                        (descendant) =>
+                            enhancer.MustUnwrap(descendant).SomeCustomId
+                        )
+            );
+
+            Assert.AreEqual(1, idSet.Min());
+            Assert.AreEqual(idSet.Count, idSet.Max());
+        }  // public void Test_PlainMarker
+
+        [Test]
         public void Test_Something()
         {
             var instance = (

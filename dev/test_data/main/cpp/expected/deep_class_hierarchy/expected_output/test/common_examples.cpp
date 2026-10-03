@@ -51,6 +51,16 @@ const char* StaticTypeName<
 
 template<>
 struct StaticTypeName<
+  our::types::IPlainMarker
+> {
+  static const char* name;
+};
+const char* StaticTypeName<
+  our::types::IPlainMarker
+>::name = "IPlainMarker";
+
+template<>
+struct StaticTypeName<
   our::types::ISomething
 > {
   static const char* name;
@@ -266,6 +276,73 @@ std::shared_ptr<
   );
 
   return LoadBlossom(
+    path
+  );
+}
+
+std::shared_ptr<
+  our::types::IPlainMarker
+> LoadPlainMarker(
+  const std::filesystem::path& path
+) {
+  
+
+  std::shared_ptr<
+    our::types::IClass
+  > abstract = test::common::xmlization::MustReadInstance(
+    path
+  );
+
+  std::shared_ptr<
+    our::types::IPlainMarker
+  > instance(
+    std::dynamic_pointer_cast<
+      our::types::IPlainMarker
+    >(
+      abstract
+    )
+  );
+
+  if (instance == nullptr) {
+    throw std::runtime_error(
+      our::common::Concat(
+        "Failed to cast the instance to IPlainMarker from ",
+        path.string()
+      )
+    );
+  }
+
+  return instance;
+}
+
+std::shared_ptr<
+  our::types::IPlainMarker
+> LoadMinPlainMarker() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "plainMarker"
+      / "minimal.xml"
+  );
+
+  return LoadPlainMarker(
+    path
+  );
+}
+
+std::shared_ptr<
+  our::types::IPlainMarker
+> LoadMaxPlainMarker() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "plainMarker"
+      / "maximal.xml"
+  );
+
+  return LoadPlainMarker(
     path
   );
 }

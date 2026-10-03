@@ -116,6 +116,40 @@ namespace dummy.Tests
             return instance;
         }  // public static Our.Blossom LoadMinimalBlossom
 
+        public static Our.PlainMarker LoadMaximalPlainMarker()
+        {
+            string path = Path.Combine(
+                Our.Tests.Common.TestDataDir,
+                "Json",
+                "Expected",
+                "PlainMarker",
+                "maximal.json");
+
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
+
+            var instance = Our.Jsonization.Deserialize.PlainMarkerFrom(
+                node);
+
+            return instance;
+        }  // public static Our.PlainMarker LoadMaximalPlainMarker
+
+        public static Our.PlainMarker LoadMinimalPlainMarker()
+        {
+            string path = Path.Combine(
+                Our.Tests.Common.TestDataDir,
+                "Json",
+                "Expected",
+                "PlainMarker",
+                "minimal.json");
+
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
+
+            var instance = Our.Jsonization.Deserialize.PlainMarkerFrom(
+                node);
+
+            return instance;
+        }  // public static Our.PlainMarker LoadMinimalPlainMarker
+
         public static Our.Something LoadMaximalSomething()
         {
             string path = Path.Combine(

@@ -376,6 +376,13 @@ namespace dummy
                     BlossomFromSequence, "blossom"));
 
             /// <summary>
+            /// Read an instance of class PlainMarker from its XML element.
+            /// </summary>
+            internal static readonly ElementReader<Our.PlainMarker> PlainMarkerFromElement = (
+                AtElement<Our.PlainMarker>(
+                    PlainMarkerFromSequence, "plainMarker"));
+
+            /// <summary>
             /// Read an instance of class Something from its XML element.
             /// </summary>
             internal static readonly ElementReader<Our.Something> SomethingFromElement = (
@@ -917,6 +924,50 @@ namespace dummy
             }  // internal static Our.Blossom? BlossomFromSequence
 
             /// <summary>
+            /// Deserialize an instance of IMarker from an XML element.
+            /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            internal static Our.IMarker IMarkerFromElement(
+                Xml.XmlReader reader,
+                out Reporting.Error? error)
+            {
+                string elementName = XmlCommon.PeekElementName(
+                    reader, out error);
+                if (error != null)
+                {
+                    return default!;
+                }
+
+                switch (elementName)
+                {
+                    case "plainMarker":
+                        return PlainMarkerFromElement(
+                            reader, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return default!;
+                }
+            }  // internal static Our.IMarker? IMarkerFromElement
+
+            /// <summary>
+            /// Deserialize an instance of class PlainMarker from a sequence of XML elements.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Our.PlainMarker PlainMarkerFromSequence(
+                Xml.XmlReader reader,
+                bool isEmptySequence,
+                out Reporting.Error? error)
+            {
+                error = null;
+                return new Our.PlainMarker();
+            }  // internal static Our.PlainMarker PlainMarkerFromSequence
+
+            /// <summary>
             /// Deserialize an instance of class Something from a sequence of XML elements.
             /// </summary>
             /// <remarks>
@@ -1389,6 +1440,74 @@ namespace dummy
             }
 
             /// <summary>
+            /// Deserialize an instance of IMarker from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of IMarker.
+            /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Our.IMarker IMarkerFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IMarker, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Our.IMarker result = DeserializeImplementation.IMarkerFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of PlainMarker from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of PlainMarker.
+            /// </exception>
+            public static Our.PlainMarker PlainMarkerFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class PlainMarker, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Our.PlainMarker result = DeserializeImplementation.PlainMarkerFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
             /// Deserialize an instance of Something from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
@@ -1659,6 +1778,27 @@ namespace dummy
                     "blossom",
                     NS);
                 BlossomToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "UnusedParameter.Local")]
+            private static void PlainMarkerToSequence(
+                Our.IPlainMarker that,
+                Xml.XmlWriter writer)
+            {
+                // Intentionally empty.
+            }  // private static void PlainMarkerToSequence
+
+            public override void VisitPlainMarker(
+                Our.IPlainMarker that,
+                Xml.XmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "plainMarker",
+                    NS);
+                PlainMarkerToSequence(
                     that,
                     writer);
                 writer.WriteEndElement();

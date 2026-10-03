@@ -81,6 +81,30 @@ func TestDescendOnceOnAnInstanceOfBlossom(
 	}
 }
 
+func TestDescendOnceOnAnInstanceOfPlainMarker(
+	t *testing.T,
+) {
+	instance := ourtesting.MustLoadMaximalPlainMarker()
+
+	expectedPth := filepath.Join(
+		ourtesting.TestDataDir,
+		"DescendOnce",
+		"PlainMarker",
+		"maximal.json.trace",
+	)
+
+	onlyOnce := true
+
+	message := compareOrRerecordTrace(
+		instance,
+		expectedPth,
+		onlyOnce,
+	)
+	if message != nil {
+		t.Fatal(*message)
+	}
+}
+
 func TestDescendOnceOnAnInstanceOfSomething(
 	t *testing.T,
 ) {

@@ -70,6 +70,16 @@ public class Verification {
     }
 
     @Override
+    public Stream<Reporting.Error> transformPlainMarker(
+      IPlainMarker that) {
+      Stream<Reporting.Error> errorStream = Stream.empty();
+
+      // No verification has been defined for PlainMarker.
+
+      return errorStream;
+    }
+
+    @Override
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();

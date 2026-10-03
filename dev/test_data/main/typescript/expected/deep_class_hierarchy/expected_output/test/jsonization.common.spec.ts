@@ -22,6 +22,11 @@ test("commonJsonization loaders for Blossom", () => {
   expect(TestCommonJsonization.loadMaximalBlossom()).not.toBeNull();
 });
 
+test("commonJsonization loaders for PlainMarker", () => {
+  expect(TestCommonJsonization.loadMinimalPlainMarker()).not.toBeNull();
+  expect(TestCommonJsonization.loadMaximalPlainMarker()).not.toBeNull();
+});
+
 test("commonJsonization loaders for Something", () => {
   expect(TestCommonJsonization.loadMinimalSomething()).not.toBeNull();
   expect(TestCommonJsonization.loadMaximalSomething()).not.toBeNull();

@@ -309,6 +309,78 @@ namespace dummy
         }
     }
 
+    public interface IMarker : IClass
+    {
+        // Intentionally empty.
+    }
+
+    public interface IPlainMarker : IMarker
+    {
+        // Intentionally empty.
+    }
+
+    public class PlainMarker : IPlainMarker
+    {
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.VisitPlainMarker(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.VisitPlainMarker(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.TransformPlainMarker(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.TransformPlainMarker(this, context);
+        }
+    }
+
     public interface ISomething : IClass
     {
         public INode SomeChoice { get; set; }

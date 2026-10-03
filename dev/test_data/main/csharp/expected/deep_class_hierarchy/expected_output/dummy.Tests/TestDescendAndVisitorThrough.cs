@@ -169,6 +169,31 @@ namespace dummy.Tests
         }  // public void Test_Descend_against_VisitorThrough_for_Blossom
 
         [Test]
+        public void Test_Descend_of_PlainMarker()
+        {
+            Our.PlainMarker instance = (
+                Our.Tests.CommonJsonization.LoadMaximalPlainMarker());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Our.Tests.Common.TestDataDir,
+                    "Descend",
+                    "PlainMarker",
+                    "maximal.json.trace"));
+        }  // public void Test_Descend_of_PlainMarker
+
+        [Test]
+        public void Test_Descend_against_VisitorThrough_for_PlainMarker()
+        {
+            Our.PlainMarker instance = (
+                Our.Tests.CommonJsonization.LoadMaximalPlainMarker());
+
+            AssertDescendAndVisitorThroughSame(
+                instance);
+        }  // public void Test_Descend_against_VisitorThrough_for_PlainMarker
+
+        [Test]
         public void Test_Descend_of_Something()
         {
             Our.Something instance = (

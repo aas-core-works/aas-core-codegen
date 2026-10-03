@@ -95,6 +95,23 @@ func VerifyBlossom(
 	return
 }
 
+// Verify `that` instance of [ourtypes.IPlainMarker].
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyPlainMarker(
+	that ourtypes.IPlainMarker,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	// No verification has been defined for IPlainMarker.
+
+	return
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -254,6 +271,11 @@ func Verify(
 	case ourtypes.ModelTypeBlossom:
 		abort = VerifyBlossom(
 			that.(ourtypes.IBlossom),
+			onError,
+		)
+	case ourtypes.ModelTypePlainMarker:
+		abort = VerifyPlainMarker(
+			that.(ourtypes.IPlainMarker),
 			onError,
 		)
 	case ourtypes.ModelTypeSomething:

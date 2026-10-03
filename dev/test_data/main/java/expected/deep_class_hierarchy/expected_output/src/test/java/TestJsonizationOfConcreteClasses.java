@@ -380,6 +380,105 @@ public class TestJsonizationOfConcreteClasses {
   } // public void testBlossomVerificationFail
 
   @Test
+  public void testPlainMarkerOk() throws IOException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    final Path searchPath = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "PlainMarker");
+    final List<Path> paths = Common.findPaths(searchPath, ".json");
+
+    for (Path path : paths) {
+      final JsonNode node = objectMapper.readTree(path.toFile());
+      final PlainMarker instance = Jsonization.Deserialize.deserializePlainMarker(node);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+    }
+  } // public void testPlainMarkerOk
+
+  @Test
+  public void testPlainMarkerDeserializationFromNonObjectFail() throws IOException {
+    final JsonNode node = JsonNodeFactory.instance.textNode("INVALID");
+
+    Jsonization.DeserializeException exception = null;
+    try {
+      final PlainMarker unused = Jsonization.Deserialize.deserializePlainMarker(node);
+    } catch (Jsonization.DeserializeException observedException) {
+      exception = observedException;
+    }
+
+    assert exception != null : "Expected an exception, but got none";
+    assert exception.getMessage().startsWith("Expected a JsonObject, but got ") :
+      "Unexpected exception message: " + exception.getMessage();
+  } // public void testPlainMarkerDeserializationFromNonObjectFail
+
+  @Test
+  public void testPlainMarkerDeserializationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir = causeDir.resolve("PlainMarker");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of PlainMarker for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        Jsonization.DeserializeException exception = null;
+        try {
+          final PlainMarker var = Jsonization.Deserialize.deserializePlainMarker(node);
+        } catch (Jsonization.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(
+          exception, path);
+      }
+    }
+  } // public void testPlainMarkerDeserializationFail
+
+  @Test
+  public void testPlainMarkerVerificationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve("PlainMarker");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of PlainMarker for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        final PlainMarker instance = Jsonization.Deserialize.deserializePlainMarker(node);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testPlainMarkerVerificationFail
+
+  @Test
   public void testSomethingOk() throws IOException {
     final ObjectMapper objectMapper = new ObjectMapper();
 

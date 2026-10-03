@@ -262,6 +262,90 @@ func MustLoadMinimalBlossom(
 	return
 }
 
+// Load a maximal example of [ourtypes.IPlainMarker] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMaximalPlainMarker(
+) (result ourtypes.IPlainMarker) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"PlainMarker",
+		"maximal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := ourjsonization.PlainMarkerFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IPlainMarker " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(ourtypes.IPlainMarker)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IPlainMarker at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
+// Load a minimal example of [ourtypes.IPlainMarker] from
+// the test data directory.
+//
+// If there is any error, panic.
+func MustLoadMinimalPlainMarker(
+) (result ourtypes.IPlainMarker) {
+	pth := path.Join(
+		TestDataDir,
+		"Json",
+		"Expected",
+		"PlainMarker",
+		"minimal.json",
+	)
+
+	jsonable := MustReadJsonable(pth)
+
+	instance, err := ourjsonization.PlainMarkerFromJsonable(
+		jsonable,
+	)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to de-serialize an instance of IPlainMarker " +
+				"from %s: %s",
+				pth, err.Error(),
+			),
+		)
+	}
+	var ok bool
+	result, ok = instance.(ourtypes.IPlainMarker)
+	if !ok {
+		panic(
+			fmt.Sprintf(
+				"Expected to find an instance of IPlainMarker at %s, " +
+				"but got an instance of %T: %v",
+				pth, instance, instance,
+			),
+		)
+	}
+	return
+}
+
 // Load a maximal example of [ourtypes.ISomething] from
 // the test data directory.
 //

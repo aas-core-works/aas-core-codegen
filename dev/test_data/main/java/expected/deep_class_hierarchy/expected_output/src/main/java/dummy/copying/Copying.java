@@ -80,6 +80,13 @@ public class Copying
         }
 
         @Override
+        public IClass transformPlainMarker(
+            IPlainMarker that
+        ) {
+            return new PlainMarker();
+        }
+
+        @Override
         public IClass transformSomething(
             ISomething that
         ) {
@@ -129,6 +136,13 @@ public class Copying
                 that.getValue(),
                 that.getDetails()
             );
+        }
+
+        @Override
+        public IClass transformPlainMarker (
+            IPlainMarker that
+        ) {
+            return new PlainMarker();
         }
 
         @Override

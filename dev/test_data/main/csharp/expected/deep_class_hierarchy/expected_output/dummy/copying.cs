@@ -72,6 +72,13 @@ namespace dummy
                     that.Details);
             }
 
+            public override Our.IClass TransformPlainMarker(
+                Our.IPlainMarker that
+            )
+            {
+                return new Our.PlainMarker();
+            }
+
             public override Our.IClass TransformSomething(
                 Our.ISomething that
             )
@@ -122,6 +129,13 @@ namespace dummy
                     that.Value,
                     that.Details
                 );
+            }
+
+            public override Our.IClass TransformPlainMarker(
+                Our.IPlainMarker that
+            )
+            {
+                return new Our.PlainMarker();
             }
 
             public override Our.IClass TransformSomething(

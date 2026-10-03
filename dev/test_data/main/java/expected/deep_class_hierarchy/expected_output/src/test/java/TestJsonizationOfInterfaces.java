@@ -145,6 +145,22 @@ public class TestJsonizationOfInterfaces {
     assertEquals(
       objectMapper.readTree(jsonObject.toString()), objectMapper.readTree(anotherJsonObject.toString()));
   } // void testRoundTripILeafFromLeaf
+
+  @Test
+  public void testRoundTripIMarkerFromPlainMarker()
+    throws IOException, JsonProcessingException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    PlainMarker instance = CommonJsonization.loadMaximalPlainMarker();
+    final JsonNode jsonObject = Jsonization.Serialize.toJsonObject(instance);
+
+    IMarker anotherInstance = Jsonization.Deserialize.deserializeIMarker(
+      jsonObject);
+    final JsonNode anotherJsonObject = Jsonization.Serialize.toJsonObject(anotherInstance);
+
+    assertEquals(
+      objectMapper.readTree(jsonObject.toString()), objectMapper.readTree(anotherJsonObject.toString()));
+  } // void testRoundTripIMarkerFromPlainMarker
 } // class TestJsonizationOfInterfaces
 
 // package dummy.tests

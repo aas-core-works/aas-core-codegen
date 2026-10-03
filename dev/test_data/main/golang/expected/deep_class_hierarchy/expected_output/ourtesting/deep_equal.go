@@ -95,6 +95,16 @@ func deepEqualBlossom(
 // Perform a comparison for deep equality between `that` and `other` instance.
 //
 // The deep equality means that all the properties are checked for equality recursively.
+func deepEqualPlainMarker(
+	that ourtypes.IPlainMarker,
+	other ourtypes.IPlainMarker,
+) bool {
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` instance.
+//
+// The deep equality means that all the properties are checked for equality recursively.
 func deepEqualSomething(
 	that ourtypes.ISomething,
 	other ourtypes.ISomething,
@@ -171,6 +181,11 @@ func DeepEqual(
 		return deepEqualBlossom(
 			that.(ourtypes.IBlossom),
 			other.(ourtypes.IBlossom),
+		)
+	case ourtypes.ModelTypePlainMarker:
+		return deepEqualPlainMarker(
+			that.(ourtypes.IPlainMarker),
+			other.(ourtypes.IPlainMarker),
 		)
 	case ourtypes.ModelTypeSomething:
 		return deepEqualSomething(

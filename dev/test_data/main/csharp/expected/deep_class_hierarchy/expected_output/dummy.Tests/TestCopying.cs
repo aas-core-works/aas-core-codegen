@@ -82,6 +82,18 @@ namespace dummy.Tests
                     && that.Details == casted.Details);
             }
 
+            public override bool TransformPlainMarker(
+                Our.IPlainMarker that,
+                Our.IClass other)
+            {
+                if (!(other is Our.PlainMarker casted) || ReferenceEquals(that, other))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
             public override bool TransformSomething(
                 Our.ISomething that,
                 Our.IClass other)
@@ -150,6 +162,13 @@ namespace dummy.Tests
                 && that.Description == other.Description
                 && that.Value == other.Value
                 && that.Details == other.Details);
+        }
+
+        private static bool PlainMarkerShallowEquals(
+            Our.PlainMarker that,
+            Our.PlainMarker other)
+        {
+            return true;
         }
 
         private static bool SomethingShallowEquals(
@@ -251,6 +270,34 @@ namespace dummy.Tests
                     instance, instanceCopy),
                 "Blossom");
         }  // public void Test_Blossom_deep_copy
+
+        [Test]
+        public void Test_PlainMarker_shallow_copy()
+        {
+            Our.PlainMarker instance = (
+                Our.Tests.CommonJsonization.LoadMaximalPlainMarker());
+
+            var instanceCopy = Our.Copying.Shallow(instance);
+
+            Assert.IsTrue(
+                PlainMarkerShallowEquals(
+                    instance, instanceCopy),
+                "PlainMarker");
+        }  // public void Test_PlainMarker_shallow_copy
+
+        [Test]
+        public void Test_PlainMarker_deep_copy()
+        {
+            Our.PlainMarker instance = (
+                Our.Tests.CommonJsonization.LoadMaximalPlainMarker());
+
+            var instanceCopy = Our.Copying.Deep(instance);
+
+            Assert.IsTrue(
+                DeepCopyCheckerInstance.Transform(
+                    instance, instanceCopy),
+                "PlainMarker");
+        }  // public void Test_PlainMarker_deep_copy
 
         [Test]
         public void Test_Something_shallow_copy()

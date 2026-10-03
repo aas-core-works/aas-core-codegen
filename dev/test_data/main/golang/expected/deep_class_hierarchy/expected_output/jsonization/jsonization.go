@@ -719,6 +719,74 @@ func blossomFromMapWithoutDispatch(
 	return
 }
 
+// Parse `jsonable` as an instance of [ourtypes.IMarker],
+// or return an error.
+func MarkerFromJsonable(
+	jsonable interface{},
+) (
+	result ourtypes.IMarker,
+	err error,
+) {
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = notAMapError(jsonable)
+		return
+	}
+
+	return markerFromMap(m)
+}
+
+// Parse `jsonable` as an instance of [ourtypes.IPlainMarker],
+// or return an error.
+func PlainMarkerFromJsonable(
+	jsonable interface{},
+) (
+	result ourtypes.IPlainMarker,
+	err error,
+) {
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = notAMapError(jsonable)
+		return
+	}
+
+	err = checkModelType(m, "PlainMarker")
+	if err != nil {
+		return
+	}
+
+	return plainMarkerFromMapWithoutDispatch(m)
+}
+
+// Parse [ourtypes.IPlainMarker] from a map,
+// or return an error, if any.
+func plainMarkerFromMapWithoutDispatch(
+	m map[string]interface{},
+) (
+	result ourtypes.IPlainMarker,
+	err error,
+) {
+	for k := range m {
+		switch k {
+		case "modelType":
+			// The model type has already been checked before the loop.
+
+		default:
+			err = newDeserializationError(
+				fmt.Sprintf(
+					"Unexpected property: %s",
+					k,
+				),
+			)
+			return
+		}
+	}
+
+	result = ourtypes.NewPlainMarker()
+
+	return
+}
+
 // Parse `jsonable` as an instance of [ourtypes.ISomething],
 // or return an error.
 func SomethingFromJsonable(
@@ -969,6 +1037,36 @@ func leafFromMap(
 			fmt.Sprintf(
 				"Unexpected model type " +
 				"for ILeaf: %s",
+				modelType,
+			),
+		)
+	}
+
+	return
+}
+
+// De-serialize an instance of [ourtypes.IMarker]
+// from a map by dispatching to the concrete `*FromMapWithoutDispatch` function.
+func markerFromMap(
+	m map[string]interface{},
+) (
+	result ourtypes.IMarker,
+	err error,
+) {
+	var modelType string
+	modelType, err = modelTypeFromMap(m)
+	if err != nil {
+		return
+	}
+
+	switch modelType {
+	case "PlainMarker":
+		result, err = plainMarkerFromMapWithoutDispatch(m)
+	default:
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Unexpected model type " +
+				"for IMarker: %s",
 				modelType,
 			),
 		)
@@ -1233,6 +1331,22 @@ func blossomToMap(
 	return
 }
 
+// Serialize [ourtypes.IPlainMarker] as a JSON-able map.
+//
+// This function performs no dispatch! It is only used to serialize
+// the properties. If you want to serialize an instance of
+// [ourtypes.IPlainMarker] with proper dispatch, call
+// [ToJsonable].
+func plainMarkerToMap(
+	that ourtypes.IPlainMarker,
+) (result map[string]interface{}, err error) {
+	result = make(map[string]interface{})
+
+	result["modelType"] = "PlainMarker"
+
+	return
+}
+
 // Serialize [ourtypes.ISomething] as a JSON-able map.
 //
 // This function performs no dispatch! It is only used to serialize
@@ -1304,6 +1418,10 @@ func ToJsonable(
 	case ourtypes.ModelTypeBlossom:
 		result, err = blossomToMap(
 			that.(ourtypes.IBlossom),
+		)
+	case ourtypes.ModelTypePlainMarker:
+		result, err = plainMarkerToMap(
+			that.(ourtypes.IPlainMarker),
 		)
 	case ourtypes.ModelTypeSomething:
 		result, err = somethingToMap(

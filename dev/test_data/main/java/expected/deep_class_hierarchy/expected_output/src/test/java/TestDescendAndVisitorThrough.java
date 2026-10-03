@@ -137,6 +137,27 @@ public class TestDescendAndVisitorThrough {
     } // public void testDescendAgainstVisitorThroughForBlossom
 
     @Test
+    public void testDescendOfPlainMarker() throws IOException {
+      final PlainMarker instance = CommonJsonization.loadMaximalPlainMarker();
+
+      compareOrRerecordTrace(
+        instance,
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Descend",
+          "PlainMarker",
+          "maximal.json.trace"));
+    } // public void testDescendOfPlainMarker
+
+    @Test
+    public void testDescendAgainstVisitorThroughForPlainMarker() throws IOException {
+      PlainMarker instance = (
+        CommonJsonization.loadMaximalPlainMarker());
+
+      assertDescendAndVisitorThroughSame(instance);
+    } // public void testDescendAgainstVisitorThroughForPlainMarker
+
+    @Test
     public void testDescendOfSomething() throws IOException {
       final Something instance = CommonJsonization.loadMaximalSomething();
 

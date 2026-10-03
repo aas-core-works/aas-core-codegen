@@ -26,6 +26,9 @@ public abstract class AbstractVisitor implements IVisitor
   public abstract void visitBlossom(
     IBlossom that
   );
+  public abstract void visitPlainMarker(
+    IPlainMarker that
+  );
   public abstract void visitSomething(
     ISomething that
   );

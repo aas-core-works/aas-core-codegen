@@ -22,6 +22,11 @@ test("commonXmlization loaders for Blossom", () => {
   expect(TestCommonXmlization.loadMaximalBlossom()).not.toBeNull();
 });
 
+test("commonXmlization loaders for PlainMarker", () => {
+  expect(TestCommonXmlization.loadMinimalPlainMarker()).not.toBeNull();
+  expect(TestCommonXmlization.loadMaximalPlainMarker()).not.toBeNull();
+});
+
 test("commonXmlization loaders for Something", () => {
   expect(TestCommonXmlization.loadMinimalSomething()).not.toBeNull();
   expect(TestCommonXmlization.loadMaximalSomething()).not.toBeNull();

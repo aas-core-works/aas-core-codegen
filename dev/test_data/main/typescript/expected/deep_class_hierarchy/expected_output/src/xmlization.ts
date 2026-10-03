@@ -641,6 +641,69 @@ function parseBlossomFromSequence(
 
 /**
  * Parse the sequence of properties of an instance
+ * of {@link types!PlainMarker}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully. This is the contract of
+ * a `ContentParser`, so this function is used as one wherever an instance
+ * of {@link types!PlainMarker} is embedded.
+ */
+function parsePlainMarkerFromSequence(
+  cursor: XmlCursor
+): OurCommon.Either<OurTypes.PlainMarker, DeserializationError> {
+  // No properties
+
+  const className = OurTypes.PlainMarker.name;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const nextTagOrError = nextPropertyOpenTag(cursor, className);
+    if (nextTagOrError === null) {
+      break;
+    }
+    if (nextTagOrError instanceof DeserializationError) {
+      return new OurCommon.Either<OurTypes.PlainMarker, DeserializationError>(
+        null,
+        nextTagOrError
+      );
+    }
+
+    const propertyLocalName = localNameOfTag(nextTagOrError.tag);
+
+    let propertyError: DeserializationError | null = null;
+    switch (propertyLocalName) {
+      default: {
+        propertyError = new DeserializationError(
+          `Unexpected XML property: ${propertyLocalName}`
+        );
+        break;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(new ElementSegment(propertyLocalName));
+      return new OurCommon.Either<OurTypes.PlainMarker, DeserializationError>(
+        null,
+        propertyError
+      );
+    }
+
+    cursor.skipIgnorable();
+  }
+
+  // No required properties
+
+  const instance = new OurTypes.PlainMarker();
+  return new OurCommon.Either<OurTypes.PlainMarker, DeserializationError>(
+    instance,
+    null
+  );
+}
+
+/**
+ * Parse the sequence of properties of an instance
  * of {@link types!Something}.
  *
  * The opening tag is expected to have been already read by the caller, and
@@ -949,6 +1012,19 @@ function writeBlossomAsSequence(
 
 /**
  * Write the properties of an instance
+ * of {@link types!PlainMarker}, and neither the opening
+ * nor the closing tag of the element which holds them -- which is the contract of
+ * a `ContentWriter`, so this function is used as one.
+ */
+function writePlainMarkerAsSequence(
+  parts: Array<string>,
+  that: OurTypes.PlainMarker
+): void {
+  // No properties
+}
+
+/**
+ * Write the properties of an instance
  * of {@link types!Something}, and neither the opening
  * nor the closing tag of the element which holds them -- which is the contract of
  * a `ContentWriter`, so this function is used as one.
@@ -1201,6 +1277,73 @@ export function leafFromXmlString(
   return instanceOrError;
 }
 
+const PARSERS_OF_MARKER = new Map<
+  string,
+  ContentParser<OurTypes.IMarker>
+>([
+  ["plainMarker", parsePlainMarkerFromSequence]
+]);
+
+/**
+ * Dispatch-parse an instance
+ * of {@link types!IMarker} from the next
+ * XML element in `cursor`, based on the element's local name.
+ *
+ * @param cursor - to read from
+ * @returns the parsed instance, or an error
+ */
+function dispatchParseMarkerElement(
+  cursor: XmlCursor
+): OurCommon.Either<OurTypes.IMarker, DeserializationError> {
+  return dispatchParseElement(
+    cursor,
+    "IMarker",
+    PARSERS_OF_MARKER
+  );
+}
+
+/**
+ * Parse an XML string as an instance
+ * of {@link types!IMarker}.
+ *
+ * @param xml - XML string to parse
+ * @returns parsed instance, or an error
+ */
+export function markerFromXmlString(
+  xml: string
+): OurCommon.Either<OurTypes.IMarker, DeserializationError> {
+  if (xml.length === 0) {
+    return newDeserializationError<OurTypes.IMarker>(
+      "Expected an XML document, but got an empty string"
+    );
+  }
+
+  const tokensOrError = tokenizeXml(xml);
+  if (tokensOrError.error !== null) {
+    return new OurCommon.Either<OurTypes.IMarker, DeserializationError>(
+      null,
+      tokensOrError.error
+    );
+  }
+
+  const cursor = new XmlCursor(tokensOrError.mustValue());
+
+  const instanceOrError = dispatchParseMarkerElement(cursor);
+  if (instanceOrError.error !== null) {
+    return instanceOrError;
+  }
+
+  cursor.skipIgnorable();
+  if (cursor.current() !== null) {
+    return newDeserializationError<OurTypes.IMarker>(
+      "Expected no tokens after the root XML element, but got token kind: " +
+        currentTokenKind(cursor)
+    );
+  }
+
+  return instanceOrError;
+}
+
 const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
   string,
   ContentParser<OurTypes.Class>
@@ -1208,6 +1351,7 @@ const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
   ["branch", parseBranchFromSequence],
   ["leaf", parseLeafFromSequence],
   ["blossom", parseBlossomFromSequence],
+  ["plainMarker", parsePlainMarkerFromSequence],
   ["something", parseSomethingFromSequence],
   ["container", parseContainerFromSequence]
 ]);
@@ -1440,6 +1584,18 @@ class Serializer extends OurTypes.AbstractVisitorWithContext<Array<string>> {
       "blossom",
       that,
       writeBlossomAsSequence
+    );
+  }
+
+  visitPlainMarkerWithContext(
+    that: OurTypes.PlainMarker,
+    parts: Array<string>
+  ): void {
+    writeElement(
+      parts,
+      "plainMarker",
+      that,
+      writePlainMarkerAsSequence
     );
   }
 

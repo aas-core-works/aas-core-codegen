@@ -132,6 +132,37 @@ std::pair<
 
 std::pair<
   common::optional<
+    std::shared_ptr<types::IMarker>
+  >,
+  common::optional<DeserializationError>
+> MarkerFromElement(
+  xml_common::ReaderMergingText& reader
+);
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IPlainMarker>
+  >,
+  common::optional<DeserializationError>
+> PlainMarkerFromElement(
+  xml_common::ReaderMergingText& reader
+);
+
+template <
+  typename T,
+  typename std::enable_if<
+    std::is_base_of<T, types::IPlainMarker>::value
+  >::type* = nullptr
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> PlainMarkerFromSequence(
+  xml_common::ReaderMergingText& reader
+);
+
+std::pair<
+  common::optional<
     std::shared_ptr<types::ISomething>
   >,
   common::optional<DeserializationError>
@@ -194,6 +225,10 @@ const std::unordered_map<
   {
     "blossom",
     types::ModelType::kBlossom
+  },
+  {
+    "plainMarker",
+    types::ModelType::kPlainMarker
   },
   {
     "something",
@@ -938,6 +973,10 @@ std::pair<
           return BlossomFromSequence<
             types::IClass
           >(a_reader);
+        case types::ModelType::kPlainMarker:
+          return PlainMarkerFromSequence<
+            types::IClass
+          >(a_reader);
         case types::ModelType::kSomething:
           return SomethingFromSequence<
             types::IClass
@@ -1123,6 +1162,42 @@ std::pair<
     L"IBlossom",
     types::ModelType::kBlossom,
     BlossomFromSequence<types::IBlossom>
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IMarker>
+  >,
+  common::optional<DeserializationError>
+> MarkerFromElement(
+  xml_common::ReaderMergingText& reader
+) {
+  return DeserializeSoleFromElement<
+    std::shared_ptr<types::IMarker>
+  >(
+    reader,
+    L"IMarker",
+    types::ModelType::kPlainMarker,
+    PlainMarkerFromSequence<types::IMarker>
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IPlainMarker>
+  >,
+  common::optional<DeserializationError>
+> PlainMarkerFromElement(
+  xml_common::ReaderMergingText& reader
+) {
+  return DeserializeSoleFromElement<
+    std::shared_ptr<types::IPlainMarker>
+  >(
+    reader,
+    L"IPlainMarker",
+    types::ModelType::kPlainMarker,
+    PlainMarkerFromSequence<types::IPlainMarker>
   );
 }
 
@@ -1627,6 +1702,9 @@ enum class OfBlossom : std::uint32_t {
   kDetails = 3
 };  // enum class OfBlossom
 
+enum class OfPlainMarker : std::uint32_t {
+};  // enum class OfPlainMarker
+
 enum class OfSomething : std::uint32_t {
   kSomeChoice = 0,
   kSomethingWithoutChoice = 1
@@ -1696,6 +1774,13 @@ const std::unordered_map<
     OfBlossom::kDetails
   }
 };
+
+const std::size_t kPropertyCountOfPlainMarker = 0;
+
+const std::unordered_map<
+  std::string,
+  OfPlainMarker
+> kMapOfPlainMarker;
 
 const std::size_t kPropertyCountOfSomething = 2;
 
@@ -2067,6 +2152,60 @@ std::pair<
 template <
   typename T,
   typename std::enable_if<
+    std::is_base_of<T, types::IPlainMarker>::value
+  >::type*
+>
+std::pair<
+  common::optional<std::shared_ptr<T> >,
+  common::optional<DeserializationError>
+> PlainMarkerFromSequence(
+  xml_common::ReaderMergingText& reader
+) {
+  common::optional<DeserializationError> error(
+    ReadProperties<
+      properties::kPropertyCountOfPlainMarker
+    >(
+      reader,
+      properties::kMapOfPlainMarker,
+      L"IPlainMarker",
+      [&](
+        properties::OfPlainMarker property
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfPlainMarker",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<T>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<T>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::PlainMarker()
+    ),
+    common::nullopt
+  );
+}
+
+template <
+  typename T,
+  typename std::enable_if<
     std::is_base_of<T, types::ISomething>::value
   >::type*
 >
@@ -2386,6 +2525,38 @@ common::expected<
     is,
     options,
     BlossomFromElement
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IMarker>,
+  DeserializationError
+> MarkerFrom(
+  std::istream& is,
+  const ReadingOptions& options
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IMarker>
+  >(
+    is,
+    options,
+    MarkerFromElement
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IPlainMarker>,
+  DeserializationError
+> PlainMarkerFrom(
+  std::istream& is,
+  const ReadingOptions& options
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IPlainMarker>
+  >(
+    is,
+    options,
+    PlainMarkerFromElement
   );
 }
 
@@ -2764,6 +2935,57 @@ common::optional<xml_common::SerializationError> SerializeBlossomAsElement(
 /** @copybrief SerializeBlossomAsElement(const types::IBlossom&, xml_common::SelfClosingWriter& */
 common::optional<xml_common::SerializationError> SerializeBlossomPtrAsElement(
   const std::shared_ptr<types::IBlossom>& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * \brief Serialize \p that instance by dispatching to the appropriate concrete
+ * serialization function.
+ *
+ * \param that instance to be serialized
+ * \param writer to be write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializeMarkerAsElement(
+  const types::IMarker& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/** @copybrief SerializeMarkerAsElement(const types::IMarker&, xml_common::SelfClosingWriter& */
+common::optional<xml_common::SerializationError> SerializeMarkerPtrAsElement(
+  const std::shared_ptr<types::IMarker>& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializePlainMarkerAsSequence(
+  const types::IPlainMarker& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/**
+ * Serialize \p that instance to an XML element
+ * `<plainMarker>`.
+ *
+ * \param that instance to be serialized
+ * \return an error, if any
+ */
+common::optional<xml_common::SerializationError> SerializePlainMarkerAsElement(
+  const types::IPlainMarker& that,
+  xml_common::SelfClosingWriter& writer
+);
+
+/** @copybrief SerializePlainMarkerAsElement(const types::IPlainMarker&, xml_common::SelfClosingWriter& */
+common::optional<xml_common::SerializationError> SerializePlainMarkerPtrAsElement(
+  const std::shared_ptr<types::IPlainMarker>& that,
   xml_common::SelfClosingWriter& writer
 );
 
@@ -3179,6 +3401,74 @@ common::optional<xml_common::SerializationError> SerializeBlossomPtrAsElement(
   return SerializeBlossomAsElement(*that, writer);
 }
 
+common::optional<xml_common::SerializationError> SerializeMarkerAsElement(
+  const types::IMarker& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  // NOTE (mristin):
+  // The dynamic casts are necessary due to virtual inheritance. Otherwise,
+  // we would have used static casts.
+
+  switch (that.model_type()) {
+    case types::ModelType::kPlainMarker:
+      return SerializePlainMarkerAsElement(
+        dynamic_cast<
+          const types::IPlainMarker&
+        >(that),
+        writer
+      );
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Invalid model type: ",
+          stringification::to_string(that.model_type())
+        )
+      );
+  };
+}
+
+common::optional<xml_common::SerializationError> SerializeMarkerPtrAsElement(
+  const std::shared_ptr<types::IMarker>& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return SerializeMarkerAsElement(*that, writer);
+}
+
+/**
+ * \brief Serialize \p that instance as a sequence of XML elements.
+ *
+ * Each XML element corresponds to a property.
+ *
+ * \param that instance to be serialized
+ * \param writer to write to
+ * \return error, if any
+ */
+common::optional<xml_common::SerializationError> SerializePlainMarkerAsSequence(
+  const types::IPlainMarker& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return common::nullopt;
+}
+
+common::optional<xml_common::SerializationError> SerializePlainMarkerAsElement(
+  const types::IPlainMarker& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return WriteElement(
+    "plainMarker",
+    that,
+    writer,
+    SerializePlainMarkerAsSequence
+  );
+}
+
+common::optional<xml_common::SerializationError> SerializePlainMarkerPtrAsElement(
+  const std::shared_ptr<types::IPlainMarker>& that,
+  xml_common::SelfClosingWriter& writer
+) {
+  return SerializePlainMarkerAsElement(*that, writer);
+}
+
 /**
  * \brief Serialize \p that instance as a sequence of XML elements.
  *
@@ -3324,6 +3614,13 @@ common::optional<xml_common::SerializationError> WriteClass(
       return SerializeBlossomAsElement(
         dynamic_cast<
           const types::IBlossom&
+        >(that),
+        writer
+      );
+    case types::ModelType::kPlainMarker:
+      return SerializePlainMarkerAsElement(
+        dynamic_cast<
+          const types::IPlainMarker&
         >(that),
         writer
       );

@@ -104,6 +104,18 @@ class _Transformer(
         yield
 
     # noinspection PyMethodMayBeStatic
+    def transform_plain_marker(
+            self,
+            that: our_types.PlainMarker
+    ) -> Iterator[Error]:
+        # No verification has been defined for PlainMarker.
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
+
+    # noinspection PyMethodMayBeStatic
     def transform_something(
             self,
             that: our_types.Something

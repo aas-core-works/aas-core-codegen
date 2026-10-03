@@ -45,6 +45,20 @@ class Blossom(Leaf, DBC):
         self.details = details
 
 
+@abstract
+@serialization(with_model_type=True)
+class Marker(DBC):
+    def __init__(self) -> None:
+        pass
+
+
+# NOTE (mristin):
+# The constructor only calls the parent constructor, but has no arguments.
+class Plain_marker(Marker, DBC):
+    def __init__(self) -> None:
+        Marker.__init__(self)
+
+
 class Something(DBC):
     some_choice: Node
     something_without_choice: Branch

@@ -42,6 +42,11 @@ public abstract class AbstractTransformerWithContext<ContextT, T>
     ContextT context
   );
 
+  public abstract T transformPlainMarker(
+    IPlainMarker that,
+    ContextT context
+  );
+
   public abstract T transformSomething(
     ISomething that,
     ContextT context

@@ -474,6 +474,64 @@ namespace dummy.Tests
             // Compare
             Assert.AreEqual(outputText, anotherOutputBuilder.ToString());
         }  // void Test_round_trip_ILeaf_from_Leaf
+
+        [Test]
+        public void Test_round_trip_IMarker_from_PlainMarker()
+        {
+            // We load from JSON here just to jump-start the round trip.
+            // The round-trip goes then over XML.
+            var instance = Our.Tests.CommonJsonization.LoadMaximalPlainMarker();
+
+            // The round-trip starts here.
+            var outputBuilder = new System.Text.StringBuilder();
+
+            // Serialize to XML
+            {
+                using var xmlWriter = System.Xml.XmlWriter.Create(
+                    outputBuilder,
+                    new System.Xml.XmlWriterSettings()
+                    {
+                        Encoding = System.Text.Encoding.UTF8,
+                        OmitXmlDeclaration = true
+                    });
+
+                Our.Xmlization.Serialize.To(
+                    instance,
+                    xmlWriter);
+            }
+
+            // De-serialize from XML
+            string outputText = outputBuilder.ToString();
+
+            using var outputReader = new System.IO.StringReader(outputText);
+
+            using var xmlReader = System.Xml.XmlReader.Create(
+                outputReader,
+                new System.Xml.XmlReaderSettings());
+
+            var anotherInstance = Our.Xmlization.Deserialize.IMarkerFrom(
+                xmlReader);
+
+            // Serialize back to XML
+            var anotherOutputBuilder = new System.Text.StringBuilder();
+
+            {
+                using var anotherXmlWriter = System.Xml.XmlWriter.Create(
+                    anotherOutputBuilder,
+                    new System.Xml.XmlWriterSettings()
+                    {
+                        Encoding = System.Text.Encoding.UTF8,
+                        OmitXmlDeclaration = true
+                    });
+
+                Our.Xmlization.Serialize.To(
+                    anotherInstance,
+                    anotherXmlWriter);
+            }
+
+            // Compare
+            Assert.AreEqual(outputText, anotherOutputBuilder.ToString());
+        }  // void Test_round_trip_IMarker_from_PlainMarker
     }  // class TestXmlizationOfInterfaces
 }  // namespace dummy.Tests
 

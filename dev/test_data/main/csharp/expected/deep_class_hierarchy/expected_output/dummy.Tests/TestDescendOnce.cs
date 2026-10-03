@@ -103,6 +103,21 @@ namespace dummy.Tests
         }  // public void Test_Blossom
 
         [Test]
+        public void Test_PlainMarker()
+        {
+            Our.PlainMarker instance = (
+                Our.Tests.CommonJsonization.LoadMaximalPlainMarker());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Our.Tests.Common.TestDataDir,
+                    "DescendOnce",
+                    "PlainMarker",
+                    "maximal.json.trace"));
+        }  // public void Test_PlainMarker
+
+        [Test]
         public void Test_Something()
         {
             Our.Something instance = (

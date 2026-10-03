@@ -81,6 +81,34 @@ std::shared_ptr<
 
 template <typename E>
 std::shared_ptr<
+  types::IMarker
+> Wrap(
+  const std::shared_ptr<
+    types::IMarker
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
+template <typename E>
+std::shared_ptr<
+  types::IPlainMarker
+> Wrap(
+  const std::shared_ptr<
+    types::IPlainMarker
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
+template <typename E>
+std::shared_ptr<
   types::ISomething
 > Wrap(
   const std::shared_ptr<
@@ -370,6 +398,45 @@ class EnhancedBlossom
 };
 
 template<class E>
+class EnhancedPlainMarker
+    : virtual public types::IPlainMarker,
+    virtual public IEnhanced<E> {
+ public:
+  types::ModelType model_type() const override {
+    return types::ModelType::kPlainMarker;
+  }
+
+  const std::shared_ptr<E>& enhancement() const {
+    return enhancement_;
+  }
+
+  std::shared_ptr<E>& mutable_enhancement() {
+    return enhancement_;
+  }
+
+  void set_enhancement(
+    std::shared_ptr<E> value
+  ) {
+    enhancement_ = std::move(value);
+  }
+
+  EnhancedPlainMarker(
+    std::shared_ptr<types::IPlainMarker> instance,
+    std::shared_ptr<E> enhancement
+  ) :
+    instance_(instance),
+    enhancement_(enhancement) {
+    // Intentionally empty.
+  }
+
+  virtual ~EnhancedPlainMarker() = default;
+
+ private:
+  std::shared_ptr<types::IPlainMarker> instance_;
+  std::shared_ptr<E> enhancement_;
+};
+
+template<class E>
 class EnhancedSomething
     : virtual public types::ISomething,
     virtual public IEnhanced<E> {
@@ -621,6 +688,42 @@ std::shared_ptr<types::IBlossom> WrapBlossom(
  * \tparam E type of the enhancement
  */
 template<typename E>
+std::shared_ptr<types::IPlainMarker> WrapPlainMarker(
+  const std::shared_ptr<types::IPlainMarker>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  // We assume that we already checked whether `that` has been enhanced
+  // in the caller.
+
+  // No properties to be recursively enhanced.
+
+  std::shared_ptr<E> enh(
+    factory(that)
+  );
+  return (enh == nullptr)
+    ? that
+    : std::shared_ptr<types::IPlainMarker>(
+      new EnhancedPlainMarker<E>(
+        that,
+        enh
+      )
+    );
+}
+
+/**
+ * Wrap \p that with an enhanced instance.
+ *
+ * \param that instance to be wrapped and enhanced
+ * \param factory to produce an enhancement based on an instance
+ * \return Enhanced instance, or `that` if no enhancement produced
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
 std::shared_ptr<types::ISomething> WrapSomething(
   const std::shared_ptr<types::ISomething>& that,
   const std::function<
@@ -787,6 +890,14 @@ std::shared_ptr<
       return impl::WrapBlossom<E>(
         std::dynamic_pointer_cast<
           types::IBlossom
+        >(that),
+        factory
+      );
+      break;
+    case types::ModelType::kPlainMarker:
+      return impl::WrapPlainMarker<E>(
+        std::dynamic_pointer_cast<
+          types::IPlainMarker
         >(that),
         factory
       );
@@ -1005,6 +1116,88 @@ std::shared_ptr<
   switch (that->model_type()) {
     case types::ModelType::kBlossom:
       return impl::WrapBlossom<E>(
+        that,
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::IMarker
+> Wrap(
+  const std::shared_ptr<
+    types::IMarker
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::IMarker
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kPlainMarker:
+      return impl::WrapPlainMarker<E>(
+        std::dynamic_pointer_cast<
+          types::IPlainMarker
+        >(that),
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::IPlainMarker
+> Wrap(
+  const std::shared_ptr<
+    types::IPlainMarker
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::IPlainMarker
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kPlainMarker:
+      return impl::WrapPlainMarker<E>(
         that,
         factory
       );

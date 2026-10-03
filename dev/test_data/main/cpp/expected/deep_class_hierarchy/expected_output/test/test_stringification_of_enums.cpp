@@ -52,6 +52,20 @@ TEST_CASE("Test ModelType round-trip") {
   );
 
   REQUIRE(
+    our::types::ModelType::kPlainMarker
+    == our::stringification::MustModelTypeFromString(
+      "PlainMarker"
+    )
+  );
+
+  REQUIRE(
+    our::stringification::to_string(
+      our::types::ModelType::kPlainMarker
+    )
+    == "PlainMarker"
+  );
+
+  REQUIRE(
     our::types::ModelType::kSomething
     == our::stringification::MustModelTypeFromString(
       "Something"

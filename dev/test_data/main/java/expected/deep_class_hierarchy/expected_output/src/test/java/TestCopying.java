@@ -64,6 +64,17 @@ public class TestCopying {
     }
 
     @Override
+    public Boolean transformPlainMarker(IPlainMarker that, IClass other) {
+      if (!(other instanceof PlainMarker)) {
+        return false;
+      }
+
+      PlainMarker casted = (PlainMarker) other;
+
+      return true;
+    }
+
+    @Override
     public Boolean transformSomething(ISomething that, IClass other) {
       if (!(other instanceof Something)) {
         return false;
@@ -119,6 +130,12 @@ public class TestCopying {
       && that.getDetails().equals(other.getDetails()));
   }
 
+  private static Boolean PlainMarkerShallowEquals(
+    PlainMarker that,
+    PlainMarker other) {
+    return true;
+  }
+
   private static Boolean SomethingShallowEquals(
     Something that,
     Something other) {
@@ -144,6 +161,10 @@ public class TestCopying {
   }
 
   private static Boolean BlossomDeepEquals(Blossom that, Blossom other) {
+    return DeepEqualiserInstance.transform(that, other);
+  }
+
+  private static Boolean PlainMarkerDeepEquals(PlainMarker that, PlainMarker other) {
     return DeepEqualiserInstance.transform(that, other);
   }
 
@@ -214,6 +235,26 @@ public class TestCopying {
       BlossomDeepEquals(instance, instanceCopy),
       "Blossom");
   } // public void testBlossomDeepCopy
+
+  @Test
+  public void testPlainMarkerShallowCopy() throws IOException {
+    final PlainMarker instance = CommonJsonization.loadMaximalPlainMarker();
+    final PlainMarker instanceCopy = Copying.shallow(instance);
+
+    assertTrue(
+      PlainMarkerShallowEquals(instance, instanceCopy),
+      "PlainMarker");
+  } // public void testPlainMarkerShallowCopy
+
+  @Test
+  public void testPlainMarkerDeepCopy() throws IOException {
+    final PlainMarker instance = CommonJsonization.loadMaximalPlainMarker();
+    final PlainMarker instanceCopy = Copying.deep(instance);
+
+    assertTrue(
+      PlainMarkerDeepEquals(instance, instanceCopy),
+      "PlainMarker");
+  } // public void testPlainMarkerDeepCopy
 
   @Test
   public void testSomethingShallowCopy() throws IOException {

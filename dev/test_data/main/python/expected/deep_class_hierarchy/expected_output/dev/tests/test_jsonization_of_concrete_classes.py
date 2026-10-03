@@ -94,6 +94,30 @@ class TestRoundTrips(unittest.TestCase):
             )
             self.assertListEqual([], list(map(str, mismatches)))
 
+    def test_plain_marker(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'PlainMarker'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                original_jsonable = json.load(fid)
+
+            instance = our_jsonization.plain_marker_from_jsonable(
+                original_jsonable
+            )
+
+            another_jsonable = our_jsonization.to_jsonable(instance)
+
+            mismatches = tests.common_jsonization.check_equal(
+                original_jsonable,
+                another_jsonable
+            )
+            self.assertListEqual([], list(map(str, mismatches)))
+
     def test_something(self) -> None:
         for path in sorted(
             (

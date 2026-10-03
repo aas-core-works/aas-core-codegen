@@ -41,6 +41,20 @@ test("casts over an instance of Branch", () => {
   ).toBeNull();
 
   expect(
+    OurTypes.isMarker(theBranch)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asMarker(theBranch)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isPlainMarker(theBranch)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asPlainMarker(theBranch)
+  ).toBeNull();
+
+  expect(
     OurTypes.isSomething(theBranch)
   ).toStrictEqual(false);
   expect(
@@ -85,6 +99,20 @@ test("casts over an instance of Leaf", () => {
   ).toStrictEqual(false);
   expect(
     OurTypes.asBlossom(theLeaf)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isMarker(theLeaf)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asMarker(theLeaf)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isPlainMarker(theLeaf)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asPlainMarker(theLeaf)
   ).toBeNull();
 
   expect(
@@ -135,6 +163,20 @@ test("casts over an instance of Blossom", () => {
   ).toStrictEqual(theBlossom);
 
   expect(
+    OurTypes.isMarker(theBlossom)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asMarker(theBlossom)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isPlainMarker(theBlossom)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asPlainMarker(theBlossom)
+  ).toBeNull();
+
+  expect(
     OurTypes.isSomething(theBlossom)
   ).toStrictEqual(false);
   expect(
@@ -146,6 +188,67 @@ test("casts over an instance of Blossom", () => {
   ).toStrictEqual(false);
   expect(
     OurTypes.asContainer(theBlossom)
+  ).toBeNull();
+});
+
+test("casts over an instance of PlainMarker", () => {
+  const thePlainMarker =
+    TestCommonJsonization.loadMinimalPlainMarker();
+
+  expect(
+    OurTypes.isNode(thePlainMarker)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asNode(thePlainMarker)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isBranch(thePlainMarker)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asBranch(thePlainMarker)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isLeaf(thePlainMarker)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asLeaf(thePlainMarker)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isBlossom(thePlainMarker)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asBlossom(thePlainMarker)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isMarker(thePlainMarker)
+  ).toStrictEqual(true);
+  expect(
+    OurTypes.asMarker(thePlainMarker)
+  ).toStrictEqual(thePlainMarker);
+
+  expect(
+    OurTypes.isPlainMarker(thePlainMarker)
+  ).toStrictEqual(true);
+  expect(
+    OurTypes.asPlainMarker(thePlainMarker)
+  ).toStrictEqual(thePlainMarker);
+
+  expect(
+    OurTypes.isSomething(thePlainMarker)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asSomething(thePlainMarker)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isContainer(thePlainMarker)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asContainer(thePlainMarker)
   ).toBeNull();
 });
 
@@ -179,6 +282,20 @@ test("casts over an instance of Something", () => {
   ).toStrictEqual(false);
   expect(
     OurTypes.asBlossom(theSomething)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isMarker(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asMarker(theSomething)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isPlainMarker(theSomething)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asPlainMarker(theSomething)
   ).toBeNull();
 
   expect(
@@ -226,6 +343,20 @@ test("casts over an instance of Container", () => {
   ).toStrictEqual(false);
   expect(
     OurTypes.asBlossom(theContainer)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isMarker(theContainer)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asMarker(theContainer)
+  ).toBeNull();
+
+  expect(
+    OurTypes.isPlainMarker(theContainer)
+  ).toStrictEqual(false);
+  expect(
+    OurTypes.asPlainMarker(theContainer)
   ).toBeNull();
 
   expect(

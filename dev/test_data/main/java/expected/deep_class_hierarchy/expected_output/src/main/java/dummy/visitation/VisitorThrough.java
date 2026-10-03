@@ -47,6 +47,15 @@ public class VisitorThrough implements IVisitor {
     }
   }
 
+  public void visitPlainMarker(
+    IPlainMarker that
+  ) {
+    // Just descend through, do nothing with {@code that}
+    for (IClass something : that.descendOnce()) {
+      visit(something);
+    }
+  }
+
   public void visitSomething(
     ISomething that
   ) {

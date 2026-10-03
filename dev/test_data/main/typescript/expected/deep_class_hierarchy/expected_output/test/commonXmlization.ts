@@ -206,6 +206,70 @@ export function loadMinimalBlossom(
 }
 
 /**
+ * Load a maximal XML example of {@link types.PlainMarker}
+ * from the test data directory.
+ */
+export function loadMaximalPlainMarker(
+): OurTypes.PlainMarker {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "plainMarker",
+    "maximal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = OurXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = OurTypes.asPlainMarker(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of PlainMarker in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
+ * Load a minimal XML example of {@link types.PlainMarker}
+ * from the test data directory.
+ */
+export function loadMinimalPlainMarker(
+): OurTypes.PlainMarker {
+  const aPath = path.join(
+    TestCommon.TEST_DATA_DIR,
+    "Xml",
+    "Expected",
+    "plainMarker",
+    "minimal.xml"
+  );
+
+  const text = fs.readFileSync(aPath, "utf-8");
+
+  const instanceOrError = OurXmlization.fromXmlString(
+    text
+  );
+  expect(instanceOrError.error).toBeNull();
+  const instance = instanceOrError.mustValue();
+
+  const casted = OurTypes.asPlainMarker(instance);
+  if (casted === null) {
+    throw new Error(
+      `Expected instance of PlainMarker in ${aPath}, ` +
+      `but got: ${typeof instance}`
+    );
+  }
+  return casted;
+}
+
+/**
  * Load a maximal XML example of {@link types.Something}
  * from the test data directory.
  */

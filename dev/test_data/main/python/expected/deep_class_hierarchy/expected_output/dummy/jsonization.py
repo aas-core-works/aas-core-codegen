@@ -598,6 +598,62 @@ def blossom_from_jsonable(
     )
 
 
+def marker_from_jsonable(
+        jsonable: Jsonable
+) -> our_types.Marker:
+    """
+    Parse an instance of :py:class:`.types.Marker` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Concrete instance of :py:class:`.types.Marker`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dispatch_from_jsonable(
+        jsonable,
+        _MARKER_FROM_JSONABLE_DISPATCH,
+        'Marker'
+    )
+
+
+def plain_marker_from_jsonable(
+        jsonable: Jsonable
+) -> our_types.PlainMarker:
+    """
+    Parse an instance of :py:class:`.types.PlainMarker` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Parsed instance of :py:class:`.types.PlainMarker`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    mapping = _as_mapping(jsonable)
+
+    model_type = mapping.get('modelType', None)
+    if model_type != 'PlainMarker':
+        raise DeserializationException(
+            f"Expected modelType to be 'PlainMarker', "
+            f"but got: {model_type!r}"
+        )
+
+    try:
+        for key in mapping:
+            if key == 'modelType':
+                # The model type has already been checked above.
+                pass
+            else:
+                raise DeserializationException(
+                    f"Unexpected property: {key}"
+                )
+    except DeserializationException as exception:
+        exception.path._prepend(
+            PropertySegment(mapping, key)
+        )
+        raise
+
+    return our_types.PlainMarker()
+
+
 def something_from_jsonable(
         jsonable: Jsonable
 ) -> our_types.Something:
@@ -732,6 +788,16 @@ _LEAF_FROM_JSONABLE_DISPATCH: Mapping[
 ] = {
     'Leaf': _leaf_from_jsonable_without_dispatch,
     'Blossom': blossom_from_jsonable,
+}
+
+
+#: De-serialize a concrete instance of
+#: :py:class:`.types.Marker`, by its model type
+_MARKER_FROM_JSONABLE_DISPATCH: Mapping[
+    str,
+    _Parser[our_types.Marker]
+] = {
+    'PlainMarker': plain_marker_from_jsonable,
 }
 
 
@@ -891,6 +957,15 @@ def _blossom_to_jsonable(
     return jsonable
 
 
+def _plain_marker_to_jsonable(
+    that: our_types.PlainMarker
+) -> MutableMapping[str, MutableJsonable]:
+    """Serialize :paramref:`that` to a JSON-able representation."""
+    jsonable: MutableMapping[str, MutableJsonable] = dict()
+    jsonable['modelType'] = 'PlainMarker'
+    return jsonable
+
+
 def _something_to_jsonable(
     that: our_types.Something
 ) -> MutableMapping[str, MutableJsonable]:
@@ -949,6 +1024,9 @@ class _Serializer(
     )
     transform_blossom = staticmethod(
         _blossom_to_jsonable
+    )
+    transform_plain_marker = staticmethod(
+        _plain_marker_to_jsonable
     )
     transform_something = staticmethod(
         _something_to_jsonable

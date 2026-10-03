@@ -487,6 +487,99 @@ public class TestXmlizationOfConcreteClasses {
   } // public void testBlossomVerificationFail
 
   @Test
+  public void testPlainMarkerOk() throws IOException, XMLStreamException {
+    final Path searchPath =
+      Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "plainMarker");
+    final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+    for (Path path : paths) {
+      final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+      final XMLEventReader xmlReader =
+        xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+      final PlainMarker instance =
+        Xmlization.Deserialize.deserializePlainMarker(xmlReader);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+
+      assertSerializeDeserializeEqualsOriginal(instance, path);
+    }
+  } // public void testPlainMarkerOk
+
+  @Test
+  public void testPlainMarkerDeserializationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir =
+        causeDir.resolve("plainMarker");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of PlainMarker for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        XmlCommon.DeserializeException exception = null;
+
+        try {
+          Xmlization.Deserialize.deserializePlainMarker(xmlReader);
+        } catch (XmlCommon.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(exception, path);
+      }
+    }
+  }  // public void testPlainMarkerDeserializationFail
+
+  @Test
+  public void testPlainMarkerVerificationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve(
+        "plainMarker");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of PlainMarker for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        final PlainMarker instance =
+          Xmlization.Deserialize.deserializePlainMarker(xmlReader);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testPlainMarkerVerificationFail
+
+  @Test
   public void testSomethingOk() throws IOException, XMLStreamException {
     final Path searchPath =
       Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "something");

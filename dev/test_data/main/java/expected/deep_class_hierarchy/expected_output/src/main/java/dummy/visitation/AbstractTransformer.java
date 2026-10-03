@@ -33,6 +33,10 @@ public abstract class AbstractTransformer<T> implements ITransformer<T>
     IBlossom that
   );
 
+  public abstract T transformPlainMarker(
+    IPlainMarker that
+  );
+
   public abstract T transformSomething(
     ISomething that
   );

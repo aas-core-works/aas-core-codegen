@@ -36,6 +36,14 @@ func TestIsXxxOnAnInstanceOfBranch(t *testing.T) {
 		)
 	}
 
+	if ourtypes.IsPlainMarker(instance) {
+		t.Errorf(
+			"Expected IsPlainMarker to be false on an instance " +
+			"of IBranch with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
 	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
@@ -75,6 +83,14 @@ func TestIsXxxOnAnInstanceOfLeaf(t *testing.T) {
 	if ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be false on an instance " +
+			"of ILeaf with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsPlainMarker(instance) {
+		t.Errorf(
+			"Expected IsPlainMarker to be false on an instance " +
 			"of ILeaf with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)
@@ -124,6 +140,14 @@ func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
 		)
 	}
 
+	if ourtypes.IsPlainMarker(instance) {
+		t.Errorf(
+			"Expected IsPlainMarker to be false on an instance " +
+			"of IBlossom with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
 	if ourtypes.IsSomething(instance) {
 		t.Errorf(
 			"Expected IsSomething to be false on an instance " +
@@ -136,6 +160,58 @@ func TestIsXxxOnAnInstanceOfBlossom(t *testing.T) {
 		t.Errorf(
 			"Expected IsContainer to be false on an instance " +
 			"of IBlossom with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+}
+
+func TestIsXxxOnAnInstanceOfPlainMarker(t *testing.T) {
+	instance := ourtesting.MustLoadMinimalPlainMarker()
+
+	if ourtypes.IsBranch(instance) {
+		t.Errorf(
+			"Expected IsBranch to be false on an instance " +
+			"of IPlainMarker with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsLeaf(instance) {
+		t.Errorf(
+			"Expected IsLeaf to be false on an instance " +
+			"of IPlainMarker with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsBlossom(instance) {
+		t.Errorf(
+			"Expected IsBlossom to be false on an instance " +
+			"of IPlainMarker with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if !ourtypes.IsPlainMarker(instance) {
+		t.Errorf(
+			"Expected IsPlainMarker to be true on an instance " +
+			"of IPlainMarker with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsSomething(instance) {
+		t.Errorf(
+			"Expected IsSomething to be false on an instance " +
+			"of IPlainMarker with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsContainer(instance) {
+		t.Errorf(
+			"Expected IsContainer to be false on an instance " +
+			"of IPlainMarker with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)
 	}
@@ -163,6 +239,14 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 	if ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be false on an instance " +
+			"of ISomething with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsPlainMarker(instance) {
+		t.Errorf(
+			"Expected IsPlainMarker to be false on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)
@@ -207,6 +291,14 @@ func TestIsXxxOnAnInstanceOfContainer(t *testing.T) {
 	if ourtypes.IsBlossom(instance) {
 		t.Errorf(
 			"Expected IsBlossom to be false on an instance " +
+			"of IContainer with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsPlainMarker(instance) {
+		t.Errorf(
+			"Expected IsPlainMarker to be false on an instance " +
 			"of IContainer with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)

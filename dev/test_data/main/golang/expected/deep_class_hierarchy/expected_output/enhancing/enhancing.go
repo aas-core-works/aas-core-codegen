@@ -275,6 +275,59 @@ func wrapBlossom[E any](
 	return
 }
 
+type enhancedPlainMarker[E any] struct {
+	instance ourtypes.IPlainMarker
+	enhancement E
+}
+
+func (epm *enhancedPlainMarker[E]) ModelType(
+) ourtypes.ModelType {
+	return epm.instance.ModelType()
+}
+
+func (epm *enhancedPlainMarker[E]) DescendOnce(
+	action func(ourtypes.IClass)bool,
+) bool {
+	return epm.instance.DescendOnce(action)
+}
+
+func (epm *enhancedPlainMarker[E]) Descend(
+	action func(ourtypes.IClass) bool,
+) bool {
+	return epm.instance.Descend(action)
+}
+
+func (epm *enhancedPlainMarker[E]) getEnhancement(
+) E {
+	return epm.enhancement
+}
+
+func (epm *enhancedPlainMarker[E]) setEnhancement(
+	value E,
+) {
+	epm.enhancement = value
+}
+
+func wrapPlainMarker[E any](
+	that ourtypes.IPlainMarker,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IPlainMarker) {
+	// We assume that we already checked whether `that` has been enhanced
+	// in the caller.
+
+	enh, shouldEnhance := factory(that)
+	if shouldEnhance {
+		result = &enhancedPlainMarker[E]{
+			instance: that,
+			enhancement: enh,
+		}
+	} else {
+		result = that
+	}
+
+	return
+}
+
 type enhancedSomething[E any] struct {
 	instance ourtypes.ISomething
 	enhancement E
@@ -486,6 +539,11 @@ func Wrap[E any](
 	case ourtypes.ModelTypeBlossom:
 		result = wrapBlossom[E](
 			that.(ourtypes.IBlossom),
+			factory,
+		)
+	case ourtypes.ModelTypePlainMarker:
+		result = wrapPlainMarker[E](
+			that.(ourtypes.IPlainMarker),
 			factory,
 		)
 	case ourtypes.ModelTypeSomething:

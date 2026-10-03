@@ -193,6 +193,18 @@ void Blossom::set_details(
 
 // endregion Blossom
 
+// region PlainMarker
+
+PlainMarker::PlainMarker() {
+  // Intentionally empty.
+}
+
+ModelType PlainMarker::model_type() const {
+  return ModelType::kPlainMarker;
+}
+
+// endregion PlainMarker
+
 // region Something
 
 Something::Something(
@@ -295,6 +307,8 @@ bool IsNode(
       return true;
     case ModelType::kBlossom:
       return true;
+    case ModelType::kPlainMarker:
+      return false;
     case ModelType::kSomething:
       return false;
     case ModelType::kContainer:
@@ -321,6 +335,8 @@ bool IsBranch(
       return true;
     case ModelType::kBlossom:
       return true;
+    case ModelType::kPlainMarker:
+      return false;
     case ModelType::kSomething:
       return false;
     case ModelType::kContainer:
@@ -347,6 +363,8 @@ bool IsLeaf(
       return true;
     case ModelType::kBlossom:
       return true;
+    case ModelType::kPlainMarker:
+      return false;
     case ModelType::kSomething:
       return false;
     case ModelType::kContainer:
@@ -372,6 +390,64 @@ bool IsBlossom(
     case ModelType::kLeaf:
       return false;
     case ModelType::kBlossom:
+      return true;
+    case ModelType::kPlainMarker:
+      return false;
+    case ModelType::kSomething:
+      return false;
+    case ModelType::kContainer:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsMarker(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kBranch:
+      return false;
+    case ModelType::kLeaf:
+      return false;
+    case ModelType::kBlossom:
+      return false;
+    case ModelType::kPlainMarker:
+      return true;
+    case ModelType::kSomething:
+      return false;
+    case ModelType::kContainer:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsPlainMarker(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kBranch:
+      return false;
+    case ModelType::kLeaf:
+      return false;
+    case ModelType::kBlossom:
+      return false;
+    case ModelType::kPlainMarker:
       return true;
     case ModelType::kSomething:
       return false;
@@ -399,6 +475,8 @@ bool IsSomething(
       return false;
     case ModelType::kBlossom:
       return false;
+    case ModelType::kPlainMarker:
+      return false;
     case ModelType::kSomething:
       return true;
     case ModelType::kContainer:
@@ -424,6 +502,8 @@ bool IsContainer(
     case ModelType::kLeaf:
       return false;
     case ModelType::kBlossom:
+      return false;
+    case ModelType::kPlainMarker:
       return false;
     case ModelType::kSomething:
       return false;

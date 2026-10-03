@@ -51,6 +51,9 @@ class IVisitor {
   virtual void VisitBlossom(
     const std::shared_ptr<types::IBlossom>& that
   ) = 0;
+  virtual void VisitPlainMarker(
+    const std::shared_ptr<types::IPlainMarker>& that
+  ) = 0;
   virtual void VisitSomething(
     const std::shared_ptr<types::ISomething>& that
   ) = 0;
@@ -89,6 +92,9 @@ class PassThroughVisitor
   ) override;
   void VisitBlossom(
     const std::shared_ptr<types::IBlossom>& that
+  ) override;
+  void VisitPlainMarker(
+    const std::shared_ptr<types::IPlainMarker>& that
   ) override;
   void VisitSomething(
     const std::shared_ptr<types::ISomething>& that

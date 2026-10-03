@@ -128,6 +128,8 @@ _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
         our_jsonization.container_from_jsonable,
     'Leaf':
         our_jsonization.leaf_from_jsonable,
+    'PlainMarker':
+        our_jsonization.plain_marker_from_jsonable,
     'Something':
         our_jsonization.something_from_jsonable
 }
@@ -145,6 +147,8 @@ _MODEL_TYPE_TO_CLASS: Mapping[
         our_types.Container,
     'Leaf':
         our_types.Leaf,
+    'PlainMarker':
+        our_types.PlainMarker,
     'Something':
         our_types.Something
 }
