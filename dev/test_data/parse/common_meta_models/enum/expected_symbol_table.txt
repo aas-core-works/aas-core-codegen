@@ -57,7 +57,34 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Negating the result twice must give the result.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='negated',
+                args=[
+                  FunctionCall(
+                    name='negated',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_result',
+                        original_node=...)],
+                    original_node=...)],
+                original_node=...),
+              op='EQ',
+              right=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='some_result',
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       description=None,
       node=...,
@@ -65,7 +92,70 @@ UnverifiedSymbolTable(
       methods_by_name=...)],
   named_unions=[],
   constants=[],
-  verification_functions=[],
+  verification_functions=[
+    UnderstoodMethod(
+      name='negated',
+      verification=True,
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='result',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Result',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='Result',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      non_mutating=False,
+      body=[
+        textwrap.dedent("""\
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='result',
+                    original_node=...),
+                  op='EQ',
+                  right=Member(
+                    instance=Name(
+                      identifier='Result',
+                      original_node=...),
+                    name='Ok',
+                    original_node=...),
+                  original_node=...),
+                body=[
+                  Return(
+                    value=Member(
+                      instance=Name(
+                        identifier='Result',
+                        original_node=...),
+                      name='Not_ok',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...)],
+            default=None,
+            original_node=...)"""),
+        textwrap.dedent("""\
+          Return(
+            value=Member(
+              instance=Name(
+                identifier='Result',
+                original_node=...),
+              name='Ok',
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...)],
   meta_model=MetaModel(
     description=None,
     version='dummy',

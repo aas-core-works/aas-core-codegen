@@ -37,6 +37,19 @@ Error::Error(
 
 // endregion struct Error
 
+// region Verification functions
+
+types::Result Negated(
+  types::Result result
+) {
+  if (result == types::Result::kOk) {
+    return types::Result::kNotOk;
+  }
+  return types::Result::kOk;
+}
+
+// endregion Verification functions
+
 namespace {
 
 /**
@@ -45,7 +58,7 @@ namespace {
  * A shape tells which checks apply to a value, see \ref ChecksOf.
  */
 enum class Shape : std::uint32_t {
-  
+  kSomething = 0
 };  // enum class Shape
 
 /**
@@ -67,11 +80,33 @@ struct Check {
 
 // region Checks
 
+bool Something_0(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::Negated(
+    verification::Negated(
+      that->some_result()
+    )
+  ) == that->some_result();
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
 const std::vector<Check>& ChecksOf(Shape shape) {
   switch (shape) {
+    case Shape::kSomething: {
+      static const std::vector<Check> checks = {
+        {
+          &Something_0,
+          L"Negating the result twice must give the result."
+        }
+      };
+      return checks;
+    }
     default:
       throw std::logic_error(
         common::Concat(
@@ -200,15 +235,86 @@ std::unique_ptr<IIterator> Empty() {
 }
 
 /**
+ * Iterate over a single value which lives in the model.
+ */
+class OneIterator : public IIterator {
+ public:
+  OneIterator(
+    const void* value,
+    Shape shape
+  ) :
+    value_(value),
+    shape_(shape),
+    done_(true) {
+    // Intentionally empty.
+  }
+
+  void Start() override {
+    done_ = false;
+  }
+
+  void Next() override {
+    done_ = true;
+  }
+
+  bool Done() const override {
+    return done_;
+  }
+
+  const void* Value() const override {
+    return value_;
+  }
+
+  Shape ShapeOf() const override {
+    return shape_;
+  }
+
+  void AppendToPath(iteration::Path&) const override {
+    // Intentionally empty, as the value itself is the end of the path.
+  }
+
+  std::unique_ptr<IIterator> Clone() const override {
+    return common::make_unique<OneIterator>(*this);
+  }
+
+ private:
+  const void* value_;
+  Shape shape_;
+  bool done_;
+};  // class OneIterator
+
+std::unique_ptr<IIterator> One(
+  const void* value,
+  Shape shape
+) {
+  return common::make_unique<OneIterator>(value, shape);
+}
+
+std::unique_ptr<IIterator> Over_Something(
+  const types::ISomething& that,
+  bool
+) {
+  return One(&that, Shape::kSomething);
+}
+
+/**
  * Iterate over the values of the \p instance, dispatched on its runtime type.
  */
 std::unique_ptr<IIterator> DispatchOnModelType(
-  const types::IClass&,
-  bool
+  const types::IClass& instance,
+  bool recursive
 ) {
-  // NOTE (mristin):
-  // The instances of no class have anything to verify.
-  return Empty();
+  switch (instance.model_type()) {
+    case types::ModelType::kSomething:
+      return Over_Something(
+        dynamic_cast<const types::ISomething&>(instance),
+        recursive
+      );
+    default:
+      // NOTE (mristin):
+      // The instances of the other classes have nothing to verify.
+      return Empty();
+  }
 }
 
 // endregion Iteration over the values

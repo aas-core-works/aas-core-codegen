@@ -32,6 +32,20 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
+        /// Negate <paramref name="result" />, returning an enumeration literal.
+        /// </summary>
+        public static Result Negated(
+            Result result
+        )
+        {
+            if (result == Result.Ok)
+            {
+                return Result.NotOk;
+            }
+            return Result.Ok;
+        }  // public static Result Negated
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -56,6 +70,14 @@ namespace dummy
                 Our.ISomething that
             )
             {
+                if (!(
+                    Verification.Negated(Verification.Negated(that.SomeResult)) == that.SomeResult))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Negating the result twice must give the result.");
+                }
+
                 foreach (var error in Verification.VerifyResult(that.SomeResult))
                 {
                     error.PrependSegment(

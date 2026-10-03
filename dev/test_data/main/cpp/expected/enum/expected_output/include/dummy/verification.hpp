@@ -212,6 +212,15 @@ class RecursiveVerification : public IVerification {
   const std::shared_ptr<types::IClass>& instance_;
 };  // class RecursiveVerification
 
+// region Verification functions
+
+/// \brief Negate \p result, returning an enumeration literal.
+types::Result Negated(
+  types::Result result
+);
+
+// endregion Verification functions
+
 }  // namespace verification
 /**@}*/
 

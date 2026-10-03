@@ -9,6 +9,19 @@ class Result(Enum):
     Not_ok = "not-ok"
 
 
+@verification
+def negated(result: Result) -> Result:
+    """Negate :paramref:`result`, returning an enumeration literal."""
+    if result == Result.Ok:
+        return Result.Not_ok
+
+    return Result.Ok
+
+
+@invariant(
+    lambda self: negated(negated(self.some_result)) == self.some_result,
+    "Negating the result twice must give the result.",
+)
 class Something:
     some_result: Result
 

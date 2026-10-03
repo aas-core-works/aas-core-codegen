@@ -30,6 +30,17 @@ import dummy.visitation.AbstractTransformer;
 
 public class Verification {
   /**
+   * Negate {@code result}, returning an enumeration literal.
+   */
+  public static Result negated(
+    Result result) {
+    if (result == Result.OK) {
+        return Result.NOT_OK;
+    }
+    return Result.OK;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -55,6 +66,14 @@ public class Verification {
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!(
+        negated(negated(that.getSomeResult())) == that.getSomeResult())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Negating the result twice must give the result.")));
+      }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
         Stream.of(that.getSomeResult())
