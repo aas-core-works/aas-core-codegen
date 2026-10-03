@@ -1111,9 +1111,6 @@ def _args_to_arguments(
         "for keyword-only arguments either."
     )
 
-    if len(node.args) == 0:
-        return None, Error(node, "Unexpected no arguments")
-
     arguments = []  # type: List[Argument]
 
     # region ``self``

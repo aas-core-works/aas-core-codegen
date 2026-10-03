@@ -2553,6 +2553,36 @@ UnverifiedSymbolTable(
       node=...,
       arguments_by_name=...),
     UnderstoodMethod(
+      name='seven_is_lucky',
+      verification=True,
+      visibility='PUBLIC',
+      arguments=[],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      non_mutating=False,
+      body=[
+        textwrap.dedent("""\
+          Return(
+            value=IsIn(
+              member=Constant(
+                value=7,
+                original_node=...),
+              container=Name(
+                identifier='Lucky_numbers',
+                original_node=...),
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...),
+    UnderstoodMethod(
       name='numbers_are_all_small',
       verification=True,
       visibility='PUBLIC',
@@ -2626,24 +2656,31 @@ UnverifiedSymbolTable(
             original_node=...)"""),
         textwrap.dedent("""\
           Return(
-            value=All(
-              generator=ForEach(
-                variable=Name(
-                  identifier='number',
+            value=And(
+              values=[
+                FunctionCall(
+                  name='seven_is_lucky',
+                  args=[],
                   original_node=...),
-                iteration=Name(
-                  identifier='seen',
-                  original_node=...),
-                original_node=...),
-              condition=Comparison(
-                left=Name(
-                  identifier='number',
-                  original_node=...),
-                op='LT',
-                right=Constant(
-                  value=1000,
-                  original_node=...),
-                original_node=...),
+                All(
+                  generator=ForEach(
+                    variable=Name(
+                      identifier='number',
+                      original_node=...),
+                    iteration=Name(
+                      identifier='seen',
+                      original_node=...),
+                    original_node=...),
+                  condition=Comparison(
+                    left=Name(
+                      identifier='number',
+                      original_node=...),
+                    op='LT',
+                    right=Constant(
+                      value=1000,
+                      original_node=...),
+                    original_node=...),
+                  original_node=...)],
               original_node=...),
             original_node=...)""")],
       node=...,

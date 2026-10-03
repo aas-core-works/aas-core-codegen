@@ -297,7 +297,10 @@ bool UniqueTextsAreAllShort(
   const std::vector<std::wstring>& texts
 );
 
-/// \brief Check `all` over a local set.
+/// \brief Check the constant set of lucky numbers without any arguments.
+bool SevenIsLucky();
+
+/// \brief Check `all` over a local set, and call a function without arguments.
 bool NumbersAreAllSmall(
   const std::vector<int64_t>& numbers
 );

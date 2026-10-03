@@ -256,6 +256,14 @@ bool UniqueTextsAreAllShort(
   );
 }
 
+bool SevenIsLucky() {
+  return (
+    constants::kLuckyNumbers.find(
+      7
+    ) != constants::kLuckyNumbers.end()
+  );
+}
+
 bool NumbersAreAllSmall(
   const std::vector<int64_t>& numbers
 ) {
@@ -264,11 +272,14 @@ bool NumbersAreAllSmall(
     seen.insert(number);
   }
   return (
-    common::All(
-      [&](int64_t number) -> bool {
-        return number < 1000;
-      },
-      seen
+    (
+      SevenIsLucky()
+      && common::All(
+        [&](int64_t number) -> bool {
+          return number < 1000;
+        },
+        seen
+      )
     )
   );
 }

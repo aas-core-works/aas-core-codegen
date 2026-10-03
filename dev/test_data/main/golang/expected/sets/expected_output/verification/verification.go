@@ -266,7 +266,15 @@ func UniqueTextsAreAllShort(
 	return TextsAreAllShort(seen)
 }
 
-// Check `all` over a local set.
+// Check the constant set of lucky numbers without any arguments.
+func SevenIsLucky() bool {
+	return ourcommon.MapContains(
+			ourconstants.LuckyNumbers,
+			7,
+		)
+}
+
+// Check `all` over a local set, and call a function without arguments.
 func NumbersAreAllSmall(
 	numbers []int64,
 ) bool {
@@ -274,7 +282,8 @@ func NumbersAreAllSmall(
 	for _, number := range numbers {
 		seen[number] = struct{}{}
 	}
-	return ourcommon.AllKeys(
+	return SevenIsLucky() &&
+		ourcommon.AllKeys(
 			func(number int64) bool {
 				return number < 1000
 			},

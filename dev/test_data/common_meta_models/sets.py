@@ -221,13 +221,19 @@ def unique_texts_are_all_short(texts: Sequence[str]) -> bool:
 
 
 @verification
+def seven_is_lucky() -> bool:
+    """Check the constant set of lucky numbers without any arguments."""
+    return 7 in Lucky_numbers
+
+
+@verification
 def numbers_are_all_small(numbers: Sequence[int]) -> bool:
-    """Check ``all`` over a local set."""
+    """Check ``all`` over a local set, and call a function without arguments."""
     seen: Set[int] = set()
     for number in numbers:
         seen.add(number)
 
-    return all(number < 1000 for number in seen)
+    return seven_is_lucky() and all(number < 1000 for number in seen)
 
 
 @verification

@@ -1916,6 +1916,25 @@ SymbolTable(
       parsed=...,
       arguments_by_name=...),
     TranspilableVerification(
+      name='seven_is_lucky',
+      visibility='PUBLIC',
+      arguments=[],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the constant set of lucky numbers without any arguments.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
       name='numbers_are_all_small',
       visibility='PUBLIC',
       arguments=[
@@ -1933,7 +1952,7 @@ SymbolTable(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check <literal>all</literal> over a local set.</paragraph>',
+        summary='<paragraph>Check <literal>all</literal> over a local set, and call a function without arguments.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,
