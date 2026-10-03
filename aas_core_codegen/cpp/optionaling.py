@@ -171,7 +171,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
             # NOTE (mristin):
             # Tuple items are restricted to atomic types (primitives, constrained
             # primitives, classes and enumerations) by
-            # intermediate._translate._verify_only_simple_type_patterns, so none of
+            # parse._translate._verify_symbol_table, so none of
             # them can ever be optional.
             self.is_optional_map[node] = False
             return None

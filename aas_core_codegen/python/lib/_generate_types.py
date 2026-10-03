@@ -443,27 +443,10 @@ def _descend_into_container_name(
     Name the module-level function descending into ``type_anno``.
 
     We follow the grammar of the monikers of the composed de/serializers, see
-    :py:attr:`aas_core_codegen.python.common.MONIKER_BY_PRIMITIVE_TYPE`, so two
-    different containers never share a function.
+    :py:func:`aas_core_codegen.python.common.type_moniker`, so two different
+    containers never share a function.
     """
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        return Identifier(
-            f"_descend_list_of__{python_common.atomic_moniker(type_anno.items)}"
-        )
-
-    if isinstance(type_anno, intermediate.SetTypeAnnotation):
-        return Identifier(
-            f"_descend_set_of__{python_common.atomic_moniker(type_anno.items)}"
-        )
-
-    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        monikers = [python_common.atomic_moniker(item) for item in type_anno.items]
-
-        return Identifier(
-            f"_descend_tuple{len(type_anno.items)}_of__" + "__".join(monikers)
-        )
-
-    assert_never(type_anno)
+    return Identifier(f"_descend_{python_common.type_moniker(type_anno)}")
 
 
 @require(
@@ -515,7 +498,7 @@ if recurse:
     raise AssertionError(
         f"Unexpected type annotation holding instances: {type_anno}. "
         f"The optionals nested in the containers should have been refused in "
-        f"intermediate._translate._verify_only_simple_type_patterns."
+        f"parse._translate._verify_symbol_table."
     )
 
 
@@ -1980,21 +1963,17 @@ def generate(
     # NOTE (mristin):
     # The set properties and the corresponding arguments of the constructors are
     # always mutable, so they are annotated as ``Set``.
-    if Identifier("Set") not in set_imports and any(
-        isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.SetTypeAnnotation,
-        )
-        for cls in symbol_table.classes
-        for prop in cls.properties
+    if Identifier("Set") not in set_imports and intermediate_uses.set_properties(
+        symbol_table
     ):
         set_imports.append(Identifier("Set"))
 
     typing_imports.extend(set_imports)
 
     # NOTE (mristin):
-    # We spell out the final local lists as ``Final[Sequence[...]]``, so we need to
-    # import ``Final`` and ``Sequence`` only if the methods declare them.
+    # We spell out the final local lists as ``Final[Sequence[...]]``, and the lists
+    # of the read-only arguments as ``Sequence[...]``, so we need to import ``Final``
+    # and ``Sequence`` only if the methods declare them.
     final_annotations = [
         annotation
         for method in specified_methods
@@ -2002,10 +1981,21 @@ def generate(
         if intermediate_type_inference.is_final_annotation(annotation)
     ]  # type: List[parse_tree.Expression]
 
-    if Identifier("Sequence") not in typing_imports and any(
-        isinstance(node, parse_tree.Name) and node.identifier == "Sequence"
-        for annotation in final_annotations
-        for node in parse_tree.over_nodes(annotation)
+    if Identifier("Sequence") not in typing_imports and (
+        any(
+            isinstance(node, parse_tree.Name) and node.identifier == "Sequence"
+            for annotation in final_annotations
+            for node in parse_tree.over_nodes(annotation)
+        )
+        or any(
+            isinstance(type_anno, intermediate.ListTypeAnnotation)
+            for method in specified_methods
+            for argument in method.arguments
+            if not argument.mutable
+            for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+                argument.type_annotation
+            )
+        )
     ):
         typing_imports.append(Identifier("Sequence"))
 

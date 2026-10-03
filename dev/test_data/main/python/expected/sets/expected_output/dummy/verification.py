@@ -64,7 +64,7 @@ Error = our_reporting.Error
 
 
 def texts_are_unique(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """Check a local set of strings."""
     # pylint: disable=all
@@ -77,7 +77,7 @@ def texts_are_unique(
 
 
 def numbers_are_unique_between_zeros(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """Check a local set of integers which we reset at every zero."""
     # pylint: disable=all
@@ -93,7 +93,7 @@ def numbers_are_unique_between_zeros(
 
 
 def kinds_are_unique(
-    kinds: List[our_types.Kind]
+    kinds: Sequence[our_types.Kind]
 ) -> bool:
     """Check a local set of enumeration literals."""
     # pylint: disable=all
@@ -106,7 +106,7 @@ def kinds_are_unique(
 
 
 def codes_are_unique(
-    codes: List[str]
+    codes: Sequence[str]
 ) -> bool:
     """Check a local set of constrained primitives."""
     # pylint: disable=all
@@ -119,7 +119,7 @@ def codes_are_unique(
 
 
 def flags_are_uniform(
-    flags: List[bool]
+    flags: Sequence[bool]
 ) -> bool:
     """Check a local set of booleans queried with literals."""
     # pylint: disable=all
@@ -134,7 +134,7 @@ def flags_are_uniform(
 
 
 def lengths_are_unique(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """
     Check a local set of integers filled with and queried by lengths.
@@ -149,7 +149,7 @@ def lengths_are_unique(
 
 
 def add_texts(
-    texts: List[str],
+    texts: Sequence[str],
     collected: Set[str]
 ) -> bool:
     """
@@ -197,8 +197,8 @@ def is_in_kinds(
 
 
 def texts_are_disjoint(
-    texts: List[str],
-    other_texts: Optional[List[str]]
+    texts: Sequence[str],
+    other_texts: Optional[Sequence[str]]
 ) -> bool:
     """
     Check that :paramref:`texts` and :paramref:`other_texts` share no text.
@@ -254,7 +254,7 @@ def texts_are_all_short(
 
 
 def unique_texts_are_all_short(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """Collect :paramref:`texts` into a local set, and check them all."""
     # pylint: disable=all
@@ -264,7 +264,7 @@ def unique_texts_are_all_short(
 
 
 def numbers_are_all_small(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """Check ``all`` over a local set."""
     # pylint: disable=all
@@ -279,7 +279,7 @@ def numbers_are_all_small(
 
 
 def at_most_one_text_is_reserved(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """Check the intersection of a constant set with a local set."""
     # pylint: disable=all
@@ -290,7 +290,7 @@ def at_most_one_text_is_reserved(
 
 
 def some_kind_is_not_special(
-    kinds: List[our_types.Kind],
+    kinds: Sequence[our_types.Kind],
     optional_kind: Optional[our_types.Kind]
 ) -> bool:
     """

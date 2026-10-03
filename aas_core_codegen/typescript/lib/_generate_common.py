@@ -950,7 +950,7 @@ export function findStr(text: string, sub: string, start = 0): number {{
     # NOTE (mristin):
     # Analogous to the modulo, we add the helpers only if the meta-model has
     # a set in a property, which we serialize as a sorted array.
-    if typescript_common.has_set_properties(symbol_table):
+    if intermediate_uses.set_properties(symbol_table):
         for block in SET_SORTING:
             blocks.insert(len(blocks) - 1, block)
 

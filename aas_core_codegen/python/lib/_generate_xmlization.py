@@ -973,10 +973,10 @@ def _is_enclosed_in_a_prescribed_element(
     Check whether a value of the ``type_annotation`` needs the tag prescribed for it.
 
     An instance element is self-describing -- its tag *is* its model type -- so it
-    carries its own tag wherever it occurs. Everything else is written into an
-    element whose tag comes from the position instead (``v`` in a list, ``v1``,
-    ``v2``, *etc.* in a tuple), and that tag therefore has to be checked against
-    what the enclosing element prescribes.
+    carries its own tag wherever it occurs. Everything else, including a nested list,
+    tuple or set, is written into an element whose tag comes from the position
+    instead (``v`` in a list, ``v1``, ``v2``, *etc.* in a tuple), and that tag
+    therefore has to be checked against what the enclosing element prescribes.
     """
     if _is_encoded_as_text(type_annotation):
         return True
@@ -987,6 +987,9 @@ def _is_enclosed_in_a_prescribed_element(
             intermediate.JsonValueTypeAnnotation,
             intermediate.JsonArrayTypeAnnotation,
             intermediate.JsonObjectTypeAnnotation,
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.SetTypeAnnotation,
         ),
     )
 
@@ -1061,24 +1064,15 @@ def _content_reader_name(
         else:
             assert_never(our_type)
 
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        items_type_anno = intermediate.beneath_optional(type_anno.items)
-
-        return Identifier(
-            f"_read_list_of__{python_common.atomic_moniker(items_type_anno)}"
-        )
-
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        monikers = [python_common.atomic_moniker(item) for item in type_anno.items]
-
-        return Identifier(
-            f"_read_tuple{len(type_anno.items)}_of__" + "__".join(monikers)
-        )
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        return Identifier(
-            f"_read_set_of__{python_common.atomic_moniker(type_anno.items)}"
-        )
+    elif isinstance(
+        type_anno,
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+        ),
+    ):
+        return Identifier(f"_read_{python_common.type_moniker(type_anno)}")
 
     else:
         assert_never(type_anno)
@@ -1105,7 +1099,7 @@ def _element_reader_name(
 
     if _is_enclosed_in_a_prescribed_element(type_anno):
         return Identifier(
-            f"_read_{python_common.atomic_moniker(type_anno)}__at_{expected_tag}"
+            f"_read_{python_common.type_moniker(type_anno)}__at_{expected_tag}"
         )
 
     assert isinstance(
@@ -1187,7 +1181,7 @@ def {name}(
 ) -> {value_type}:
 {I}\"\"\"
 {I}Read the content of :paramref:`element`, which must be tagged
-{I}``{expected_tag}``, as {python_common.describe_atomic_type(type_annotation)}.
+{I}``{expected_tag}``, as {python_common.describe_value_type(type_annotation)}.
 {I}\"\"\"
 {I}return _read_named_element(
 {II}element,
@@ -1217,19 +1211,7 @@ def {name}(
         """Register the reader of a list with the items of the ``type_annotation``."""
         self.note_needed_helper("_read_list_of_items")
 
-        items_type_anno = intermediate.beneath_optional(type_annotation.items)
-
-        if isinstance(
-            items_type_anno,
-            (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
-        ):
-            raise AssertionError(
-                "(mristin) We handle only lists of primitive types and of our types "
-                "in the XML de-serialization at the moment. The meta-model does not "
-                "contain any other lists, so we wanted to keep the code as simple as "
-                "possible, and avoid unrolling. Please contact the developers if you "
-                "need this feature."
-            )
+        items_type_anno = type_annotation.items
 
         self._register_element_reader(items_type_anno, expected_tag="v")
 
@@ -1251,7 +1233,7 @@ def {name}(
 ) -> List[{item_type}]:
 {I}\"\"\"
 {I}Read the items of :paramref:`element` as a list of
-{I}{python_common.describe_atomic_type(items_type_anno)}.
+{I}{python_common.describe_type(items_type_anno)}.
 {I}\"\"\"
 {I}return _read_list_of_items(
 {II}element,
@@ -1289,7 +1271,7 @@ def {name}(
 ) -> Set[{item_type}]:
 {I}\"\"\"
 {I}Read the items of :paramref:`element` as a set of
-{I}{python_common.describe_atomic_type(items_type_anno)}.
+{I}{python_common.describe_type(items_type_anno)}.
 {I}\"\"\"
 {I}return _read_set_of_items(
 {II}element,
@@ -1311,15 +1293,6 @@ def {name}(
         item_types = []  # type: List[Stripped]
 
         for i, item_type_anno in enumerate(type_annotation.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, constrained "
-                "primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so "
-                "no nested optionals, lists or tuples are expected here."
-            )
-
             expected_tag = f"v{i + 1}"
 
             self._register_element_reader(item_type_anno, expected_tag=expected_tag)
@@ -1914,20 +1887,20 @@ def _cls_sequence_writer_name(cls: intermediate.ConcreteClass) -> Identifier:
     )
 
 
-def _tuple_writer_name(type_annotation: intermediate.TupleTypeAnnotation) -> Identifier:
-    """Give out the name of the writer of a tuple of the ``type_annotation``."""
-    monikers = [python_common.atomic_moniker(item) for item in type_annotation.items]
+def _container_writer_name(
+    type_annotation: Union[
+        intermediate.ListTypeAnnotation,
+        intermediate.TupleTypeAnnotation,
+        intermediate.SetTypeAnnotation,
+    ],
+) -> Identifier:
+    """
+    Give out the name of the writer of a list, a tuple or a set.
 
-    return Identifier(
-        f"_write_tuple{len(type_annotation.items)}_of__" + "__".join(monikers)
-    )
-
-
-def _set_writer_name(type_annotation: intermediate.SetTypeAnnotation) -> Identifier:
-    """Give out the name of the writer of a set of the ``type_annotation``."""
-    return Identifier(
-        f"_write_set_of__{python_common.atomic_moniker(type_annotation.items)}"
-    )
+    A list is written by a writer of its own only if it is an item of another list,
+    see :py:meth:`_WriterRegistry._register_list_writer`.
+    """
+    return Identifier(f"_write_{python_common.type_moniker(type_annotation)}")
 
 
 def _element_writer_call(
@@ -2044,7 +2017,7 @@ def _element_writer_call(
             assert_never(our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        items_type_anno = intermediate.beneath_optional(type_anno.items)
+        items_type_anno = type_anno.items
 
         if not _is_enclosed_in_a_prescribed_element(items_type_anno):
             return (
@@ -2052,33 +2025,28 @@ def _element_writer_call(
                 [prop_literal, value, "serializer"],
             )
 
-        items_primitive_type = intermediate.try_primitive_type(items_type_anno)
-        if items_primitive_type is not None:
-            write_item = Identifier(
-                _WRITE_FUNCTION_BY_PRIMITIVE_TYPE[items_primitive_type]
-            )
-        elif isinstance(items_type_anno, intermediate.JsonValueTypeAnnotation):
-            write_item = Identifier("_write_json_value_as_element")
-        elif isinstance(items_type_anno, intermediate.JsonArrayTypeAnnotation):
-            write_item = Identifier("_write_json_array_as_element")
-        elif isinstance(items_type_anno, intermediate.JsonObjectTypeAnnotation):
-            write_item = Identifier("_write_json_object_as_element")
+        # NOTE (mristin):
+        # The item writer must have the uniform shape of a writer. A nested list
+        # needs a writer of its own for that, as a list is otherwise written by
+        # the shared ``_write_list_of_items``, which takes the item writer on top.
+        write_item: Identifier
+        if isinstance(items_type_anno, intermediate.ListTypeAnnotation):
+            write_item = _container_writer_name(items_type_anno)
         else:
-            assert isinstance(items_type_anno, intermediate.OurTypeAnnotation)
-            assert isinstance(items_type_anno.our_type, intermediate.Enumeration)
-
-            write_item = Identifier("_write_enum_as_element")
+            write_item, _ = _element_writer_call(items_type_anno, None, value)
 
         return (
             Identifier("_write_list_of_items"),
             [prop_literal, value, write_item, "serializer"],
         )
 
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        return (_tuple_writer_name(type_anno), [prop_literal, value, "serializer"])
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        return (_set_writer_name(type_anno), [prop_literal, value, "serializer"])
+    elif isinstance(
+        type_anno, (intermediate.TupleTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        return (
+            _container_writer_name(type_anno),
+            [prop_literal, value, "serializer"],
+        )
 
     else:
         assert_never(type_anno)
@@ -2136,7 +2104,7 @@ class _WriterRegistry:
         """Register the writer of a tuple with the items of the ``type_annotation``."""
         arity = len(type_annotation.items)
 
-        name = _tuple_writer_name(type_annotation)
+        name = _container_writer_name(type_annotation)
 
         value_type = python_common.generate_type(
             type_annotation, types_module=Identifier("our_types")
@@ -2145,15 +2113,6 @@ class _WriterRegistry:
         statements = []  # type: List[Stripped]
 
         for i, item_type_anno in enumerate(type_annotation.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, constrained "
-                "primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so "
-                "no nested optionals, lists or tuples are expected here."
-            )
-
             item_value = f"value[{i}]"
 
             write: Stripped
@@ -2226,6 +2185,56 @@ def {name}(
             ),
         )
 
+    def _register_list_writer(
+        self, type_annotation: intermediate.ListTypeAnnotation
+    ) -> None:
+        """
+        Register the writer of a list with the items of the ``type_annotation``.
+
+        We need such a writer only for a list which is an item of another list, so
+        that the enclosing list can take it as its item writer. Otherwise, a list is
+        written by the shared helpers directly, see :py:func:`_element_writer_call`.
+        """
+        self.register_property_writer(type_annotation)
+
+        name = _container_writer_name(type_annotation)
+
+        value_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("our_types")
+        )
+
+        function, arguments = _element_writer_call(type_annotation, None, "value")
+
+        write = _join_arguments(function, ["name"] + arguments, columns=len(II))
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+def {name}(
+{I}name: str,
+{I}prop_name: Optional[str],
+{I}value: {indent_but_first_line(value_type, I)},
+{I}serializer: '_Serializer'
+) -> None:
+{I}\"\"\"
+{I}Write the items of :paramref:`value` enclosed in the :paramref:`name` element.
+
+{I}:param name: of the enclosing element
+{I}:param prop_name:
+{II}name of the property, as spelled in Python, whose value is written, or
+{II}``None`` if the access to the value is recorded by an enclosing writer
+{I}:param value: to be serialized
+{I}:param serializer: to write to
+{I}:raise: :py:class:`SerializationException` if the value could not be written
+{I}\"\"\"
+{I}try:
+{II}{indent_but_first_line(write, II)}
+{I}except Exception as exception:
+{II}_attribute_to_property(exception, prop_name)"""
+            ),
+        )
+
     def _register_set_writer(
         self, type_annotation: intermediate.SetTypeAnnotation
     ) -> None:
@@ -2236,7 +2245,7 @@ def {name}(
 
         self.register_property_writer(items_type_anno)
 
-        name = _set_writer_name(type_annotation)
+        name = _container_writer_name(type_annotation)
 
         value_type = python_common.generate_type(
             type_annotation, types_module=Identifier("our_types")
@@ -2363,19 +2372,7 @@ def {name}(
                 assert_never(our_type)
 
         elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-            items_type_anno = intermediate.beneath_optional(type_anno.items)
-
-            if isinstance(
-                items_type_anno,
-                (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
-            ):
-                raise AssertionError(
-                    "(mristin) We handle only lists of primitive types and of our types "
-                    "in the XML serialization at the moment. The meta-model does not "
-                    "contain any other lists, so we wanted to keep the code as simple "
-                    "as possible, and avoid unrolling. Please contact the developers "
-                    "if you need this feature."
-                )
+            items_type_anno = type_anno.items
 
             if not _is_enclosed_in_a_prescribed_element(items_type_anno):
                 self.note_needed_helper("_write_list_of_instances")
@@ -2383,7 +2380,10 @@ def {name}(
 
             self.note_needed_helper("_write_list_of_items")
 
-            self.register_property_writer(items_type_anno)
+            if isinstance(items_type_anno, intermediate.ListTypeAnnotation):
+                self._register_list_writer(items_type_anno)
+            else:
+                self.register_property_writer(items_type_anno)
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_writer(type_anno)
@@ -4153,16 +4153,9 @@ def generate(
     )
 
     # NOTE (mristin):
-    # We import ``Set`` only for the set properties so that the import is never
-    # unused.
-    uses_set_properties = any(
-        isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.SetTypeAnnotation,
-        )
-        for concrete_cls in symbol_table.concrete_classes
-        for prop in concrete_cls.properties
-    )
+    # We import ``Set`` only for the sets in the properties so that the import is
+    # never unused.
+    uses_set_properties = intermediate_uses.set_properties(symbol_table)
     set_import = f"{I}Set,\n" if uses_set_properties else ""
 
     blocks = [

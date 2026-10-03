@@ -2116,7 +2116,7 @@ __xml_namespace__ = "https://dummy.com"
 def some_func(items: List[Item], lists: List[List[str]], text: str) -> bool:
     for item in items:
         item.text = text
-        item.texts = item.texts[:]
+        item.texts = list(item.texts)
 
     for texts in lists:
         texts[0] = text
@@ -2166,7 +2166,7 @@ def some_func(item: Item) -> bool:
                 """\
 @verification
 def some_func(item: Mutable["Item"]) -> bool:
-    return fill(item.texts[:], "x")"""
+    return fill(list(item.texts), "x")"""
             ),
             expected_joined_message=(
                 "The argument 'texts' of the verification function 'fill' is "
@@ -2315,23 +2315,111 @@ def some_func(item: Mutable["Item"], texts: List[str]) -> bool:
                 "The value assigned to the property 'texts' of item holds a "
                 "list, which Python would share, but C++ would copy. We can "
                 "not transpile the sharing to C++, so please assign an "
-                "explicit copy of the list, *e.g.*, ``texts[:]``."
+                "explicit copy of the list, *e.g.*, ``list(texts)``."
             ),
         )
 
-    def test_partial_slice_of_list_fails(self) -> None:
+    def test_slice_of_list_fails(self) -> None:
         Test_with_smoke().expect_type_inference_to_fail(
             source=Test_mutability.source_with_verification(
                 """\
 @verification
 def some_func(item: Mutable["Item"], texts: List[str]) -> bool:
-    item.texts = texts[1:]
+    item.texts = texts[:]
     return True"""
             ),
             expected_joined_message=(
-                "We support slicing a list only to copy it as a whole, with "
-                "``[:]``, but got a slice with a start or an end"
+                "We do not support slicing a list. If you want to copy the list, "
+                "please use ``list(texts)``, which mypy accepts for a read-only "
+                "``Sequence`` as well."
             ),
+        )
+
+    def test_copy_of_read_only_list_is_mutable(self) -> None:
+        Test_with_smoke.execute(
+            Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(item: Mutable["Item"], texts: Sequence[str]) -> bool:
+    item.texts = list(texts)
+
+    copied: List[str] = list(texts)
+    copied[0] = "x"
+    return fill(copied, "y")"""
+            )
+        )
+
+    def test_list_without_arguments_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    return len(list()) > 0"""
+            ),
+            expected_joined_message=(
+                "We support ``list(...)`` only to copy a list, so we expect "
+                "exactly one argument, but got 0."
+            ),
+        )
+
+    def test_list_of_string_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(text: str) -> bool:
+    return len(list(text)) > 0"""
+            ),
+            expected_joined_message=(
+                "We support ``list(...)`` only to copy a non-None list, " "but got: str"
+            ),
+        )
+
+    def test_list_of_optional_list_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(texts: Optional[Sequence[str]]) -> bool:
+    return len(list(texts)) > 0"""
+            ),
+            expected_joined_message=(
+                "We support ``list(...)`` only to copy a non-None list, "
+                "but got: Optional[List[str]]. Please check for ``is not None`` "
+                "first."
+            ),
+        )
+
+    def test_read_only_value_in_mutable_variable_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(texts: Optional[Sequence[str]]) -> bool:
+    maybe_texts: Optional[List[str]] = texts
+    return maybe_texts is not None"""
+            ),
+            expected_joined_message=(
+                "The variable 'maybe_texts' is declared as mutable with "
+                "``Optional[List[str]]``, but the argument 'texts' is declared as "
+                "a Sequence, which is read-only. Please declare it as a List if "
+                "the function mutates it. Alternatively, please copy the list with "
+                "``list(texts)``, or declare "
+                "the variable with ``Sequence[...]`` instead of ``List[...]`` if "
+                "you do not mutate it."
+            ),
+        )
+
+    def test_read_only_value_in_read_only_variable_passes(self) -> None:
+        Test_with_smoke.execute(
+            Test_mutability.source_with_verification(
+                """\
+@verification
+def some_func(texts: Optional[Sequence[str]]) -> bool:
+    maybe_texts: Optional[Sequence[str]] = texts
+    return maybe_texts is not None"""
+            )
         )
 
     def test_copy_of_nested_lists_fails(self) -> None:
@@ -2340,13 +2428,15 @@ def some_func(item: Mutable["Item"], texts: List[str]) -> bool:
                 """\
 @verification
 def some_func(lists: List[List[str]]) -> bool:
-    return len(lists[:]) > 0"""
+    return len(list(lists)) > 0"""
             ),
             expected_joined_message=(
                 "We can not copy the list of type List[List[str]] with "
-                "``[:]``, since its items hold lists themselves. Python "
-                "copies the list shallowly, so that the copy shares the inner "
-                "lists, while C++ copies the inner lists as well."
+                "``list(...)``, since its items hold lists or sets themselves. "
+                "Python copies the list shallowly, so that the copy shares "
+                "the inner lists and sets, while C++ copies them as well. We do "
+                "not support deep copies at the moment. Please contact "
+                "the developers if you need this feature."
             ),
         )
 
@@ -4056,19 +4146,19 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual("str", type_map["self.text[:1]"])
         self.assertEqual("int", type_map["self.text[:1].find('x')"])
 
-    def test_partial_slice_of_a_list_fails(self) -> None:
+    def test_slice_of_a_list_fails(self) -> None:
         self.expect_error(
             "len(self.text[0:1]) == 1",
-            "We support slicing a list only to copy it as a whole, with ``[:]``, "
-            "but got a slice with a start or an end",
+            "We do not support slicing a list. If you want to copy the list, "
+            "please use ``list(self.text)``, which mypy accepts for a read-only "
+            "``Sequence`` as well.",
             property_type="List[str]",
         )
 
     def test_slice_of_a_tuple_fails(self) -> None:
         self.expect_error(
             "len(self.text[0:1]) == 1",
-            "We support slicing only of non-None strings, and copying of non-None "
-            "lists with ``[:]``, but got: Tuple[int, int]",
+            "We support slicing only of non-None strings, but got: Tuple[int, int]",
             property_type="Tuple[int, int]",
         )
 
@@ -4092,8 +4182,7 @@ __xml_namespace__ = "https://dummy.com"
             Test_string_slicing_and_find.infer_type_map(source)
 
         self.assertEqual(
-            "We support slicing only of non-None strings, and copying of non-None "
-            "lists with ``[:]``, but got: Optional[str]",
+            "We support slicing only of non-None strings, but got: Optional[str]",
             str(context.exception),
         )
 
@@ -5038,7 +5127,8 @@ def some_func(text: str) -> bool:
 """,
             expected_message=(
                 "We support a set only as the container of ``in``, the collection "
-                "of a for-loop, the receiver of its methods, an argument of a call, "
+                "or the variable of a for-loop, the receiver of its methods, "
+                "an argument of a call, "
                 "the target of an assignment, the value of a nullness check, and a "
                 "new set as the assigned value. Elsewhere, the targets would need "
                 "to either copy or share the set, and they disagree on that: C++ "
@@ -5334,6 +5424,197 @@ def count_texts(self) -> int:
                 "The method '__parent_private' of the class 'Child' is private, "
                 "so it can be only called on self from the methods of the class",
             ],
+        )
+
+
+class Test_nested_collections(unittest.TestCase):
+    maxDiff = None
+
+    _PRELUDE = """\
+class Item(DBC):
+    lists: List[List[str]]
+    pair: Tuple[List[str], int]
+    list_of_sets: List[Set[str]]
+
+    def __init__(
+        self,
+        lists: List[List[str]],
+        pair: Tuple[List[str], int],
+        list_of_sets: List[Set[str]],
+    ) -> None:
+        self.lists = lists
+        self.pair = pair
+        self.list_of_sets = list_of_sets
+
+
+"""
+
+    _EPILOGUE = """
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+    def expect_type_inference_to_fail(
+        self, body: str, expected_joined_message: str
+    ) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_nested_collections._PRELUDE
+            + body
+            + Test_nested_collections._EPILOGUE,
+            expected_joined_message=expected_joined_message,
+        )
+
+    def test_iteration_and_indexing_pass(self) -> None:
+        Test_with_smoke.execute(
+            source=Test_nested_collections._PRELUDE
+            + """\
+@verification
+def some_func(
+    lists: Sequence[Sequence[Tuple[int, AbstractSet[str]]]],
+    text: str
+) -> bool:
+    for inner in lists:
+        for pair in inner:
+            if pair[0] > 0 and text in pair[1]:
+                return len(lists[0][1][1]) > 0
+
+    return all(
+        all(len(pair[1]) > 0 for pair in inner)
+        for inner in lists
+    )"""
+            + Test_nested_collections._EPILOGUE
+        )
+
+    def test_comparison_of_lists_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(lists: Sequence[Sequence[str]]) -> bool:
+    return lists[0] == lists[1]""",
+            expected_joined_message=(
+                "We do not support comparing the lists, the tuples or the sets, "
+                "but the right operand is inferred to be List[str]. The targets "
+                "disagree on the comparison: Python compares them item by item, "
+                "while C#, Java and TypeScript compare their references. Please "
+                "compare their items instead, *e.g.*, in a for-loop.\n"
+                "We do not support comparing the lists, the tuples or the sets, "
+                "but the left operand is inferred to be List[str]. The targets "
+                "disagree on the comparison: Python compares them item by item, "
+                "while C#, Java and TypeScript compare their references. Please "
+                "compare their items instead, *e.g.*, in a for-loop."
+            ),
+        )
+
+    def test_comparison_of_tuples_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str, number: int) -> bool:
+    return (text, number) != (text, 1)""",
+            expected_joined_message=(
+                "We do not support comparing the lists, the tuples or the sets, "
+                "but the right operand is inferred to be Tuple[str, int]. The targets "
+                "disagree on the comparison: Python compares them item by item, "
+                "while C#, Java and TypeScript compare their references. Please "
+                "compare their items instead, *e.g.*, in a for-loop.\n"
+                "We do not support comparing the lists, the tuples or the sets, "
+                "but the left operand is inferred to be Tuple[str, int]. The targets "
+                "disagree on the comparison: Python compares them item by item, "
+                "while C#, Java and TypeScript compare their references. Please "
+                "compare their items instead, *e.g.*, in a for-loop."
+            ),
+        )
+
+    def test_list_as_member_of_in_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(lists: Sequence[Sequence[str]], texts: Sequence[str]) -> bool:
+    return texts in lists""",
+            expected_joined_message=(
+                "We do not support looking up a list, a tuple or a set with "
+                "``in``, but the member is inferred to be List[str]. The targets "
+                "disagree on the comparison: Python compares the items item by "
+                "item, while C#, Java and TypeScript compare their references."
+            ),
+        )
+
+    def test_copy_of_list_of_sets_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(item: Mutable[Item]) -> bool:
+    item.list_of_sets = list(item.list_of_sets)
+    return True""",
+            expected_joined_message=(
+                "We can not copy the list of type List[Set[str]] with "
+                "``list(...)``, since its items hold lists or sets themselves. "
+                "Python copies the list shallowly, so that the copy shares "
+                "the inner lists and sets, while C++ copies them as well. We do "
+                "not support deep copies at the moment. Please contact "
+                "the developers if you need this feature."
+            ),
+        )
+
+    def test_storing_tuple_holding_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(item: Mutable[Item], other: Item) -> bool:
+    item.pair = other.pair
+    return True""",
+            expected_joined_message=(
+                "The value assigned to the property 'pair' of item holds lists or "
+                "sets, "
+                "which Python would share, but C++ would copy. We can not "
+                "transpile the sharing to C++, so please assign explicit copies "
+                "of them, *e.g.*, a tuple literal of the lists copied with "
+                "``list(...)``. We do not support deep copies of the nested lists and "
+                "sets at the moment. Please contact the developers if you need "
+                "this feature."
+            ),
+        )
+
+    def test_storing_tuple_literal_of_copies_passes(self) -> None:
+        Test_with_smoke.execute(
+            source=Test_nested_collections._PRELUDE
+            + """\
+@verification
+def some_func(item: Mutable[Item], other: Item) -> bool:
+    item.pair = (list(other.pair[0]), other.pair[1])
+    return True"""
+            + Test_nested_collections._EPILOGUE
+        )
+
+    def test_optional_in_tuple_literal_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: Optional[str]) -> bool:
+    pair = (text, 1)
+    return True""",
+            expected_joined_message=(
+                "The items of a tuple can not be None, as we support Optional "
+                "only at the top of a type annotation, but the item is inferred "
+                "to be Optional[str]. Please check first that the item is not "
+                "None, *e.g.*, with ``if text is not None:``."
+            ),
+        )
+
+    def test_optional_items_in_local_annotation_fail(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[Sequence[str]]) -> bool:
+    lists: Optional[List[List[Optional[str]]]] = None
+    return True""",
+            expected_joined_message=(
+                "We support Optional only at the top of a type annotation, so "
+                "the items of a list can not be optional, but got: "
+                "List[Optional[str]]"
+            ),
         )
 
 

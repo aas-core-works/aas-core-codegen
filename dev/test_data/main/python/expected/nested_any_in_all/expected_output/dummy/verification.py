@@ -71,7 +71,7 @@ def is_english(
 
 
 def lang_string_sets_have_english(
-    lang_string_sets: List[our_types.LangStringSet]
+    lang_string_sets: Sequence[our_types.LangStringSet]
 ) -> bool:
     """
     Check that every set in :paramref:`lang_string_sets` has at least one
@@ -91,7 +91,7 @@ def lang_string_sets_have_english(
 
 
 def iec_contents_have_definition_in_english(
-    specifications: List[our_types.Specification]
+    specifications: Sequence[our_types.Specification]
 ) -> bool:
     """
     Check that the :py:attr:`.types.IecContent.definition` is defined at least in English

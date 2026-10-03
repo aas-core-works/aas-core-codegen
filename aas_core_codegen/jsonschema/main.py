@@ -273,17 +273,15 @@ def _define_type(
                 assert not isinstance(
                     type_annotation.items, intermediate.OptionalTypeAnnotation
                 ), (
-                    "NOTE (mristin): Lists of optional values were not expected "
-                    "at the time when we implemented this. Please contact "
-                    "the developers if you need this functionality."
+                    "NOTE (mristin): The items of lists are verified to never "
+                    "be optional in parse._translate._verify_symbol_table."
                 )
             elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
                 assert not isinstance(
                     type_annotation.items, intermediate.OptionalTypeAnnotation
                 ), (
-                    "NOTE (mristin): Sets of optional values were not expected "
-                    "at the time when we implemented this. Please contact "
-                    "the developers if you need this functionality."
+                    "NOTE (mristin): The items of sets are verified to never "
+                    "be optional in parse._translate._verify_symbol_table."
                 )
             else:
                 assert_never(type_annotation)
@@ -311,13 +309,11 @@ def _define_type(
         elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
             items_type_definitions = []  # type: List[MutableMapping[str, Any]]
             for item_type_annotation in type_annotation.items:
-                assert isinstance(
-                    item_type_annotation, intermediate.AtomicTypeAnnotationAsTuple
+                assert not isinstance(
+                    item_type_annotation, intermediate.OptionalTypeAnnotation
                 ), (
-                    "NOTE (mristin): We only support tuples of atomic types "
-                    "(primitives, constrained primitives, classes and enumerations); "
-                    "this should have been caught before by "
-                    "intermediate._translate._verify_only_simple_type_patterns."
+                    "NOTE (mristin): The items of a tuple are verified to never be "
+                    "optional in parse._translate._verify_symbol_table."
                 )
 
                 item_type_definition, item_error = _define_type(
@@ -371,7 +367,7 @@ def _define_type(
             ), (
                 "NOTE (mristin): The key of a JSONObject is verified to never be "
                 "optional in "
-                "intermediate._translate._verify_only_simple_type_patterns."
+                "parse._translate._verify_symbol_table."
             )
 
             key_constraints = constraints_by_value.get(type_annotation.key, None)

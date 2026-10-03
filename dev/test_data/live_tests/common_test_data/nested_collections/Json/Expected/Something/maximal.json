@@ -1,0 +1,63 @@
+{
+  "grid": [[1, 2, 3], [4, 5, 6]],
+  "rowsOfPairs": [
+    [
+      [1, ["known", "other"]],
+      [2, ["Z", "a", "😀"]]
+    ],
+    [],
+    [[3, ["x"]]]
+  ],
+  "mixed": [
+    [
+      {
+        "modelType": "SomeItem",
+        "name": "first"
+      },
+      {
+        "modelType": "AnotherItem",
+        "serialNumber": 2
+      }
+    ],
+    ["blue", "green"],
+    [7, "code"]
+  ],
+  "setsOfColors": [["blue", "red"], [], ["green"]],
+  "gridOfUnions": [
+    [
+      {
+        "modelType": "AnotherItem",
+        "serialNumber": 1
+      }
+    ],
+    [],
+    [
+      {
+        "modelType": "SomeItem",
+        "name": "union"
+      },
+      {
+        "modelType": "AnotherItem",
+        "serialNumber": 3
+      }
+    ]
+  ],
+  "optionalGridOfItems": [
+    [
+      {
+        "modelType": "SomeItem",
+        "name": "deep"
+      }
+    ],
+    [
+      {
+        "modelType": "AnotherItem",
+        "serialNumber": 4
+      },
+      {
+        "modelType": "SomeItem",
+        "name": "deeper"
+      }
+    ]
+  ]
+}

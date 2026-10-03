@@ -289,7 +289,9 @@ class OurTypeAnnotation(TypeAnnotation):
 class ListTypeAnnotation(TypeAnnotation):
     """Represent a type annotation involving a ``List[...]``."""
 
-    def __init__(self, items: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
+    def __init__(
+        self, items: "TypeAnnotationExceptOptional", parsed: parse.TypeAnnotation
+    ):
         TypeAnnotation.__init__(self, parsed=parsed)
 
         self.items = items
@@ -307,7 +309,9 @@ class TupleTypeAnnotation(TypeAnnotation):
     """
 
     def __init__(
-        self, items: Sequence["TypeAnnotationUnion"], parsed: parse.TypeAnnotation
+        self,
+        items: Sequence["TypeAnnotationExceptOptional"],
+        parsed: parse.TypeAnnotation,
     ):
         TypeAnnotation.__init__(self, parsed=parsed)
 
@@ -326,8 +330,9 @@ class SetTypeAnnotation(TypeAnnotation):
     the argument, see :py:attr:`Argument.mutable`, so that the generators need
     not distinguish the two.
 
-    The sets are allowed in the arguments of the verification functions and of
-    the methods, and in the properties, but not in the return values.
+    The sets are allowed at any depth in the arguments of the verification
+    functions and of the methods, and in the properties, but not in the return
+    values.
 
     The sets hold only booleans, integers, strings, constrained primitives of them
     and enumeration literals. A set in a property is serialized as an array whose
@@ -337,7 +342,9 @@ class SetTypeAnnotation(TypeAnnotation):
     accepts the items in any order, but refuses the duplicates.
     """
 
-    def __init__(self, items: "TypeAnnotationUnion", parsed: parse.TypeAnnotation):
+    def __init__(
+        self, items: "TypeAnnotationExceptOptional", parsed: parse.TypeAnnotation
+    ):
         TypeAnnotation.__init__(self, parsed=parsed)
 
         self.items = items
@@ -3924,7 +3931,7 @@ def map_descendability(
         elif isinstance(a_type_annotation, JsonObjectTypeAnnotation):
             # NOTE (mristin):
             # The key is ``str`` or a class constraining ``str`` (enforced by
-            # ``_verify_only_simple_type_patterns`` in ``_translate.py``) and
+            # ``_verify_keys_of_json_objects_are_strings`` in ``_translate.py``) and
             # the value is always ``JSONValue`` -- neither ever descends into
             # a class, so a ``JsonObjectTypeAnnotation`` is never descendable.
             mapping[a_type_annotation] = False

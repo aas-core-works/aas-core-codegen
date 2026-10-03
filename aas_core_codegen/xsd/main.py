@@ -642,17 +642,15 @@ def _value_to_type_element_or_type_identifier(
                 assert not isinstance(
                     type_annotation.items, intermediate.OptionalTypeAnnotation
                 ), (
-                    "(mristin): Lists of optional values were not expected "
-                    "at the time when we implemented this. Please contact "
-                    "the developers if you need this functionality."
+                    "(mristin): The items of lists are verified to never be "
+                    "optional in parse._translate._verify_symbol_table."
                 )
             elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
                 assert not isinstance(
                     type_annotation.items, intermediate.OptionalTypeAnnotation
                 ), (
-                    "(mristin): Sets of optional values were not expected "
-                    "at the time when we implemented this. Please contact "
-                    "the developers if you need this functionality."
+                    "(mristin): The items of sets are verified to never be "
+                    "optional in parse._translate._verify_symbol_table."
                 )
             else:
                 assert_never(type_annotation)
@@ -791,15 +789,11 @@ def _value_to_type_element_or_type_identifier(
             xs_sequence = ET.SubElement(xs_complex_type, "xs:sequence")
 
             for i, item_type_annotation in enumerate(type_annotation.items):
-                assert isinstance(
-                    item_type_annotation, intermediate.AtomicTypeAnnotationAsTuple
+                assert not isinstance(
+                    item_type_annotation, intermediate.OptionalTypeAnnotation
                 ), (
-                    "(mristin): Only tuples of atomic types (primitives, "
-                    "constrained primitives, classes, enumerations and named "
-                    "unions) are supported at the moment; this should have been "
-                    "caught before by "
-                    "intermediate._translate._verify_only_simple_type_patterns. "
-                    "If you see this, please contact the developers."
+                    "(mristin): The items of a tuple are verified to never be "
+                    "optional in parse._translate._verify_symbol_table."
                 )
 
                 if isinstance(
@@ -912,14 +906,14 @@ def _value_to_type_element_or_type_identifier(
             ), (
                 "(mristin): The key of a JSONObject is verified to never be "
                 "optional in "
-                "intermediate._translate._verify_only_simple_type_patterns."
+                "parse._translate._verify_symbol_table."
             )
 
             key_primitive_type = intermediate.try_primitive_type(type_annotation.key)
             assert key_primitive_type is intermediate.PrimitiveType.STR, (
                 "(mristin): The key of a JSONObject is verified to always reduce "
                 "to a string (or a class constraining a string) in "
-                "intermediate._translate._verify_only_simple_type_patterns."
+                "intermediate._translate._verify_keys_of_json_objects_are_strings."
             )
 
             key_simple_type, key_simple_type_error = _translate_to_simple_type(

@@ -6,6 +6,7 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 from aas_core_codegen import intermediate
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.common import Error, Stripped, Identifier, indent_but_first_line
 from aas_core_codegen.typescript import (
     common as typescript_common,
@@ -427,7 +428,7 @@ def generate(
         blocks.append(_generate_enum_from_string(enumeration=enum))
         blocks.append(_generate_enum_to_string(enumeration=enum))
 
-    for enum in typescript_common.enumerations_in_set_properties(symbol_table):
+    for enum in intermediate_uses.enumerations_in_set_properties(symbol_table):
         blocks.append(_generate_rank_and_compare(enumeration=enum))
 
     blocks.append(typescript_common.WARNING)

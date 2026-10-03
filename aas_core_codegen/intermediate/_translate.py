@@ -64,7 +64,6 @@ from aas_core_codegen.intermediate._types import (
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
-    AtomicTypeAnnotationAsTuple,
     OptionalTypeAnnotation,
     OurTypeAnnotation,
     JsonValueTypeAnnotation,
@@ -84,6 +83,7 @@ from aas_core_codegen.intermediate._types import (
     Interface,
     NamedUnion,
     TypeAnnotationUnion,
+    TypeAnnotationExceptOptional,
     ClassUnion,
     VerificationUnion,
     Visibility,
@@ -1109,6 +1109,22 @@ def _to_named_union(
     )
 
 
+def _to_item_type_annotation(
+    parsed: parse.TypeAnnotation,
+) -> TypeAnnotationExceptOptional:
+    """
+    Translate the type annotation of an item of a list, a tuple or a set.
+
+    The items are never optional, see ``parse._translate._verify_symbol_table``.
+    """
+    result = _to_type_annotation(parsed)
+    assert not isinstance(result, OptionalTypeAnnotation), (
+        f"Unexpected optional item {parsed}; this should have been caught before "
+        f"in parse._translate._verify_symbol_table."
+    )
+    return result
+
+
 def _to_type_annotation(
     parsed: parse.TypeAnnotation,
 ) -> TypeAnnotationUnion:
@@ -1152,7 +1168,7 @@ def _to_type_annotation(
             # the argument, see :py:attr:`Argument.mutable`, so that the generators
             # need not distinguish the two.
             return ListTypeAnnotation(
-                items=_to_type_annotation(parsed.subscripts[0]),
+                items=_to_item_type_annotation(parsed.subscripts[0]),
                 parsed=parsed,
             )
 
@@ -1167,7 +1183,7 @@ def _to_type_annotation(
             # the argument, see :py:attr:`Argument.mutable`, so that the generators
             # need not distinguish the two.
             return SetTypeAnnotation(
-                items=_to_type_annotation(parsed.subscripts[0]),
+                items=_to_item_type_annotation(parsed.subscripts[0]),
                 parsed=parsed,
             )
 
@@ -1200,7 +1216,8 @@ def _to_type_annotation(
 
             return TupleTypeAnnotation(
                 items=[
-                    _to_type_annotation(subscript) for subscript in parsed.subscripts
+                    _to_item_type_annotation(subscript)
+                    for subscript in parsed.subscripts
                 ],
                 parsed=parsed,
             )
@@ -5246,107 +5263,95 @@ def _verify_description_rendering_with_smoke(symbol_table: SymbolTable) -> List[
     return errors
 
 
-def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
+def _over_declared_type_annotations(
+    symbol_table: SymbolTable,
+) -> Iterator[Tuple[TypeAnnotationUnion, ast.AST, str]]:
     """
-    Check that there are only simple type patterns in the meta-model.
+    Iterate over the type annotations declared in the meta-model.
 
-    Namely, for a lot of code generators, unrolling arbitrary type annotations is
-    quite complex. In contrast, if we can make simplifying assumptions about the types
-    in the meta-model, we can write much simpler generators.
+    We yield the type annotations of the properties, and of the arguments and
+    the return values of the verification functions and of the methods, together
+    with the node to report the errors at, and the description of where they are
+    declared.
 
-    First, the meta-model is quite limited itself at the moment, so the complexity of
-    the general solutions is not warranted. Second, we hope that there will be fewer
-    bugs in the simple solution which is particularly important at this early adoption
-    stage.
-
-    We anticipate that we will want to actually write the more complex generators
-    in the future. At this point, we restrict ourselves to the following patterns:
-
-    * Non-nested optional types, *i.e.* optional of optionals, are unexpected;
-    * Lists of optionals are unexpected;
-    * Tuples of non-atomic types (*i.e.* of lists, tuples or optionals) are
-      unexpected -- we only support tuples of primitives, constrained primitives,
-      classes, enumerations and JSON-able values; and
-    * The key of a ``JSONObject`` must be ``str`` or a class (transitively)
-      constraining ``str`` -- its open-keyed shape only makes sense over
-      string-like keys.
-
-    Note that a list of lists is not supported: the code generators report an
-    error where they would otherwise have to descend into a nested list. A
-    JSON-able array is a different matter -- an array of arrays is a perfectly
-    good ``JSONValue`` -- but its shape is known only at run time, so there is
-    nothing for this check to verify.
+    The inherited properties and methods are yielded only once, where they have
+    been specified.
     """
-    errors = []  # type: List[Error]
+    for func in symbol_table.verification_functions:
+        for arg in func.arguments:
+            yield (
+                arg.type_annotation,
+                arg.parsed.node,
+                f"the argument {arg.name!r} of the verification function "
+                f"{func.name!r}",
+            )
+
+        if func.returns is not None:
+            yield (
+                func.returns,
+                func.parsed.node,
+                f"the return value of the verification function {func.name!r}",
+            )
+
     for cls in symbol_table.classes:
         for prop in cls.properties:
-            if isinstance(prop.type_annotation, OptionalTypeAnnotation) and isinstance(
-                prop.type_annotation.value, OptionalTypeAnnotation
+            if prop.specified_for is not cls:
+                continue
+
+            yield (
+                prop.type_annotation,
+                prop.parsed.node,
+                f"the property {prop.name!r} of the class {cls.name!r}",
+            )
+
+        for method in cls.methods:
+            if method.specified_for is not cls:
+                continue
+
+            for arg in method.arguments:
+                yield (
+                    arg.type_annotation,
+                    arg.parsed.node,
+                    f"the argument {arg.name!r} of the method {method.name!r} "
+                    f"of the class {cls.name!r}",
+                )
+
+            if method.returns is not None:
+                yield (
+                    method.returns,
+                    method.parsed.node,
+                    f"the return value of the method {method.name!r} "
+                    f"of the class {cls.name!r}",
+                )
+
+
+def _verify_keys_of_json_objects_are_strings(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """
+    Check that the key of every ``JSONObject`` is ``str``.
+
+    The key can also be a class (transitively) constraining ``str``. The open-keyed
+    shape of a ``JSONObject`` only makes sense over string-like keys.
+    """
+    errors = []  # type: List[Error]
+    for type_anno, node, what in _over_declared_type_annotations(symbol_table):
+        for nested in over_type_annotation_and_nested_type_annotations(type_anno):
+            if (
+                isinstance(nested, JsonObjectTypeAnnotation)
+                and try_primitive_type(nested.key) != PrimitiveType.STR
             ):
                 errors.append(
                     Error(
-                        prop.parsed.node,
-                        "We currently support only a limited set of "
-                        "type annotation patterns. At the moment, we do not handle "
-                        "nested optionals. Please contact the developers if you "
-                        "need this functionality",
+                        node,
+                        f"We only support ``str`` or a class constraining "
+                        f"``str`` as the key of a ``JSONObject``, "
+                        f"but {what} has the type {type_anno}. "
+                        f"Please contact the developers if you need "
+                        f"this functionality.",
                     )
                 )
-
-            type_anno = beneath_optional(prop.type_annotation)
-            if isinstance(type_anno, ListTypeAnnotation):
-                if isinstance(type_anno.items, OptionalTypeAnnotation):
-                    errors.append(
-                        Error(
-                            prop.parsed.node,
-                            f"We currently support only a limited set of "
-                            f"type annotation patterns. At the moment, we handle "
-                            f"only lists of non-optionals, "
-                            f"but the property {prop.name!r} "
-                            f"of the class {cls.name!r} "
-                            f"has type: {prop.type_annotation}. "
-                            f"Please contact the developers if you need "
-                            f"this functionality",
-                        )
-                    )
-
-            elif isinstance(type_anno, TupleTypeAnnotation):
-                if not all(
-                    isinstance(item, AtomicTypeAnnotationAsTuple)
-                    for item in type_anno.items
-                ):
-                    errors.append(
-                        Error(
-                            prop.parsed.node,
-                            f"We currently support only a limited set of "
-                            f"type annotation patterns. At the moment, we handle "
-                            f"only tuples of primitives, constrained primitives, "
-                            f"classes and enumerations (*i.e.* no tuples of "
-                            f"optionals, lists or nested tuples), "
-                            f"but the property {prop.name!r} "
-                            f"of the class {cls.name!r} "
-                            f"has type: {prop.type_annotation}. "
-                            f"Please contact the developers if you need "
-                            f"this functionality",
-                        )
-                    )
-
-            elif isinstance(type_anno, JsonObjectTypeAnnotation):
-                if try_primitive_type(type_anno.key) != PrimitiveType.STR:
-                    errors.append(
-                        Error(
-                            prop.parsed.node,
-                            f"We currently support only a limited set of "
-                            f"type annotation patterns. At the moment, we only "
-                            f"support ``str`` or a class constraining ``str`` as "
-                            f"the key of a ``JSONObject``, "
-                            f"but the property {prop.name!r} "
-                            f"of the class {cls.name!r} "
-                            f"has type: {prop.type_annotation}. "
-                            f"Please contact the developers if you need "
-                            f"this functionality",
-                        )
-                    )
+                break
 
     return errors
 
@@ -5747,46 +5752,20 @@ def _assert_all_type_annotations_are_unique_instances(
 
 
 def _verify_items_of_sets(symbol_table: SymbolTable) -> List[Error]:
-    """Check that the sets in the arguments and properties hold supported items."""
+    """Check that the sets, at any depth of the type annotations, hold supported items."""
     errors = []  # type: List[Error]
 
-    typed_with_whats = []  # type: List[Tuple[Union[Argument, Property], str]]
+    for type_anno, node, what in _over_declared_type_annotations(symbol_table):
+        for nested in over_type_annotation_and_nested_type_annotations(type_anno):
+            if not isinstance(nested, SetTypeAnnotation):
+                continue
 
-    typed_with_whats.extend(
-        (arg, f"the argument {arg.name!r} of the verification function {func.name!r}")
-        for func in symbol_table.verification_functions
-        for arg in func.arguments
-    )
-
-    typed_with_whats.extend(
-        (
-            arg,
-            f"the argument {arg.name!r} of the method {method.name!r} "
-            f"of the class {cls.name!r}",
-        )
-        for cls in symbol_table.classes
-        for method in cls.methods
-        if method.specified_for is cls
-        for arg in method.arguments
-    )
-
-    typed_with_whats.extend(
-        (prop, f"the property {prop.name!r} of the class {cls.name!r}")
-        for cls in symbol_table.classes
-        for prop in cls.properties
-        if prop.specified_for is cls
-    )
-
-    for typed, what in typed_with_whats:
-        type_anno = beneath_optional(typed.type_annotation)
-        if not isinstance(type_anno, SetTypeAnnotation):
-            continue
-
-        refusal = intermediate_type_inference.refusal_of_set_items(
-            intermediate_type_inference.convert_type_annotation(type_anno.items)
-        )
-        if refusal is not None:
-            errors.append(Error(typed.parsed.node, f"In {what}: {refusal}"))
+            refusal = intermediate_type_inference.refusal_of_set_items(
+                intermediate_type_inference.convert_type_annotation(nested.items)
+            )
+            if refusal is not None:
+                errors.append(Error(node, f"In {what}: {refusal}"))
+                break
 
     return errors
 
@@ -6024,7 +6003,7 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
 
     errors.extend(_verify_description_rendering_with_smoke(symbol_table=symbol_table))
 
-    errors.extend(_verify_only_simple_type_patterns(symbol_table=symbol_table))
+    errors.extend(_verify_keys_of_json_objects_are_strings(symbol_table=symbol_table))
 
     errors.extend(_verify_patterns_anchored_at_start_and_end(symbol_table=symbol_table))
 

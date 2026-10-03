@@ -12,7 +12,11 @@ from aas_core_codegen.common import (
     Identifier,
     assert_never,
 )
-from aas_core_codegen.cpp import common as cpp_common, naming as cpp_naming
+from aas_core_codegen.cpp import (
+    common as cpp_common,
+    naming as cpp_naming,
+    over as cpp_over,
+)
 from aas_core_codegen.cpp.common import (
     INDENT as I,
     INDENT2 as II,
@@ -3006,6 +3010,164 @@ def _xml_deserialize_item_expr(
     raise AssertionError("Should not have gotten here")
 
 
+def _deserialize_nested_content_name(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> str:
+    """Name the function reading the content of a container nested in another one."""
+    return f"DeserializeContent_{cpp_over.moniker(type_anno)}"
+
+
+def _xml_deserialize_item_or_nested_expr(
+    item_type_anno: intermediate.TypeAnnotationExceptOptional,
+    v_element_name: str,
+) -> Stripped:
+    """
+    Generate the expression of the callable to de-serialize an item from XML.
+
+    A list, a set or a tuple nested as an item is read from its ``<v>``,
+    ``<v1>``, *etc.* element, while its content is read by a function of its own,
+    see :py:func:`_generate_deserialize_nested_content`.
+    """
+    item_type = cpp_common.generate_type(
+        type_annotation=item_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
+
+    if not isinstance(item_type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple)
+        return _xml_deserialize_item_expr(
+            item_type_anno=item_type_anno,
+            item_type=item_type,
+            v_element_name=v_element_name,
+        )
+
+    v_element_name_literal = cpp_common.string_literal(v_element_name)
+
+    return Stripped(
+        f"""\
+[](xml_common::ReaderMergingText& a_reader) {{
+{I}return DeserializeValueFromVElement<
+{II}{indent_but_first_line(item_type, II)}
+{I}>(
+{II}a_reader,
+{II}{_deserialize_nested_content_name(item_type_anno)},
+{II}{v_element_name_literal}
+{I});
+}}"""
+    )
+
+
+def _xml_deserialize_container_content_expr(
+    type_anno: intermediate.ContainerTypeAnnotation, reader_expr: str
+) -> Stripped:
+    """Generate the expression reading the content of a list, a set or a tuple."""
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        items_type_anno = type_anno.items
+
+        item_type = cpp_common.generate_type(
+            type_annotation=items_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        item_expr = _xml_deserialize_item_or_nested_expr(
+            item_type_anno=items_type_anno, v_element_name="v"
+        )
+
+        return Stripped(
+            f"""\
+DeserializeList<
+{I}{indent_but_first_line(item_type, I)}
+>(
+{I}{reader_expr},
+{I}{indent_but_first_line(item_expr, I)}
+)"""
+        )
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        set_type = cpp_common.generate_type(
+            type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        item_expr = _xml_deserialize_item_or_nested_expr(
+            item_type_anno=type_anno.items, v_element_name="v"
+        )
+
+        return Stripped(
+            f"""\
+DeserializeSet<
+{I}{indent_but_first_line(set_type, I)}
+>(
+{I}{reader_expr},
+{I}{indent_but_first_line(item_expr, I)}
+)"""
+        )
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        item_types = []  # type: List[Stripped]
+        item_exprs = []  # type: List[Stripped]
+
+        for i, item_type_anno in enumerate(type_anno.items):
+
+            item_types.append(
+                cpp_common.generate_type(
+                    type_annotation=item_type_anno,
+                    types_namespace=cpp_common.TYPES_NAMESPACE,
+                )
+            )
+
+            item_exprs.append(
+                _xml_deserialize_item_or_nested_expr(
+                    item_type_anno=item_type_anno, v_element_name=f"v{i + 1}"
+                )
+            )
+
+        item_types_joined = ",\n".join(item_types)
+        item_exprs_joined = ",\n".join(item_exprs)
+
+        return Stripped(
+            f"""\
+DeserializeTuple{len(type_anno.items)}<
+{I}{indent_but_first_line(item_types_joined, I)}
+>(
+{I}{reader_expr},
+{I}{indent_but_first_line(item_exprs_joined, I)}
+)"""
+        )
+
+    assert_never(type_anno)
+
+
+def _generate_deserialize_nested_content(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the function reading the content of a container nested in another one."""
+    value_type = cpp_common.generate_type(
+        type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
+
+    content_expr = _xml_deserialize_container_content_expr(
+        type_anno=type_anno, reader_expr="reader"
+    )
+
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize the content of a nested collection from \\p reader.
+ *
+ * \\param reader to read from
+ * \\return the de-serialized value, or an error, if any
+ */
+std::pair<
+{I}common::optional<
+{II}{indent_but_first_line(value_type, II)}
+{I}>,
+{I}common::optional<DeserializationError>
+> {_deserialize_nested_content_name(type_anno)}(
+{I}xml_common::ReaderMergingText& reader
+) {{
+{I}return {indent_but_first_line(content_expr, I)};
+}}"""
+    )
+
+
 def _generate_deserialize_list_expr(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -3017,15 +3179,8 @@ def _generate_deserialize_list_expr(
         type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
     )
 
-    if not isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple):
-        raise NotImplementedError(
-            "NOTE (mristin): We currently generate XML de-serialization only for "
-            f"the lists of atomic values, but we got: {prop.type_annotation}. "
-            f"Please contact the developers if you need this feature."
-        )
-
-    deserialize_item_expr = _xml_deserialize_item_expr(
-        item_type_anno=type_anno.items, item_type=item_type, v_element_name="v"
+    deserialize_item_expr = _xml_deserialize_item_or_nested_expr(
+        item_type_anno=type_anno.items, v_element_name="v"
     )
 
     return Stripped(
@@ -3094,23 +3249,17 @@ def _generate_deserialize_tuple_expr(
     item_exprs = []  # type: List[Stripped]
 
     for i, item_type_anno in enumerate(type_anno.items):
-        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-            "Tuple items are restricted to atomic types (primitives, "
-            "constrained primitives, classes and enumerations) by "
-            "intermediate._translate._verify_only_simple_type_patterns, so no "
-            "nested optionals, lists or tuples are expected here."
-        )
 
-        item_type = cpp_common.generate_type(
-            type_annotation=item_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        item_types.append(
+            cpp_common.generate_type(
+                type_annotation=item_type_anno,
+                types_namespace=cpp_common.TYPES_NAMESPACE,
+            )
         )
-        item_types.append(item_type)
 
         item_exprs.append(
-            _xml_deserialize_item_expr(
-                item_type_anno=item_type_anno,
-                item_type=item_type,
-                v_element_name=f"v{i + 1}",
+            _xml_deserialize_item_or_nested_expr(
+                item_type_anno=item_type_anno, v_element_name=f"v{i + 1}"
             )
         )
 
@@ -4382,7 +4531,7 @@ def _xml_write_content_expr(
 
 
 def _xml_writes_own_element(
-    type_anno: intermediate.AtomicTypeAnnotation,
+    type_anno: intermediate.TypeAnnotationUnion,
 ) -> bool:
     """
     Check whether a value of ``type_anno`` writes the element around itself.
@@ -4423,6 +4572,170 @@ def _xml_write_own_element_expr(
     )
 
 
+def _write_nested_content_name(type_anno: intermediate.ContainerTypeAnnotation) -> str:
+    """Name the function writing the content of a container nested in another one."""
+    return f"WriteContent_{cpp_over.moniker(type_anno)}"
+
+
+def _xml_write_item_call(
+    item_type_anno: intermediate.TypeAnnotationExceptOptional,
+    item_expr: str,
+    writer_expr: str,
+    v_element_name: str,
+) -> Stripped:
+    """
+    Generate the call writing ``item_expr`` as a whole element of its own.
+
+    An instance writes its own element, while everything else is wrapped in
+    the element named ``v_element_name``.
+    """
+    if _xml_writes_own_element(item_type_anno):
+        assert isinstance(item_type_anno, intermediate.OurTypeAnnotation)
+        return Stripped(
+            f"{_xml_write_own_element_expr(item_type_anno)}({item_expr}, {writer_expr})"
+        )
+
+    if isinstance(item_type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        write_content = Stripped(_write_nested_content_name(item_type_anno))
+    else:
+        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple)
+        write_content = _xml_write_content_expr(item_type_anno)
+
+    v_name_literal = cpp_common.string_literal(v_element_name)
+
+    return Stripped(
+        f"""\
+WriteElement(
+{I}{v_name_literal},
+{I}{item_expr},
+{I}{writer_expr},
+{I}{indent_but_first_line(write_content, I)}
+)"""
+    )
+
+
+def _generate_write_nested_content(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """Generate the function writing the content of a container nested in another one."""
+    value_var = "value"
+    writer_var = "writer"
+    error_var = "error"
+    index_var = "i"
+
+    value_type = cpp_common.generate_type(
+        type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+    )
+
+    body: Stripped
+
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        items_type_anno = type_anno.items
+
+        prefix = ""
+        if isinstance(type_anno, intermediate.SetTypeAnnotation):
+            # NOTE (mristin):
+            # All the SDKs write the items of a set in the same order, so that
+            # the path of an error refers to the index of the item in that order.
+            sorted_var = "sorted"
+            item_type = cpp_common.generate_type(
+                type_annotation=items_type_anno,
+                types_namespace=cpp_common.TYPES_NAMESPACE,
+            )
+            less = cpp_common.generate_set_item_less(items_type_anno)
+
+            prefix = f"""\
+const std::vector<const {item_type}*> {sorted_var}(
+{I}common::SortedPointers({value_var}, {less})
+);
+
+"""
+            items_var = sorted_var
+            item_expr = f"*{sorted_var}[{index_var}]"
+        else:
+            items_var = value_var
+            item_expr = f"{value_var}[{index_var}]"
+
+        item_call = _xml_write_item_call(
+            item_type_anno=items_type_anno,
+            item_expr=item_expr,
+            writer_expr=writer_var,
+            v_element_name="v",
+        )
+
+        body = Stripped(
+            f"""\
+{prefix}for (size_t {index_var} = 0; {index_var} < {items_var}.size(); ++{index_var}) {{
+{I}common::optional<xml_common::SerializationError> {error_var}(
+{II}{indent_but_first_line(item_call, II)}
+{I});
+
+{I}if ({error_var}.has_value()) {{
+{II}{error_var}->path.segments.emplace_front(
+{III}common::make_unique<iteration::IndexSegment>({index_var})
+{II});
+
+{II}return {error_var};
+{I}}}
+}}
+
+return common::nullopt;"""
+        )
+
+    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        stmts = [
+            Stripped(f"common::optional<xml_common::SerializationError> {error_var};")
+        ]  # type: List[Stripped]
+
+        for i, item in enumerate(type_anno.items):
+            item_call = _xml_write_item_call(
+                item_type_anno=item,
+                item_expr=f"std::get<{i}>({value_var})",
+                writer_expr=writer_var,
+                v_element_name=f"v{i + 1}",
+            )
+
+            stmts.append(
+                Stripped(
+                    f"""\
+{error_var} = {indent_but_first_line(item_call, "")};
+if ({error_var}.has_value()) {{
+{I}{error_var}->path.segments.emplace_front(
+{II}common::make_unique<iteration::IndexSegment>({i})
+{I});
+
+{I}return {error_var};
+}}"""
+                )
+            )
+
+        stmts.append(Stripped("return common::nullopt;"))
+
+        body = Stripped("\n\n".join(stmts))
+
+    else:
+        assert_never(type_anno)
+
+    return Stripped(
+        f"""\
+/**
+ * \\brief Write the content of a nested collection \\p {value_var}.
+ *
+ * \\param {value_var} to be written
+ * \\param {writer_var} to write to
+ * \\return the error, if any
+ */
+common::optional<xml_common::SerializationError> {_write_nested_content_name(type_anno)}(
+{I}const {indent_but_first_line(value_type, I)}& {value_var},
+{I}xml_common::SelfClosingWriter& {writer_var}
+) {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 def _xml_write_tuple_item_exprs(
     type_anno: intermediate.TupleTypeAnnotation,
 ) -> List[Stripped]:
@@ -4437,12 +4750,6 @@ def _xml_write_tuple_item_exprs(
     item_exprs = []  # type: List[Stripped]
 
     for i, item_type_anno in enumerate(type_anno.items):
-        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-            "Tuple items are restricted to atomic types (primitives, "
-            "constrained primitives, classes and enumerations) by "
-            "intermediate._translate._verify_only_simple_type_patterns, so no "
-            "nested optionals, lists or tuples are expected here."
-        )
 
         if _xml_writes_own_element(item_type_anno):
             assert isinstance(item_type_anno, intermediate.OurTypeAnnotation)
@@ -4453,9 +4760,27 @@ def _xml_write_tuple_item_exprs(
             type_annotation=item_type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
         )
 
-        write_value = _xml_write_content_expr(item_type_anno)
+        write_value = (
+            Stripped(_write_nested_content_name(item_type_anno))
+            if isinstance(item_type_anno, intermediate.ContainerTypeAnnotationAsTuple)
+            else _xml_write_content_expr(item_type_anno)
+        )
 
         v_name_literal = cpp_common.string_literal(f"v{i + 1}")
+
+        write_element = (
+            Stripped(f"WriteElement({v_name_literal}, item, a_writer, {write_value})")
+            if "\n" not in write_value
+            else Stripped(
+                f"""\
+WriteElement(
+{I}{v_name_literal},
+{I}item,
+{I}a_writer,
+{I}{indent_but_first_line(write_value, I)}
+)"""
+            )
+        )
 
         item_exprs.append(
             Stripped(
@@ -4464,7 +4789,7 @@ def _xml_write_tuple_item_exprs(
 {I}const {indent_but_first_line(item_type, I)}& item,
 {I}xml_common::SelfClosingWriter& a_writer
 ) {{
-{I}return WriteElement({v_name_literal}, item, a_writer, {write_value});
+{I}return {indent_but_first_line(write_element, I)};
 }}"""
             )
         )
@@ -4491,12 +4816,14 @@ def _generate_write_property_statements(prop: intermediate.Property) -> Stripped
     function_name: str
     writer_exprs: List[Stripped]
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "List items are restricted to atomic types (primitives, "
-            "constrained primitives, classes, enumerations and JSON-able values), "
-            "so no nested optionals, lists or tuples are expected here."
-        )
+    if isinstance(type_anno, intermediate.ListTypeAnnotation) and isinstance(
+        type_anno.items, intermediate.ContainerTypeAnnotationAsTuple
+    ):
+        function_name = "WriteListOfValuesProperty"
+        writer_exprs = [Stripped(_write_nested_content_name(type_anno.items))]
+
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple)
 
         if _xml_writes_own_element(type_anno.items):
             assert isinstance(type_anno.items, intermediate.OurTypeAnnotation)
@@ -5074,348 +5401,74 @@ void Serialize(
 def _type_annotation_contains_list(
     type_annotation: intermediate.TypeAnnotationUnion,
 ) -> bool:
-    """Check whether the type annotation has a list type annotation."""
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        return True
-
-    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
-        # NOTE (mristin):
-        # Tuples are heterogeneous and fixed-length, so their items are always
-        # de-serialized one by one, without ever looping over ``DeserializeList``.
-        return False
-
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return _type_annotation_contains_list(type_annotation.value)
-
-    elif isinstance(
-        type_annotation,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        return False
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # A set is de-serialized with ``DeserializeSet``, not ``DeserializeList``.
-        return False
-
-    else:
-        # noinspection PyTypeChecker
-        assert_never(type_annotation)
-
-
-def _type_annotation_contains_tuple_with_atomic_non_class_item(
-    type_annotation: intermediate.TypeAnnotationUnion,
-) -> bool:
-    """
-    Check whether the type annotation is a tuple with a non-class atomic item.
-
-    Such tuples need ``DeserializeValueFromVElement`` for their non-class items,
-    just as lists of non-class atomic values do.
-    """
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
-        for item in type_annotation.items:
-            assert isinstance(item, intermediate.AtomicTypeAnnotationAsTuple)
-
-            if isinstance(item, intermediate.PrimitiveTypeAnnotation):
-                return True
-
-            elif isinstance(item, intermediate.OurTypeAnnotation):
-                if isinstance(
-                    item.our_type,
-                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive),
-                ):
-                    return True
-
-            elif isinstance(
-                item,
-                (
-                    intermediate.JsonValueTypeAnnotation,
-                    intermediate.JsonArrayTypeAnnotation,
-                    intermediate.JsonObjectTypeAnnotation,
-                ),
-            ):
-                return True
-
-        return False
-
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return _type_annotation_contains_tuple_with_atomic_non_class_item(
-            type_annotation.value
+    """Check whether the type annotation holds a list at any depth."""
+    return any(
+        isinstance(type_anno, intermediate.ListTypeAnnotation)
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
         )
-
-    elif isinstance(
-        type_annotation,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        return False
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        return False
-
-    else:
-        # noinspection PyTypeChecker
-        assert_never(type_annotation)
-
-
-def _type_annotation_contains_list_of_atomic_non_class_values(
-    type_annotation: intermediate.TypeAnnotationUnion,
-) -> bool:
-    """
-    Check whether the type annotation has a list of non-class atomic values.
-
-    These are, for example, lists of enumerations or lists of primitives.
-    """
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        if isinstance(type_annotation.items, intermediate.PrimitiveTypeAnnotation):
-            return True
-
-        elif isinstance(type_annotation.items, intermediate.OurTypeAnnotation):
-            if isinstance(type_annotation.items.our_type, intermediate.Enumeration):
-                return True
-
-            elif isinstance(
-                type_annotation.items.our_type, intermediate.ConstrainedPrimitive
-            ):
-                return True
-
-            elif isinstance(
-                type_annotation.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                return False
-
-            elif isinstance(type_annotation.items.our_type, intermediate.NamedUnion):
-                return False
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_annotation.items.our_type)
-
-        elif isinstance(type_annotation.items, intermediate.ListTypeAnnotation):
-            return _type_annotation_contains_list_of_atomic_non_class_values(
-                type_annotation.items.items
-            )
-
-        elif isinstance(type_annotation.items, intermediate.OptionalTypeAnnotation):
-            return _type_annotation_contains_list_of_atomic_non_class_values(
-                type_annotation.items.value
-            )
-
-        elif isinstance(type_annotation.items, intermediate.TupleTypeAnnotation):
-            # NOTE (mristin):
-            # No meta-model currently declares a list of tuples, and other parts of
-            # the code generation would already reject it defensively, so this can
-            # not actually occur in practice, but we still handle it explicitly for
-            # exhaustiveness. A tuple is not itself an atomic non-class value, so
-            # we return ``False``.
-            return False
-
-        elif isinstance(
-            type_annotation.items,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able list item is wrapped in its own ``<v>`` element via
-            # ``DeserializeValueFromVElement``/``WriteListOfValuesProperty``,
-            # exactly like a primitive or an enumeration.
-            return True
-
-        elif isinstance(type_annotation.items, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set nested in a list, as the parser refuses "
-                f"the nested sets: {type_annotation}"
-            )
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_annotation.items)
-
-    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
-        # NOTE (mristin):
-        # Tuples never loop over ``WriteListOfValuesProperty``/
-        # ``DeserializeValueFromVElement`` through a list-like generic function;
-        # see :py:func:`_type_annotation_contains_tuple_with_atomic_non_class_item`
-        # for the tuple-specific check.
-        return False
-
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return _type_annotation_contains_list_of_atomic_non_class_values(
-            type_annotation.value
-        )
-
-    elif isinstance(
-        type_annotation,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        return False
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # A set is written with ``WriteSetOfValuesProperty``, see
-        # :py:func:`_type_annotation_contains_set`.
-        return False
-
-    else:
-        # noinspection PyTypeChecker
-        assert_never(type_annotation)
-
-
-def _type_annotation_contains_list_of_instances(
-    type_annotation: intermediate.TypeAnnotationUnion,
-) -> bool:
-    """Check whether the type annotation has a list of instances."""
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        return False
-
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        if isinstance(type_annotation.items, intermediate.PrimitiveTypeAnnotation):
-            return False
-
-        elif isinstance(type_annotation.items, intermediate.OurTypeAnnotation):
-            if isinstance(type_annotation.items.our_type, intermediate.Enumeration):
-                return False
-
-            elif isinstance(
-                type_annotation.items.our_type, intermediate.ConstrainedPrimitive
-            ):
-                return False
-
-            elif isinstance(
-                type_annotation.items.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass),
-            ):
-                return True
-
-            elif isinstance(type_annotation.items.our_type, intermediate.NamedUnion):
-                return True
-
-            else:
-                # noinspection PyTypeChecker
-                assert_never(type_annotation.items.our_type)
-
-        elif isinstance(type_annotation.items, intermediate.ListTypeAnnotation):
-            return _type_annotation_contains_list_of_instances(
-                type_annotation.items.items
-            )
-
-        elif isinstance(type_annotation.items, intermediate.OptionalTypeAnnotation):
-            return _type_annotation_contains_list_of_instances(
-                type_annotation.items.value
-            )
-
-        elif isinstance(type_annotation.items, intermediate.TupleTypeAnnotation):
-            # NOTE (mristin):
-            # No meta-model currently declares a list of tuples, and other parts of
-            # the code generation would already reject it defensively, so this can
-            # not actually occur in practice, but we still handle it explicitly for
-            # exhaustiveness. A tuple is not itself an instance, so we return
-            # ``False``.
-            return False
-
-        elif isinstance(
-            type_annotation.items,
-            (
-                intermediate.JsonValueTypeAnnotation,
-                intermediate.JsonArrayTypeAnnotation,
-                intermediate.JsonObjectTypeAnnotation,
-            ),
-        ):
-            # NOTE (mristin):
-            # A JSON-able value is plain data (``nlohmann::json``), never
-            # a reference to one of our own classes.
-            return False
-
-        elif isinstance(type_annotation.items, intermediate.SetTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected set nested in a list, as the parser refuses "
-                f"the nested sets: {type_annotation}"
-            )
-
-        else:
-            # noinspection PyTypeChecker
-            assert_never(type_annotation.items)
-
-    elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
-        # NOTE (mristin):
-        # Tuple class items are de-serialized/serialized directly, one by one,
-        # without ever looping over ``WriteListOfInstancesProperty``.
-        return False
-
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return _type_annotation_contains_list_of_instances(type_annotation.value)
-
-    elif isinstance(
-        type_annotation,
-        (
-            intermediate.JsonValueTypeAnnotation,
-            intermediate.JsonArrayTypeAnnotation,
-            intermediate.JsonObjectTypeAnnotation,
-        ),
-    ):
-        return False
-
-    elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
-        # NOTE (mristin):
-        # A set holds only primitives and enumeration literals, but no instances.
-        return False
-
-    else:
-        # noinspection PyTypeChecker
-        assert_never(type_annotation)
-
-
-def _type_annotation_contains_set(
-    type_annotation: intermediate.TypeAnnotationUnion,
-) -> bool:
-    """
-    Check whether the type annotation is a set, or an optional set.
-
-    The sets hold only primitives, constrained primitives and enumeration
-    literals, each wrapped in its own ``<v>`` element, and never nest.
-    """
-    return isinstance(
-        intermediate.beneath_optional(type_annotation), intermediate.SetTypeAnnotation
     )
+
+
+def _type_annotation_contains_value_in_v_element(
+    type_annotation: intermediate.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether the type annotation holds, at any depth, an item which is
+    wrapped in its positional ``<v>``, ``<v1>``, ``<v2>``, *etc.* element.
+
+    Everything is wrapped so but an instance, which writes its own element.
+    Such items need ``DeserializeValueFromVElement``.
+    """
+    for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+        type_annotation
+    ):
+        if isinstance(
+            type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+        ):
+            items = [
+                type_anno.items
+            ]  # type: Sequence[intermediate.TypeAnnotationUnion]
+        elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            items = type_anno.items
+        else:
+            continue
+
+        if any(not _xml_writes_own_element(item) for item in items):
+            return True
+
+    return False
+
+
+def _type_annotation_is_list_of_values(
+    type_annotation: intermediate.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether the type annotation is a list whose items are wrapped in
+    ``<v>``, *i.e.*, whose items are not instances.
+
+    Such a property is written with ``WriteListOfValuesProperty``.
+    """
+    type_anno = intermediate.beneath_optional(type_annotation)
+
+    return isinstance(
+        type_anno, intermediate.ListTypeAnnotation
+    ) and not _xml_writes_own_element(type_anno.items)
+
+
+def _type_annotation_is_list_of_instances(
+    type_annotation: intermediate.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether the type annotation is a list of instances.
+
+    Such a property is written with ``WriteListOfInstancesProperty``.
+    """
+    type_anno = intermediate.beneath_optional(type_annotation)
+
+    return isinstance(
+        type_anno, intermediate.ListTypeAnnotation
+    ) and _xml_writes_own_element(type_anno.items)
 
 
 # fmt: off
@@ -5533,11 +5586,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         blocks.extend(_generate_deserialize_json_from_xml_rpc_implementation())
 
     if any(
-        _type_annotation_contains_list_of_atomic_non_class_values(prop.type_annotation)
-        or _type_annotation_contains_tuple_with_atomic_non_class_item(
-            prop.type_annotation
-        )
-        or _type_annotation_contains_set(prop.type_annotation)
+        _type_annotation_contains_value_in_v_element(prop.type_annotation)
         for cls in symbol_table.concrete_classes
         for prop in cls.properties
     ):
@@ -5550,11 +5599,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
     ):
         blocks.append(_generate_deserialize_list())
 
-    has_set_properties = any(
-        _type_annotation_contains_set(prop.type_annotation)
-        for cls in symbol_table.concrete_classes
-        for prop in cls.properties
-    )
+    has_set_properties = intermediate_uses.set_properties(symbol_table)
 
     if has_set_properties:
         blocks.append(_generate_deserialize_set())
@@ -5564,6 +5609,13 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
 
     for enumeration in symbol_table.enumerations:
         blocks.append(_generate_deserialize_enumeration(enumeration))
+
+    nested_containers = cpp_over.collect_nested_containers(
+        symbol_table.concrete_classes
+    )
+
+    for nested_container in nested_containers:
+        blocks.append(_generate_deserialize_nested_content(nested_container))
 
     if any(len(cls.properties) > 0 for cls in symbol_table.concrete_classes):
         blocks.append(_generate_read_into())
@@ -5637,20 +5689,30 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         blocks.extend(_generate_write_property())
 
     if any(
-        _type_annotation_contains_list_of_instances(prop.type_annotation)
+        _type_annotation_is_list_of_instances(prop.type_annotation)
         for cls in symbol_table.concrete_classes
         for prop in cls.properties
     ):
         blocks.extend(_generate_write_list_of_instances_property())
 
     if any(
-        _type_annotation_contains_list_of_atomic_non_class_values(prop.type_annotation)
+        _type_annotation_is_list_of_values(prop.type_annotation)
         for cls in symbol_table.concrete_classes
         for prop in cls.properties
     ):
         blocks.extend(_generate_write_list_of_values_property())
 
-    if has_set_properties:
+    # NOTE (mristin):
+    # A set nested in a list or in a tuple is written by a lambda of its own, so
+    # only a set property needs the framer.
+    if any(
+        isinstance(
+            intermediate.beneath_optional(prop.type_annotation),
+            intermediate.SetTypeAnnotation,
+        )
+        for cls in symbol_table.concrete_classes
+        for prop in cls.properties
+    ):
         blocks.extend(_generate_write_set_of_values_property())
 
     for arity in intermediate.tuple_arities(symbol_table):
@@ -5671,6 +5733,9 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
                 named_union=named_union
             )
         )
+
+    for nested_container in nested_containers:
+        blocks.append(_generate_write_nested_content(nested_container))
 
     for cls in symbol_table.classes:
         if isinstance(cls, intermediate.ConcreteClass):

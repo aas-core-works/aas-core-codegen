@@ -2,7 +2,7 @@
 
 import io
 import textwrap
-from typing import List, Set
+from typing import List, Sequence, Set, Union
 
 from icontract import require
 
@@ -144,7 +144,7 @@ def _generate_deep_equals_expr(
         f"Unexpected type annotation to be compared deeply: {type_anno}. "
         f"The sets hold only values compared by ``equals``, and the optionals "
         f"nested in the containers should have been refused in "
-        f"intermediate._translate._verify_only_simple_type_patterns."
+        f"parse._translate._verify_symbol_table."
     )
 
 
@@ -308,21 +308,18 @@ private Boolean transform(IUnion<?> that, IUnion<?> other) {{
     )
 
 
-def _generate_deep_equals_transformer(
+def _containers_compared_deeply(
     symbol_table: intermediate.SymbolTable,
-) -> Stripped:
-    """Generate the transformer that checks for deep equality."""
-    blocks = []  # type: List[Stripped]
+) -> List[Union[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation]]:
+    """
+    List the containers which are compared deeply by methods of their own.
 
-    for concrete_cls in symbol_table.concrete_classes:
-        blocks.append(_generate_transform_as_deep_equals(cls=concrete_cls))
+    The containers are de-duplicated by their type moniker.
+    """
+    result = (
+        []
+    )  # type: List[Union[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation]]
 
-    if len(symbol_table.named_unions) > 0:
-        blocks.append(_generate_union_transform_helper())
-
-    # NOTE (mristin):
-    # We compare deeply the containers through methods of their own, one per
-    # type moniker.
     observed_monikers = set()  # type: Set[str]
     for cls in symbol_table.concrete_classes:
         for prop in cls.properties:
@@ -342,8 +339,33 @@ def _generate_deep_equals_transformer(
                     continue
 
                 observed_monikers.add(moniker)
+                result.append(type_anno)
 
-                blocks.append(_generate_deep_equals_container(type_anno=type_anno))
+    return result
+
+
+def _generate_deep_equals_transformer(
+    symbol_table: intermediate.SymbolTable,
+    containers: Sequence[
+        Union[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation]
+    ],
+) -> Stripped:
+    """
+    Generate the transformer that checks for deep equality.
+
+    The ``containers`` are compared deeply by methods of their own.
+    """
+    blocks = []  # type: List[Stripped]
+
+    for concrete_cls in symbol_table.concrete_classes:
+        blocks.append(_generate_transform_as_deep_equals(cls=concrete_cls))
+
+    if len(symbol_table.named_unions) > 0:
+        blocks.append(_generate_union_transform_helper())
+
+    blocks.extend(
+        _generate_deep_equals_container(type_anno=container) for container in containers
+    )
 
     writer = io.StringIO()
     writer.write(
@@ -382,8 +404,12 @@ def generate(
     """
     Generate code to test copying.
     """
+    containers = _containers_compared_deeply(symbol_table)
+
     blocks = [
-        _generate_deep_equals_transformer(symbol_table=symbol_table),
+        _generate_deep_equals_transformer(
+            symbol_table=symbol_table, containers=containers
+        ),
         Stripped(
             """\
 private static final _DeepEqualiser DeepEqualiserInstance = new _DeepEqualiser();"""
@@ -444,6 +470,18 @@ public void test{cls_name}DeepCopy() throws IOException {{
         Stripped("import java.util.List;"),
         Stripped("import org.junit.jupiter.api.Test;"),
     ]  # type: List[Stripped]
+
+    # NOTE (mristin):
+    # The methods comparing the containers spell out their types, so we need to
+    # import the sets nested in them.
+    if any(
+        isinstance(nested, intermediate.SetTypeAnnotation)
+        for container in containers
+        for nested in intermediate.over_type_annotation_and_nested_type_annotations(
+            container
+        )
+    ):
+        imports.append(Stripped("import java.util.Set;"))
 
     # NOTE (mristin):
     # The methods comparing the containers spell out the Jackson nodes in their

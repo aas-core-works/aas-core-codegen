@@ -11,6 +11,7 @@ from typing import (
     Sequence,
     Set,
     Tuple,
+    Union,
 )
 
 from icontract import ensure, require
@@ -107,26 +108,15 @@ def _parser_name(type_annotation: intermediate.TypeAnnotationUnion) -> Identifie
 
         return python_naming.function_name(Identifier(f"{our_type.name}_from_jsonable"))
 
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        items_type_anno = intermediate.beneath_optional(type_anno.items)
-
-        return Identifier(
-            f"_list_of__{python_common.atomic_moniker(items_type_anno)}_from_jsonable"
-        )
-
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        monikers = [python_common.atomic_moniker(item) for item in type_anno.items]
-
-        return Identifier(
-            f"_tuple{len(type_anno.items)}_of__"
-            + "__".join(monikers)
-            + "_from_jsonable"
-        )
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        return Identifier(
-            f"_set_of__{python_common.atomic_moniker(type_anno.items)}_from_jsonable"
-        )
+    elif isinstance(
+        type_anno,
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+        ),
+    ):
+        return Identifier(f"_{python_common.type_moniker(type_anno)}_from_jsonable")
 
     else:
         assert_never(type_anno)
@@ -185,19 +175,7 @@ class _ParserRegistry:
         """Register the parser of a list with the items of the ``type_annotation``."""
         self.note_needed_helper("_list_from_jsonable")
 
-        items_type_anno = intermediate.beneath_optional(type_annotation.items)
-
-        assert not isinstance(
-            items_type_anno,
-            (
-                intermediate.ListTypeAnnotation,
-                intermediate.TupleTypeAnnotation,
-                intermediate.SetTypeAnnotation,
-            ),
-        ), (
-            "We chose to implement only a very limited pattern matching; "
-            "see intermediate._translate._verify_only_simple_type_patterns"
-        )
+        items_type_anno = type_annotation.items
 
         self.register_parser(items_type_anno)
 
@@ -218,7 +196,7 @@ def {name}(
 ) -> List[{item_type}]:
 {I}"""
 {I}Parse :paramref:`jsonable` as a list of
-{I}{python_common.describe_atomic_type(items_type_anno)}.
+{I}{python_common.describe_type(items_type_anno)}.
 
 {I}:param jsonable: JSON-able structure to be parsed
 {I}:return: parsed list
@@ -256,7 +234,7 @@ def {name}(
 ) -> Set[{item_type}]:
 {I}"""
 {I}Parse :paramref:`jsonable` as a set of
-{I}{python_common.describe_atomic_type(type_annotation.items)}.
+{I}{python_common.describe_type(type_annotation.items)}.
 
 {I}:param jsonable: JSON-able structure to be parsed
 {I}:return: parsed set
@@ -281,15 +259,6 @@ def {name}(
         item_types = []  # type: List[Stripped]
 
         for item_type_anno in type_annotation.items:
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, constrained "
-                "primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so "
-                "no nested optionals, lists or tuples are expected here."
-            )
-
             self.register_parser(item_type_anno)
 
             parse_items.append(_parser_name(item_type_anno))
@@ -1675,37 +1644,15 @@ def _cls_serializer_name(cls: intermediate.ConcreteClass) -> Identifier:
     return python_naming.private_function_name(Identifier(f"{cls.name}_to_jsonable"))
 
 
-def _list_serializer_name(
-    type_annotation: intermediate.ListTypeAnnotation,
+def _container_serializer_name(
+    type_annotation: Union[
+        intermediate.ListTypeAnnotation,
+        intermediate.TupleTypeAnnotation,
+        intermediate.SetTypeAnnotation,
+    ],
 ) -> Identifier:
-    """Give out the name of the serializer of a list of the ``type_annotation``."""
-    items_type_anno = intermediate.beneath_optional(type_annotation.items)
-
-    return Identifier(
-        f"_list_of__{python_common.atomic_moniker(items_type_anno)}_to_jsonable"
-    )
-
-
-def _set_serializer_name(
-    type_annotation: intermediate.SetTypeAnnotation,
-) -> Identifier:
-    """Give out the name of the serializer of a set of the ``type_annotation``."""
-    return Identifier(
-        f"_set_of__{python_common.atomic_moniker(type_annotation.items)}_to_jsonable"
-    )
-
-
-def _tuple_serializer_name(
-    type_annotation: intermediate.TupleTypeAnnotation,
-) -> Identifier:
-    """Give out the name of the serializer of a tuple of the ``type_annotation``."""
-    monikers = [python_common.atomic_moniker(item) for item in type_annotation.items]
-
-    return Identifier(
-        f"_tuple{len(type_annotation.items)}_of__"
-        + "__".join(monikers)
-        + "_to_jsonable"
-    )
+    """Give out the name of the serializer of a list, a tuple or a set."""
+    return Identifier(f"_{python_common.type_moniker(type_annotation)}_to_jsonable")
 
 
 def _generate_json_value_to_jsonable() -> Stripped:
@@ -1920,7 +1867,7 @@ def _generate_serialization(
     serializer_name: Identifier
 
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        items_type_anno = intermediate.beneath_optional(type_anno.items)
+        items_type_anno = type_anno.items
 
         # NOTE (mristin):
         # A list of the values which JSON carries as they come needs no serializer
@@ -1930,10 +1877,10 @@ def _generate_serialization(
         if _serialized_as_it_is(items_type_anno):
             serializer_name = Identifier("list")
         else:
-            serializer_name = _list_serializer_name(type_anno)
+            serializer_name = _container_serializer_name(type_anno)
 
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        serializer_name = _tuple_serializer_name(type_anno)
+        serializer_name = _container_serializer_name(type_anno)
 
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
         # NOTE (mristin):
@@ -1945,7 +1892,7 @@ def _generate_serialization(
         if _serialized_as_it_is(type_anno.items):
             serializer_name = Identifier("sorted")
         else:
-            serializer_name = _set_serializer_name(type_anno)
+            serializer_name = _container_serializer_name(type_anno)
 
     else:
         assert_never(type_anno)
@@ -1964,7 +1911,7 @@ class _SerializerRegistry:
 
     The composed serializers are de-duplicated by the type which they serialize, so
     that all the classes share them, and they are named by
-    :py:func:`_list_serializer_name` and :py:func:`_tuple_serializer_name`. Nothing
+    :py:func:`_container_serializer_name`. Nothing
     whatsoever is composed at the time of the serialization: a serializer is
     a module-level function, so the region contains no lambda at all.
 
@@ -2018,19 +1965,7 @@ class _SerializerRegistry:
         self, type_annotation: intermediate.ListTypeAnnotation
     ) -> None:
         """Register the serializer of a list with items of the ``type_annotation``."""
-        items_type_anno = intermediate.beneath_optional(type_annotation.items)
-
-        assert not isinstance(
-            items_type_anno,
-            (
-                intermediate.ListTypeAnnotation,
-                intermediate.TupleTypeAnnotation,
-                intermediate.SetTypeAnnotation,
-            ),
-        ), (
-            "We chose to implement only a very limited pattern matching; "
-            "see intermediate._translate._verify_only_simple_type_patterns"
-        )
+        items_type_anno = type_annotation.items
 
         # NOTE (mristin):
         # See the note in :py:func:`_generate_serialize_statement` on why such a list
@@ -2040,15 +1975,13 @@ class _SerializerRegistry:
 
         self.register_serializer(items_type_anno)
 
-        name = _list_serializer_name(type_annotation)
+        name = _container_serializer_name(type_annotation)
 
         list_type = python_common.generate_type(
             type_annotation, types_module=Identifier("our_types")
         )
 
-        item_serialization = _generate_atomic_serialization(
-            Stripped("item"), items_type_anno
-        )
+        item_serialization = _generate_serialization(Stripped("item"), items_type_anno)
 
         # NOTE (mristin):
         # A comprehension can not record which item was refused, so the items are
@@ -2079,7 +2012,7 @@ def {name}(
 ) -> List[MutableJsonable]:
 {I}"""
 {I}Serialize :paramref:`that` as a list of
-{I}{python_common.describe_atomic_type(items_type_anno)}.
+{I}{python_common.describe_type(items_type_anno)}.
 
 {I}:param that: list to be serialized
 {I}:return: JSON-able representation of :paramref:`that`
@@ -2109,7 +2042,7 @@ def {name}(
 
         self.register_serializer(items_type_anno)
 
-        name = _set_serializer_name(type_annotation)
+        name = _container_serializer_name(type_annotation)
 
         set_type = python_common.generate_type(
             type_annotation, types_module=Identifier("our_types")
@@ -2170,22 +2103,16 @@ def {name}(
         item_expressions = []  # type: List[Stripped]
 
         for i, item_type_anno in enumerate(type_annotation.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, constrained "
-                "primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so "
-                "no nested optionals, lists or tuples are expected here."
-            )
-
             self.register_serializer(item_type_anno)
 
             item_expressions.append(
-                _generate_atomic_serialization(Stripped(f"that[{i}]"), item_type_anno)
+                _generate_serialization(
+                    Stripped(f"that[{i}]"),
+                    item_type_anno,
+                )
             )
 
-        name = _tuple_serializer_name(type_annotation)
+        name = _container_serializer_name(type_annotation)
 
         tuple_type = python_common.generate_type(
             type_annotation, types_module=Identifier("our_types")

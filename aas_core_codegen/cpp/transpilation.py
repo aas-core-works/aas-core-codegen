@@ -1309,28 +1309,6 @@ common::{contains_function}(
 
         assert collection is not None
 
-        if isinstance(
-            self.type_map[node.collection],
-            intermediate_type_inference.ListTypeAnnotation,
-        ):
-            # NOTE (mristin):
-            # The type inference allows slicing a list only to copy it as a whole,
-            # ``[:]``, which we transpile as an explicit copy of the vector.
-            list_type, error_msg = generate_type(
-                type_annotation=self.type_map[node],
-                types_namespace=self._types_namespace,
-            )
-            if error_msg is not None:
-                return None, Error(node.original_node, error_msg)
-
-            assert list_type is not None
-            return (
-                _generate_call_with_single_argument(
-                    function=list_type, argument=collection
-                ),
-                None,
-            )
-
         if node.start is not None:
             assert start is not None
             start = self._as_int64_position(node.start, start)
@@ -1723,6 +1701,43 @@ common::{function_name}(
                 # transpiled in the anonymous namespace.
                 return (
                     Stripped(f"{cpp_common.COMMON_NAMESPACE}::ParseSafeInt({args[0]})"),
+                    None,
+                )
+
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LIST
+            ):
+                assert len(node.args) == 1, (
+                    f"Expected exactly one argument, but got: {node.args}; "
+                    f"this should have been caught before."
+                )
+
+                the_list, error = self._transform_and_value_if_necessary(node.args[0])
+                if error is not None:
+                    return None, Error(
+                        node.original_node,
+                        "Failed to transpile the argument of list",
+                        [error],
+                    )
+
+                assert the_list is not None
+
+                # NOTE (mristin):
+                # The type inference allows ``list(...)`` only to copy a list,
+                # which we transpile as an explicit copy of the vector.
+                list_type, error_msg = generate_type(
+                    type_annotation=self.type_map[node],
+                    types_namespace=self._types_namespace,
+                )
+                if error_msg is not None:
+                    return None, Error(node.original_node, error_msg)
+
+                assert list_type is not None
+                return (
+                    _generate_call_with_single_argument(
+                        function=list_type, argument=the_list
+                    ),
                     None,
                 )
 

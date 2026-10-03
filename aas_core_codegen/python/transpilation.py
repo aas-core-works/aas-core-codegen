@@ -802,6 +802,17 @@ not (
 
                 return Stripped("set()"), None
 
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LIST
+            ):
+                assert len(args) == 1, (
+                    f"Expected exactly one argument, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                return Stripped(f"list({args[0]})"), None
+
             else:
                 assert_never(func_type.func.kind)
         else:
@@ -1351,10 +1362,21 @@ range(
             # for a variable initialized with ``None``.
             is_final = intermediate_type_inference.is_final_annotation(node.annotation)
 
+            # NOTE (mristin):
+            # The type inference does not distinguish between ``List`` and
+            # ``Sequence`` of a variable which is not final, so we look at
+            # the spelling, as a read-only value, such as a read-only argument, can
+            # be assigned only to a variable spelled read-only in mypy.
+            is_spelled_read_only = any(
+                isinstance(annotation_node, parse_tree.Name)
+                and annotation_node.identifier in ("Sequence", "AbstractSet")
+                for annotation_node in parse_tree.over_nodes(node.annotation)
+            )
+
             declared_type, error_message = generate_type(
                 type_annotation=self.type_map[node.target],
                 types_module=self._types_module,
-                read_only=is_final,
+                read_only=is_final or is_spelled_read_only,
             )
             if error_message is not None:
                 errors.append(Error(node.annotation.original_node, error_message))

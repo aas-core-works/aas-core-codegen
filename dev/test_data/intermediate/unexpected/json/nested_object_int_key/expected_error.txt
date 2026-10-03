@@ -1,0 +1,1 @@
+We only support ``str`` or a class constraining ``str`` as the key of a ``JSONObject``, but the property 'values' of the class 'Something' has the type List[JSONObject[int]]. Please contact the developers if you need this functionality.

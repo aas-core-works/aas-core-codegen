@@ -172,7 +172,7 @@ export function parseSet<T>(
 }}"""
             )
         ]
-        if typescript_common.has_set_properties(symbol_table)
+        if intermediate_uses.set_properties(symbol_table)
         else []
     )  # type: List[Stripped]
 

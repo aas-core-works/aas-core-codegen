@@ -93,7 +93,7 @@ def child_a_is_small(
 
 
 def few_matches(
-    texts: List[str],
+    texts: Sequence[str],
     text: str
 ) -> bool:
     """
@@ -109,7 +109,7 @@ def few_matches(
 
 
 def texts_are_consistent(
-    texts: List[str],
+    texts: Sequence[str],
     text: str,
     number: int
 ) -> bool:

@@ -206,7 +206,7 @@ def texts_are_few(
 ) -> bool:
     """Check the declarations of the lists."""
     all_texts: Sequence[str] = texts
-    maybe_texts: Optional[List[str]] = optional_texts
+    maybe_texts: Optional[Sequence[str]] = optional_texts
     if maybe_texts is not None and len(maybe_texts) > 3:
         return False
 

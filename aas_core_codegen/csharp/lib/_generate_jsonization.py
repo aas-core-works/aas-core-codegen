@@ -2385,35 +2385,15 @@ def _generate_transform_property(
 
     elif isinstance(
         type_anno,
-        (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+        ),
     ):
-        item_type_annos = (
-            [type_anno.items]
-            if isinstance(type_anno, intermediate.ListTypeAnnotation)
-            else list(type_anno.items)
-        )
-
-        for item_type_anno in item_type_annos:
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                f"Expected an atomic item (a primitive, a constrained primitive, "
-                f"an enumeration, a class or a named union) of {type_anno}, "
-                f"but got {item_type_anno}. "
-                f"This should have already been verified in "
-                f"intermediate._translate._verify_only_simple_type_patterns."
-            )
-
-        serializer_name = _serializer_name(type_anno)
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            f"Expected an atomic item (a primitive, a constrained primitive or "
-            f"an enumeration) of {type_anno}, but got {type_anno.items}. "
-            f"This should have already been verified in "
-            f"intermediate._translate._verify_items_of_sets."
-        )
-
+        # NOTE (mristin):
+        # The serializers of the nested lists, tuples and sets are composed
+        # recursively, see :py:func:`_serializer_expr`.
         serializer_name = _serializer_name(type_anno)
 
     else:

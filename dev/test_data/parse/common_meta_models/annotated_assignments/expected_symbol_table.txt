@@ -2992,7 +2992,7 @@ UnverifiedSymbolTable(
                 original_node=...),
               index=Index(
                 collection=Name(
-                  identifier='List',
+                  identifier='Sequence',
                   original_node=...),
                 index=Name(
                   identifier='str',

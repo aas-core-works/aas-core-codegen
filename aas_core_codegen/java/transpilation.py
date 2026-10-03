@@ -455,27 +455,6 @@ class Transpiler(
 
         assert collection is not None
 
-        if isinstance(
-            self.type_map[node.collection],
-            intermediate_type_inference.ListTypeAnnotation,
-        ):
-            # NOTE (mristin):
-            # The type inference allows slicing a list only to copy it as a whole,
-            # ``[:]``, which we transpile as a new ``ArrayList``.
-            if not isinstance(
-                node.collection,
-                (
-                    parse_tree.Member,
-                    parse_tree.FunctionCall,
-                    parse_tree.MethodCall,
-                    parse_tree.Name,
-                    parse_tree.Index,
-                ),
-            ):
-                collection = Stripped(f"({collection})")
-
-            return Stripped(f"new java.util.ArrayList<>({collection})"), None
-
         # NOTE (mristin):
         # We do not use the native ``substring`` as it counts the UTF-16 code units
         # instead of the characters, throws on the positions out of range, and does
@@ -1147,6 +1126,42 @@ class Transpiler(
                 # the safe integers. See ``StringHelpers.parseSafeInt`` in
                 # the generated common package.
                 return Stripped(f"StringHelpers.parseSafeInt({args[0]})"), None
+
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.LIST
+            ):
+                assert len(node.args) == 1, (
+                    f"Expected exactly one argument, but got: {node.args}; "
+                    f"this should have been caught before."
+                )
+
+                the_list, error = self.transform(node.args[0])
+                if error is not None:
+                    return None, Error(
+                        node.original_node,
+                        "Failed to transpile the argument of list",
+                        [error],
+                    )
+
+                assert the_list is not None
+
+                # NOTE (mristin):
+                # The type inference allows ``list(...)`` only to copy a list,
+                # which we transpile as a new ``ArrayList``.
+                if not isinstance(
+                    node.args[0],
+                    (
+                        parse_tree.Member,
+                        parse_tree.FunctionCall,
+                        parse_tree.MethodCall,
+                        parse_tree.Name,
+                        parse_tree.Index,
+                    ),
+                ):
+                    the_list = Stripped(f"({the_list})")
+
+                return Stripped(f"new java.util.ArrayList<>({the_list})"), None
 
             elif (
                 func_type.func.kind

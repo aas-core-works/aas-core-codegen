@@ -350,7 +350,7 @@ def _content_parser_name(
 
 
 def _element_parser_name(
-    type_anno: intermediate.AtomicTypeAnnotation, tag_suffix: str
+    type_anno: intermediate.TypeAnnotationExceptOptional, tag_suffix: str
 ) -> Identifier:
     """
     Give out the parser of a whole XML element, the tags included, holding a value of
@@ -372,7 +372,7 @@ def _element_parser_name(
         return Identifier(f"parseElement_{typescript_common.atomic_moniker(type_anno)}")
 
     return Identifier(
-        f"parseAtV{tag_suffix}_{typescript_common.atomic_moniker(type_anno)}"
+        f"parseAtV{tag_suffix}_{typescript_common.type_moniker(type_anno)}"
     )
 
 
@@ -411,15 +411,18 @@ class _ParserRegistry:
         self._blocks_by_name[name] = block
 
     def _register_element_parser(
-        self, type_anno: intermediate.AtomicTypeAnnotation, tag_suffix: str
+        self, type_anno: intermediate.TypeAnnotationExceptOptional, tag_suffix: str
     ) -> None:
         """
         Register the parser of a whole element holding a value of the ``type_anno``.
 
         A dispatched value needs none, see :py:func:`_element_parser_name`.
+        A nested list, set or tuple needs the parser of its content as well.
         """
         if typescript_common.is_dispatched(type_anno):
             return
+
+        self.register_property_parser(type_anno)
 
         name = _element_parser_name(type_anno, tag_suffix)
 
@@ -461,14 +464,7 @@ function {name}(
 
     def _register_list_parser(self, type_anno: intermediate.ListTypeAnnotation) -> None:
         """Register the parser of the content of an element holding a list."""
-        items_type_anno = intermediate.beneath_optional(type_anno.items)
-
-        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-            f"(mristin) We only handle XML de/serialization of lists "
-            f"containing atomic values, but you want to generate the code "
-            f"for a list of type {type_anno}. Please contact the "
-            f"developers if you need this feature."
-        )
+        items_type_anno = type_anno.items
 
         self._register_element_parser(items_type_anno, tag_suffix="")
 
@@ -502,11 +498,6 @@ function {name}(
     def _register_set_parser(self, type_anno: intermediate.SetTypeAnnotation) -> None:
         """Register the parser of the content of an element holding a set."""
         items_type_anno = type_anno.items
-
-        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-            "The sets hold only primitives, constrained primitives and enumeration "
-            "literals; see intermediate._translate._verify_items_of_sets"
-        )
 
         self._register_element_parser(items_type_anno, tag_suffix="")
 
@@ -547,14 +538,6 @@ function {name}(
         parse_items = []  # type: List[str]
 
         for i, item_type_anno in enumerate(type_anno.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
-            )
 
             self._register_element_parser(item_type_anno, tag_suffix=str(i + 1))
 
@@ -1131,7 +1114,7 @@ def _content_writer_name(
         return _write_sequence_function_name_for_concrete_class(cls=type_anno.our_type)
 
     if isinstance(type_anno, intermediate.ListTypeAnnotation) and _is_instance_type(
-        intermediate.beneath_optional(type_anno.items)
+        type_anno.items
     ):
         return Identifier("writeListOfInstances")
 
@@ -1139,7 +1122,7 @@ def _content_writer_name(
 
 
 def _element_writer_name(
-    type_anno: intermediate.AtomicTypeAnnotation, tag_suffix: str
+    type_anno: intermediate.TypeAnnotationExceptOptional, tag_suffix: str
 ) -> Identifier:
     """
     Give out the writer of a whole XML element, the tags included, holding a value
@@ -1154,7 +1137,7 @@ def _element_writer_name(
         return Identifier("writeClass")
 
     return Identifier(
-        f"writeAtV{tag_suffix}_{typescript_common.atomic_moniker(type_anno)}"
+        f"writeAtV{tag_suffix}_{typescript_common.type_moniker(type_anno)}"
     )
 
 
@@ -1372,15 +1355,18 @@ class _WriterRegistry:
         self._blocks_by_name[name] = block
 
     def _register_element_writer(
-        self, type_anno: intermediate.AtomicTypeAnnotation, tag_suffix: str
+        self, type_anno: intermediate.TypeAnnotationExceptOptional, tag_suffix: str
     ) -> None:
         """
         Register the writer of a whole element holding a value of the ``type_anno``.
 
-        An instance needs none, see :py:func:`_element_writer_name`.
+        An instance needs none, see :py:func:`_element_writer_name`. A nested list,
+        set or tuple needs the writer of its content as well.
         """
         if _is_instance_type(type_anno):
             return
+
+        self.register_property_writer(type_anno)
 
         name = _element_writer_name(type_anno, tag_suffix)
 
@@ -1416,14 +1402,7 @@ function {name}(
 
     def _register_list_writer(self, type_anno: intermediate.ListTypeAnnotation) -> None:
         """Register the writer of the content of an element holding a list."""
-        items_type_anno = intermediate.beneath_optional(type_anno.items)
-
-        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-            f"(mristin) We only handle XML de/serialization of lists "
-            f"containing atomic values, but you want to generate the code "
-            f"for a list of type {type_anno}. Please contact the "
-            f"developers if you need this feature."
-        )
+        items_type_anno = type_anno.items
 
         if _is_instance_type(items_type_anno):
             # NOTE (mristin):
@@ -1471,11 +1450,6 @@ function {name}(
         """
         items_type_anno = type_anno.items
 
-        assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-            "The sets hold only primitives, constrained primitives and enumeration "
-            "literals; see intermediate._translate._verify_items_of_sets"
-        )
-
         self._register_element_writer(items_type_anno, tag_suffix="")
 
         name = _content_writer_name(type_anno)
@@ -1520,14 +1494,6 @@ function {name}(
         write_items = []  # type: List[str]
 
         for i, item_type_anno in enumerate(type_anno.items):
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
-            )
 
             self._register_element_writer(item_type_anno, tag_suffix=str(i + 1))
 

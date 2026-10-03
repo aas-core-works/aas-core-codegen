@@ -18,6 +18,7 @@ from typing import (
     Dict,
     Set,
     Iterable,
+    Iterator,
 )
 
 import asttokens
@@ -2562,11 +2563,11 @@ def _classdef_to_our_type(
     )
 
 
-def _verify_arity_of_type_annotation_subscript(
+def _verify_arity_of_this_type_annotation_subscript(
     type_annotation: SubscriptedTypeAnnotation,
 ) -> Optional[Error]:
     """
-    Check that the subscripted type annotation has the expected number of arguments.
+    Check the number of arguments of ``type_annotation``, but not of the nested ones.
 
     :return: error message, if any
     """
@@ -2626,6 +2627,318 @@ def _verify_arity_of_type_annotation_subscript(
             f"a subscripted type annotation {type_annotation.identifier!r}, "
             f"but got {len(type_annotation.subscripts)}: {type_annotation}",
         )
+
+    return None
+
+
+def _verify_arity_of_type_annotation_subscript(
+    type_annotation: SubscriptedTypeAnnotation,
+) -> Optional[Error]:
+    """
+    Check that the subscripted type annotation has the expected number of arguments.
+
+    We check the nested subscripted type annotations as well, *e.g.*,
+    ``List[List[int, str]]``.
+
+    :return: error message, if any
+    """
+    error = _verify_arity_of_this_type_annotation_subscript(type_annotation)
+    if error is not None:
+        return error
+
+    for subscript in type_annotation.subscripts:
+        if isinstance(subscript, SubscriptedTypeAnnotation):
+            error = _verify_arity_of_type_annotation_subscript(subscript)
+            if error is not None:
+                return error
+
+    return None
+
+
+def _over_subscripted_type_annotations(
+    type_annotation: TypeAnnotation,
+) -> Iterator[SubscriptedTypeAnnotation]:
+    """Iterate over ``type_annotation`` and all its nested subscripted ones."""
+    if isinstance(type_annotation, SubscriptedTypeAnnotation):
+        yield type_annotation
+
+        for subscript in type_annotation.subscripts:
+            yield from _over_subscripted_type_annotations(subscript)
+
+
+def _respell_mutability(type_annotation: TypeAnnotation, read_only: bool) -> str:
+    """
+    Render ``type_annotation`` with the collections of the given mutability.
+
+    We drop ``Mutable``, as the collections spell the mutability themselves,
+    and ``Mutable`` is not allowed beneath them.
+    """
+    if not isinstance(type_annotation, SubscriptedTypeAnnotation):
+        return str(type_annotation)
+
+    if type_annotation.identifier == "Mutable":
+        return _respell_mutability(type_annotation.subscripts[0], read_only)
+
+    identifier: str = type_annotation.identifier
+    if identifier in ("List", "Sequence"):
+        identifier = "Sequence" if read_only else "List"
+    elif identifier in ("Set", "AbstractSet"):
+        identifier = "AbstractSet" if read_only else "Set"
+
+    subscripts_text = ", ".join(
+        _respell_mutability(subscript, read_only)
+        for subscript in type_annotation.subscripts
+    )
+    return f"{identifier}[{subscripts_text}]"
+
+
+def _verify_optionals_only_at_top(
+    type_annotation: TypeAnnotation, where: str
+) -> Optional[Error]:
+    """
+    Check that ``Optional`` appears only at the top of ``type_annotation``.
+
+    The nested optionals can not be de/serialized in JSON and XML on many targets:
+    a missing item of a list or a tuple can not be told apart from ``None``, and
+    an optional of an optional is indistinguishable from an optional.
+
+    The ``where`` describes the place of ``type_annotation`` in the error message.
+    """
+    top = (
+        type_annotation.subscripts[0]
+        if isinstance(type_annotation, SubscriptedTypeAnnotation)
+        and type_annotation.identifier == "Optional"
+        else type_annotation
+    )
+
+    for subscripted in _over_subscripted_type_annotations(top):
+        if subscripted.identifier == "Optional":
+            return Error(
+                subscripted.node,
+                f"We support Optional only at the top of a type annotation, "
+                f"but {where} has the type {type_annotation}, which nests "
+                f"{subscripted}. The items of the lists, the tuples and "
+                f"the sets can not be optional, and an optional can not be "
+                f"optional itself, since the nested optionals can not be "
+                f"de/serialized in JSON and XML on many targets.",
+            )
+
+    return None
+
+
+def _verify_no_sets_in_return(
+    type_annotation: TypeAnnotation, where: str
+) -> Optional[Error]:
+    """
+    Check that the return ``type_annotation`` neither is nor holds a set.
+
+    We support the sets at any depth of the type annotation of an argument or
+    of a property, but not in the return values.
+
+    The ``where`` describes the place of ``type_annotation`` in the error message,
+    *e.g.*, ``the return type of the method 'x' of the class 'Y'``.
+    """
+    for subscripted in _over_subscripted_type_annotations(type_annotation):
+        if subscripted.identifier in SET_TYPES:
+            return Error(
+                subscripted.node,
+                f"The type annotation {subscripted} is not allowed "
+                f"in {where}. We support the sets only in the arguments of "
+                f"the verification functions and of the methods, in "
+                f"the properties, and in the constant sets. The return values "
+                f"can neither be nor hold sets at the moment. "
+                f"Please contact the developers if you need this feature.",
+            )
+
+    return None
+
+
+def _verify_no_declared_mutability(
+    type_annotation: TypeAnnotation, where: str
+) -> Optional[Error]:
+    """
+    Check that ``type_annotation`` uses neither ``Sequence``, ``AbstractSet`` nor ``Mutable``.
+
+    Only the arguments of the verification functions and of the methods declare
+    their mutability. The properties, the return values and the arguments of
+    the constructors, which mirror the properties, are spelled with ``List`` and
+    ``Set`` at every level.
+
+    The ``where`` describes the place of ``type_annotation`` in the error message,
+    *e.g.*, ``the property 'x' of the class 'Y'``.
+    """
+    for subscripted in _over_subscripted_type_annotations(type_annotation):
+        if not (
+            subscripted.identifier in MUTABILITY_TYPES
+            or subscripted.identifier == "AbstractSet"
+        ):
+            continue
+
+        subscripts_text = ", ".join(
+            str(subscript) for subscript in subscripted.subscripts
+        )
+
+        replacement: str
+        if subscripted.identifier == "Sequence":
+            replacement = f"List[{subscripts_text}]"
+        elif subscripted.identifier == "AbstractSet":
+            replacement = f"Set[{subscripts_text}]"
+        else:
+            replacement = subscripts_text
+
+        return Error(
+            subscripted.node,
+            f"The type annotation {subscripted} is not allowed "
+            f"in {where}. {subscripted.identifier} declares "
+            f"the mutability of an argument of a verification function "
+            f"or of a method. The properties, the return values and "
+            f"the arguments of the constructors, which mirror "
+            f"the properties, do not declare mutability. "
+            f"Please use {replacement} instead.",
+        )
+
+    return None
+
+
+def _verify_spelling_of_declared_mutability(
+    type_annotation: TypeAnnotation, where: str
+) -> Optional[Error]:
+    """
+    Check that the argument's ``type_annotation`` spells its mutability consistently.
+
+    ``Mutable`` is allowed only at the top of an argument's type annotation,
+    or directly under ``Optional``.
+
+    The mutability of an argument is deep: it flows from the argument to all
+    the values reached through it. Hence, all the nested lists and sets need to
+    be spelled the same as the outermost collection -- ``List`` and ``Set`` if
+    the argument is mutable, ``Sequence`` and ``AbstractSet`` if it is
+    read-only. A tuple at the top of an argument is read-only.
+
+    The ``where`` describes the place of ``type_annotation`` in the error message,
+    *e.g.*, ``the argument 'x' of the verification function 'f'``.
+    """
+    # NOTE (mristin):
+    # This check runs after :py:func:`_verify_optionals_only_at_top`, so there can
+    # be at most one ``Optional``, and only at the top.
+    top = (
+        type_annotation.subscripts[0]
+        if isinstance(type_annotation, SubscriptedTypeAnnotation)
+        and type_annotation.identifier == "Optional"
+        else type_annotation
+    )
+
+    if isinstance(top, SubscriptedTypeAnnotation) and top.identifier == "Mutable":
+        wrapped = top.subscripts[0]
+
+        if isinstance(wrapped, SubscriptedTypeAnnotation) and (
+            wrapped.identifier in ("List", "Sequence", "Set", "AbstractSet")
+        ):
+            items = ", ".join(str(subscript) for subscript in wrapped.subscripts)
+
+            if wrapped.identifier in ("List", "Sequence"):
+                what = "list"
+                mutable_generic = "List"
+                read_only_generic = "Sequence"
+                read_only_article = "a"
+            else:
+                what = "set"
+                mutable_generic = "Set"
+                read_only_generic = "AbstractSet"
+                read_only_article = "an"
+
+            if wrapped.identifier == read_only_generic:
+                return Error(
+                    top.node,
+                    f"The type annotation {top} is contradictory: "
+                    f"{read_only_article} {read_only_generic} declares "
+                    f"a read-only {what}, "
+                    f"while Mutable declares that the function mutates "
+                    f"the argument. If the function mutates the {what}, "
+                    f"please declare it as {mutable_generic}[{items}], which "
+                    f"is mutable. Otherwise, please declare it "
+                    f"as {read_only_generic}[{items}] without Mutable.",
+                )
+
+            return Error(
+                top.node,
+                f"The type annotation {top} is redundant, since "
+                f"a {mutable_generic} already declares a mutable {what}. "
+                f"Please declare it as {mutable_generic}[{items}] without "
+                f"Mutable, or as {read_only_generic}[{items}] if the function "
+                f"does not mutate the {what}.",
+            )
+
+    read_only = not (
+        isinstance(top, SubscriptedTypeAnnotation)
+        and top.identifier in ("List", "Set", "Mutable")
+    )
+
+    for subscripted in _over_subscripted_type_annotations(type_annotation):
+        if subscripted.identifier == "Mutable" and subscripted is not top:
+            return Error(
+                subscripted.node,
+                f"The type annotation {subscripted} is not allowed "
+                f"in {where}. Mutable is allowed only at the top of "
+                f"the argument's type annotation, or directly under Optional. "
+                f"The mutability of an argument is deep, so please declare "
+                f"the argument as {_respell_mutability(type_annotation, False)} "
+                f"if the function mutates it.",
+            )
+
+        if subscripted is top:
+            continue
+
+        if subscripted.identifier in ("List", "Set") and read_only:
+            what = "list" if subscripted.identifier == "List" else "set"
+
+            # NOTE (mristin):
+            # A nested list or set implies a subscripted type annotation at
+            # the top.
+            assert isinstance(top, SubscriptedTypeAnnotation)
+
+            reason = (
+                "a tuple is read-only"
+                if top.identifier == "Tuple"
+                else f"declared by {top.identifier}"
+            )
+
+            suggestion = (
+                f"Please declare it as {_respell_mutability(type_annotation, True)}"
+            )
+            if top.identifier in ("Sequence", "AbstractSet"):
+                suggestion += (
+                    f", or as {_respell_mutability(type_annotation, False)} "
+                    f"if the function mutates the argument"
+                )
+
+            return Error(
+                subscripted.node,
+                f"The type annotation {type_annotation} of {where} is "
+                f"contradictory: the argument is read-only, as {reason}, "
+                f"while {subscripted} declares a mutable {what}. "
+                f"The mutability of an argument is deep, so all the nested "
+                f"lists and sets of a read-only argument are read-only as well. "
+                f"{suggestion}.",
+            )
+
+        if subscripted.identifier in ("Sequence", "AbstractSet") and not read_only:
+            what = "list" if subscripted.identifier == "Sequence" else "set"
+
+            assert isinstance(top, SubscriptedTypeAnnotation)
+
+            return Error(
+                subscripted.node,
+                f"The type annotation {type_annotation} of {where} is "
+                f"contradictory: the argument is mutable, as declared by "
+                f"{top.identifier}, while {subscripted} declares a read-only "
+                f"{what}. The mutability of an argument is deep, so all "
+                f"the nested lists and sets of a mutable argument are mutable "
+                f"as well. Please declare it as "
+                f"{_respell_mutability(type_annotation, False)}, or as "
+                f"{_respell_mutability(type_annotation, True)} if the function "
+                f"does not mutate the argument.",
+            )
 
     return None
 
@@ -3220,157 +3533,26 @@ def _verify_symbol_table(
                         if error is not None:
                             errors.append(error)
 
-    def verify_placement_of_sets(
-        type_annotation: TypeAnnotation, allowed: bool, where: str
-    ) -> Optional[Error]:
-        """
-        Check that ``Set`` and ``AbstractSet`` are placed only where ``allowed``.
-
-        We support the sets at the top of the type annotation of an argument or
-        of a property, or directly under ``Optional``. The ``where`` describes
-        the place of ``type_annotation`` in the error messages, *e.g.*,
-        ``the property 'x' of the class 'Y'``.
-
-        We look through ``Mutable`` as well, so that
-        :py:func:`verify_placement_of_mutability_types` can explain what is wrong
-        with ``Mutable`` around a set.
-
-        :return: error message, if any
-        """
-        if not isinstance(type_annotation, SubscriptedTypeAnnotation):
-            return None
-
-        if type_annotation.identifier in SET_TYPES and not allowed:
-            return Error(
-                type_annotation.node,
-                f"The type annotation {type_annotation} is not allowed "
-                f"in {where}. We support the sets only in the arguments of "
-                f"the verification functions and of the methods and in "
-                f"the properties, at the top of the type annotation or directly "
-                f"under Optional, and in the constant sets. The return values "
-                f"and the nested type annotations can not be sets at the moment. "
-                f"Please contact the developers if you need this feature.",
+    for func in symbol_table.verification_functions:
+        for type_anno in itertools.chain(
+            (arg.type_annotation for arg in func.arguments),
+            () if func.returns is None else (func.returns,),
+        ):
+            error = verify_no_dangling_references_in_type_annotation(
+                type_annotation=type_anno
             )
 
-        is_transparent = type_annotation.identifier in ("Optional", "Mutable")
+            if error is None and isinstance(type_anno, SubscriptedTypeAnnotation):
+                error = _verify_arity_of_type_annotation_subscript(type_anno)
 
-        for subscript in type_annotation.subscripts:
-            error = verify_placement_of_sets(
-                type_annotation=subscript,
-                allowed=allowed and is_transparent,
-                where=where,
-            )
             if error is not None:
-                return error
-
-        return None
-
-    def verify_placement_of_mutability_types(
-        type_annotation: TypeAnnotation, allowed: bool, where: str
-    ) -> Optional[Error]:
-        """
-        Check that ``Sequence``, ``AbstractSet`` and ``Mutable`` are placed only where ``allowed``.
-
-        They declare the mutability of an argument of a verification function or
-        of a method, so they are allowed only at the top of its type annotation, or
-        directly under ``Optional``. The ``where`` describes the place of ``type_annotation`` in
-        the error messages, *e.g.*, ``the property 'x' of the class 'Y'``.
-
-        :return: error message, if any
-        """
-        if not isinstance(type_annotation, SubscriptedTypeAnnotation):
-            return None
-
-        if (
-            type_annotation.identifier in MUTABILITY_TYPES
-            or type_annotation.identifier == "AbstractSet"
-        ) and not allowed:
-            subscripts_text = ", ".join(
-                str(subscript) for subscript in type_annotation.subscripts
-            )
-
-            replacement: str
-            if type_annotation.identifier == "Sequence":
-                replacement = f"List[{subscripts_text}]"
-            elif type_annotation.identifier == "AbstractSet":
-                replacement = f"Set[{subscripts_text}]"
-            else:
-                replacement = subscripts_text
-
-            return Error(
-                type_annotation.node,
-                f"The type annotation {type_annotation} is not allowed "
-                f"in {where}. {type_annotation.identifier} declares "
-                f"the mutability of an argument of a verification function "
-                f"or of a method, so it is allowed only at the top of "
-                f"the argument's type annotation, or directly under Optional. "
-                f"The properties, the return values and the nested type "
-                f"annotations do not declare mutability. "
-                f"Please use {replacement} instead.",
-            )
-
-        if type_annotation.identifier == "Mutable" and allowed:
-            wrapped = type_annotation.subscripts[0]
-            while (
-                isinstance(wrapped, SubscriptedTypeAnnotation)
-                and wrapped.identifier == "Optional"
-            ):
-                wrapped = wrapped.subscripts[0]
-
-            if isinstance(wrapped, SubscriptedTypeAnnotation) and (
-                wrapped.identifier in ("List", "Sequence", "Set", "AbstractSet")
-            ):
-                items = ", ".join(str(subscript) for subscript in wrapped.subscripts)
-
-                if wrapped.identifier in ("List", "Sequence"):
-                    what = "list"
-                    mutable_generic = "List"
-                    read_only_generic = "Sequence"
-                    read_only_article = "a"
-                else:
-                    what = "set"
-                    mutable_generic = "Set"
-                    read_only_generic = "AbstractSet"
-                    read_only_article = "an"
-
-                if wrapped.identifier == read_only_generic:
-                    return Error(
-                        type_annotation.node,
-                        f"The type annotation {type_annotation} is contradictory: "
-                        f"{read_only_article} {read_only_generic} declares "
-                        f"a read-only {what}, "
-                        f"while Mutable declares that the function mutates "
-                        f"the argument. If the function mutates the {what}, "
-                        f"please declare it as {mutable_generic}[{items}], which "
-                        f"is mutable. Otherwise, please declare it "
-                        f"as {read_only_generic}[{items}] without Mutable.",
-                    )
-
-                return Error(
-                    type_annotation.node,
-                    f"The type annotation {type_annotation} is redundant, since "
-                    f"a {mutable_generic} already declares a mutable {what}. "
-                    f"Please declare it as {mutable_generic}[{items}] without "
-                    f"Mutable, or as {read_only_generic}[{items}] if the function "
-                    f"does not mutate the {what}.",
-                )
-
-        is_optional = type_annotation.identifier == "Optional"
-
-        for subscript in type_annotation.subscripts:
-            error = verify_placement_of_mutability_types(
-                type_annotation=subscript,
-                allowed=allowed and is_optional,
-                where=where,
-            )
-            if error is not None:
-                return error
-
-        return None
+                errors.append(error)
 
     # NOTE (mristin):
-    # We check the placement of the sets first, since a misplaced ``AbstractSet``
-    # is primarily a misplaced set, and only then a misplaced declaration of
+    # We report only the first error of each type annotation, as the later checks
+    # assume that the earlier ones passed. We check the sets in the return values
+    # before the mutability, since an ``AbstractSet`` in a return value is
+    # primarily a misplaced set, and only then a misplaced declaration of
     # the mutability.
 
     for our_type in symbol_table.our_types:
@@ -3379,29 +3561,37 @@ def _verify_symbol_table(
 
         for prop in our_type.properties:
             where = f"the property {prop.name!r} of the class {our_type.name!r}"
-            error = verify_placement_of_sets(
-                type_annotation=prop.type_annotation, allowed=True, where=where
-            )
+
+            error = _verify_optionals_only_at_top(prop.type_annotation, where)
+
             if error is None:
-                error = verify_placement_of_mutability_types(
-                    type_annotation=prop.type_annotation, allowed=False, where=where
-                )
+                error = _verify_no_declared_mutability(prop.type_annotation, where)
+
             if error is not None:
                 errors.append(error)
 
         for method in our_type.methods:
             for arg in method.arguments:
                 where = (
-                    f"the argument {arg.name!r} of the method "
-                    f"{method.name!r} of the class {our_type.name!r}"
+                    f"the argument {arg.name!r} of the method {method.name!r} "
+                    f"of the class {our_type.name!r}"
                 )
-                error = verify_placement_of_sets(
-                    type_annotation=arg.type_annotation, allowed=True, where=where
-                )
+
+                error = _verify_optionals_only_at_top(arg.type_annotation, where)
+
                 if error is None:
-                    error = verify_placement_of_mutability_types(
-                        type_annotation=arg.type_annotation, allowed=True, where=where
-                    )
+                    if method.name == "__init__":
+                        # NOTE (mristin):
+                        # The arguments of a constructor mirror the properties, so
+                        # they do not declare mutability.
+                        error = _verify_no_declared_mutability(
+                            arg.type_annotation, where
+                        )
+                    else:
+                        error = _verify_spelling_of_declared_mutability(
+                            arg.type_annotation, where
+                        )
+
                 if error is not None:
                     errors.append(error)
 
@@ -3410,13 +3600,15 @@ def _verify_symbol_table(
                     f"the return type of the method {method.name!r} "
                     f"of the class {our_type.name!r}"
                 )
-                error = verify_placement_of_sets(
-                    type_annotation=method.returns, allowed=False, where=where
-                )
+
+                error = _verify_optionals_only_at_top(method.returns, where)
+
                 if error is None:
-                    error = verify_placement_of_mutability_types(
-                        type_annotation=method.returns, allowed=False, where=where
-                    )
+                    error = _verify_no_sets_in_return(method.returns, where)
+
+                if error is None:
+                    error = _verify_no_declared_mutability(method.returns, where)
+
                 if error is not None:
                     errors.append(error)
 
@@ -3426,25 +3618,28 @@ def _verify_symbol_table(
                 f"the argument {arg.name!r} of the verification function "
                 f"{func.name!r}"
             )
-            error = verify_placement_of_sets(
-                type_annotation=arg.type_annotation, allowed=True, where=where
-            )
+
+            error = _verify_optionals_only_at_top(arg.type_annotation, where)
+
             if error is None:
-                error = verify_placement_of_mutability_types(
-                    type_annotation=arg.type_annotation, allowed=True, where=where
+                error = _verify_spelling_of_declared_mutability(
+                    arg.type_annotation, where
                 )
+
             if error is not None:
                 errors.append(error)
 
         if func.returns is not None:
             where = f"the return type of the verification function {func.name!r}"
-            error = verify_placement_of_sets(
-                type_annotation=func.returns, allowed=False, where=where
-            )
+
+            error = _verify_optionals_only_at_top(func.returns, where)
+
             if error is None:
-                error = verify_placement_of_mutability_types(
-                    type_annotation=func.returns, allowed=False, where=where
-                )
+                error = _verify_no_sets_in_return(func.returns, where)
+
+            if error is None:
+                error = _verify_no_declared_mutability(func.returns, where)
+
             if error is not None:
                 errors.append(error)
 

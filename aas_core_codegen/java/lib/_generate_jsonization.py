@@ -2,7 +2,7 @@
 
 import io
 import textwrap
-from typing import Final, List, Mapping, Optional, Set, Tuple
+from typing import Final, List, Mapping, Optional, Sequence, Set, Tuple
 
 from icontract import ensure
 
@@ -144,15 +144,9 @@ def _item_parser_reference(type_anno: intermediate.TypeAnnotationUnion) -> Strip
     property therefore costs nothing at run-time, and leaves one call site per
     item type instead of one per property.
     """
-    assert isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-        f"We only support lists and tuples of atomic values (primitives, "
-        f"constrained primitives, enumeration literals) or classes when "
-        f"de-serializing from JSON, but got the nested type {type_anno}. "
-        f"Please contact the developers if you need this feature."
-    )
-
     return Stripped(
-        f"{_DESERIALIZE_IMPL_NAME}::{_parse_method_for_atomic_value(type_anno)}"
+        f"{_DESERIALIZE_IMPL_NAME}::"
+        f"{_parse_method_name(intermediate.beneath_optional(type_anno))}"
     )
 
 
@@ -554,15 +548,20 @@ def _composed_type_annotations(
 
     for cls in symbol_table.concrete_classes:
         for arg in cls.constructor.arguments:
-            type_anno = intermediate.beneath_optional(arg.type_annotation)
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                arg.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
 
-            if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
-                continue
-
-            moniker = java_common.type_moniker(type_anno)
-            if moniker not in observed:
-                observed.add(moniker)
-                result.append(type_anno)
+                moniker = java_common.type_moniker(type_anno)
+                if moniker not in observed:
+                    observed.add(moniker)
+                    result.append(type_anno)
 
     return result
 
@@ -577,8 +576,15 @@ def _generate_composed_parser(
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         item_parser = _item_parser_reference(type_anno.items)
 
+        items_type = java_common.generate_type(type_anno.items)
+
+        # NOTE (mristin):
+        # A Javadoc comment can not carry a type broken over several lines, as
+        # ``generate_type`` breaks a long tuple, so we describe it in words.
         description = (
-            f"a list of {{@code {java_common.generate_type(type_anno.items)}}}"
+            f"a list of {{@code {items_type}}}"
+            if "\n" not in items_type
+            else "a list of nested collections"
         )
 
         body = Stripped(f"return parseArray(node, {item_parser});")
@@ -2005,13 +2011,22 @@ def _serialized_leaf_moniker(type_anno: intermediate.AtomicTypeAnnotation) -> st
     return "IClass"
 
 
-def _serialized_value_type(type_anno: intermediate.AtomicTypeAnnotation) -> Stripped:
+def _serialized_value_type(type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
     """
     Render the type of a value of ``type_anno`` as its serializer takes it.
 
     A scalar keeps its own Java type; everything else widens to the interface
-    it is serialized through, so that one serializer serves them all.
+    it is serialized through, so that one serializer serves them all. A list,
+    a set and a tuple are rendered as their serializers take them, see
+    :py:func:`_container_type`.
     """
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return _container_type(type_anno)
+
+    assert isinstance(
+        type_anno, intermediate.AtomicTypeAnnotationAsTuple
+    ), f"Expected an atomic type annotation, but got: {type_anno}"
+
     primitive_type = intermediate.try_primitive_type(type_anno)
     if primitive_type is not None:
         return java_common.PRIMITIVE_TYPE_MAP[primitive_type]
@@ -2039,68 +2054,59 @@ def _serialized_value_type(type_anno: intermediate.AtomicTypeAnnotation) -> Stri
 
 def _item_type_annotations(
     type_anno: intermediate.ContainerTypeAnnotation,
-) -> List[intermediate.AtomicTypeAnnotation]:
-    """
-    Give the items of the list or of the tuple ``type_anno``, in order.
-
-    An item is atomic, which
-    :py:func:`aas_core_codegen.intermediate._translate._verify_only_simple_type_patterns`
-    guarantees for a tuple and which the code generators assume for a list,
-    and which we narrow here so that the leaf functions can simply say so in
-    their signatures.
-    """
-    items: List[intermediate.TypeAnnotationUnion]
+) -> Sequence[intermediate.TypeAnnotationExceptOptional]:
+    """Give the items of the list, the set or the tuple ``type_anno``, in order."""
     if isinstance(
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
-        items = [type_anno.items]
-    elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        items = list(type_anno.items)
-    else:
-        assert_never(type_anno)
+        return [type_anno.items]
 
-    result = []  # type: List[intermediate.AtomicTypeAnnotation]
-    for item in items:
-        assert isinstance(item, intermediate.AtomicTypeAnnotationAsTuple), (
-            f"We only support lists and tuples of atomic values (primitives, "
-            f"constrained primitives, enumeration literals), of classes or of "
-            f"named unions when serializing to JSON, but got the nested "
-            f"type {item}. Please contact the developers if you need this "
-            f"feature."
-        )
-        result.append(item)
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return type_anno.items
 
-    return result
+    assert_never(type_anno)
 
 
-def _serializer_name(type_anno: intermediate.ContainerTypeAnnotation) -> Identifier:
+def _serialized_moniker(type_anno: intermediate.TypeAnnotationExceptOptional) -> str:
     """
-    Name the function serializing the list or the tuple ``type_anno``.
+    Name what ``type_anno`` is serialized *as*, at any depth.
 
-    Only a list and a tuple have no function of their own to be named after,
-    so only they are composed out of the serialization of their items. The name
-    follows what those items are serialized *as* and not their types (see
-    :py:func:`_serialized_leaf_moniker`), so one function serves every list,
-    and every tuple, whose items are serialized the same way.
+    The monikers follow the grammar of
+    :py:func:`aas_core_codegen.java.common.type_moniker` over the leaves named by
+    :py:func:`_serialized_leaf_moniker`, so the encoding stays injective.
     """
-    monikers = [
-        _serialized_leaf_moniker(item_type_anno)
-        for item_type_anno in _item_type_annotations(type_anno)
-    ]
-
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        return Identifier(f"serialize{java_common.list_moniker(monikers[0])}")
+        return java_common.list_moniker(_serialized_moniker(type_anno.items))
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         # NOTE (mristin):
         # The items of a set are sorted before they are serialized, and they
         # are sorted each in their own way, so we can not name the serializer
         # after what the items are serialized as.
-        return Identifier(
-            f"serialize{java_common.set_moniker(java_common.set_items_moniker(type_anno.items))}"
+        return java_common.set_moniker(java_common.set_items_moniker(type_anno.items))
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return java_common.tuple_moniker(
+            [
+                _serialized_moniker(item_type_anno)
+                for item_type_anno in _item_type_annotations(type_anno)
+            ]
         )
 
-    return Identifier(f"serialize{java_common.tuple_moniker(monikers)}")
+    return _serialized_leaf_moniker(type_anno)
+
+
+def _serializer_name(type_anno: intermediate.ContainerTypeAnnotation) -> Identifier:
+    """
+    Name the function serializing the list, the set or the tuple ``type_anno``.
+
+    Only a list, a set and a tuple have no function of their own to be named
+    after, so only they are composed out of the serialization of their items.
+    The name follows what those items are serialized *as* and not their types
+    (see :py:func:`_serialized_moniker`), so one function serves every list,
+    and every tuple, whose items are serialized the same way.
+    """
+    return Identifier(f"serialize{_serialized_moniker(type_anno)}")
 
 
 def _container_type(type_anno: intermediate.ContainerTypeAnnotation) -> Stripped:
@@ -2135,17 +2141,23 @@ def _container_type(type_anno: intermediate.ContainerTypeAnnotation) -> Stripped
 
 
 def _serialize_call(
-    type_anno: intermediate.AtomicTypeAnnotation,
+    type_anno: intermediate.TypeAnnotationExceptOptional,
     source_expr: Stripped,
     indentation: int,
 ) -> Stripped:
     """
     Generate the expression converting ``source_expr`` into a JSON node.
 
+    A nested list, set or tuple is converted by its own composed serializer.
+
     ``indentation`` is where the expression starts, so that a call which does
     not fit the line is broken after the opening parenthesis.
     """
-    function = _serialize_function(type_anno)
+    function = (
+        Stripped(_serializer_name(type_anno))
+        if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple)
+        else _serialize_function(type_anno)
+    )
 
     one_liner = Stripped(f"{function}({source_expr})")
     if "\n" not in one_liner and indentation + len(one_liner) <= _MAX_LINE_LENGTH:
@@ -2365,10 +2377,6 @@ def _generate_transform_property(
     serializer: Stripped
 
     if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
-        # NOTE (mristin):
-        # That the items are atomic is asserted in
-        # :py:func:`_item_type_annotations`, which names the offending type,
-        # and through which every use of the items goes.
         serializer = Stripped(_serializer_name(type_anno))
     else:
         serializer = _serialize_function(type_anno)
@@ -2506,15 +2514,20 @@ def _composed_serializer_type_annotations(
 
     for cls in symbol_table.concrete_classes:
         for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                ):
+                    continue
 
-            if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
-                continue
-
-            name = _serializer_name(type_anno)
-            if name not in observed:
-                observed.add(name)
-                result.append(type_anno)
+                name = _serializer_name(type_anno)
+                if name not in observed:
+                    observed.add(name)
+                    result.append(type_anno)
 
     return result
 
@@ -2533,18 +2546,22 @@ def _called_serialize_functions(
     """
     result = set()  # type: Set[Stripped]
 
-    for cls in symbol_table.concrete_classes:
-        for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
+    # NOTE (mristin):
+    # We descend only into the items of the lists, the sets and the tuples. The key
+    # of a ``JSONObject`` is not serialized by a conversion function of its own.
+    stack = [
+        intermediate.beneath_optional(prop.type_annotation)
+        for cls in symbol_table.concrete_classes
+        for prop in cls.properties
+    ]  # type: List[intermediate.TypeAnnotationExceptOptional]
 
-            item_type_annos = (
-                _item_type_annotations(type_anno)
-                if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple)
-                else [type_anno]
-            )
+    while len(stack) > 0:
+        type_anno = stack.pop()
 
-            for item_type_anno in item_type_annos:
-                result.add(_serialize_function(item_type_anno))
+        if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+            stack.extend(_item_type_annotations(type_anno))
+        else:
+            result.add(_serialize_function(type_anno))
 
     return result
 

@@ -581,7 +581,7 @@ def _generate_wrap_expr(
     raise AssertionError(
         f"Unexpected type annotation holding instances: {type_anno}. "
         f"The optionals nested in the containers should have been refused in "
-        f"intermediate._translate._verify_only_simple_type_patterns."
+        f"parse._translate._verify_symbol_table."
     )
 
 
@@ -795,6 +795,16 @@ _Wrapper(
 
                 if isinstance(type_anno, intermediate.SetTypeAnnotation):
                     imports.append(Stripped("import java.util.HashSet;"))
+
+                # NOTE (mristin):
+                # The method spells out the type of the container, so we need to
+                # import the sets nested in it as well.
+                if Stripped("import java.util.Set;") not in imports and any(
+                    isinstance(nested, intermediate.SetTypeAnnotation)
+                    for nested in intermediate.over_type_annotation_and_nested_type_annotations(
+                        type_anno
+                    )
+                ):
                     imports.append(Stripped("import java.util.Set;"))
 
                 body.append(

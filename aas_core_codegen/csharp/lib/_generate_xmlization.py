@@ -1223,17 +1223,6 @@ def _generate_deserialize_property(
     """
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation) and not isinstance(
-        type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-    ):
-        return None, Error(
-            prop.parsed.node,
-            f"(mristin) We only handle the XML de-serialization of lists of "
-            f"atomic values, but you want to generate the code for a list of "
-            f"type {type_anno}. Please contact the developers if you need "
-            f"this feature.",
-        )
-
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
     reader_name = _content_reader_name(type_anno)
 
@@ -2738,17 +2727,6 @@ def _generate_serialize_property(
     :py:func:`_generate_content_writer_fields`).
     """
     type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-    if isinstance(type_anno, intermediate.ListTypeAnnotation) and not isinstance(
-        type_anno.items, intermediate.AtomicTypeAnnotationAsTuple
-    ):
-        return None, Error(
-            prop.parsed.node,
-            f"(mristin) We only handle the XML serialization of lists of "
-            f"atomic values, but you want to generate the code for a list of "
-            f"type {type_anno}. Please contact the developers if you need "
-            f"this feature.",
-        )
 
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(prop.xml_name)

@@ -3,7 +3,7 @@
 import io
 import math
 import re
-from typing import List, Tuple, Optional, Set
+from typing import List, Tuple, Optional
 
 from icontract import ensure, require
 
@@ -754,28 +754,6 @@ def generate_argument_type(
         type_annotation=argument.type_annotation,
         types_namespace=types_namespace,
     )
-
-
-def enumerations_in_set_properties(
-    symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.Enumeration]:
-    """List the enumerations whose literals are held by a set property."""
-    enumeration_id_set = set()  # type: Set[int]
-    for cls in symbol_table.classes:
-        for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
-            if (
-                isinstance(type_anno, intermediate.SetTypeAnnotation)
-                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(type_anno.items.our_type, intermediate.Enumeration)
-            ):
-                enumeration_id_set.add(id(type_anno.items.our_type))
-
-    return [
-        enumeration
-        for enumeration in symbol_table.enumerations
-        if id(enumeration) in enumeration_id_set
-    ]
 
 
 def rank_function_name(enumeration: intermediate.Enumeration) -> Identifier:

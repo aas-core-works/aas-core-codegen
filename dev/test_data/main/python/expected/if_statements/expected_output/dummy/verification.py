@@ -290,7 +290,7 @@ def narrowing_after_the_only_completing_branch(
 
 
 def child_as_have_texts(
-    parents: List[our_types.Parent]
+    parents: Sequence[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing after the ``continue`` and the early return in a loop.
@@ -307,7 +307,7 @@ def child_as_have_texts(
 
 
 def texts_before_container_are_short(
-    parents: List[our_types.Parent]
+    parents: Sequence[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing after the ``continue`` in a loop with a ``break``.
@@ -336,7 +336,7 @@ def text_or_default_is_short(
 
 def last_child_a_is_small(
     parent: our_types.Parent,
-    parents: List[our_types.Parent]
+    parents: Sequence[our_types.Parent]
 ) -> bool:
     """
     Check the narrowing of a variable to a class by the assigned value.

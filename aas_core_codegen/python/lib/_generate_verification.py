@@ -865,7 +865,7 @@ def _generate_verify_into(
         raise AssertionError(
             f"Unexpected type annotation with something to verify: {type_anno}. "
             f"The optionals nested in the containers should have been refused in "
-            f"intermediate._translate._verify_only_simple_type_patterns."
+            f"parse._translate._verify_symbol_table."
         )
 
     for_header = f"for error in {function}({expr})"

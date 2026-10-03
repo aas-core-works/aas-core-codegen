@@ -63,7 +63,7 @@ Error = our_reporting.Error
 
 
 def first_text_is_not_empty(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """Check the for-each with an unconditional early return."""
     # pylint: disable=all
@@ -73,7 +73,7 @@ def first_text_is_not_empty(
 
 
 def no_number_is_zero(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """Check the for-each with an early return in a switch."""
     # pylint: disable=all
@@ -84,7 +84,7 @@ def no_number_is_zero(
 
 
 def no_number_is_minus_one(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """
     Check the for-range with a variable defined in the body of the loop.
@@ -98,7 +98,7 @@ def no_number_is_minus_one(
 
 
 def no_number_after_the_first_is_one(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """Check the for-range which does not start at zero."""
     # pylint: disable=all
@@ -109,7 +109,7 @@ def no_number_after_the_first_is_one(
 
 
 def sum_is_small(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """
     Check the for-each which assigns to a variable defined before the loop.
@@ -122,7 +122,7 @@ def sum_is_small(
 
 
 def no_item_has_an_empty_text(
-    items: List[our_types.Item]
+    items: Sequence[our_types.Item]
 ) -> bool:
     """Check the nested for-each loops."""
     # pylint: disable=all
@@ -135,7 +135,7 @@ def no_item_has_an_empty_text(
 
 
 def is_neither_thirteen_nor_unlucky(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """Check the loop variable re-used in a sibling loop."""
     # pylint: disable=all
@@ -150,7 +150,7 @@ def is_neither_thirteen_nor_unlucky(
 
 def alpha_has_no_negative_numbers(
     kind: our_types.Kind,
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """Check the for-each in a switch branch."""
     # pylint: disable=all
@@ -162,7 +162,7 @@ def alpha_has_no_negative_numbers(
 
 
 def sum_of_odd_numbers_is_small(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """
     Check the for-each with a continue in a switch followed by statements.
@@ -177,7 +177,7 @@ def sum_of_odd_numbers_is_small(
 
 
 def items_are_few_and_texts_expected(
-    items: List[our_types.Item]
+    items: Sequence[our_types.Item]
 ) -> bool:
     """
     Check the continue in all the branches of a switch in a nested for-range.
@@ -198,7 +198,7 @@ def items_are_few_and_texts_expected(
 
 
 def numbers_before_stop_are_few(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """
     Check the for-each with a break in a switch followed by statements.
@@ -213,7 +213,7 @@ def numbers_before_stop_are_few(
 
 
 def weights_before_end_are_small(
-    numbers: List[int]
+    numbers: Sequence[int]
 ) -> bool:
     """
     Check the break in a chain of if and elif which compares a single subject.
@@ -244,7 +244,7 @@ def weights_before_end_are_small(
 
 def texts_before_stop_are_few(
     kind: our_types.Kind,
-    items: List[our_types.Item]
+    items: Sequence[our_types.Item]
 ) -> bool:
     """
     Check the break in the nested branches of a switch in a nested for-range.

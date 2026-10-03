@@ -1,0 +1,33 @@
+{
+  "grid": [
+    [
+      1,
+      "two"
+    ]
+  ],
+  "rowsOfPairs": [
+    [
+      [
+        1,
+        [
+          "known"
+        ]
+      ]
+    ]
+  ],
+  "mixed": [
+    [
+      {
+        "modelType": "SomeItem",
+        "name": "first"
+      }
+    ],
+    [],
+    [
+      0,
+      "c"
+    ]
+  ],
+  "setsOfColors": [],
+  "gridOfUnions": []
+}

@@ -874,7 +874,7 @@ def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
         raise AssertionError(
             f"Unexpected optional to be verified: {type_anno}. The optionals "
             f"nested in the containers should have been refused in "
-            f"intermediate._translate._verify_only_simple_type_patterns."
+            f"parse._translate._verify_symbol_table."
         )
 
     return java_common.leaf_moniker(type_anno)
@@ -944,7 +944,7 @@ def _verify_method(type_anno: intermediate.TypeAnnotationUnion) -> Identifier:
     raise AssertionError(
         f"Unexpected type annotation with something to verify: {type_anno}. "
         f"The optionals nested in the containers should have been refused in "
-        f"intermediate._translate._verify_only_simple_type_patterns."
+        f"parse._translate._verify_symbol_table."
     )
 
 

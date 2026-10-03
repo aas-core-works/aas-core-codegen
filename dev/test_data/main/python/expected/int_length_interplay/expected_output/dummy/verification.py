@@ -63,7 +63,7 @@ Error = our_reporting.Error
 
 
 def count_texts(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> int:
     """Check returning a length as an integer."""
     # pylint: disable=all
@@ -71,7 +71,7 @@ def count_texts(
 
 
 def last_position(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> int:
     """Check returning an arithmetic over a length as an integer."""
     # pylint: disable=all
@@ -79,7 +79,7 @@ def last_position(
 
 
 def no_number_is_seven(
-    numbers: List[int],
+    numbers: Sequence[int],
     count: int
 ) -> bool:
     """
@@ -100,7 +100,7 @@ def no_number_is_seven(
 
 
 def no_seven_from(
-    numbers: List[int],
+    numbers: Sequence[int],
     start: int
 ) -> bool:
     """Check the ranges over the integers with a length as a bound."""
@@ -135,7 +135,7 @@ def fill_texts_from_both_ends(
 
 
 def count_after_reassignment(
-    texts: List[str]
+    texts: Sequence[str]
 ) -> int:
     """
     Check re-assigning a length to an integer and to a length variable.
@@ -150,7 +150,7 @@ def count_after_reassignment(
 
 def set_counts(
     something: our_types.Something,
-    texts: List[str]
+    texts: Sequence[str]
 ) -> bool:
     """
     Check assigning a length to integer properties and to an integer item.

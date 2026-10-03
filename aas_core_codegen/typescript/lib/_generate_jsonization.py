@@ -999,6 +999,76 @@ def _parse_function_for_atomic_value(
     return Stripped(function_name)
 
 
+def _parse_function_reference(
+    type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
+    """
+    Reference the function parsing a value of ``type_anno``.
+
+    A list, a set or a tuple nested in another one has no function of its own to
+    be referenced, so it gets a composed parser named by its moniker, see
+    :py:func:`_generate_composed_parser`. This way, no closure is allocated at
+    the point of the call either.
+    """
+    if isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+        return Stripped(f"parse{typescript_common.type_moniker(type_anno)}")
+
+    return _parse_function_for_atomic_value(type_anno)
+
+
+def _generate_parse_call(
+    type_anno: intermediate.TypeAnnotationExceptOptional, value_expression: Stripped
+) -> Stripped:
+    """Generate the call which de-serializes ``value_expression`` as ``type_anno``."""
+    if isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple):
+        return Stripped(
+            f"""\
+{_parse_function_for_atomic_value(type_anno)}(
+{I}{value_expression}
+)"""
+        )
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+        return Stripped(
+            f"""\
+parseArray(
+{I}{value_expression},
+{I}{_parse_function_reference(type_anno.items)}
+)"""
+        )
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation):
+        return Stripped(
+            f"""\
+parseSet(
+{I}{value_expression},
+{I}{_parse_function_reference(type_anno.items)}
+)"""
+        )
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        item_types_joined = ", ".join(
+            typescript_common.generate_type(
+                item_type_anno, types_module=Identifier("OurTypes")
+            )
+            for item_type_anno in type_anno.items
+        )
+
+        item_parse_functions_joined = ",\n".join(
+            f"{I}{_parse_function_reference(item)}" for item in type_anno.items
+        )
+
+        return Stripped(
+            f"""\
+parseTuple{len(type_anno.items)}<{item_types_joined}>(
+{I}{value_expression},
+{item_parse_functions_joined}
+)"""
+        )
+
+    assert_never(type_anno)
+
+
 def _generate_parse_call_for_property(prop: intermediate.Property) -> Stripped:
     """
     Generate the call which de-serializes the value of ``prop``.
@@ -1052,86 +1122,82 @@ def _generate_parse_call_for_property(prop: intermediate.Property) -> Stripped:
     width here would only make the generator harder to read for no effect on
     the code which is finally compiled.
     """
-    type_anno = intermediate.beneath_optional(prop.type_annotation)
+    return _generate_parse_call(
+        type_anno=intermediate.beneath_optional(prop.type_annotation),
+        value_expression=Stripped("jsonableValue"),
+    )
 
-    if isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple):
-        parse_function = _parse_function_for_atomic_value(type_anno)
 
-        return Stripped(
-            f"""\
-{parse_function}(
-{I}jsonableValue
-)"""
+def _generate_composed_parser(
+    type_anno: intermediate.ContainerTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the function parsing a list, a set or a tuple nested in another one.
+
+    See :py:func:`_parse_function_reference` on why we need it.
+    """
+    value_type = typescript_common.generate_type(
+        type_anno, types_module=Identifier("OurTypes")
+    )
+
+    call = _generate_parse_call(
+        type_anno=type_anno, value_expression=Stripped("jsonable")
+    )
+
+    return Stripped(
+        f"""\
+/**
+ * Parse `jsonable` as a nested collection.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed value, or an error
+ */
+function {_parse_function_reference(type_anno)}(
+{I}jsonable: JsonValue
+): OurCommon.Either<{value_type}, DeserializationError> {{
+{I}return {indent_but_first_line(call, I)};
+}}"""
+    )
+
+
+def _collect_nested_containers(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.ContainerTypeAnnotation]:
+    """
+    List the lists, the sets and the tuples nested in other ones, de-duplicated.
+
+    They are listed in post-order, so that a container comes after the ones
+    nested in it.
+    """
+    result = []  # type: List[intermediate.ContainerTypeAnnotation]
+    observed = set()  # type: Set[str]
+
+    def visit(
+        type_anno: intermediate.TypeAnnotationExceptOptional, nested: bool
+    ) -> None:
+        """Collect the containers nested in ``type_anno``, and itself if ``nested``."""
+        if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
+            return
+
+        items = (
+            type_anno.items
+            if isinstance(type_anno, intermediate.TupleTypeAnnotation)
+            else [type_anno.items]
         )
+        for item in items:
+            visit(item, True)
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "We chose to implement only a very limited pattern matching; "
-            "see intermediate._translate_._verify_only_simple_type_patterns"
-        )
+        if nested:
+            moniker = typescript_common.type_moniker(type_anno)
+            if moniker not in observed:
+                observed.add(moniker)
+                result.append(type_anno)
 
-        parse_item_function = _parse_function_for_atomic_value(type_anno.items)
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            visit(intermediate.beneath_optional(prop.type_annotation), False)
 
-        return Stripped(
-            f"""\
-parseArray(
-{I}jsonableValue,
-{I}{parse_item_function}
-)"""
-        )
-
-    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
-        item_types = []  # type: List[Stripped]
-        item_parse_functions = []  # type: List[str]
-        for item_type_anno in type_anno.items:
-            assert isinstance(
-                item_type_anno, intermediate.AtomicTypeAnnotationAsTuple
-            ), (
-                "Tuple items are restricted to atomic types (primitives, "
-                "constrained primitives, classes and enumerations) by "
-                "intermediate._translate._verify_only_simple_type_patterns, so no "
-                "nested optionals, lists or tuples are expected here."
-            )
-
-            item_types.append(
-                typescript_common.generate_type(
-                    item_type_anno, types_module=Identifier("OurTypes")
-                )
-            )
-            item_parse_functions.append(
-                _parse_function_for_atomic_value(item_type_anno)
-            )
-
-        item_types_joined = ", ".join(item_types)
-        item_parse_functions_joined = ",\n".join(
-            f"{I}{item_parse_function}" for item_parse_function in item_parse_functions
-        )
-
-        return Stripped(
-            f"""\
-parseTuple{len(type_anno.items)}<{item_types_joined}>(
-{I}jsonableValue,
-{item_parse_functions_joined}
-)"""
-        )
-
-    if isinstance(type_anno, intermediate.SetTypeAnnotation):
-        assert isinstance(type_anno.items, intermediate.AtomicTypeAnnotationAsTuple), (
-            "The sets hold only primitives, constrained primitives and enumeration "
-            "literals; see intermediate._translate._verify_items_of_sets"
-        )
-
-        parse_item_function = _parse_function_for_atomic_value(type_anno.items)
-
-        return Stripped(
-            f"""\
-parseSet(
-{I}jsonableValue,
-{I}{parse_item_function}
-)"""
-        )
-
-    assert_never(type_anno)
+    return result
 
 
 def _generate_parse_case(
@@ -1940,6 +2006,51 @@ def _generate_serialize_call(
     assert_never(our_type)
 
 
+def _jsonable_type(type_anno: intermediate.TypeAnnotationExceptOptional) -> Stripped:
+    """Render the JSON-able type which a value of ``type_anno`` becomes, at any depth."""
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
+    ):
+        return Stripped(f"Array<{_jsonable_type(type_anno.items)}>")
+
+    if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+        return Stripped("Array<JsonValue>")
+
+    return _jsonable_type_of_atomic(type_anno)
+
+
+def _generate_serialize_value(
+    access_expression: Stripped, type_anno: intermediate.TypeAnnotationExceptOptional
+) -> Stripped:
+    """Generate the expression serializing ``access_expression`` at any depth."""
+    if isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple):
+        return _generate_serialize_call(access_expression, type_anno)
+
+    if isinstance(type_anno, intermediate.ListTypeAnnotation) and (
+        intermediate.try_primitive_type(type_anno.items)
+        in (intermediate.PrimitiveType.BOOL, intermediate.PrimitiveType.STR)
+    ):
+        # NOTE (mristin):
+        # JSON carries a boolean and a string as they come, so a list of them needs
+        # no serializer of its own: ``Array.from`` already is the whole conversion,
+        # and it copies at the speed of the engine.
+        return Stripped(f"Array.from({access_expression})")
+
+    if isinstance(type_anno, intermediate.SetTypeAnnotation) and (
+        intermediate.try_primitive_type(type_anno.items)
+        in (intermediate.PrimitiveType.BOOL, intermediate.PrimitiveType.STR)
+    ):
+        # NOTE (mristin):
+        # Analogous to the lists above, a set of booleans or of strings needs no
+        # serializer of its own, only the sorting.
+        return typescript_common.generate_sorted_set_items(
+            type_anno=type_anno, set_expression=access_expression
+        )
+
+    function_name = _composed_serialize_function_name(type_anno)
+    return Stripped(f"{function_name}({access_expression})")
+
+
 def _generate_serialize_enumeration(
     enumeration: intermediate.Enumeration,
 ) -> Stripped:
@@ -1997,21 +2108,15 @@ def _generate_serialize_list(type_anno: intermediate.ListTypeAnnotation) -> Stri
     does.
     """
     items_type_anno = type_anno.items
-    assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-        f"(mristin) We generate the JSON serialization code only for "
-        f"the lists of atomic values at the moment, "
-        f"but we got a list of type {type_anno}. "
-        f"Please contact the developers if you need this feature."
-    )
 
     function_name = _composed_serialize_function_name(type_anno)
 
     item_type = typescript_common.generate_type(
         items_type_anno, types_module=Identifier("OurTypes")
     )
-    jsonable_item_type = _jsonable_type_of_atomic(items_type_anno)
+    jsonable_item_type = _jsonable_type(items_type_anno)
 
-    serialize_item = _generate_serialize_call(
+    serialize_item = _generate_serialize_value(
         access_expression=Stripped("that[i]"), type_anno=items_type_anno
     )
 
@@ -2056,23 +2161,19 @@ def _generate_serialize_set(type_anno: intermediate.SetTypeAnnotation) -> Stripp
     in the serialized array, just as for a list.
     """
     items_type_anno = type_anno.items
-    assert isinstance(items_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-        "The sets hold only primitives, constrained primitives and enumeration "
-        "literals; see intermediate._translate._verify_items_of_sets"
-    )
 
     function_name = _composed_serialize_function_name(type_anno)
 
     item_type = typescript_common.generate_type(
         items_type_anno, types_module=Identifier("OurTypes")
     )
-    jsonable_item_type = _jsonable_type_of_atomic(items_type_anno)
+    jsonable_item_type = _jsonable_type(items_type_anno)
 
     sorted_items = typescript_common.generate_sorted_set_items(
         type_anno=type_anno, set_expression=Stripped("that")
     )
 
-    serialize_item = _generate_serialize_call(
+    serialize_item = _generate_serialize_value(
         access_expression=Stripped("items[i]"), type_anno=items_type_anno
     )
 
@@ -2117,15 +2218,7 @@ def _generate_serialize_tuple(type_anno: intermediate.TupleTypeAnnotation) -> St
     The items are written out in order, so the name of the function states what its
     body does, and each item carries a ``try`` under its own position.
     """
-    item_type_annos = []  # type: List[intermediate.AtomicTypeAnnotation]
-    for item_type_anno in type_anno.items:
-        assert isinstance(item_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
-            "Tuple items are restricted to atomic types (primitives, "
-            "constrained primitives, classes and enumerations) by "
-            "intermediate._translate._verify_only_simple_type_patterns, so no "
-            "nested optionals, lists or tuples are expected here."
-        )
-        item_type_annos.append(item_type_anno)
+    item_type_annos = list(type_anno.items)
 
     function_name = _composed_serialize_function_name(type_anno)
 
@@ -2140,7 +2233,7 @@ def _generate_serialize_tuple(type_anno: intermediate.TupleTypeAnnotation) -> St
     for i, item_type_anno in enumerate(item_type_annos):
         statement = Stripped(
             f"result[{i}] = "
-            f"{_generate_serialize_call(Stripped(f'that[{i}]'), item_type_anno)};"
+            f"{_generate_serialize_value(Stripped(f'that[{i}]'), item_type_anno)};"
         )
 
         statements.append(
@@ -2197,38 +2290,7 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
     prop_name = typescript_naming.property_name(prop.name)
     access_expression = Stripped(f"that.{prop_name}")
 
-    value_expression: Stripped
-
-    if isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple):
-        value_expression = _generate_serialize_call(access_expression, type_anno)
-
-    elif isinstance(type_anno, intermediate.ListTypeAnnotation) and (
-        intermediate.try_primitive_type(type_anno.items)
-        in (intermediate.PrimitiveType.BOOL, intermediate.PrimitiveType.STR)
-    ):
-        # NOTE (mristin):
-        # JSON carries a boolean and a string as they come, so a list of them needs
-        # no serializer of its own: ``Array.from`` already is the whole conversion,
-        # and it copies at the speed of the engine.
-        value_expression = Stripped(f"Array.from({access_expression})")
-
-    elif isinstance(type_anno, intermediate.SetTypeAnnotation) and (
-        intermediate.try_primitive_type(type_anno.items)
-        in (intermediate.PrimitiveType.BOOL, intermediate.PrimitiveType.STR)
-    ):
-        # NOTE (mristin):
-        # Analogous to the lists above, a set of booleans or of strings needs no
-        # serializer of its own, only the sorting.
-        value_expression = typescript_common.generate_sorted_set_items(
-            type_anno=type_anno, set_expression=access_expression
-        )
-
-    elif isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
-        function_name = _composed_serialize_function_name(type_anno)
-        value_expression = Stripped(f"{function_name}({access_expression})")
-
-    else:
-        assert_never(type_anno)
+    value_expression = _generate_serialize_value(access_expression, type_anno)
 
     statement = Stripped(
         f"""\
@@ -2440,17 +2502,22 @@ def _collect_composed_type_annotations(
 
     for cls in symbol_table.concrete_classes:
         for prop in cls.properties:
-            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            for (
+                type_anno
+            ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                prop.type_annotation
+            ):
+                if not _needs_composed_serializer(type_anno):
+                    continue
 
-            if not _needs_composed_serializer(type_anno):
-                continue
+                assert isinstance(
+                    type_anno, intermediate.ContainerTypeAnnotationAsTuple
+                )
 
-            assert isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple)
-
-            name = _composed_serialize_function_name(type_anno)
-            if name not in observed:
-                observed.add(name)
-                result.append(type_anno)
+                name = _composed_serialize_function_name(type_anno)
+                if name not in observed:
+                    observed.add(name)
+                    result.append(type_anno)
 
     return result
 
@@ -2869,7 +2936,7 @@ function newDeserializationError<T>(
         _generate_parse_array(),
         *(
             [_generate_parse_set()]
-            if typescript_common.has_set_properties(symbol_table)
+            if intermediate_uses.set_properties(symbol_table)
             else []
         ),
         _generate_bool_from_jsonable(),
@@ -2881,6 +2948,9 @@ function newDeserializationError<T>(
 
     for arity in intermediate.tuple_arities(symbol_table=symbol_table):
         blocks.append(_generate_parse_tuple_helper(arity))
+
+    for nested_type_anno in _collect_nested_containers(symbol_table):
+        blocks.append(_generate_composed_parser(nested_type_anno))
 
     errors = []  # type: List[Error]
 

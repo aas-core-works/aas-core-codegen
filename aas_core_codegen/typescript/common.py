@@ -147,47 +147,6 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
 # region Sorting of the sets
 
 
-def has_set_properties(symbol_table: intermediate.SymbolTable) -> bool:
-    """
-    Check whether a class of the meta-model holds a set in one of its properties.
-
-    The sets in the properties are serialized as sorted arrays, so we generate
-    the helpers for sorting only if there is such a property.
-    """
-    return any(
-        isinstance(
-            intermediate.beneath_optional(prop.type_annotation),
-            intermediate.SetTypeAnnotation,
-        )
-        for cls in symbol_table.classes
-        for prop in cls.properties
-    )
-
-
-def enumerations_in_set_properties(
-    symbol_table: intermediate.SymbolTable,
-) -> List[intermediate.Enumeration]:
-    """
-    List the enumerations whose literals a set in a property holds.
-
-    We generate the ranks of the literals only for these enumerations, see
-    :py:func:`generate_sorted_set_items`.
-    """
-    result = []  # type: List[intermediate.Enumeration]
-    for enumeration in symbol_table.enumerations:
-        if any(
-            isinstance(type_anno, intermediate.SetTypeAnnotation)
-            and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-            and type_anno.items.our_type is enumeration
-            for cls in symbol_table.classes
-            for prop in cls.properties
-            for type_anno in (intermediate.beneath_optional(prop.type_annotation),)
-        ):
-            result.append(enumeration)
-
-    return result
-
-
 def generate_sorted_set_items(
     type_anno: intermediate.SetTypeAnnotation, set_expression: Stripped
 ) -> Stripped:

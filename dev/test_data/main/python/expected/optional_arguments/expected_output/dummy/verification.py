@@ -121,7 +121,7 @@ def item_has_name(
 
 
 def texts_are_few(
-    texts: Optional[List[str]]
+    texts: Optional[Sequence[str]]
 ) -> bool:
     """Check the optional list argument."""
     # pylint: disable=all
