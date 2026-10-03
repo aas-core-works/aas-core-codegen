@@ -42,6 +42,13 @@ public interface IItem extends IClass {
   Boolean isCountWithin(Long limit);
 
   /**
+   * Check that the count is between {@code low} and {@code high}.
+   */
+  Boolean isCountBetween(
+    Long low,
+    Long high);
+
+  /**
    * Check that there are no texts, calling another method on {@code self}.
    */
   Boolean isEmpty();

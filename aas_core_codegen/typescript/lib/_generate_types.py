@@ -1157,7 +1157,7 @@ def _generate_interface(
             arg_codes.append(Stripped(f"{arg_name}: {arg_type}"))
 
         signature_name = typescript_naming.method_name(signature.name)
-        if len(arg_codes) > 2:
+        if len(arg_codes) > 1:
             arg_block = ",\n".join(arg_codes)
             signature_blocks.append(
                 Stripped(

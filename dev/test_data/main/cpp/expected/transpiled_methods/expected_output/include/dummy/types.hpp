@@ -105,6 +105,12 @@ class IItem
     int64_t limit
   ) const = 0;
 
+  /// \brief Check that the count is between \p low and \p high.
+  virtual bool IsCountBetween(
+    int64_t low,
+    int64_t high
+  ) const = 0;
+
   /// \brief Check that there are no texts, calling another method on `self`.
   virtual bool IsEmpty() const = 0;
 
@@ -231,6 +237,11 @@ class First
     int64_t limit
   ) const override;
 
+  bool IsCountBetween(
+    int64_t low,
+    int64_t high
+  ) const override;
+
   bool IsEmpty() const override;
 
   int64_t Parity() const override;
@@ -332,6 +343,11 @@ class Second
 
   bool IsCountWithin(
     int64_t limit
+  ) const override;
+
+  bool IsCountBetween(
+    int64_t low,
+    int64_t high
   ) const override;
 
   bool IsEmpty() const override;

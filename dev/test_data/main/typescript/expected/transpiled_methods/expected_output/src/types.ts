@@ -144,6 +144,14 @@ export interface IItem extends Class {
   isCountWithin(limit: number): boolean;
 
   /**
+   * Check that the count is between `low` and `high`.
+   */
+  isCountBetween(
+    low: number,
+    high: number
+  ): boolean;
+
+  /**
    * Check that there are no texts, calling another method on `self`.
    */
   isEmpty(): boolean;
@@ -249,6 +257,19 @@ export class First
     limit: number
   ): boolean {
     return this.count <= limit;
+  }
+
+  /**
+   * Check that the count is between `low` and `high`.
+   */
+  isCountBetween(
+    low: number,
+    high: number
+  ): boolean {
+    return (
+      low <= this.count
+      && this.count <= high
+    );
   }
 
   /**
@@ -479,6 +500,19 @@ export class Second
     limit: number
   ): boolean {
     return this.count <= limit;
+  }
+
+  /**
+   * Check that the count is between `low` and `high`.
+   */
+  isCountBetween(
+    low: number,
+    high: number
+  ): boolean {
+    return (
+      low <= this.count
+      && this.count <= high
+    );
   }
 
   /**

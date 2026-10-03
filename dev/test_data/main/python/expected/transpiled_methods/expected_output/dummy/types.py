@@ -140,6 +140,21 @@ class Item(Class):
         # pylint: disable=all
         return self.count <= limit
 
+    def is_count_between(
+        self,
+        low: int,
+        high: int
+    ) -> bool:
+        """
+        Check that the count is between :paramref:`low` and :paramref:`high`.
+        """
+        # pylint: disable=all
+        return (
+            (
+                low <= self.count
+                and self.count <= high
+            ))
+
     def is_empty(self) -> bool:
         """
         Check that there are no texts, calling another method on ``self``.

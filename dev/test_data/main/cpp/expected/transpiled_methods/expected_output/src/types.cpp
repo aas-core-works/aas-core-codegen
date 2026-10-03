@@ -96,6 +96,18 @@ bool First::IsCountWithin(
   return this->count() <= limit;
 }
 
+bool First::IsCountBetween(
+  int64_t low,
+  int64_t high
+) const {
+  return (
+    (
+      low <= this->count()
+      && this->count() <= high
+    )
+  );
+}
+
 bool First::IsEmpty() const {
   return (
     (
@@ -254,6 +266,18 @@ bool Second::IsCountWithin(
   int64_t limit
 ) const {
   return this->count() <= limit;
+}
+
+bool Second::IsCountBetween(
+  int64_t low,
+  int64_t high
+) const {
+  return (
+    (
+      low <= this->count()
+      && this->count() <= high
+    )
+  );
 }
 
 bool Second::IsEmpty() const {

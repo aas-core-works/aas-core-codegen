@@ -232,6 +232,74 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...),
         UnderstoodMethod(
+          name='is_count_between',
+          verification=False,
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...),
+            Argument(
+              name='low',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='int',
+                node=...),
+              default=None,
+              node=...),
+            Argument(
+              name='high',
+              type_annotation=AtomicTypeAnnotation(
+                identifier='int',
+                node=...),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='bool',
+            node=...),
+          description=Description(
+            document=...,
+            node=...),
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=And(
+                  values=[
+                    Comparison(
+                      left=Name(
+                        identifier='low',
+                        original_node=...),
+                      op='LE',
+                      right=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      op='LE',
+                      right=Name(
+                        identifier='high',
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                original_node=...)""")],
+          node=...,
+          arguments_by_name=...),
+        UnderstoodMethod(
           name='is_empty',
           verification=False,
           visibility='PUBLIC',

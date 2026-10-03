@@ -89,6 +89,13 @@ namespace dummy
         public bool IsCountWithin(long limit);
 
         /// <summary>
+        /// Check that the count is between <paramref name="low" /> and <paramref name="high" />.
+        /// </summary>
+        public bool IsCountBetween(
+            long low,
+            long high);
+
+        /// <summary>
         /// Check that there are no texts, calling another method on <c>self</c>.
         /// </summary>
         public bool IsEmpty();
@@ -184,6 +191,18 @@ namespace dummy
         )
         {
             return this.Count <= limit;
+        }
+
+        /// <summary>
+        /// Check that the count is between <paramref name="low" /> and <paramref name="high" />.
+        /// </summary>
+        public bool IsCountBetween(
+            long low,
+            long high
+        )
+        {
+            return low <= this.Count
+            && this.Count <= high;
         }
 
         /// <summary>
@@ -403,6 +422,18 @@ namespace dummy
         )
         {
             return this.Count <= limit;
+        }
+
+        /// <summary>
+        /// Check that the count is between <paramref name="low" /> and <paramref name="high" />.
+        /// </summary>
+        public bool IsCountBetween(
+            long low,
+            long high
+        )
+        {
+            return low <= this.Count
+            && this.Count <= high;
         }
 
         /// <summary>
