@@ -66,7 +66,7 @@ func ({receiver} *{struct_name}[E]) {method_name}(){returns_suffix} {{
 }}"""
         )
 
-    arguments_definition = ",".join(
+    arguments_definition = "\n".join(
         f"{arg_name} {arg_type}," for arg_type, arg_name in arg_types_names
     )
 

@@ -627,7 +627,7 @@ def _generate_interface(
             arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
         signature_name = csharp_naming.method_name(method.name)
-        if len(arg_codes) > 2:
+        if len(arg_codes) > 1:
             arg_block = ",\n".join(arg_codes)
             arg_block_indented = textwrap.indent(arg_block, I)
             signature_blocks.append(

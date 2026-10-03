@@ -84,6 +84,17 @@ namespace dummy
                 );
             }
 
+            public bool IsCountBetween(
+                long low,
+                long high
+            )
+            {
+                return _instance.IsCountBetween(
+                    low,
+                    high
+                );
+            }
+
             public bool IsEmpty()
             {
                 return _instance.IsEmpty();
@@ -226,6 +237,17 @@ namespace dummy
             {
                 return _instance.IsCountWithin(
                     limit
+                );
+            }
+
+            public bool IsCountBetween(
+                long low,
+                long high
+            )
+            {
+                return _instance.IsCountBetween(
+                    low,
+                    high
                 );
             }
 

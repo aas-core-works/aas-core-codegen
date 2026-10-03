@@ -155,6 +155,16 @@ class EnhancedFirst
     );
   }
 
+  bool IsCountBetween(
+    int64_t low,
+    int64_t high
+  ) const override {
+    return instance_->IsCountBetween(
+      low,
+      high
+    );
+  }
+
   bool IsEmpty() const override {
     return instance_->IsEmpty();
   }
@@ -307,6 +317,16 @@ class EnhancedSecond
   ) const override {
     return instance_->IsCountWithin(
       limit
+    );
+  }
+
+  bool IsCountBetween(
+    int64_t low,
+    int64_t high
+  ) const override {
+    return instance_->IsCountBetween(
+      low,
+      high
     );
   }
 

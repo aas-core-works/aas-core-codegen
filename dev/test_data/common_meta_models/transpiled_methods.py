@@ -60,6 +60,11 @@ class Item(DBC):
         return self.count <= limit
 
     @non_mutating
+    def is_count_between(self, low: int, high: int) -> bool:
+        """Check that the count is between :paramref:`low` and :paramref:`high`."""
+        return low <= self.count and self.count <= high
+
+    @non_mutating
     def is_empty(self) -> bool:
         """Check that there are no texts, calling another method on ``self``."""
         return len(self.texts) == 0 and self.total_length() == 0

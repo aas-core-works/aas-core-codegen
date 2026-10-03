@@ -118,6 +118,18 @@ public class First implements IFirst {
   }
 
   /**
+   * Check that the count is between {@code low} and {@code high}.
+   */
+  @Override
+  public Boolean isCountBetween(
+    Long low,
+    Long high
+  ) {
+    return low <= this.getCount()
+    && this.getCount() <= high;
+  }
+
+  /**
    * Check that there are no texts, calling another method on {@code self}.
    */
   @Override

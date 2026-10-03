@@ -92,6 +92,16 @@ func (f *enhancedFirst[E]) IsCountWithin(
 	)
 }
 
+func (f *enhancedFirst[E]) IsCountBetween(
+	low int64,
+	high int64,
+) bool {
+	return f.instance.IsCountBetween(
+		low,
+		high,
+	)
+}
+
 func (f *enhancedFirst[E]) IsEmpty() bool {
 	return f.instance.IsEmpty()
 }
@@ -246,6 +256,16 @@ func (s *enhancedSecond[E]) IsCountWithin(
 ) bool {
 	return s.instance.IsCountWithin(
 		limit,
+	)
+}
+
+func (s *enhancedSecond[E]) IsCountBetween(
+	low int64,
+	high int64,
+) bool {
+	return s.instance.IsCountBetween(
+		low,
+		high,
 	)
 }
 

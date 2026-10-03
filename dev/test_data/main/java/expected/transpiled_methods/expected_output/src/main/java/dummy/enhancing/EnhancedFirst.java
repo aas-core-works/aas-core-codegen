@@ -82,6 +82,17 @@ public class EnhancedFirst<EnhancementT>
     );
   }
 
+  public Boolean isCountBetween(
+    Long low,
+    Long high
+  )
+  {
+    return instance.isCountBetween(
+      low,
+      high
+    );
+  }
+
   public Boolean isEmpty() {
     return instance.isEmpty();
   }

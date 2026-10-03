@@ -101,6 +101,12 @@ type IItem interface {
 		limit int64,
 	) bool;
 
+	// Check that the count is between low and high.
+	IsCountBetween(
+		low int64,
+		high int64,
+	) bool;
+
 	// Check that there are no texts, calling another method on `self`.
 	IsEmpty() bool;
 
@@ -172,6 +178,12 @@ type IFirst interface {
 	// Check that the count does not exceed limit.
 	IsCountWithin(
 		limit int64,
+	) bool;
+
+	// Check that the count is between low and high.
+	IsCountBetween(
+		low int64,
+		high int64,
 	) bool;
 
 	// Check that there are no texts, calling another method on `self`.
@@ -297,6 +309,15 @@ func (f *First) IsCountWithin(
 	limit int64,
 ) bool {
 	return f.Count() <= limit
+}
+
+// Check that the count is between low and high.
+func (f *First) IsCountBetween(
+	low int64,
+	high int64,
+) bool {
+	return low <= f.Count() &&
+		f.Count() <= high
 }
 
 // Check that there are no texts, calling another method on `self`.
@@ -443,6 +464,12 @@ type ISecond interface {
 		limit int64,
 	) bool;
 
+	// Check that the count is between low and high.
+	IsCountBetween(
+		low int64,
+		high int64,
+	) bool;
+
 	// Check that there are no texts, calling another method on `self`.
 	IsEmpty() bool;
 
@@ -581,6 +608,15 @@ func (s *Second) IsCountWithin(
 	limit int64,
 ) bool {
 	return s.Count() <= limit
+}
+
+// Check that the count is between low and high.
+func (s *Second) IsCountBetween(
+	low int64,
+	high int64,
+) bool {
+	return low <= s.Count() &&
+		s.Count() <= high
 }
 
 // Check that there are no texts, calling another method on `self`.

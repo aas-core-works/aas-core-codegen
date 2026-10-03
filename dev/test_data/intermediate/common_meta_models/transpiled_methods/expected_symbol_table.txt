@@ -139,6 +139,40 @@ SymbolTable(
             parsed=...,
             arguments_by_name=...),
           Signature(
+            name='is_count_between',
+            arguments=[
+              Argument(
+                name='low',
+                type_annotation=PrimitiveTypeAnnotation(
+                  a_type='INT',
+                  parsed=...),
+                default=None,
+                mutable=False,
+                parsed=...),
+              Argument(
+                name='high',
+                type_annotation=PrimitiveTypeAnnotation(
+                  a_type='INT',
+                  parsed=...),
+                default=None,
+                mutable=False,
+                parsed=...)],
+            returns=PrimitiveTypeAnnotation(
+              a_type='BOOL',
+              parsed=...),
+            description=DescriptionOfSignature(
+              summary='<paragraph>Check that the count is between <ReferenceToArgument refuri="low">low</ReferenceToArgument> and <ReferenceToArgument refuri="high">high</ReferenceToArgument>.</paragraph>',
+              remarks=[],
+              arguments_by_name=[],
+              returns=None,
+              parsed=...),
+            contracts=Contracts(
+              preconditions=[],
+              snapshots=[],
+              postconditions=[]),
+            parsed=...,
+            arguments_by_name=...),
+          Signature(
             name='is_empty',
             arguments=[],
             returns=PrimitiveTypeAnnotation(
@@ -498,6 +532,74 @@ SymbolTable(
                   right=Name(
                     identifier='limit',
                     original_node=...),
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...),
+        UnderstoodMethod(
+          name='is_count_between',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='low',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...),
+            Argument(
+              name='high',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check that the count is between <ReferenceToArgument refuri="low">low</ReferenceToArgument> and <ReferenceToArgument refuri="high">high</ReferenceToArgument>.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to AbstractClass Item',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=And(
+                  values=[
+                    Comparison(
+                      left=Name(
+                        identifier='low',
+                        original_node=...),
+                      op='LE',
+                      right=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      op='LE',
+                      right=Name(
+                        identifier='high',
+                        original_node=...),
+                      original_node=...)],
                   original_node=...),
                 original_node=...)""")],
           arguments_by_name=...),
@@ -1322,6 +1424,74 @@ SymbolTable(
                 original_node=...)""")],
           arguments_by_name=...),
         UnderstoodMethod(
+          name='is_count_between',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='low',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...),
+            Argument(
+              name='high',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check that the count is between <ReferenceToArgument refuri="low">low</ReferenceToArgument> and <ReferenceToArgument refuri="high">high</ReferenceToArgument>.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to AbstractClass Item',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=And(
+                  values=[
+                    Comparison(
+                      left=Name(
+                        identifier='low',
+                        original_node=...),
+                      op='LE',
+                      right=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      op='LE',
+                      right=Name(
+                        identifier='high',
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...),
+        UnderstoodMethod(
           name='is_empty',
           visibility='PUBLIC',
           arguments=[],
@@ -2136,6 +2306,74 @@ SymbolTable(
                   right=Name(
                     identifier='limit',
                     original_node=...),
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...),
+        UnderstoodMethod(
+          name='is_count_between',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='low',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...),
+            Argument(
+              name='high',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check that the count is between <ReferenceToArgument refuri="low">low</ReferenceToArgument> and <ReferenceToArgument refuri="high">high</ReferenceToArgument>.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to AbstractClass Item',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=And(
+                  values=[
+                    Comparison(
+                      left=Name(
+                        identifier='low',
+                        original_node=...),
+                      op='LE',
+                      right=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='count',
+                        original_node=...),
+                      op='LE',
+                      right=Name(
+                        identifier='high',
+                        original_node=...),
+                      original_node=...)],
                   original_node=...),
                 original_node=...)""")],
           arguments_by_name=...),
