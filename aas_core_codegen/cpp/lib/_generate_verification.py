@@ -204,6 +204,12 @@ def generate_header(
         else ""
     )
 
+    unordered_map_include = (
+        "#include <unordered_map>\n"
+        if intermediate_uses.dicts_in(symbol_table.verification_functions)
+        else ""
+    )
+
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
     blocks = [
@@ -222,6 +228,7 @@ def generate_header(
 
 #pragma warning(push, 0)
 #include <set>
+{unordered_map_include}\
 {unordered_set_include}\
 #pragma warning(pop)"""
         ),
@@ -2354,6 +2361,13 @@ class _Analysis:
         ):
             return True
 
+        elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_annotation}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
+
         else:
             assert_never(type_annotation)
 
@@ -2569,6 +2583,13 @@ def _generate_over_expression(
             "EachKey", [expr, f"Shape::{_shape_literal(key_constrained_primitive)}"]
         )
         return cpp_over.generate_call("Chain", [one, each_key])
+
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_annotation}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
 
     else:
         assert_never(type_annotation)

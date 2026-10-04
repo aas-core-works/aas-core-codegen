@@ -174,6 +174,21 @@ def generate_type(
 
         return Stripped(f"Set<{item_type}>"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.DictTypeAnnotation):
+        keys_type, error_message = generate_type(
+            type_annotation=type_annotation.keys, types_module=types_module
+        )
+        if error_message is not None:
+            return None, error_message
+
+        values_type, error_message = generate_type(
+            type_annotation=type_annotation.values, types_module=types_module
+        )
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"Map<{keys_type}, {values_type}>"), None
+
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         item_types = []  # type: List[Stripped]
         for item in type_annotation.items:
@@ -467,6 +482,29 @@ class Transpiler(
             # a negative index from its back.
             return Stripped(f"{collection}[{index}]"), None
 
+        if isinstance(
+            intermediate_type_inference.beneath_optional(collection_type),
+            intermediate_type_inference.DictTypeAnnotation,
+        ):
+            # NOTE (mristin):
+            # Python raises a ``KeyError`` on a missing key, while ``Map.get``
+            # silently gives ``undefined``. See ``mapGetOrThrow`` in the generated
+            # common module.
+            result = Stripped(f"OurCommon.mapGetOrThrow({collection}, {index})")
+            if len(collection) + len(index) < 30:
+                return result, None
+
+            return (
+                Stripped(
+                    f"""\
+OurCommon.mapGetOrThrow(
+{I}{indent_but_first_line(collection, I)},
+{I}{indent_but_first_line(index, I)}
+)"""
+                ),
+                None,
+            )
+
         # NOTE (mristin):
         # Poor man's re-flow
         result = Stripped(f"OurCommon.at({collection}, {index})")
@@ -506,6 +544,58 @@ OurCommon.at(
 
         joined = ", ".join(value_reprs)
         return Stripped(f"[{joined}]"), None
+
+    def transform_dict_literal(
+        self, node: parse_tree.DictLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        dict_type, error_message = generate_type(
+            self.type_map[node], types_module=self._types_module
+        )
+        if error_message is not None:
+            return None, Error(node.original_node, error_message)
+
+        assert dict_type is not None
+
+        errors = []  # type: List[Error]
+        entries = []  # type: List[Stripped]
+
+        for key_node, value_node in zip(node.keys, node.values):
+            key, error = self.transform(key_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            value, error = self.transform(value_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert key is not None
+            assert value is not None
+            entries.append(Stripped(f"[{key}, {value}]"))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the dictionary literal", errors
+            )
+
+        if len(entries) == 0:
+            return Stripped(f"new {dict_type}()"), None
+
+        joined_entries = ", ".join(entries)
+        if "\n" not in joined_entries and len(joined_entries) <= 50:
+            return Stripped(f"new {dict_type}([{joined_entries}])"), None
+
+        entries_joined_with_new_lines = ",\n".join(entries)
+        return (
+            Stripped(
+                f"""\
+new {dict_type}([
+{I}{indent_but_first_line(entries_joined_with_new_lines, I)}
+])"""
+            ),
+            None,
+        )
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_slice(
@@ -628,6 +718,8 @@ OurCommon.at(
         if isinstance(container_type, intermediate_type_inference.ListTypeAnnotation):
             return Stripped(f"{container}.includes({member})"), None
         elif isinstance(container_type, intermediate_type_inference.SetTypeAnnotation):
+            return Stripped(f"{container}.has({member})"), None
+        elif isinstance(container_type, intermediate_type_inference.DictTypeAnnotation):
             return Stripped(f"{container}.has({member})"), None
         elif isinstance(
             container_type, intermediate_type_inference.JsonObjectTypeAnnotation
@@ -858,6 +950,28 @@ OurCommon.at(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_GET:
+                if len(args) == 1:
+                    # NOTE (mristin):
+                    # The values of a dictionary are never ``null`` nor
+                    # ``undefined``, so ``undefined`` stands only for a missing key,
+                    # which we represent as ``null`` as all the other optionals.
+                    return Stripped(f"({instance}.get({args[0]}) ?? null)"), None
+
+                # NOTE (mristin):
+                # See ``mapGetOr`` in the generated common module, which evaluates
+                # the key only once.
+                return (
+                    Stripped(f"OurCommon.mapGetOr({instance}, {args[0]}, {args[1]})"),
+                    None,
+                )
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_POP:
+                # NOTE (mristin):
+                # The ``Map.delete`` ignores a missing key, as ``x.pop(k, None)``
+                # does in Python.
+                return Stripped(f"{instance}.delete({args[0]})"), None
+
             else:
                 assert_never(kind)
 
@@ -933,6 +1047,11 @@ OurCommon.at(
             return Stripped(f"{collection}.length"), None
 
         elif isinstance(collection_type, intermediate_type_inference.SetTypeAnnotation):
+            return Stripped(f"{collection}.size"), None
+
+        elif isinstance(
+            collection_type, intermediate_type_inference.DictTypeAnnotation
+        ):
             return Stripped(f"{collection}.size"), None
 
         elif isinstance(
@@ -1120,6 +1239,18 @@ OurCommon.at(
                     return None, Error(node.original_node, error_message)
 
                 return Stripped(f"new {set_type}()"), None
+
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.DICT
+            ):
+                dict_type, error_message = generate_type(
+                    self.type_map[node], types_module=self._types_module
+                )
+                if error_message is not None:
+                    return None, Error(node.original_node, error_message)
+
+                return Stripped(f"new {dict_type}()"), None
 
             elif (
                 func_type.func.kind
@@ -1628,6 +1759,15 @@ OurCommon.floorMod(
                 assert iteration is not None
                 source = iteration
 
+            # NOTE (mristin):
+            # A ``Map`` iterates over its key-value pairs, while Python iterates
+            # over the keys of a dictionary.
+            if isinstance(
+                self.type_map[node.generator.iteration],
+                intermediate_type_inference.DictTypeAnnotation,
+            ):
+                source = Stripped(f"{source}.keys()")
+
         elif isinstance(node.generator, parse_tree.ForRange):
             assert start is not None
             assert end is not None
@@ -1693,9 +1833,59 @@ OurCommon.range(
                     identifier=node.target.identifier, type_annotation=type_anno
                 )
 
+        if isinstance(node.target, parse_tree.Index) and isinstance(
+            self.type_map[node.target.collection],
+            intermediate_type_inference.DictTypeAnnotation,
+        ):
+            collection, error = self.transform(node.target.collection)
+            if error is not None:
+                errors.append(error)
+
+            key, error = self.transform(node.target.index)
+            if error is not None:
+                errors.append(error)
+
+            if len(errors) > 0:
+                return None, Error(
+                    node.original_node, "Failed to transpile the assignment", errors
+                )
+
+            assert collection is not None
+            assert key is not None
+            assert value is not None
+
+            if not isinstance(
+                node.target.collection,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                collection = Stripped(f"({collection})")
+
+            # NOTE (mristin):
+            # Poor man's re-flow
+            if "\n" not in value and len(collection) + len(key) + len(value) < 50:
+                return Stripped(f"{collection}.set({key}, {value});"), None
+
+            return (
+                Stripped(
+                    f"""\
+{collection}.set(
+{I}{indent_but_first_line(key, I)},
+{I}{indent_but_first_line(value, I)}
+);"""
+                ),
+                None,
+            )
+
         if isinstance(node.target, parse_tree.Index):
             # NOTE (mristin):
-            # The type inference allows only the items of a list as index targets.
+            # The type inference allows only the items of a list or of a dictionary
+            # as index targets. The dictionaries are handled above.
             # We can not assign to ``OurCommon.at``, while the plain assignment
             # would not resolve the negative indices, and would silently grow
             # the array on an out-of-bound index.
@@ -1943,22 +2133,101 @@ return (
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        variable_name = node.generator.variable.identifier
-        variable = typescript_naming.variable_name(variable_name)
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
 
         header: Optional[str] = None
         if isinstance(node.generator, parse_tree.ForEach):
+            variable = typescript_naming.variable_name(
+                node.generator.variable.identifier
+            )
+
             iteration, error = self.transform(node.generator.iteration)
             if error is not None:
                 errors.append(error)
             else:
                 assert iteration is not None
+
+                # NOTE (mristin):
+                # A ``Map`` iterates over its key-value pairs, while Python iterates
+                # over the keys of a dictionary.
+                if isinstance(
+                    self.type_map[node.generator.iteration],
+                    intermediate_type_inference.DictTypeAnnotation,
+                ):
+                    if not isinstance(
+                        node.generator.iteration,
+                        (
+                            parse_tree.Member,
+                            parse_tree.FunctionCall,
+                            parse_tree.MethodCall,
+                            parse_tree.Name,
+                            parse_tree.Index,
+                        ),
+                    ):
+                        iteration = Stripped(f"({iteration})")
+
+                    iteration = Stripped(f"{iteration}.keys()")
+
                 header = (
                     f"for (const {variable} of "
                     f"{indent_but_first_line(iteration, I)})"
                 )
 
+        elif isinstance(node.generator, parse_tree.ForEachItem):
+            key = typescript_naming.variable_name(node.generator.key.identifier)
+            value = typescript_naming.variable_name(node.generator.value.identifier)
+
+            mapping, error = self.transform(node.generator.mapping)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert mapping is not None
+
+                # NOTE (mristin):
+                # ESLint refuses the unused variables, so we iterate only over
+                # the keys or only over the values if the body uses only one of
+                # them.
+                used_name_set = {
+                    some_node.identifier
+                    for stmt in node.body
+                    for some_node in parse_tree.over_nodes(stmt)
+                    if isinstance(some_node, parse_tree.Name)
+                }
+                key_used = node.generator.key.identifier in used_name_set
+                value_used = node.generator.value.identifier in used_name_set
+
+                if not isinstance(
+                    node.generator.mapping,
+                    (
+                        parse_tree.Member,
+                        parse_tree.FunctionCall,
+                        parse_tree.MethodCall,
+                        parse_tree.Name,
+                        parse_tree.Index,
+                    ),
+                ):
+                    mapping = Stripped(f"({mapping})")
+
+                mapping_text = indent_but_first_line(mapping, I)
+
+                if key_used and value_used:
+                    header = f"for (const [{key}, {value}] of {mapping_text})"
+                elif key_used:
+                    header = f"for (const {key} of {mapping_text}.keys())"
+                elif value_used:
+                    header = f"for (const {value} of {mapping_text}.values())"
+                else:
+                    header = f"for (const _{key} of {mapping_text}.keys())"
+
         elif isinstance(node.generator, parse_tree.ForRange):
+            variable = typescript_naming.variable_name(
+                node.generator.variable.identifier
+            )
+
             start, error = self.transform(node.generator.start)
             if error is not None:
                 errors.append(error)
@@ -1992,17 +2261,18 @@ for (
         assert header is not None
 
         # NOTE (mristin):
-        # The loop variable is scoped to the loop, so we define it in its own
+        # The loop variables are scoped to the loop, so we define them in their own
         # environment enclosing the body.
         parent_environment = self._environment
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(
-            identifier=variable_name,
-            type_annotation=self.type_map[node.generator.variable],
-        )
-        self._variable_name_set.add(variable_name)
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self.type_map[loop_variable],
+            )
+            self._variable_name_set.add(loop_variable.identifier)
 
         self._environment = loop_environment
         try:

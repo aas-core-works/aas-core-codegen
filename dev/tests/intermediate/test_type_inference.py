@@ -1424,10 +1424,10 @@ __xml_namespace__ = "https://dummy.com"
         self.expect_type_inference_to_fail(
             source=source,
             expected_joined_message=(
-                "Expected the argument of ``len`` to be a string, "
-                "a bytearray, a list, a set, a tuple, a JSONArray or a JSONObject, "
-                "since we know how to compute the length only of these types "
-                "in all the target languages, but got: int"
+                "Expected the argument of ``len`` to be a string, a bytearray, a "
+                "list, a set, a dictionary, a tuple, a JSONArray or a JSONObject, "
+                "since we know how to compute the length only of these types in "
+                "all the target languages, but got: int"
             ),
         )
 
@@ -2067,8 +2067,8 @@ def some_func(item: Item) -> bool:
     return True"""
             ),
             expected_joined_message=(
-                "Expected the target of an assignment to be a variable, "
-                "a property of a class or an item of a list, but got: Slice"
+                "Expected the target of an assignment to be a variable, a property "
+                "of a class or an item of a list or of a dictionary, but got: Slice"
             ),
         )
 
@@ -2432,11 +2432,11 @@ def some_func(lists: List[List[str]]) -> bool:
             ),
             expected_joined_message=(
                 "We can not copy the list of type List[List[str]] with "
-                "``list(...)``, since its items hold lists or sets themselves. "
-                "Python copies the list shallowly, so that the copy shares "
-                "the inner lists and sets, while C++ copies them as well. We do "
-                "not support deep copies at the moment. Please contact "
-                "the developers if you need this feature."
+                "``list(...)``, since its items hold lists, sets or dictionaries "
+                "themselves. Python copies the list shallowly, so that the copy "
+                "shares the inner collections, while C++ copies them as well. We "
+                "do not support deep copies at the moment. Please contact the "
+                "developers if you need this feature."
             ),
         )
 
@@ -4429,14 +4429,15 @@ def some_func(number: int) -> bool:
             body="""\
 @verification
 def some_func(texts: Sequence[str]) -> bool:
-    x: Mapping[str, str] = texts
+    x: Iterable[str] = texts
     return True
 """,
             expected_message=(
                 "We support only ``Optional[...]``, ``List[...]``, "
-                "``Sequence[...]``, ``Set[...]`` and ``Tuple[...]`` as generic "
+                "``Sequence[...]``, ``Set[...]``, ``AbstractSet[...]``, "
+                "``Dict[...]``, ``Mapping[...]`` and ``Tuple[...]`` as generic "
                 "types in the type annotations of the variables, but got: "
-                "Mapping[...]"
+                "Iterable[...]"
             ),
         )
 
@@ -5127,13 +5128,13 @@ def some_func(text: str) -> bool:
 """,
             expected_message=(
                 "We support a set only as the container of ``in``, the collection "
-                "or the variable of a for-loop, the receiver of its methods, "
-                "an argument of a call, "
-                "the target of an assignment, the value of a nullness check, "
-                "the returned value, and a new set or the result of a call as "
-                "the assigned value. Elsewhere, the targets would need "
-                "to either copy or share the set, and they disagree on that: C++ "
-                "copies it, while the other targets share it."
+                "or the variable of a for-loop, the receiver of its methods, an "
+                "argument of a call, the target of an assignment, the value of a "
+                "nullness check, the returned value, and a new set or the result "
+                "of a call as the assigned value or as a value of a dictionary "
+                "literal. Elsewhere, the targets would need to either copy or "
+                "share the set, and they disagree on that: C++ copies it, while "
+                "the other targets share it."
             ),
         )
 
@@ -5366,6 +5367,660 @@ def some_func(text: str) -> Tuple[str, int]:
             expected_message=(
                 "Expected the returned value to be assignable to the return type "
                 "Tuple[str, int], but got Tuple[str, length]."
+            ),
+        )
+
+
+_DICT_PRELUDE: Final[
+    str
+] = """\
+class Kind(Enum):
+    Alpha = "alpha"
+    Beta = "beta"
+
+
+class Item(DBC):
+    name: str
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+
+@verification
+def is_counted(text: str, counts: Mapping[str, int]) -> bool:
+    return text in counts
+
+
+"""
+
+
+class Test_dict(unittest.TestCase):
+    def expect_type_inference_to_fail(self, body: str, expected_message: str) -> None:
+        """Expect the type inference of the verification functions to fail."""
+        source = _DICT_PRELUDE + body + _ANNOTATED_ASSIGNMENT_EPILOGUE
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        base_environment = intermediate_type_inference.populate_base_environment(
+            symbol_table=symbol_table
+        )
+
+        messages = []  # type: List[str]
+        for verification in symbol_table.verification_functions:
+            assert isinstance(verification, intermediate.TranspilableVerification)
+
+            # fmt: off
+            _, inference_error = (
+                intermediate_type_inference.infer_for_verification(
+                    verification=verification,
+                    base_environment=base_environment
+                )
+            )
+            # fmt: on
+
+            if inference_error is not None:
+                messages.append(
+                    tests.common.most_underlying_messages([inference_error])
+                )
+
+        self.assertEqual(expected_message, "\n".join(messages), source)
+
+    def test_dict_without_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts = {}
+    return True
+""",
+            expected_message=(
+                "We support ``dict()``, ``{}`` and a dictionary literal only as "
+                "the value assigned to a variable declared as a dictionary, "
+                "*e.g.*, ``x: Dict[str, int] = {}``, since the targets need to "
+                "know the type of the keys and of the values of the new dictionary."
+            ),
+        )
+
+    def test_dict_call_without_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts = dict()
+    return True
+""",
+            expected_message=(
+                "We support ``dict()``, ``{}`` and a dictionary literal only as "
+                "the value assigned to a variable declared as a dictionary, "
+                "*e.g.*, ``x: Dict[str, int] = {}``, since the targets need to "
+                "know the type of the keys and of the values of the new dictionary."
+            ),
+        )
+
+    def test_dict_call_with_arguments_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Dict[str, int] = dict(texts)
+    return True
+""",
+            expected_message=(
+                "We support only ``dict()`` without arguments to create a new "
+                "dictionary, but got 1 argument(s). Please use a dictionary "
+                "literal, *e.g.*, ``{'a': 1, 'b': 2}``, instead."
+            ),
+        )
+
+    def test_dict_literal_assigned_to_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: List[str] = {}
+    return True
+""",
+            expected_message=(
+                "We support ``dict()``, ``{}`` and a dictionary literal only as "
+                "the value assigned to a variable declared as a dictionary, "
+                "*e.g.*, ``x: Dict[str, int] = {}``, since the targets need to "
+                "know the type of the keys and of the values of the new "
+                "dictionary. The target is of type List[str]."
+            ),
+        )
+
+    def test_dict_literal_returned_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> Dict[str, int]:
+    return {}
+""",
+            expected_message=(
+                "We support ``dict()``, ``{}`` and a dictionary literal only as "
+                "the value assigned to a variable declared as a dictionary, "
+                "*e.g.*, ``x: Dict[str, int] = {}``, since the targets need to "
+                "know the type of the keys and of the values of the new dictionary."
+            ),
+        )
+
+    def test_key_computed_at_run_time_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Dict[str, int] = {texts[0]: 1}
+    return True
+""",
+            expected_message=(
+                "We support only the literal constants and the enumeration "
+                "literals as the keys of a dictionary literal, but got: texts[0]. "
+                "Python keeps the last value if the keys collide, while a C++ "
+                "initializer list keeps the first one, and Java's "
+                "``Map.ofEntries`` throws. We can not tell whether the keys "
+                "computed at run time collide, so please assign such keys one by "
+                "one, *e.g.*, ``x[k] = v``."
+            ),
+        )
+
+    def test_duplicate_key_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Dict[str, int] = {"a": 1, "b": 2, "a": 3}
+    return True
+""",
+            expected_message=(
+                "The key 'a' is duplicated in the dictionary literal. Python keeps "
+                "the last value of the duplicate keys, while a C++ initializer "
+                "list keeps the first one, and Java's ``Map.ofEntries`` throws. "
+                "Please list each key only once."
+            ),
+        )
+
+    def test_duplicate_enumeration_literal_key_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Dict[Kind, int] = {Kind.Alpha: 1, Kind.Alpha: 2}
+    return True
+""",
+            expected_message=(
+                "The key Kind.Alpha is duplicated in the dictionary literal. "
+                "Python keeps the last value of the duplicate keys, while a C++ "
+                "initializer list keeps the first one, and Java's "
+                "``Map.ofEntries`` throws. Please list each key only once."
+            ),
+        )
+
+    def test_key_of_wrong_type_in_literal_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Dict[str, int] = {1: 1}
+    return True
+""",
+            expected_message=(
+                "Expected the key to be of the type of the keys of the dictionary "
+                "Dict[str, int], but got: int"
+            ),
+        )
+
+    def test_value_of_wrong_type_in_literal_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Dict[str, int] = {"a": "b"}
+    return True
+""",
+            expected_message=(
+                "Expected the value to be assignable to the values of the "
+                "dictionary Dict[str, int], but got: str"
+            ),
+        )
+
+    def test_list_in_literal_not_copied_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(numbers: List[int]) -> bool:
+    lists: Dict[str, List[int]] = {"a": numbers}
+    return True
+""",
+            expected_message=(
+                "The value of the key 'a' in the dictionary literal holds lists, "
+                "sets or dictionaries, which Python would share, but C++ would "
+                "copy. We can not transpile the sharing to C++, so please use "
+                "explicit copies of them, *e.g.*, a list copied with ``list(...)``."
+            ),
+        )
+
+    def test_read_only_instance_in_literal_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(item: Item) -> bool:
+    items: Dict[str, Item] = {"a": item}
+    return True
+""",
+            expected_message=(
+                "The value of the key 'a' would become mutable through the new "
+                "dictionary, so it needs to be mutable itself, but the argument "
+                "'item' is read-only. Please declare it as Mutable[...] if the "
+                "function mutates it."
+            ),
+        )
+
+    def test_boolean_keys_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    flags: Dict[bool, int] = {}
+    return True
+""",
+            expected_message=(
+                "We do not support the dictionaries with boolean keys, but got the "
+                "keys of type bool. Python considers ``True`` and ``1`` to be the "
+                "same key, while the other targets do not, and a dictionary of two "
+                "keys is better written as two variables."
+            ),
+        )
+
+    def test_float_keys_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    flags: Dict[float, int] = {}
+    return True
+""",
+            expected_message=(
+                "We do not support the dictionaries with floating-point keys, but "
+                "got the keys of type float. The targets disagree on the equality "
+                "of NaN and of 0.0 and -0.0 as keys, and on how to write such a "
+                "key in JSON."
+            ),
+        )
+
+    def test_class_keys_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    flags: Dict[Item, int] = {}
+    return True
+""",
+            expected_message=(
+                "We support only the strings, the integers, the constrained "
+                "primitives of them and the enumeration literals as the keys of a "
+                "dictionary, but got the keys of type Item, which is a class. "
+                "Please contact the developers if you need the instances as keys."
+            ),
+        )
+
+    def test_list_keys_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    flags: Dict[List[int], int] = {}
+    return True
+""",
+            expected_message=(
+                "We do not support the lists, the sets or the dictionaries as the "
+                "keys of a dictionary, but got the keys of type List[int]. They "
+                "are mutable and hence unhashable in Python."
+            ),
+        )
+
+    def test_optional_values_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    flags: Dict[str, Optional[int]] = {}
+    return True
+""",
+            expected_message=(
+                "We support Optional only at the top of a type annotation, so the "
+                "values of a dictionary can not be optional, but got: Dict[str, "
+                "Optional[int]]"
+            ),
+        )
+
+    def test_final_dict_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Final[Dict[str, int]] = {}
+    return True
+""",
+            expected_message=(
+                "A variable declared as ``Final[...]`` is immutable, but "
+                "``Dict[...]`` is mutable. Please declare it as ``Mapping[...]`` "
+                "instead."
+            ),
+        )
+
+    def test_mapping_variable_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Mapping[str, int] = {}
+    return True
+""",
+            expected_message=(
+                "We do not support declaring a variable as a ``Mapping[...]``, "
+                "since it would share a dictionary with another variable, and the "
+                "targets disagree on that: C++ copies the dictionary, while the "
+                "other targets share it. Please declare a new dictionary as "
+                "``Dict[...]`` and initialize it with ``dict()``, ``{}`` or a "
+                "dictionary literal."
+            ),
+        )
+
+    def test_pop_without_default_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Dict[str, int]) -> bool:
+    counts.pop("a")
+    return True
+""",
+            expected_message=(
+                "We support ``pop`` only as ``x.pop(k, None)``, which removes the "
+                "key and does nothing if the key is missing. Python raises a "
+                "``KeyError`` on a missing key without the default ``None``, while "
+                "the other targets silently ignore it."
+            ),
+        )
+
+    def test_pop_with_non_none_default_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Dict[str, int]) -> bool:
+    counts.pop("a", 0)
+    return True
+""",
+            expected_message=(
+                "We support ``pop`` only as ``x.pop(k, None)``, which removes the "
+                "key and does nothing if the key is missing, but got the default: "
+                "0. The targets do not return the removed value, and Python raises "
+                "a ``KeyError`` on a missing key without the default, while the "
+                "other targets silently ignore it."
+            ),
+        )
+
+    def test_pop_on_mapping_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    counts.pop("a", None)
+    return True
+""",
+            expected_message=(
+                "The ``pop`` mutates the dictionary, but the argument 'counts' is "
+                "declared as a Mapping, which is read-only. Please declare it as a "
+                "Dict if the function mutates it."
+            ),
+        )
+
+    def test_pop_as_expression_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Dict[str, int]) -> bool:
+    result = counts.pop("a", None)
+    return True
+""",
+            expected_message=(
+                "The ``pop`` of a dictionary returns nothing in the targets, so it "
+                "can only be called as a statement on its own.\n"
+                "We can not infer the type of the variable 'result' from ``None``. "
+                "Please declare the variable with a type annotation, *e.g.*, "
+                "``result: Optional[...] = None``."
+            ),
+        )
+
+    def test_pop_with_key_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Dict[str, int]) -> bool:
+    counts.pop(1, None)
+    return True
+""",
+            expected_message=(
+                "Expected the key of ``pop`` to be of the type of the keys of the "
+                "dictionary Dict[str, int], but got: int"
+            ),
+        )
+
+    def test_item_set_on_mapping_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    counts["a"] = 1
+    return True
+""",
+            expected_message=(
+                "We can not assign to an item of the dictionary of counts, since "
+                "the argument 'counts' is declared as a Mapping, which is "
+                "read-only. Please declare it as a Dict if the function mutates it."
+            ),
+        )
+
+    def test_item_set_on_final_mapping_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    counts: Final[Mapping[str, int]] = {}
+    counts["a"] = 1
+    return True
+""",
+            expected_message=(
+                "We can not assign to an item of the dictionary of counts, since "
+                "the variable 'counts' is declared as ``Final[...]``."
+            ),
+        )
+
+    def test_item_set_in_loop_over_keys_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Dict[str, int]) -> bool:
+    for text in counts:
+        counts[text] = 0
+    return True
+""",
+            expected_message=(
+                "The dictionary counts can not be mutated in the for-loop over it, "
+                "since the targets disagree on that: Python and Java throw an "
+                "exception, the behavior is undefined in C++, while Go and "
+                "TypeScript carry on."
+            ),
+        )
+
+    def test_pop_in_loop_over_items_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Dict[str, int]) -> bool:
+    for text, count in counts.items():
+        counts.pop(text, None)
+    return True
+""",
+            expected_message=(
+                "The dictionary counts can not be mutated in the for-loop over it, "
+                "since the targets disagree on that: Python and Java throw an "
+                "exception, the behavior is undefined in C++, while Go and "
+                "TypeScript carry on."
+            ),
+        )
+
+    def test_aliasing_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    other = counts
+    return True
+""",
+            expected_message=(
+                "We support a dictionary only as the container of ``in``, the "
+                "collection or the variable of a for-loop, the receiver of its "
+                "methods, an indexed collection, an argument of a call, the target "
+                "of an assignment, the value of a nullness check, the returned "
+                "value, and a new dictionary or the result of a call as the "
+                "assigned value or as a value of a dictionary literal. Elsewhere, "
+                "the targets would need to either copy or share the dictionary, "
+                "and they disagree on that: C++ copies it, while the other targets "
+                "share it."
+            ),
+        )
+
+    def test_items_outside_of_loop_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    items = counts.items()
+    return True
+""",
+            expected_message=(
+                "We support ``items()`` of a dictionary only in a for-loop "
+                "statement, ``for k, v in x.items()``. Otherwise, we support only "
+                "the following methods on dictionaries: 'get', 'pop'"
+            ),
+        )
+
+    def test_unsupported_method_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    keys = counts.keys()
+    return True
+""",
+            expected_message=(
+                "The member 'keys' is not supported on dictionaries; we support "
+                "only the following methods: 'get', 'pop'"
+            ),
+        )
+
+    def test_get_with_default_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    count = counts.get("a", "b")
+    return True
+""",
+            expected_message=(
+                "Expected the default of ``get`` to be assignable to the values of "
+                "the dictionary Dict[str, int], but got: str"
+            ),
+        )
+
+    def test_get_with_none_default_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    count = counts.get("a", None)
+    return True
+""",
+            expected_message=(
+                "Expected the default of ``get`` to be assignable to the values of "
+                "the dictionary Dict[str, int], but got: None. Please call ``get`` "
+                "without the default to get ``None`` on a missing key."
+            ),
+        )
+
+    def test_get_with_key_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    count = counts.get(1)
+    return True
+""",
+            expected_message=(
+                "Expected the key of ``get`` to be of the type of the keys of the "
+                "dictionary Dict[str, int], but got: int"
+            ),
+        )
+
+    def test_index_with_key_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    count = counts[1]
+    return True
+""",
+            expected_message=(
+                "Expected the key to be of the type of the keys of the dictionary "
+                "Dict[str, int], but got: int"
+            ),
+        )
+
+    def test_in_with_key_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    found = 1 in counts
+    return True
+""",
+            expected_message=(
+                "Expected the member to be of the type of the keys of the "
+                "dictionary Dict[str, int], but got: int"
+            ),
+        )
+
+    def test_same_key_and_value_variable_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, int]) -> bool:
+    for text, text in counts.items():
+        pass
+    return True
+""",
+            expected_message=(
+                "The key and the value of the iteration over the items of a "
+                "dictionary must be two different variables, but got 'text' for "
+                "both"
+            ),
+        )
+
+    def test_dict_of_other_values_passed_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(counts: Mapping[str, str]) -> bool:
+    found = is_counted("a", counts)
+    return True
+""",
+            expected_message=(
+                "The argument 'counts' of the verification function 'is_counted' "
+                "is of type Dict[str, int], but got: Dict[str, str]"
             ),
         )
 
@@ -5654,10 +6309,11 @@ def some_func(text: str, number: int) -> bool:
 def some_func(lists: Sequence[Sequence[str]], texts: Sequence[str]) -> bool:
     return texts in lists""",
             expected_joined_message=(
-                "We do not support looking up a list, a tuple or a set with "
-                "``in``, but the member is inferred to be List[str]. The targets "
-                "disagree on the comparison: Python compares the items item by "
-                "item, while C#, Java and TypeScript compare their references."
+                "We do not support looking up a list, a tuple, a set or a "
+                "dictionary with ``in``, but the member is inferred to be "
+                "List[str]. The targets disagree on the comparison: Python "
+                "compares the items item by item, while C#, Java and TypeScript "
+                "compare their references."
             ),
         )
 
@@ -5670,11 +6326,11 @@ def some_func(item: Mutable[Item]) -> bool:
     return True""",
             expected_joined_message=(
                 "We can not copy the list of type List[Set[str]] with "
-                "``list(...)``, since its items hold lists or sets themselves. "
-                "Python copies the list shallowly, so that the copy shares "
-                "the inner lists and sets, while C++ copies them as well. We do "
-                "not support deep copies at the moment. Please contact "
-                "the developers if you need this feature."
+                "``list(...)``, since its items hold lists, sets or dictionaries "
+                "themselves. Python copies the list shallowly, so that the copy "
+                "shares the inner collections, while C++ copies them as well. We "
+                "do not support deep copies at the moment. Please contact the "
+                "developers if you need this feature."
             ),
         )
 
@@ -5686,14 +6342,13 @@ def some_func(item: Mutable[Item], other: Item) -> bool:
     item.pair = other.pair
     return True""",
             expected_joined_message=(
-                "The value assigned to the property 'pair' of item holds lists or "
-                "sets, "
-                "which Python would share, but C++ would copy. We can not "
-                "transpile the sharing to C++, so please assign explicit copies "
-                "of them, *e.g.*, a tuple literal of the lists copied with "
-                "``list(...)``. We do not support deep copies of the nested lists and "
-                "sets at the moment. Please contact the developers if you need "
-                "this feature."
+                "The value assigned to the property 'pair' of item holds lists, "
+                "sets or dictionaries, which Python would share, but C++ would "
+                "copy. We can not transpile the sharing to C++, so please assign "
+                "explicit copies of them, *e.g.*, a tuple literal of the lists "
+                "copied with ``list(...)``. We do not support deep copies of the "
+                "nested lists, sets and dictionaries at the moment. Please contact "
+                "the developers if you need this feature."
             ),
         )
 

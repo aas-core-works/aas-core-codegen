@@ -608,6 +608,34 @@ def generate_type(
 
         return Stripped(f"Set[{item_type}]")
 
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        keys_type = generate_type(
+            type_annotation=type_annotation.keys,
+            types_module=types_module,
+            read_only=read_only,
+        )
+        values_type = generate_type(
+            type_annotation=type_annotation.values,
+            types_module=types_module,
+            read_only=read_only,
+        )
+
+        generic = "Mapping" if read_only else "Dict"
+
+        if "\n" not in keys_type and "\n" not in values_type:
+            return Stripped(f"{generic}[{keys_type}, {values_type}]")
+
+        # NOTE (mristin):
+        # The values are already broken over multiple lines, so we follow
+        # the same bracket-per-line style as for the tuples.
+        return Stripped(
+            f"""\
+{generic}[
+{INDENT}{indent_but_first_line(keys_type, INDENT)},
+{INDENT}{indent_but_first_line(values_type, INDENT)},
+]"""
+        )
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(
@@ -699,8 +727,9 @@ def generate_argument_type(
     """
     Generate the type of the ``argument``.
 
-    The mutability of an argument is deep, so we generate the lists and the sets
-    of a read-only argument as ``Sequence``'s and ``AbstractSet``'s at any depth.
+    The mutability of an argument is deep, so we generate the lists, the sets and
+    the dictionaries of a read-only argument as ``Sequence``'s, ``AbstractSet``'s
+    and ``Mapping``'s at any depth.
     This way, the read-only values, such as the constant sets, can be passed to it,
     and mypy refuses to mutate the argument, just as the type inference does.
     """
@@ -763,6 +792,62 @@ def typing_imports_for_sets(
 
     if uses_set:
         result.append(Identifier("Set"))
+
+    return result
+
+
+def typing_imports_for_dicts(
+    functions: Sequence[Union[intermediate.Verification, intermediate.Method]]
+) -> List[Identifier]:
+    """
+    List the generic types from ``typing`` needed by the dictionaries in ``functions``.
+
+    We need ``Mapping`` for the read-only dictionary arguments and the final local
+    dictionaries, and ``Dict`` for the mutable dictionary arguments, the dictionary
+    return values and for the declarations of the other local dictionaries. We list
+    them only if needed so that the imports are never unused.
+    """
+    uses_mapping = False
+    uses_dict = False
+
+    for function in functions:
+        for argument in function.arguments:
+            if any(
+                isinstance(type_anno, intermediate.DictTypeAnnotation)
+                for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+                    argument.type_annotation
+                )
+            ):
+                if argument.mutable:
+                    uses_dict = True
+                else:
+                    uses_mapping = True
+
+        if function.returns is not None and any(
+            isinstance(type_anno, intermediate.DictTypeAnnotation)
+            for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+                function.returns
+            )
+        ):
+            uses_dict = True
+
+        # NOTE (mristin):
+        # A local dictionary is declared either as ``Dict[...]``, or as
+        # ``Final[Mapping[...]]``, and we spell it out the same.
+        for annotation in intermediate.local_declaration_annotations(function):
+            for node in parse_tree.over_nodes(annotation):
+                if isinstance(node, parse_tree.Name):
+                    if node.identifier == "Dict":
+                        uses_dict = True
+                    elif node.identifier == "Mapping":
+                        uses_mapping = True
+
+    result = []  # type: List[Identifier]
+    if uses_dict:
+        result.append(Identifier("Dict"))
+
+    if uses_mapping:
+        result.append(Identifier("Mapping"))
 
     return result
 

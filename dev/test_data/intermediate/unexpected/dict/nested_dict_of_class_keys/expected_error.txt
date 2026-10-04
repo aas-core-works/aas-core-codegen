@@ -1,0 +1,1 @@
+In the argument 'counts' of the verification function 'some_func': We support only the strings, the integers, the constrained primitives of them and the enumeration literals as the keys of a dictionary, but got the keys of type Item, which is a class. Please contact the developers if you need the instances as keys.

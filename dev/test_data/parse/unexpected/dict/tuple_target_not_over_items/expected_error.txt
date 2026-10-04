@@ -1,0 +1,1 @@
+We support unpacking the loop variables of a for-loop only over the items of a dictionary, ``for k, v in x.items()``, but got: ``for text, count in counts``

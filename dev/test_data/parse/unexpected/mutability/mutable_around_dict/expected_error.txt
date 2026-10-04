@@ -1,0 +1,1 @@
+The type annotation Mutable[Dict[str, int]] is redundant, since a Dict already declares a mutable dictionary. Please declare it as Dict[str, int] without Mutable, or as Mapping[str, int] if the function does not mutate the dictionary.

@@ -993,6 +993,13 @@ def _value_to_type_element_or_type_identifier(
 
             return _TypeElementOrTypeIdentifier(element=xs_complex_type), None
 
+        elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_annotation}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
+
         else:
             # noinspection PyTypeChecker
             assert_never(type_annotation)

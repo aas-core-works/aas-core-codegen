@@ -202,13 +202,20 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         if last_error is not None:
             return last_error
 
+        member_type = self._type_map[node.member]
         if isinstance(
-            self._type_map[node.member],
+            member_type,
             intermediate_type_inference.BuiltinMethodTypeAnnotation,
         ):
             # NOTE (mristin):
-            # The built-in methods on strings never return an optional.
-            self.is_optional_map[node] = False
+            # The built-in methods never return an optional, except for ``get``
+            # of a dictionary without a default, which gives ``None`` on
+            # a missing key.
+            self.is_optional_map[node] = (
+                member_type.method.kind
+                is intermediate_type_inference.BuiltinMethodKind.DICT_GET
+                and len(node.args) == 1
+            )
             return None
 
         instance_type_anno = intermediate_type_inference.beneath_optional(
@@ -312,6 +319,25 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
             # using :py:prop:`errors`.
             if error is not None:
                 last_error = error
+
+        if last_error is not None:
+            return last_error
+
+        self.is_optional_map[node] = False
+        return None
+
+    def transform_dict_literal(self, node: parse_tree.DictLiteral) -> Optional[Error]:
+        last_error = None  # type: Optional[Error]
+        for key, value in zip(node.keys, node.values):
+            for child in (key, value):
+                error = self.transform(child)
+
+                # NOTE (mristin):
+                # Do not immediately return so that other items are processed as
+                # well. This way we get a longer list of errors which the caller can
+                # report using :py:prop:`errors`.
+                if error is not None:
+                    last_error = error
 
         if last_error is not None:
             return last_error
@@ -513,6 +539,29 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         self.is_optional_map[node] = False
         return None
 
+    def transform_for_each_item(self, node: parse_tree.ForEachItem) -> Optional[Error]:
+        error: Optional[Error]
+
+        for variable in (node.key, node.value):
+            if self._environment.find(variable.identifier) is not None:
+                error = Error(
+                    variable.original_node,
+                    f"The variable {variable.identifier} "
+                    f"has been already defined before",
+                )
+                self.errors.append(error)
+                return error
+
+        error = self.transform(node.mapping)
+        if error is not None:
+            return error
+
+        self.is_optional_map[node.key] = False
+        self.is_optional_map[node.value] = False
+
+        self.is_optional_map[node] = False
+        return None
+
     def transform_for_range(self, node: parse_tree.ForRange) -> Optional[Error]:
         # noinspection PyUnusedLocal
         error = None  # type: Optional[Error]
@@ -704,16 +753,23 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
             return error
 
         # NOTE (mristin):
-        # The loop variable is scoped to the loop, so we define it in its own
+        # The loop variables are scoped to the loop, so we define them in their own
         # environment enclosing the body.
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
+
         parent_environment = self._environment
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(
-            identifier=node.generator.variable.identifier,
-            type_annotation=self._type_map[node.generator.variable],
-        )
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self._type_map[loop_variable],
+            )
 
         self._environment = loop_environment
         try:

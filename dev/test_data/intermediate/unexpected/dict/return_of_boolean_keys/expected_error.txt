@@ -1,0 +1,1 @@
+In the return value of the verification function 'some_func': We do not support the dictionaries with boolean keys, but got the keys of type bool. Python considers ``True`` and ``1`` to be the same key, while the other targets do not, and a dictionary of two keys is better written as two variables.

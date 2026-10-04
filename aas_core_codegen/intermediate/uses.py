@@ -264,6 +264,54 @@ def sets(symbol_table: _types.SymbolTable) -> bool:
     return sets_in(functions)
 
 
+def _nested_dicts(
+    type_annotation: _types.TypeAnnotationUnion,
+) -> Iterator[_types.DictTypeAnnotation]:
+    """Iterate over the dictionaries in ``type_annotation`` at any depth."""
+    for type_anno in _types.over_type_annotation_and_nested_type_annotations(
+        type_annotation
+    ):
+        if isinstance(type_anno, _types.DictTypeAnnotation):
+            yield type_anno
+
+
+def dicts_in(functions: Sequence[Union[_types.Verification, _types.Method]]) -> bool:
+    """
+    Check whether the ``functions`` take, return or declare local dictionaries.
+
+    The C++ generator uses this check to include ``<unordered_map>`` only where
+    it is needed.
+    """
+    return any(
+        any(
+            any(True for _ in _nested_dicts(argument.type_annotation))
+            for argument in function.arguments
+        )
+        or (
+            function.returns is not None
+            and any(True for _ in _nested_dicts(function.returns))
+        )
+        or _types.declares_local_dict(function)
+        for function in functions
+    )
+
+
+def dicts(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model might use the dictionaries in transpilable code.
+
+    The dictionaries are the dictionary arguments, the dictionary return values and
+    the local dictionaries. The generators use this function to decide whether they
+    need to generate the helper functions for the dictionaries.
+    """
+    functions = [
+        *symbol_table.verification_functions,
+        *(method for cls in symbol_table.classes for method in cls.methods),
+    ]  # type: List[Union[_types.Verification, _types.Method]]
+
+    return dicts_in(functions)
+
+
 def set_operations(symbol_table: _types.SymbolTable) -> bool:
     """
     Check whether the meta-model computes an intersection or a difference of sets.
@@ -413,6 +461,65 @@ def sets_of_enumeration_literals(symbol_table: _types.SymbolTable) -> bool:
                     and isinstance(node.index, parse_tree.Name)
                     and isinstance(
                         symbol_table.find_our_type(node.index.identifier),
+                        _types.Enumeration,
+                    )
+                ):
+                    return True
+
+    return False
+
+
+def _holds_dict_with_enumeration_keys(
+    type_annotation: _types.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether ``type_annotation`` holds a dictionary keyed by enumeration
+    literals at any depth.
+    """
+    return any(
+        isinstance(dict_type_anno.keys, _types.OurTypeAnnotation)
+        and isinstance(dict_type_anno.keys.our_type, _types.Enumeration)
+        for dict_type_anno in _nested_dicts(type_annotation)
+    )
+
+
+def dicts_with_enumeration_keys(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether the meta-model uses a dictionary keyed by enumeration literals.
+
+    The dictionaries are the dictionary arguments, the dictionary return values
+    and the local dictionaries. We do not have the types of the local
+    dictionaries at hand here, so we resolve the keys of ``Dict[...]`` and
+    ``Mapping[...]`` in the annotations of the local declarations.
+    """
+    functions = [
+        *symbol_table.verification_functions,
+        *(method for cls in symbol_table.classes for method in cls.methods),
+    ]  # type: List[Union[_types.Verification, _types.Method]]
+
+    for function in functions:
+        if any(
+            _holds_dict_with_enumeration_keys(argument.type_annotation)
+            for argument in function.arguments
+        ):
+            return True
+
+        if function.returns is not None and _holds_dict_with_enumeration_keys(
+            function.returns
+        ):
+            return True
+
+        for annotation in _types.local_declaration_annotations(function):
+            for node in parse_tree.over_nodes(annotation):
+                if (
+                    isinstance(node, parse_tree.Index)
+                    and isinstance(node.collection, parse_tree.Name)
+                    and node.collection.identifier in ("Dict", "Mapping")
+                    and isinstance(node.index, parse_tree.Tuple)
+                    and len(node.index.values) == 2
+                    and isinstance(node.index.values[0], parse_tree.Name)
+                    and isinstance(
+                        symbol_table.find_our_type(node.index.values[0].identifier),
                         _types.Enumeration,
                     )
                 ):

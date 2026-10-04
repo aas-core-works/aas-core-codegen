@@ -566,6 +566,13 @@ for item in that:
             )
         )
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -1969,6 +1976,12 @@ def generate(
         set_imports.append(Identifier("Set"))
 
     typing_imports.extend(set_imports)
+
+    typing_imports.extend(
+        name
+        for name in python_common.typing_imports_for_dicts(specified_methods)
+        if name not in typing_imports
+    )
 
     # NOTE (mristin):
     # We spell out the final local lists as ``Final[Sequence[...]]``, and the lists

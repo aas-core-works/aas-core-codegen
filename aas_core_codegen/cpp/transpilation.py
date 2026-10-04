@@ -253,6 +253,36 @@ std::tuple<
             None,
         )
 
+    elif isinstance(type_annotation, intermediate_type_inference.DictTypeAnnotation):
+        keys_type, error_msg = generate_type(
+            type_annotation=type_annotation.keys, types_namespace=types_namespace
+        )
+        if error_msg is not None:
+            return None, error_msg
+
+        assert keys_type is not None
+
+        values_type, error_msg = generate_type(
+            type_annotation=type_annotation.values, types_namespace=types_namespace
+        )
+        if error_msg is not None:
+            return None, error_msg
+
+        assert values_type is not None
+
+        keys_are_enumeration_literals = isinstance(
+            type_annotation.keys, intermediate_type_inference.OurTypeAnnotation
+        ) and isinstance(type_annotation.keys.our_type, intermediate.Enumeration)
+
+        return (
+            cpp_common.generate_dict_type(
+                keys_type=keys_type,
+                values_type=values_type,
+                keys_are_enumeration_literals=keys_are_enumeration_literals,
+            ),
+            None,
+        )
+
     else:
         return None, (
             f"(mristin): We do not handle "
@@ -304,6 +334,9 @@ def determine_whether_referencable(
         return True, None
 
     elif isinstance(type_annotation, intermediate_type_inference.SetTypeAnnotation):
+        return True, None
+
+    elif isinstance(type_annotation, intermediate_type_inference.DictTypeAnnotation):
         return True, None
 
     elif isinstance(
@@ -554,6 +587,69 @@ class Transpiler(
 
         return Stripped(f"{collection}.at({index})"), None
 
+    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
+        """
+        Convert the transpiled position ``node`` to an ``int64_t``.
+
+        The string helpers take the positions as ``int64_t``'s, our integers,
+        while the lengths are ``size_t``'s.
+        """
+        type_anno = self.type_map[node]
+        if (
+            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
+            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            return Stripped(f"static_cast<int64_t>({code})")
+
+        return code
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_key_access(
+        self, collection: Stripped, key_node: parse_tree.Expression, inserts: bool
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Access the value of the dictionary ``collection`` at ``key_node``.
+
+        If ``inserts`` is set, we access the value with ``operator[]`` so that
+        an assignment inserts the missing key. Otherwise, we access it with
+        ``at``, which throws on a missing key, as Python raises a ``KeyError``.
+        """
+        key, error = self._transform_and_value_if_necessary(key_node)
+        if error is not None:
+            return None, error
+        assert key is not None
+
+        # NOTE (mristin):
+        # The lengths are ``size_t``'s, so we convert them to our integers.
+        key = self._as_int64_position(key_node, key)
+
+        if inserts:
+            if "\n" in key:
+                return (
+                    Stripped(
+                        f"""\
+{collection}[
+{I}{indent_but_first_line(key, I)}
+]"""
+                    ),
+                    None,
+                )
+
+            return Stripped(f"{collection}[{key}]"), None
+
+        if "\n" in key:
+            return (
+                Stripped(
+                    f"""\
+{collection}.at(
+{I}{indent_but_first_line(key, I)}
+)"""
+                ),
+                None,
+            )
+
+        return Stripped(f"{collection}.at({key})"), None
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_mutable_path(
         self, node: parse_tree.Expression, dereference: bool
@@ -607,6 +703,14 @@ class Transpiler(
                     index_value += len(collection_type.items)
 
                 code = Stripped(f"std::get<{index_value}>({collection})")
+            elif isinstance(
+                collection_type, intermediate_type_inference.DictTypeAnnotation
+            ):
+                code, error = self._transform_key_access(
+                    collection=collection, key_node=node.index, inserts=False
+                )
+                if error is not None:
+                    return None, error
             else:
                 code, error = self._transform_item_access(
                     collection=collection, index_node=node.index
@@ -617,7 +721,8 @@ class Transpiler(
         else:
             return None, Error(
                 node.original_node,
-                f"Expected a variable, a property or an item of a list as a path "
+                f"Expected a variable, a property or an item of a list or of "
+                f"a dictionary as a path "
                 f"to be mutated, but got: {parse_tree.dump(node)}; this should have "
                 f"been caught in the type inference.",
             )
@@ -906,7 +1011,85 @@ class Transpiler(
                 None,
             )
 
+        if isinstance(
+            intermediate_type_inference.beneath_optional(collection_type),
+            intermediate_type_inference.DictTypeAnnotation,
+        ):
+            return self._transform_key_access(
+                collection=collection, key_node=node.index, inserts=False
+            )
+
         return self._transform_item_access(collection=collection, index_node=node.index)
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_dict_literal(
+        self, node: parse_tree.DictLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        dict_type, error_msg = generate_type(
+            type_annotation=self.type_map[node], types_namespace=self._types_namespace
+        )
+        if error_msg is not None:
+            return None, Error(node.original_node, error_msg)
+
+        assert dict_type is not None
+
+        errors = []  # type: List[Error]
+        items = []  # type: List[Stripped]
+        for key_node, value_node in zip(node.keys, node.values):
+            key, error = self._transform_and_value_if_necessary(key_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            value, error = self._transform_and_value_if_necessary(value_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert key is not None
+            assert value is not None
+
+            # NOTE (mristin):
+            # The lengths are ``size_t``'s, which C++ refuses to narrow to our
+            # integers in the brace initialization.
+            key = self._as_int64_position(key_node, key)
+            value = self._as_int64_position(value_node, value)
+
+            if "\n" not in key and "\n" not in value:
+                items.append(Stripped(f"{{{key}, {value}}}"))
+            else:
+                items.append(
+                    Stripped(
+                        f"""\
+{{
+{I}{indent_but_first_line(key, I)},
+{I}{indent_but_first_line(value, I)}
+}}"""
+                    )
+                )
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the dictionary literal", errors
+            )
+
+        if len(items) == 0:
+            return Stripped(f"{dict_type}()"), None
+
+        # NOTE (mristin):
+        # The type inference guarantees that the keys are distinct constants, as
+        # the initializer list keeps the first of the duplicate keys, while Python
+        # keeps the last one.
+        items_joined = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+{dict_type}{{
+{I}{indent_but_first_line(items_joined, I)}
+}}"""
+            ),
+            None,
+        )
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_tuple(
@@ -1023,22 +1206,6 @@ std::make_tuple(
 
         return Stripped(f"({left}) {comparator} ({right})"), None
 
-    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
-        """
-        Convert the transpiled position ``node`` to an ``int64_t``.
-
-        The string helpers take the positions as ``int64_t``'s, our integers,
-        while the lengths are ``size_t``'s.
-        """
-        type_anno = self.type_map[node]
-        if (
-            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
-            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
-        ):
-            return Stripped(f"static_cast<int64_t>({code})")
-
-        return code
-
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(
         self, node: parse_tree.IsIn
@@ -1104,9 +1271,15 @@ std::make_tuple(
             )
 
         # NOTE (mristin):
-        # We look up the member in a set in constant time, while
-        # ``common::Contains`` iterates over all the items.
-        if isinstance(container_type, intermediate_type_inference.SetTypeAnnotation):
+        # We look up the member in a set, or the key in a dictionary, in constant
+        # time, while ``common::Contains`` iterates over all the items.
+        if isinstance(
+            container_type,
+            (
+                intermediate_type_inference.SetTypeAnnotation,
+                intermediate_type_inference.DictTypeAnnotation,
+            ),
+        ):
             member = self._as_int64_position(node.member, member)
 
             if not isinstance(node.container, parse_tree.Name):
@@ -1227,9 +1400,9 @@ common::{contains_function}(
             None,
         )
 
-    def _is_set_membership(self, node: parse_tree.Node) -> bool:
+    def _is_set_or_dict_membership(self, node: parse_tree.Node) -> bool:
         """
-        Check whether ``node`` is a membership in a set.
+        Check whether ``node`` is a membership in a set or among the keys of a dict.
 
         We transpile it as a comparison, ``find(...) != end()``, so it needs
         parentheses under a negation, unlike the other memberships, which we
@@ -1237,7 +1410,10 @@ common::{contains_function}(
         """
         return isinstance(node, parse_tree.IsIn) and isinstance(
             self.type_map[node.container],
-            intermediate_type_inference.SetTypeAnnotation,
+            (
+                intermediate_type_inference.SetTypeAnnotation,
+                intermediate_type_inference.DictTypeAnnotation,
+            ),
         )
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1277,7 +1453,7 @@ common::{contains_function}(
 
         if isinstance(
             node.antecedent, no_parentheses_types_in_this_context
-        ) and not self._is_set_membership(node.antecedent):
+        ) and not self._is_set_or_dict_membership(node.antecedent):
             not_antecedent = f"!{antecedent}"
         else:
             not_antecedent = f"!({antecedent})"
@@ -1427,6 +1603,50 @@ common::{function_name}(
                 None,
             )
 
+        elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_GET:
+            # NOTE (mristin):
+            # See ``GetOrNone`` and ``GetOr`` in the generated common module, which
+            # return the value by copy, so that we never refer to a temporary
+            # default value.
+            key = self._as_int64_position(node.args[0], args[0])
+
+            if len(args) == 1:
+                return (
+                    Stripped(
+                        f"""\
+common::GetOrNone(
+{I}{indent_but_first_line(instance, I)},
+{I}{indent_but_first_line(key, I)}
+)"""
+                    ),
+                    None,
+                )
+
+            default = self._as_int64_position(node.args[1], args[1])
+
+            return (
+                Stripped(
+                    f"""\
+common::GetOr(
+{I}{indent_but_first_line(instance, I)},
+{I}{indent_but_first_line(key, I)},
+{I}{indent_but_first_line(default, I)}
+)"""
+                ),
+                None,
+            )
+
+        elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_POP:
+            # NOTE (mristin):
+            # The ``erase`` does nothing if the key is missing, as
+            # ``x.pop(k, None)`` in Python.
+            key = self._as_int64_position(node.args[0], args[0])
+
+            if not isinstance(node.member.instance, parse_tree.Name):
+                instance = Stripped(f"({instance})")
+
+            return Stripped(f"{instance}.erase({key})"), None
+
         else:
             assert_never(kind)
 
@@ -1450,6 +1670,7 @@ common::{function_name}(
                 (
                     intermediate_type_inference.ListTypeAnnotation,
                     intermediate_type_inference.SetTypeAnnotation,
+                    intermediate_type_inference.DictTypeAnnotation,
                 ),
             ):
                 mutable_arg_set.add(arg_node)
@@ -1761,6 +1982,19 @@ common::{function_name}(
                 assert set_type is not None
                 return Stripped(f"{set_type}()"), None
 
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.DICT
+            ):
+                dict_type, error_msg = generate_type(
+                    self.type_map[node], types_namespace=self._types_namespace
+                )
+                if error_msg is not None:
+                    return None, Error(node.original_node, error_msg)
+
+                assert dict_type is not None
+                return Stripped(f"{dict_type}()"), None
+
             else:
                 assert_never(func_type.func.kind)
         else:
@@ -1874,7 +2108,7 @@ common::{function_name}(
         )
         if not isinstance(
             node.operand, no_parentheses_types_in_this_context
-        ) or self._is_set_membership(node.operand):
+        ) or self._is_set_or_dict_membership(node.operand):
             return Stripped(f"!({operand})"), None
         else:
             return Stripped(f"!{operand}"), None
@@ -2382,11 +2616,24 @@ common::{concat}(
         if isinstance(node.generator, parse_tree.ForEach):
             assert iteration is not None
 
+            # NOTE (mristin):
+            # We iterate over the keys of a dictionary, as Python does.
+            over_keys = isinstance(
+                intermediate_type_inference.beneath_optional(
+                    self.type_map[node.generator.iteration]
+                ),
+                intermediate_type_inference.DictTypeAnnotation,
+            )
+
             qualifier_function: str
             if isinstance(node, parse_tree.Any):
-                qualifier_function = cpp_naming.function_name(Identifier("Some"))
+                qualifier_function = cpp_naming.function_name(
+                    Identifier("Some_key" if over_keys else "Some")
+                )
             elif isinstance(node, parse_tree.All):
-                qualifier_function = cpp_naming.function_name(Identifier("All"))
+                qualifier_function = cpp_naming.function_name(
+                    Identifier("All_keys" if over_keys else "All")
+                )
             else:
                 assert_never(node)
 
@@ -2523,8 +2770,8 @@ common::{qualifier_function}<{variable_type_cpp}>(
 
         elif isinstance(node.target, parse_tree.Index):
             # NOTE (mristin):
-            # The type inference allows only the items of a list as index targets,
-            # which we access on the mutable list.
+            # The type inference allows only the items of a list or of a dictionary
+            # as index targets, which we access on the mutable collection.
             collection, error = self._transform_mutable_path(
                 node.target.collection, dereference=True
             )
@@ -2532,9 +2779,25 @@ common::{qualifier_function}<{variable_type_cpp}>(
                 errors.append(error)
             else:
                 assert collection is not None
-                target, error = self._transform_item_access(
-                    collection=collection, index_node=node.target.index
-                )
+
+                if isinstance(
+                    intermediate_type_inference.beneath_optional(
+                        self.type_map[node.target.collection]
+                    ),
+                    intermediate_type_inference.DictTypeAnnotation,
+                ):
+                    # NOTE (mristin):
+                    # The assignment inserts the key if it is missing, as in Python.
+                    target, error = self._transform_key_access(
+                        collection=collection,
+                        key_node=node.target.index,
+                        inserts=True,
+                    )
+                else:
+                    target, error = self._transform_item_access(
+                        collection=collection, index_node=node.target.index
+                    )
+
                 if error is not None:
                     errors.append(error)
 
@@ -2999,19 +3262,184 @@ return (
 
         return Stripped(writer.getvalue()), None
 
+    def _transform_for_over_dict(
+        self,
+        mapping: parse_tree.Expression,
+        key: parse_tree.Name,
+        value: Optional[parse_tree.Name],
+        declaration: cpp_aliasing.Declaration,
+        body: Sequence[parse_tree.StatementUnion],
+    ) -> Tuple[Optional[str], List[Stripped], Optional[Error]]:
+        """
+        Transpile the header of a for-loop over the ``mapping``.
+
+        If ``value`` is None, we iterate over the keys only. The ``declaration``
+        specifies how to declare the value.
+
+        Return the header, and the bindings of the key and the value to be put at
+        the start of the ``body``. We bind only the variables which the ``body``
+        uses, as MSVC refuses the unused local variables with ``/W4 /WX``.
+        """
+        used_identifier_set = {
+            some_node.identifier
+            for stmt in body
+            for some_node in parse_tree.over_nodes(stmt)
+            if isinstance(some_node, parse_tree.Name)
+        }
+        key_name_cpp = cpp_naming.variable_name(key.identifier)
+        pair_name_cpp = cpp_naming.variable_name(
+            Identifier(
+                f"{key.identifier}_and_value"
+                if value is None
+                else f"{key.identifier}_and_{value.identifier}"
+            )
+        )
+
+        key_type_annotation = self.type_map[key]
+        key_type_cpp, error_msg = generate_type(
+            type_annotation=key_type_annotation, types_namespace=self._types_namespace
+        )
+        if error_msg is not None:
+            return None, [], Error(key.original_node, error_msg)
+
+        assert key_type_cpp is not None
+
+        # NOTE (mristin):
+        # The keys are never mutated, and a key stays in its place as long as we do
+        # not remove it, which the type inference refuses in the loop.
+        bindings = []  # type: List[Stripped]
+        if key.identifier in used_identifier_set:
+            bindings.append(
+                Stripped(
+                    f"const {key_type_cpp} {key_name_cpp} = {pair_name_cpp}.first;"
+                    if _is_cheap_to_copy(key_type_annotation)
+                    else f"const {key_type_cpp}& {key_name_cpp} = "
+                    f"{pair_name_cpp}.first;"
+                )
+            )
+
+        if value is not None and value.identifier in used_identifier_set:
+            value_name_cpp = cpp_naming.variable_name(value.identifier)
+            value_type_annotation = self.type_map[value]
+
+            value_type_cpp, error_msg = generate_type(
+                type_annotation=value_type_annotation,
+                types_namespace=self._types_namespace,
+            )
+            if error_msg is not None:
+                return None, [], Error(value.original_node, error_msg)
+
+            assert value_type_cpp is not None
+
+            if declaration is cpp_aliasing.Declaration.DEFAULT:
+                # NOTE (mristin):
+                # We refer to the values by constant reference to avoid the copies,
+                # except for the arithmetic values and the enumerations which are
+                # cheap to copy.
+                if _is_cheap_to_copy(value_type_annotation):
+                    value_type_cpp = Stripped(f"const {value_type_cpp}")
+                else:
+                    value_type_cpp = Stripped(f"const {value_type_cpp}&")
+            elif declaration is cpp_aliasing.Declaration.COPY:
+                pass
+            elif declaration is cpp_aliasing.Declaration.CONST_REF:
+                value_type_cpp = Stripped(f"const {value_type_cpp}&")
+            elif declaration is cpp_aliasing.Declaration.MUT_REF:
+                value_type_cpp = Stripped(f"{value_type_cpp}&")
+            else:
+                assert_never(declaration)
+
+            bindings.append(
+                Stripped(f"{value_type_cpp} {value_name_cpp} = {pair_name_cpp}.second;")
+            )
+
+        iteration: Optional[Stripped]
+        if declaration is cpp_aliasing.Declaration.MUT_REF:
+            # NOTE (mristin):
+            # The values are mutated through the loop variable, so we need to
+            # iterate over the mutable dictionary.
+            iteration, error = self._transform_mutable_path(mapping, dereference=True)
+            pair_type = "auto&"
+        else:
+            iteration, error = self._transform_and_value_if_necessary(mapping)
+            pair_type = "const auto&"
+
+        if error is not None:
+            return None, [], error
+
+        assert iteration is not None
+
+        if "\n" not in iteration:
+            return (
+                f"for ({pair_type} {pair_name_cpp} : {iteration})",
+                bindings,
+                None,
+            )
+
+        return (
+            f"""\
+for (
+{I}{pair_type} {pair_name_cpp} :
+{I}{indent_but_first_line(iteration, I)}
+)""",
+            bindings,
+            None,
+        )
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_for(
         self, node: parse_tree.For
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        variable_name = node.generator.variable.identifier
-        variable_type_annotation = self.type_map[node.generator.variable]
-
-        variable_name_cpp = cpp_naming.variable_name(variable_name)
-
         header: Optional[str] = None
-        if isinstance(node.generator, parse_tree.ForEach):
+
+        # NOTE (mristin):
+        # We bind the keys and the values of the dictionaries at the start of
+        # the body, as C++11 knows no structured bindings.
+        bindings = []  # type: List[Stripped]
+
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
+
+        if isinstance(node.generator, parse_tree.ForEach) and isinstance(
+            intermediate_type_inference.beneath_optional(
+                self.type_map[node.generator.iteration]
+            ),
+            intermediate_type_inference.DictTypeAnnotation,
+        ):
+            # NOTE (mristin):
+            # We iterate over the keys of a dictionary, as Python does.
+            header, bindings, error = self._transform_for_over_dict(
+                mapping=node.generator.iteration,
+                key=node.generator.variable,
+                value=None,
+                declaration=cpp_aliasing.Declaration.DEFAULT,
+                body=node.body,
+            )
+            if error is not None:
+                errors.append(error)
+
+        elif isinstance(node.generator, parse_tree.ForEachItem):
+            header, bindings, error = self._transform_for_over_dict(
+                mapping=node.generator.mapping,
+                key=node.generator.key,
+                value=node.generator.value,
+                declaration=self._declaration(node.generator),
+                body=node.body,
+            )
+            if error is not None:
+                errors.append(error)
+
+        elif isinstance(node.generator, parse_tree.ForEach):
+            variable_name_cpp = cpp_naming.variable_name(
+                node.generator.variable.identifier
+            )
+            variable_type_annotation = self.type_map[node.generator.variable]
+
             variable_type_cpp, error_msg = generate_type(
                 type_annotation=variable_type_annotation,
                 types_namespace=self._types_namespace,
@@ -3065,6 +3493,11 @@ for (
 )"""
 
         elif isinstance(node.generator, parse_tree.ForRange):
+            variable_name_cpp = cpp_naming.variable_name(
+                node.generator.variable.identifier
+            )
+            variable_type_annotation = self.type_map[node.generator.variable]
+
             variable_type_cpp, error_msg = generate_type(
                 type_annotation=variable_type_annotation,
                 types_namespace=self._types_namespace,
@@ -3118,16 +3551,18 @@ for (
         assert header is not None
 
         # NOTE (mristin):
-        # The loop variable is scoped to the loop, so we define it in its own
+        # The loop variables are scoped to the loop, so we define them in their own
         # environment enclosing the body.
         parent_environment = self._environment
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(
-            identifier=variable_name, type_annotation=variable_type_annotation
-        )
-        self._variable_name_set.add(variable_name)
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self.type_map[loop_variable],
+            )
+            self._variable_name_set.add(loop_variable.identifier)
 
         self._environment = loop_environment
         try:
@@ -3143,7 +3578,7 @@ for (
         assert stmts_and_defines is not None
         stmts, _ = stmts_and_defines
 
-        return Stripped(f"{header} {Transpiler._block(stmts)}"), None
+        return Stripped(f"{header} {Transpiler._block(bindings + stmts)}"), None
 
     def transform_continue(
         self, node: parse_tree.Continue

@@ -275,12 +275,21 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
             self.is_pointer_map[node] = False
             return None
 
+        if isinstance(
+            collection_type_anno, intermediate_type_inference.DictTypeAnnotation
+        ):
+            # NOTE (mristin):
+            # The values of a dictionary are never optional, and a missing key
+            # panics, see ``MapMustGet`` in the common package.
+            self.is_pointer_map[node] = is_pointer_type(collection_type_anno.values)
+            return None
+
         if not isinstance(
             collection_type_anno, intermediate_type_inference.ListTypeAnnotation
         ):
             error = Error(
                 node.collection.original_node,
-                f"Expected the collection to be a list in the index, "
+                f"Expected the collection to be a list or a dictionary in the index, "
                 f"but got: {collection_type_anno}",
             )
             self.errors.append(error)
@@ -390,8 +399,11 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
             intermediate_type_inference.BuiltinMethodTypeAnnotation,
         ):
             # NOTE (mristin):
-            # The built-in methods on strings never return a pointer.
-            self.is_pointer_map[node] = False
+            # The built-in methods on strings and sets never return a pointer.
+            # The ``get`` of a dictionary without a default returns a pointer if
+            # the optional value is represented as one, see ``MapGetPointer`` in
+            # the common package.
+            self.is_pointer_map[node] = is_pointer_type(self._type_map[node])
             return None
 
         instance_type_anno = intermediate_type_inference.beneath_optional(
@@ -495,6 +507,24 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
             # using :py:prop:`errors`.
             if error is not None:
                 last_error = error
+
+        if last_error is not None:
+            return last_error
+
+        self.is_pointer_map[node] = False
+        return None
+
+    def transform_dict_literal(self, node: parse_tree.DictLiteral) -> Optional[Error]:
+        last_error = None  # type: Optional[Error]
+        for key, value in zip(node.keys, node.values):
+            # NOTE (mristin):
+            # Do not immediately return so that other items are processed as well.
+            # This way we get a longer list of errors which the caller can report
+            # using :py:prop:`errors`.
+            for child in (key, value):
+                error = self.transform(child)
+                if error is not None:
+                    last_error = error
 
         if last_error is not None:
             return last_error
@@ -688,6 +718,22 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
 
         loop_variable_type = self._type_map[node.variable]
         self.is_pointer_map[node.variable] = is_pointer_type(loop_variable_type)
+
+        self.is_pointer_map[node] = False
+        return None
+
+    def transform_for_each_item(self, node: parse_tree.ForEachItem) -> Optional[Error]:
+        for variable in (node.key, node.value):
+            if self._environment.find(variable.identifier) is not None:
+                error = Error(
+                    variable.original_node,
+                    f"The variable {variable.identifier} "
+                    f"has been already defined before",
+                )
+                self.errors.append(error)
+                return error
+
+            self.is_pointer_map[variable] = is_pointer_type(self._type_map[variable])
 
         self.is_pointer_map[node] = False
         return None
@@ -887,22 +933,39 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         # The for-each in a generator does not descend into the iteration, but we
         # need to infer the is-pointer of the collection that we loop over as we
         # transpile it.
+        loop_variables: Sequence[parse_tree.Name]
         if isinstance(node.generator, parse_tree.ForEach):
             error = self.transform(node.generator.iteration)
             if error is not None:
                 return error
 
+            loop_variables = (node.generator.variable,)
+
+        elif isinstance(node.generator, parse_tree.ForEachItem):
+            error = self.transform(node.generator.mapping)
+            if error is not None:
+                return error
+
+            loop_variables = (node.generator.key, node.generator.value)
+
+        elif isinstance(node.generator, parse_tree.ForRange):
+            loop_variables = (node.generator.variable,)
+
+        else:
+            assert_never(node.generator)
+
         # NOTE (mristin):
-        # The loop variable is scoped to the loop, so we define it in its own
+        # The loop variables are scoped to the loop, so we define them in their own
         # environment enclosing the body.
         parent_environment = self._environment
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(
-            identifier=node.generator.variable.identifier,
-            type_annotation=self._type_map[node.generator.variable],
-        )
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self._type_map[loop_variable],
+            )
 
         self._environment = loop_environment
         try:

@@ -106,6 +106,17 @@ class _ParseIsIn(_Parse):
         return tree.IsIn(member=member, container=container, original_node=node), None
 
 
+def _is_items_call(node: ast.expr) -> bool:
+    """Check whether ``node`` is a call ``x.items()`` without arguments."""
+    return (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "items"
+        and len(node.args) == 0
+        and len(node.keywords) == 0
+    )
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parse_generator(
     target: ast.expr, iteration: ast.expr, original_node: ast.AST
@@ -242,6 +253,20 @@ class _ParseAnyOrAll(_Parse):
         if not isinstance(generator, ast.comprehension):
             return None, Error(
                 generator, f"Expected a comprehension, but got: {ast.dump(generator)}"
+            )
+
+        if isinstance(generator.target, ast.Tuple) and _is_items_call(generator.iter):
+            return None, Error(
+                generator,
+                f"We support iterating over the items of a dictionary, "
+                f"``for k, v in x.items()``, only in a for-loop statement, but not "
+                f"in ``{node.func.id}(...)``. The targets transpile "
+                f"``{node.func.id}(...)`` into lambdas, *e.g.*, LINQ in C# and "
+                f"streams in Java, and a lambda in C# or Java can not unpack "
+                f"a key-value pair into two variables. Please iterate over the keys "
+                f"and look the values up, *e.g.*, "
+                f"``{node.func.id}(x[k] > 0 for k in x)``, or write a for-loop "
+                f"statement.",
             )
 
         our_generator, error = _parse_generator(
@@ -484,6 +509,53 @@ class _ParseTuple(_Parse):
             values.append(value)
 
         return tree.Tuple(values=values, original_node=node), None
+
+
+class _ParseDictLiteral(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Dict)
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.Dict)
+
+        keys = []  # type: List[tree.Expression]
+        values = []  # type: List[tree.Expression]
+        for key_node, value_node in zip(node.keys, node.values):
+            if key_node is None:
+                return None, Error(
+                    value_node,
+                    f"We do not support unpacking a dictionary with ``**`` in "
+                    f"a dictionary literal, but got: {ast.unparse(value_node)}. "
+                    f"Please list the keys and the values explicitly.",
+                )
+
+            key, error = ast_node_to_our_node(key_node)
+            if error is not None:
+                return None, error
+
+            if not isinstance(key, tree.Expression):
+                return None, Error(
+                    key_node,
+                    f"Expected an expression as a key of a dictionary literal, "
+                    f"but got: {key}",
+                )
+
+            value, error = ast_node_to_our_node(value_node)
+            if error is not None:
+                return None, error
+
+            if not isinstance(value, tree.Expression):
+                return None, Error(
+                    value_node,
+                    f"Expected an expression as a value of a dictionary literal, "
+                    f"but got: {value}",
+                )
+
+            keys.append(key)
+            values.append(value)
+
+        return tree.DictLiteral(keys=keys, values=values, original_node=node), None
 
 
 class _ParseImplication(_Parse):
@@ -980,6 +1052,21 @@ class _ParseAnnotatedAssignment(_Parse):
         )
 
 
+class _ParseDelete(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Delete)
+
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        return None, Error(
+            node,
+            "We do not support ``del``. To remove a key from a dictionary, please "
+            "write ``x.pop(k, None)``, which does nothing if the key is missing. "
+            "Python's ``del x[k]`` raises a ``KeyError`` on a missing key, while "
+            "C#, Java, Go, TypeScript and C++ silently ignore it, so we spell "
+            "the removal such that it means the same in all the targets.",
+        )
+
+
 class _ParseReturn(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Return)
@@ -1362,6 +1449,48 @@ class _ParseSwitch(_Parse):
         return tree.If(branches=branches, default=default, original_node=node), None
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _parse_for_each_item(
+    target: ast.Tuple, iteration: ast.expr, original_node: ast.AST
+) -> Tuple[Optional[tree.ForEachItem], Optional[Error]]:
+    """Parse the iteration over the items of a dictionary, ``for k, v in x.items()``."""
+    if not (
+        len(target.elts) == 2
+        and all(isinstance(elt, ast.Name) for elt in target.elts)
+        and _is_items_call(iteration)
+    ):
+        return None, Error(
+            target,
+            f"We support unpacking the loop variables of a for-loop only over "
+            f"the items of a dictionary, ``for k, v in x.items()``, but got: "
+            f"``for {', '.join(ast.unparse(elt) for elt in target.elts)} "
+            f"in {ast.unparse(iteration)}``",
+        )
+
+    key, error = ast_node_to_our_node(target.elts[0])
+    if error is not None:
+        return None, error
+    assert isinstance(key, tree.Name), f"{key=}"
+
+    value, error = ast_node_to_our_node(target.elts[1])
+    if error is not None:
+        return None, error
+    assert isinstance(value, tree.Name), f"{value=}"
+
+    assert isinstance(iteration, ast.Call) and isinstance(iteration.func, ast.Attribute)
+    mapping, error = ast_node_to_our_node(iteration.func.value)
+    if error is not None:
+        return None, error
+    assert isinstance(mapping, tree.Expression), f"{mapping=}"
+
+    return (
+        tree.ForEachItem(
+            key=key, value=value, mapping=mapping, original_node=original_node
+        ),
+        None,
+    )
+
+
 class _ParseFor(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.For)
@@ -1377,9 +1506,16 @@ class _ParseFor(_Parse):
                 "of a for-loop statement",
             )
 
-        generator, error = _parse_generator(
-            target=node.target, iteration=node.iter, original_node=node
-        )
+        generator: Optional[tree.ForStatementUnion]
+        if isinstance(node.target, ast.Tuple):
+            generator, error = _parse_for_each_item(
+                target=node.target, iteration=node.iter, original_node=node
+            )
+        else:
+            generator, error = _parse_generator(
+                target=node.target, iteration=node.iter, original_node=node
+            )
+
         if error is not None:
             return None, error
 
@@ -1538,6 +1674,7 @@ _CHAIN_OF_RULES = [
     _ParseCall(),
     _ParseConstant(),
     _ParseTuple(),
+    _ParseDictLiteral(),
     _ParseImplication(),
     _ParseMember(),
     _ParseSlice(),
@@ -1553,6 +1690,7 @@ _CHAIN_OF_RULES = [
     _ParseJoinedStr(),
     _ParseAssignment(),
     _ParseAnnotatedAssignment(),
+    _ParseDelete(),
     _ParseReturn(),
     _ParseSwitch(),
     _ParseFor(),

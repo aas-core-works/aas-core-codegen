@@ -511,6 +511,13 @@ Stream.concat(
 {I}{indent_but_first_line(item_stream, I)})"""
                 )
 
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
+
         else:
             assert_never(type_anno)
 
@@ -723,6 +730,10 @@ def _generate_imports_for_interface(
 
     imports.extend(java_common.set_imports_if_necessary(cls, with_bodies=False))
 
+    imports.extend(
+        java_common.dict_imports_if_necessary(cls.methods, with_bodies=False)
+    )
+
     if len(cls.inheritances) == 0:
         import_name = Stripped(f"{package}.types.{java_common.INTERFACE_PKG}.IClass")
         imports.append(import_name)
@@ -776,6 +787,8 @@ def _generate_imports_for_class(
     )
 
     imports.extend(java_common.set_imports_if_necessary(cls, with_bodies=True))
+
+    imports.extend(java_common.dict_imports_if_necessary(cls.methods, with_bodies=True))
 
     if _has_descendable_properties(cls):
         imports.extend(

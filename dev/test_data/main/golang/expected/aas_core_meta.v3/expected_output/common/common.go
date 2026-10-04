@@ -292,11 +292,11 @@ func FindStr(text string, sub string, start int64) int64 {
 	return start + int64(LenStr(text[startOffset:startOffset+index]))
 }
 
-// Check if any of the items of the set satisfy the condition.
+// Check if any of the keys of the map satisfy the condition.
 //
-// The set is represented as a map to empty structs.
-func SomeKey[K comparable](condition func(K) bool, set map[K]struct{}) bool {
-	for k := range set {
+// A set is represented as a map to empty structs, so this checks its items.
+func SomeKey[K comparable, V any](condition func(K) bool, m map[K]V) bool {
+	for k := range m {
 		if condition(k) {
 			return true
 		}
@@ -304,11 +304,11 @@ func SomeKey[K comparable](condition func(K) bool, set map[K]struct{}) bool {
 	return false
 }
 
-// Check if all the items of the set satisfy the condition.
+// Check if all the keys of the map satisfy the condition.
 //
-// The set is represented as a map to empty structs.
-func AllKeys[K comparable](condition func(K) bool, set map[K]struct{}) bool {
-	for k := range set {
+// A set is represented as a map to empty structs, so this checks its items.
+func AllKeys[K comparable, V any](condition func(K) bool, m map[K]V) bool {
+	for k := range m {
 		if !condition(k) {
 			return false
 		}

@@ -1014,6 +1014,13 @@ Stream.<Reporting.Error>concat(
 
         body = Stripped(f"return {stream};")
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -1548,6 +1555,13 @@ def generate(
         Stripped(f"import {package}.types.model.*;"),
         Stripped(f"import {package}.visitation.AbstractTransformer;"),
     ]  # type: List[Stripped]
+
+    imports.extend(
+        Stripped(f"import {dict_import};")
+        for dict_import in java_common.dict_imports_if_necessary(
+            symbol_table.verification_functions, with_bodies=True
+        )
+    )
 
     # NOTE (mristin):
     # A JSON-able value is a Jackson node, and only the models which use one

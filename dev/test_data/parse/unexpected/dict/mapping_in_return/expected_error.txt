@@ -1,0 +1,1 @@
+The type annotation Mapping[str, int] is not allowed in the return type of the verification function 'count'. Mapping declares the mutability of an argument of a verification function or of a method. The properties, the return values and the arguments of the constructors, which mirror the properties, do not declare mutability. Please use Dict[str, int] instead.

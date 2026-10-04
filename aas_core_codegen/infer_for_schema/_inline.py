@@ -429,6 +429,10 @@ def _over_non_optional_type_annotations(
         for item in type_annotation.items:
             yield from _over_non_optional_type_annotations(item)
 
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        yield from _over_non_optional_type_annotations(type_annotation.keys)
+        yield from _over_non_optional_type_annotations(type_annotation.values)
+
     elif isinstance(
         type_annotation,
         (

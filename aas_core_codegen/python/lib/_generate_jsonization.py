@@ -118,6 +118,13 @@ def _parser_name(type_annotation: intermediate.TypeAnnotationUnion) -> Identifie
     ):
         return Identifier(f"_{python_common.type_moniker(type_anno)}_from_jsonable")
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -343,6 +350,13 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             self._register_set_parser(type_anno)
+
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
 
         else:
             assert_never(type_anno)
@@ -1894,6 +1908,13 @@ def _generate_serialization(
         else:
             serializer_name = _container_serializer_name(type_anno)
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -2222,6 +2243,13 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             self._register_set_serializer(type_anno)
+
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
 
         else:
             assert_never(type_anno)

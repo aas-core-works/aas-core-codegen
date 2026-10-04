@@ -1418,6 +1418,13 @@ def _yields(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
         # to one of our own classes.
         return False
 
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_annotation}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_annotation)
 

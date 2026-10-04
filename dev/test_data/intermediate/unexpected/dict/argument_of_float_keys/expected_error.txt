@@ -1,0 +1,1 @@
+In the argument 'counts' of the verification function 'some_func': We do not support the dictionaries with floating-point keys, but got the keys of type float. The targets disagree on the equality of NaN and of 0.0 and -0.0 as keys, and on how to write such a key in JSON.

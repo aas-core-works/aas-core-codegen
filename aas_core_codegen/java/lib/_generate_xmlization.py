@@ -272,6 +272,13 @@ def _item_type_annotations(
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return type_anno.items
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     assert_never(type_anno)
 
 
@@ -299,6 +306,13 @@ def _written_moniker(type_anno: intermediate.TypeAnnotationExceptOptional) -> st
                 _written_moniker(item_type_anno)
                 for item_type_anno in _item_type_annotations(type_anno)
             ]
+        )
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
         )
 
     return _written_leaf_moniker(type_anno)

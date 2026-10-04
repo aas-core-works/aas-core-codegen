@@ -1229,6 +1229,14 @@ def generate_header(
         else ""
     )
 
+    unordered_map_include = (
+        "#include <unordered_map>\n"
+        if intermediate_uses.dicts_in(
+            [method for cls in symbol_table.classes for method in cls.methods]
+        )
+        else ""
+    )
+
     blocks = [
         Stripped(
             f"""\
@@ -1246,6 +1254,7 @@ def generate_header(
 #include <cstdint>
 #include <memory>
 #include <string>
+{unordered_map_include}\
 {unordered_set_include}\
 #include <vector>
 #pragma warning(pop)"""

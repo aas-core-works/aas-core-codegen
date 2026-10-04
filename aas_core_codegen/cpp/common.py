@@ -488,6 +488,41 @@ std::unordered_set<
     )
 
 
+def generate_dict_type(
+    keys_type: Stripped,
+    values_type: Stripped,
+    keys_are_enumeration_literals: bool,
+    common_namespace: Optional[Identifier] = COMMON_NAMESPACE,
+) -> Stripped:
+    """
+    Generate the C++ type of a dictionary of ``keys_type`` to ``values_type``.
+
+    C++11 does not specialize ``std::hash`` for the enumerations, which C++14
+    does, so we hash the enumeration literals with our own ``EnumHash``, as for
+    the sets, see :py:func:`generate_set_type`.
+
+    If `common_namespace` is specified, it is prepended to ``EnumHash``.
+    """
+    common_namespace_prefix = (
+        "" if common_namespace is None else f"{common_namespace}::"
+    )
+
+    arguments = [keys_type, values_type]
+    if keys_are_enumeration_literals:
+        arguments.append(Stripped(f"{common_namespace_prefix}EnumHash"))
+
+    if all("<" not in argument for argument in arguments):
+        return Stripped(f"std::unordered_map<{', '.join(arguments)}>")
+
+    arguments_joined = ",\n".join(arguments)
+    return Stripped(
+        f"""\
+std::unordered_map<
+{INDENT}{indent_but_first_line(arguments_joined, INDENT)}
+>"""
+    )
+
+
 def generate_type(
     type_annotation: intermediate.TypeAnnotationUnion,
     types_namespace: Optional[Identifier] = None,
@@ -576,6 +611,25 @@ std::vector<
         return generate_set_type(
             item_type=item_type,
             items_are_enumeration_literals=items_are_enumeration_literals,
+            common_namespace=common_namespace,
+        )
+
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        keys_type = generate_type(
+            type_annotation=type_annotation.keys, types_namespace=types_namespace
+        )
+        values_type = generate_type(
+            type_annotation=type_annotation.values, types_namespace=types_namespace
+        )
+
+        keys_are_enumeration_literals = isinstance(
+            type_annotation.keys, intermediate.OurTypeAnnotation
+        ) and isinstance(type_annotation.keys.our_type, intermediate.Enumeration)
+
+        return generate_dict_type(
+            keys_type=keys_type,
+            values_type=values_type,
+            keys_are_enumeration_literals=keys_are_enumeration_literals,
             common_namespace=common_namespace,
         )
 
@@ -679,6 +733,9 @@ def is_referencable(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
         elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
             return True
 
+        elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+            return True
+
         elif isinstance(
             type_annotation,
             (
@@ -733,7 +790,7 @@ def generate_argument_type(
     """
     Generate the C++ type of the ``argument`` of a verification function or a method.
 
-    The mutable lists and sets are passed in as mutable references so that
+    The mutable lists, sets and dictionaries are passed in as mutable references so that
     the caller observes the mutations, as in Python. The instances are always passed in as
     constant references to the shared pointers, as the instance is mutable through
     the pointer anyway, and the type inference already refuses to mutate
@@ -743,7 +800,11 @@ def generate_argument_type(
     """
     if argument.mutable and isinstance(
         intermediate.beneath_optional(argument.type_annotation),
-        (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+            intermediate.DictTypeAnnotation,
+        ),
     ):
         return generate_type_with_ref(
             type_annotation=argument.type_annotation,

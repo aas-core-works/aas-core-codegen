@@ -474,6 +474,13 @@ def _generate_enhanced(
             )
         )
 
+        imports.extend(
+            Stripped(f"import {dict_import};")
+            for dict_import in java_common.dict_imports_if_necessary(
+                cls.methods, with_bodies=False
+            )
+        )
+
         blocks = [
             java_common.WARNING,
             Stripped(f"package {package}.enhancing;"),
@@ -634,6 +641,13 @@ return result;"""
         )
 
         body = Stripped(f"return {tuple_literal};")
+
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
 
     else:
         assert_never(type_anno)

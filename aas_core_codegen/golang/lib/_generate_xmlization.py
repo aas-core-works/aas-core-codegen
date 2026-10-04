@@ -283,6 +283,13 @@ def _collect_requirements(
                 observed_tuple_writers.add(writer_name)
                 tuple_type_annos.append(type_anno)
 
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
+
         else:
             assert_never(type_anno)
 
@@ -1006,6 +1013,13 @@ def _generate_read_nested_content(
             _item_reader_name(item, f"v{i + 1}")
             for i, item in enumerate(type_anno.items)
         ]
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -1240,6 +1254,13 @@ readTuple{arity}(
 {prop_var}, current, valueErr = readSetOf(
 {I}decoder, current, {read_item},
 )"""
+            )
+
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
             )
 
         else:

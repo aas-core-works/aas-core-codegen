@@ -104,6 +104,17 @@ def generate_type(
 
         return Stripped(f"Set<{item_type}>"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.DictTypeAnnotation):
+        keys_type, error = generate_type(type_annotation=type_annotation.keys)
+        if error is not None:
+            return None, error
+
+        values_type, error = generate_type(type_annotation=type_annotation.values)
+        if error is not None:
+            return None, error
+
+        return Stripped(f"Map<{keys_type}, {values_type}>"), None
+
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         item_types = []  # type: List[Stripped]
         for item in type_annotation.items:
@@ -315,6 +326,49 @@ class Transpiler(
         return Stripped(f"{instance}.{member_name}"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_as_long(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` such that an integer literal or a length is a ``long``.
+
+        We represent the integers as ``Long`` in Java, while we transpile the integer
+        literals as ``int`` literals, and the lengths are ``int``'s. Java does not
+        convert an ``int`` to ``Long`` implicitly, *e.g.*, when passing an integer
+        literal or a length as an argument to a method expecting a ``Long``, so we
+        need to suffix the literal with ``L``, and cast the length to ``long``.
+        """
+        if Transpiler._is_int_literal(node):
+            assert isinstance(node, parse_tree.Constant)
+            return Stripped(f"{node.value}L"), None
+
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if (
+            intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            if isinstance(
+                node,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                return Stripped(f"(long) {code}"), None
+
+            return Stripped(f"(long) ({code})"), None
+
+        return code, None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_index(
         self, node: parse_tree.Index
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -354,6 +408,24 @@ class Transpiler(
                 collection = Stripped(f"({collection})")
 
             return Stripped(f"{collection}.item{index_value + 1}()"), None
+
+        if isinstance(collection_type, intermediate_type_inference.DictTypeAnnotation):
+            collection, error = self.transform(node.collection)
+            if error is not None:
+                return None, error
+
+            # NOTE (mristin):
+            # A dictionary of integers holds ``Long``'s, see
+            # :py:meth:`_transform_as_long`.
+            key, error = self._transform_as_long(node.index)
+            if error is not None:
+                return None, error
+
+            # NOTE (mristin):
+            # ``Map.get`` gives ``null`` on a missing key, while Python raises
+            # a ``KeyError``. See ``MapHelpers.getOrThrow`` in the generated common
+            # package.
+            return Stripped(f"MapHelpers.getOrThrow({collection}, {key})"), None
 
         collection, error = self.transform(node.collection)
         if error is not None:
@@ -404,49 +476,6 @@ class Transpiler(
         return Stripped(f"{collection}.get({index})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def _transform_as_long(
-        self, node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` such that an integer literal or a length is a ``long``.
-
-        We represent the integers as ``Long`` in Java, while we transpile the integer
-        literals as ``int`` literals, and the lengths are ``int``'s. Java does not
-        convert an ``int`` to ``Long`` implicitly, *e.g.*, when passing an integer
-        literal or a length as an argument to a method expecting a ``Long``, so we
-        need to suffix the literal with ``L``, and cast the length to ``long``.
-        """
-        if Transpiler._is_int_literal(node):
-            assert isinstance(node, parse_tree.Constant)
-            return Stripped(f"{node.value}L"), None
-
-        code, error = self.transform(node)
-        if error is not None:
-            return None, error
-
-        assert code is not None
-
-        if (
-            intermediate_type_inference.try_primitive_type(self.type_map[node])
-            is intermediate_type_inference.PrimitiveType.LENGTH
-        ):
-            if isinstance(
-                node,
-                (
-                    parse_tree.Member,
-                    parse_tree.FunctionCall,
-                    parse_tree.MethodCall,
-                    parse_tree.Name,
-                    parse_tree.Index,
-                ),
-            ):
-                return Stripped(f"(long) {code}"), None
-
-            return Stripped(f"(long) ({code})"), None
-
-        return code, None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_tuple(
         self, node: parse_tree.Tuple
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -470,6 +499,116 @@ class Transpiler(
             )
 
         return java_common.generate_tuple_literal(item_exprs=item_exprs), None
+
+    @staticmethod
+    def _new_dict(
+        dict_type: intermediate_type_inference.DictTypeAnnotation,
+        entries: Sequence[Stripped],
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Generate a new mutable dictionary of ``dict_type`` with the given ``entries``.
+
+        We spell out the keys and the values, since Java can not infer them when
+        the new dictionary is wrapped, *e.g.*, in an ``Optional.of``.
+        """
+        dict_java_type, error = generate_type(dict_type)
+        if error is not None:
+            return None, error
+
+        assert dict_java_type is not None
+        assert dict_java_type.startswith("Map<")
+        hash_map_type = f"HashMap<{dict_java_type[len('Map<'):]}"
+
+        if len(entries) == 0:
+            return Stripped(f"new {hash_map_type}()"), None
+
+        # NOTE (mristin):
+        # ``Map.ofEntries`` gives an immutable map, so we copy it into a mutable
+        # one. The type inference refused the duplicate keys, on which
+        # ``Map.ofEntries`` would throw.
+        entries_joined = ",\n".join(entries)
+        return (
+            Stripped(
+                f"""\
+new {hash_map_type}(
+{I}Map.ofEntries(
+{II}{indent_but_first_line(entries_joined, II)}))"""
+            ),
+            None,
+        )
+
+    @staticmethod
+    def _wrap_into_named_union_if_necessary(
+        value: Stripped,
+        target_type: intermediate_type_inference.TypeAnnotationUnion,
+        value_type: intermediate_type_inference.TypeAnnotationUnion,
+    ) -> Stripped:
+        """
+        Wrap the instance of a class, given as ``value``, into the named union.
+
+        A named union is a wrapper class in Java, so we wrap the instance as
+        the most specific root of the union.
+        """
+        if not intermediate_type_inference.needs_wrapping_into_named_union(
+            target_type=target_type, value_type=value_type
+        ):
+            return value
+
+        union_type = intermediate_type_inference.beneath_optional(target_type)
+        assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(union_type.our_type, intermediate.NamedUnion)
+        assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(value_type.our_type, intermediate.Class)
+
+        root = union_type.our_type.most_specific_root_of(value_type.our_type)
+
+        union_name = java_naming.union_name(union_type.our_type.name)
+        root_class_name = java_naming.class_name(root.name)
+
+        return Stripped(f"{union_name}.from{root_class_name}({value})")
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_dict_literal(
+        self, node: parse_tree.DictLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        entries = []  # type: List[Stripped]
+
+        for key_node, value_node in zip(node.keys, node.values):
+            # NOTE (mristin):
+            # Java does not box an ``int`` to a ``Long`` key or value.
+            key, error = self._transform_as_long(key_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            value, error = self._transform_as_long(value_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert key is not None
+            assert value is not None
+
+            dict_type = self.type_map[node]
+            assert isinstance(dict_type, intermediate_type_inference.DictTypeAnnotation)
+            value = self._wrap_into_named_union_if_necessary(
+                value=value,
+                target_type=dict_type.values,
+                value_type=self.type_map[value_node],
+            )
+
+            entries.append(Stripped(f"Map.entry({key}, {value})"))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the dictionary literal", errors
+            )
+
+        dict_type = self.type_map[node]
+        assert isinstance(dict_type, intermediate_type_inference.DictTypeAnnotation)
+
+        return self._new_dict(dict_type=dict_type, entries=entries)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_slice(
@@ -585,6 +724,15 @@ class Transpiler(
         ):
             return self._transform_as_long(node)
 
+        # NOTE (mristin):
+        # The keys of a dictionary are looked up the same way as the items of a set.
+        if (
+            isinstance(set_type, intermediate_type_inference.DictTypeAnnotation)
+            and intermediate_type_inference.try_primitive_type(set_type.keys)
+            is intermediate_type_inference.PrimitiveType.INT
+        ):
+            return self._transform_as_long(node)
+
         return self.transform(node)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -633,6 +781,9 @@ class Transpiler(
             container_type, intermediate_type_inference.JsonObjectTypeAnnotation
         ):
             return Stripped(f"{container}.has({member})"), None
+
+        if isinstance(container_type, intermediate_type_inference.DictTypeAnnotation):
+            return Stripped(f"{container}.containsKey({member})"), None
 
         if isinstance(
             container_type,
@@ -898,6 +1049,46 @@ class Transpiler(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_GET:
+                key, error = self._transform_as_set_member(
+                    node=node.args[0], set_node=node.member.instance
+                )
+                if error is not None:
+                    return None, error
+
+                assert key is not None
+
+                if len(node.args) == 1:
+                    # NOTE (mristin):
+                    # The values of a dictionary are never ``null``, so ``null``
+                    # stands for a missing key.
+                    return Stripped(f"Optional.ofNullable({instance}.get({key}))"), None
+
+                # NOTE (mristin):
+                # A dictionary of integers holds ``Long``'s, see
+                # :py:meth:`_transform_as_long`.
+                default, error = self._transform_as_long(node.args[1])
+                if error is not None:
+                    return None, error
+
+                assert default is not None
+
+                return Stripped(f"{instance}.getOrDefault({key}, {default})"), None
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_POP:
+                key, error = self._transform_as_set_member(
+                    node=node.args[0], set_node=node.member.instance
+                )
+                if error is not None:
+                    return None, error
+
+                assert key is not None
+
+                # NOTE (mristin):
+                # ``Map.remove`` does nothing on a missing key, as ``pop`` with
+                # the default ``None`` in Python.
+                return Stripped(f"{instance}.remove({key})"), None
+
             else:
                 assert_never(kind)
 
@@ -1060,6 +1251,7 @@ class Transpiler(
                     (
                         intermediate_type_inference.ListTypeAnnotation,
                         intermediate_type_inference.SetTypeAnnotation,
+                        intermediate_type_inference.DictTypeAnnotation,
                         intermediate_type_inference.TupleTypeAnnotation,
                     ),
                 ):
@@ -1182,6 +1374,17 @@ class Transpiler(
                     return None, error
 
                 return Stripped(f"new HashSet<{item_type}>()"), None
+
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.DICT
+            ):
+                dict_type = self.type_map[node]
+                assert isinstance(
+                    dict_type, intermediate_type_inference.DictTypeAnnotation
+                )
+
+                return self._new_dict(dict_type=dict_type, entries=[])
 
             else:
                 assert_never(func_type.func.kind)
@@ -1710,12 +1913,25 @@ class Transpiler(
                 parse_tree.Slice,
             )
 
+            # NOTE (mristin):
+            # We iterate over the keys of a dictionary, as Python does.
+            keys = (
+                ".keySet()"
+                if isinstance(
+                    intermediate_type_inference.beneath_optional(
+                        self.type_map[node.generator.iteration]
+                    ),
+                    intermediate_type_inference.DictTypeAnnotation,
+                )
+                else ""
+            )
+
             if not isinstance(
                 node.generator.iteration, no_parentheses_types_in_this_context
             ):
-                source = Stripped(f"({iteration}.stream())")
+                source = Stripped(f"({iteration}{keys}.stream())")
             else:
-                source = Stripped(f"{iteration}.stream()")
+                source = Stripped(f"{iteration}{keys}.stream()")
         elif isinstance(node.generator, parse_tree.ForRange):
             assert start is not None
             assert end is not None
@@ -1763,36 +1979,6 @@ class Transpiler(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_any_or_all(node)
 
-    @staticmethod
-    def _wrap_into_named_union_if_necessary(
-        value: Stripped,
-        target_type: intermediate_type_inference.TypeAnnotationUnion,
-        value_type: intermediate_type_inference.TypeAnnotationUnion,
-    ) -> Stripped:
-        """
-        Wrap the instance of a class, given as ``value``, into the named union.
-
-        A named union is a wrapper class in Java, so we wrap the instance as
-        the most specific root of the union.
-        """
-        if not intermediate_type_inference.needs_wrapping_into_named_union(
-            target_type=target_type, value_type=value_type
-        ):
-            return value
-
-        union_type = intermediate_type_inference.beneath_optional(target_type)
-        assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
-        assert isinstance(union_type.our_type, intermediate.NamedUnion)
-        assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
-        assert isinstance(value_type.our_type, intermediate.Class)
-
-        root = union_type.our_type.most_specific_root_of(value_type.our_type)
-
-        union_name = java_naming.union_name(union_type.our_type.name)
-        root_class_name = java_naming.class_name(root.name)
-
-        return Stripped(f"{union_name}.from{root_class_name}({value})")
-
     def transform_assignment(
         self, node: parse_tree.Assignment
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1825,11 +2011,28 @@ class Transpiler(
             if error is not None:
                 errors.append(error)
 
+            target_is_dict_item = isinstance(
+                node.target, parse_tree.Index
+            ) and isinstance(
+                intermediate_type_inference.beneath_optional(
+                    self.type_map[node.target.collection]
+                ),
+                intermediate_type_inference.DictTypeAnnotation,
+            )
+
             index_node = None  # type: Optional[parse_tree.Expression]
             index = None  # type: Optional[Stripped]
             if isinstance(node.target, parse_tree.Index):
                 index_node = node.target.index
-                index, error = self.transform(index_node)
+
+                # NOTE (mristin):
+                # A dictionary of integers holds ``Long``'s, see
+                # :py:meth:`_transform_as_long`.
+                index, error = (
+                    self._transform_as_long(index_node)
+                    if target_is_dict_item
+                    else self.transform(index_node)
+                )
                 if error is not None:
                     errors.append(error)
 
@@ -1862,6 +2065,11 @@ class Transpiler(
             arguments = [value]  # type: List[Stripped]
             if isinstance(node.target, parse_tree.Member):
                 method_name = java_naming.setter_name(node.target.name)
+            elif target_is_dict_item:
+                assert index is not None
+
+                method_name = Identifier("put")
+                arguments.insert(0, index)
             else:
                 assert index_node is not None
                 assert index is not None
@@ -2294,18 +2502,88 @@ return (
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        variable_name = node.generator.variable.identifier
-        variable_type = self.type_map[node.generator.variable]
-        variable = java_naming.variable_name(variable_name)
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
+
+        # NOTE (mristin):
+        # We unpack the key and the value of an item of a dictionary at the start
+        # of the body.
+        unpacking = []  # type: List[Stripped]
 
         header = None  # type: Optional[str]
         if isinstance(node.generator, parse_tree.ForEach):
+            variable = java_naming.variable_name(node.generator.variable.identifier)
+
             iteration, error = self.transform(node.generator.iteration)
             if error is not None:
                 errors.append(error)
             else:
                 assert iteration is not None
+
+                # NOTE (mristin):
+                # We iterate over the keys of a dictionary, as Python does.
+                if isinstance(
+                    intermediate_type_inference.beneath_optional(
+                        self.type_map[node.generator.iteration]
+                    ),
+                    intermediate_type_inference.DictTypeAnnotation,
+                ):
+                    if not isinstance(
+                        node.generator.iteration,
+                        (
+                            parse_tree.Member,
+                            parse_tree.FunctionCall,
+                            parse_tree.MethodCall,
+                            parse_tree.Name,
+                            parse_tree.Index,
+                        ),
+                    ):
+                        iteration = Stripped(f"({iteration})")
+
+                    iteration = Stripped(f"{iteration}.keySet()")
+
                 header = f"for (var {variable} : {indent_but_first_line(iteration, I)})"
+
+        elif isinstance(node.generator, parse_tree.ForEachItem):
+            mapping, error = self.transform(node.generator.mapping)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert mapping is not None
+
+                if not isinstance(
+                    node.generator.mapping,
+                    (
+                        parse_tree.Member,
+                        parse_tree.FunctionCall,
+                        parse_tree.MethodCall,
+                        parse_tree.Name,
+                        parse_tree.Index,
+                    ),
+                ):
+                    mapping = Stripped(f"({mapping})")
+
+                key = java_naming.variable_name(node.generator.key.identifier)
+                value = java_naming.variable_name(node.generator.value.identifier)
+
+                # NOTE (mristin):
+                # The names in the meta-model never contain ``$``, so the variable
+                # of the entry can not clash with any other variable. The key is
+                # unique as the loop variables can not shadow each other, so
+                # the variables of the nested loops do not clash either.
+                entry = f"{key}$entry"
+
+                header = (
+                    f"for (var {entry} : {indent_but_first_line(mapping, I)}"
+                    f".entrySet())"
+                )
+                unpacking = [
+                    Stripped(f"var {key} = {entry}.getKey();"),
+                    Stripped(f"var {value} = {entry}.getValue();"),
+                ]
 
         elif isinstance(node.generator, parse_tree.ForRange):
             start, error = self.transform(node.generator.start)
@@ -2317,6 +2595,9 @@ return (
                 errors.append(error)
 
             if start is not None and end is not None:
+                variable_type = self.type_map[node.generator.variable]
+                variable = java_naming.variable_name(node.generator.variable.identifier)
+
                 # NOTE (mristin):
                 # We represent the lengths as ``int``, since the collections are
                 # indexed by ``int``'s in Java, while we represent the other integers
@@ -2358,14 +2639,18 @@ for (
         assert header is not None
 
         # NOTE (mristin):
-        # The loop variable is scoped to the loop, so we define it in its own
+        # The loop variables are scoped to the loop, so we define them in their own
         # environment enclosing the body.
         parent_environment = self._environment
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(identifier=variable_name, type_annotation=variable_type)
-        self._variable_name_set.add(variable_name)
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self.type_map[loop_variable],
+            )
+            self._variable_name_set.add(loop_variable.identifier)
 
         self._environment = loop_environment
         try:
@@ -2381,7 +2666,7 @@ for (
         assert stmts_and_defines is not None
         stmts, _ = stmts_and_defines
 
-        return Stripped(f"{header} {Transpiler._block(stmts)}"), None
+        return Stripped(f"{header} {Transpiler._block([*unpacking, *stmts])}"), None
 
     def transform_continue(
         self, node: parse_tree.Continue

@@ -1074,6 +1074,13 @@ def _content_reader_name(
     ):
         return Identifier(f"_read_{python_common.type_moniker(type_anno)}")
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -1449,6 +1456,13 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             self._register_set_reader(type_anno)
+
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
 
         else:
             assert_never(type_anno)
@@ -2048,6 +2062,13 @@ def _element_writer_call(
             [prop_literal, value, "serializer"],
         )
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -2390,6 +2411,13 @@ def {name}(
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             self._register_set_writer(type_anno)
+
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
 
         else:
             assert_never(type_anno)

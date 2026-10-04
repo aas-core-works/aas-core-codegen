@@ -1188,6 +1188,13 @@ def _parse_function_and_arguments(
             _parse_function_reference(item) for item in type_anno.items
         ]
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     assert_never(type_anno)
 
 
@@ -2253,6 +2260,13 @@ def _serialize_container_function_and_arguments(
             _item_or_nested_serializer_function(item) for item in type_anno.items
         ]
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     assert_never(type_anno)
 
 
@@ -2500,10 +2514,12 @@ assert_union_without_excluded(
     # ``ListTypeAnnotation``, ``SetTypeAnnotation`` and ``TupleTypeAnnotation``
     # are handled directly in the calling code (see ``_generate_cls_to_map``),
     # which unrolls them into calls of this function on the atomic items.
+    # ``DictTypeAnnotation`` is refused in the properties at the parse stage.
     excluded=[
         intermediate.ListTypeAnnotation,
         intermediate.TupleTypeAnnotation,
         intermediate.SetTypeAnnotation,
+        intermediate.DictTypeAnnotation,
     ],
 )
 

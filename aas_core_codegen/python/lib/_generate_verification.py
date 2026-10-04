@@ -994,6 +994,13 @@ IndexSegment(
             )
         )
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -1392,6 +1399,15 @@ def generate(
         "AbstractSet"
     ) in python_common.typing_imports_for_sets(symbol_table.verification_functions):
         typing_imports.insert(0, Identifier("AbstractSet"))
+
+    # NOTE (mristin):
+    # ``Mapping`` is always imported, so we only need to add ``Dict``.
+    if Identifier("Dict") in python_common.typing_imports_for_dicts(
+        symbol_table.verification_functions
+    ):
+        typing_imports.insert(
+            typing_imports.index(Identifier("Iterable")), Identifier("Dict")
+        )
 
     typing_imports_joined = ",\n".join(f"{I}{name}" for name in typing_imports)
 

@@ -1,1 +1,1 @@
-Expected the target of the generator to be a name, but got: Tuple(elts=[Name(id='number', ctx=Store()), Name(id='text', ctx=Store())], ctx=Store())
+We support unpacking the loop variables of a for-loop only over the items of a dictionary, ``for k, v in x.items()``, but got: ``for number, text in zip(numbers, texts)``

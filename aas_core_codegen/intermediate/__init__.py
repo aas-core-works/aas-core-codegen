@@ -15,6 +15,7 @@ PrimitiveTypeAnnotation = _types.PrimitiveTypeAnnotation
 OurTypeAnnotation = _types.OurTypeAnnotation
 ListTypeAnnotation = _types.ListTypeAnnotation
 SetTypeAnnotation = _types.SetTypeAnnotation
+DictTypeAnnotation = _types.DictTypeAnnotation
 TupleTypeAnnotation = _types.TupleTypeAnnotation
 OptionalTypeAnnotation = _types.OptionalTypeAnnotation
 JsonValueTypeAnnotation = _types.JsonValueTypeAnnotation
@@ -83,6 +84,7 @@ over_type_annotation_and_nested_type_annotations = (
 )
 tuple_arities = _types.tuple_arities
 declares_local_set = _types.declares_local_set
+declares_local_dict = _types.declares_local_dict
 local_declaration_annotations = _types.local_declaration_annotations
 
 NumericPlace = _types.NumericPlace

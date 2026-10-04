@@ -1,0 +1,1 @@
+We do not support ``del``. To remove a key from a dictionary, please write ``x.pop(k, None)``, which does nothing if the key is missing. Python's ``del x[k]`` raises a ``KeyError`` on a missing key, while C#, Java, Go, TypeScript and C++ silently ignore it, so we spell the removal such that it means the same in all the targets.

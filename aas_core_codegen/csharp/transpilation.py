@@ -117,6 +117,17 @@ def generate_type(
 
         return Stripped(f"HashSet<{item_type}>"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.DictTypeAnnotation):
+        keys_type, error_message = generate_type(type_annotation.keys)
+        if error_message is not None:
+            return None, error_message
+
+        values_type, error_message = generate_type(type_annotation.values)
+        if error_message is not None:
+            return None, error_message
+
+        return Stripped(f"Dictionary<{keys_type}, {values_type}>"), None
+
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         item_types = []  # type: List[Stripped]
         for item in type_annotation.items:
@@ -339,6 +350,27 @@ class Transpiler(
 
         return False
 
+    def _transform_and_unwrap_narrowed_nullable_value(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` and unwrap it if it is a narrowed nullable value type.
+
+        A value type such as ``long?`` stays nullable in C# even if the type
+        inference narrowed it down to non-null, so we need to unwrap it with
+        ``.Value`` before we assign it to a non-nullable or return it.
+        """
+        code, error = self.transform(node)
+        if error is not None:
+            return None, error
+
+        assert code is not None
+
+        if self._is_declared_nullable(node) and _is_value_type(self.type_map[node]):
+            return Stripped(f"{code}.Value"), None
+
+        return code, None
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_index(
         self, node: parse_tree.Index
@@ -396,6 +428,41 @@ class Transpiler(
                 collection = Stripped(f"{collection}.Value")
 
             return Stripped(f"{collection}.Item{index_value + 1}"), None
+
+        if isinstance(
+            intermediate_type_inference.beneath_optional(collection_type),
+            intermediate_type_inference.DictTypeAnnotation,
+        ):
+            collection, error = self.transform(node.collection)
+            if error is not None:
+                return None, error
+            assert collection is not None
+
+            # NOTE (mristin):
+            # A dictionary of value-type keys does not hold nullables, so we
+            # unwrap a narrowed key.
+            key, error = self._transform_and_unwrap_narrowed_nullable_value(node.index)
+            if error is not None:
+                return None, error
+            assert key is not None
+
+            if not isinstance(
+                node.collection,
+                (
+                    parse_tree.Member,
+                    parse_tree.FunctionCall,
+                    parse_tree.MethodCall,
+                    parse_tree.Name,
+                    parse_tree.Index,
+                ),
+            ):
+                collection = Stripped(f"({collection})")
+
+            # NOTE (mristin):
+            # The indexer of a ``Dictionary`` throws
+            # a ``KeyNotFoundException`` on a missing key, just as Python raises
+            # a ``KeyError``.
+            return Stripped(f"{collection}[{key}]"), None
 
         collection, error = self.transform(node.collection)
         if error is not None:
@@ -532,27 +599,6 @@ class Transpiler(
             None,
         )
 
-    def _transform_and_unwrap_narrowed_nullable_value(
-        self, node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` and unwrap it if it is a narrowed nullable value type.
-
-        A value type such as ``long?`` stays nullable in C# even if the type
-        inference narrowed it down to non-null, so we need to unwrap it with
-        ``.Value`` before we assign it to a non-nullable or return it.
-        """
-        code, error = self.transform(node)
-        if error is not None:
-            return None, error
-
-        assert code is not None
-
-        if self._is_declared_nullable(node) and _is_value_type(self.type_map[node]):
-            return Stripped(f"{code}.Value"), None
-
-        return code, None
-
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_tuple(
         self, node: parse_tree.Tuple
@@ -580,6 +626,65 @@ class Transpiler(
             )
 
         return csharp_common.generate_tuple_literal(value_reprs), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_dict_literal(
+        self, node: parse_tree.DictLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        dict_type, error_message = generate_type(self.type_map[node])
+        if error_message is not None:
+            return None, Error(node.original_node, error_message)
+
+        assert dict_type is not None
+
+        if len(node.keys) == 0:
+            return Stripped(f"new {dict_type}()"), None
+
+        errors = []  # type: List[Error]
+        items = []  # type: List[Stripped]
+
+        # NOTE (mristin):
+        # A dictionary of value types holds no nullables, so we unwrap a narrowed
+        # value. The keys are literals, see
+        # :py:meth:`intermediate_type_inference._Inferrer._transform_new_dict`.
+        for key_node, value_node in zip(node.keys, node.values):
+            key, error = self.transform(key_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            value, error = self._transform_and_unwrap_narrowed_nullable_value(
+                value_node
+            )
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert key is not None
+            assert value is not None
+            items.append(Stripped(f"[{key}] = {indent_but_first_line(value, I)}"))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the dictionary literal", errors
+            )
+
+        items_joined = ",\n".join(items)
+
+        # NOTE (mristin):
+        # We use the index initializers which keep the last value of the duplicate
+        # keys as Python does, though the type inference refuses the duplicate
+        # keys in the first place.
+        return (
+            Stripped(
+                f"""\
+new {dict_type}
+{{
+{I}{indent_but_first_line(items_joined, I)}
+}}"""
+            ),
+            None,
+        )
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(
@@ -666,6 +771,11 @@ class Transpiler(
         if isinstance(
             container_type, intermediate_type_inference.JsonObjectTypeAnnotation
         ):
+            return Stripped(f"{container}.ContainsKey({member})"), None
+
+        # NOTE (mristin):
+        # The membership in a dictionary is a question about its keys.
+        if isinstance(container_type, intermediate_type_inference.DictTypeAnnotation):
             return Stripped(f"{container}.ContainsKey({member})"), None
 
         if isinstance(
@@ -916,6 +1026,72 @@ class Transpiler(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_GET:
+                # NOTE (mristin):
+                # A dictionary of value types holds neither nullable keys nor
+                # nullable values, so we unwrap a narrowed key and default.
+                unwrapped_args = []  # type: List[Stripped]
+                for arg_node in node.args:
+                    arg, error = self._transform_and_unwrap_narrowed_nullable_value(
+                        arg_node
+                    )
+                    if error is not None:
+                        return None, error
+
+                    assert arg is not None
+                    unwrapped_args.append(arg)
+
+                if len(unwrapped_args) == 2:
+                    return (
+                        Stripped(
+                            f"{parenthesized_instance}.GetValueOrDefault"
+                            f"({unwrapped_args[0]}, {unwrapped_args[1]})"
+                        ),
+                        None,
+                    )
+
+                dict_type = intermediate_type_inference.beneath_optional(
+                    self.type_map[node.member.instance]
+                )
+                assert isinstance(
+                    dict_type, intermediate_type_inference.DictTypeAnnotation
+                )
+
+                # NOTE (mristin):
+                # ``GetValueOrDefault`` gives the default of a value type, such as
+                # ``0`` or ``false``, on a missing key instead of ``null``, so we
+                # use our helper for the value types.
+                if _is_value_type(dict_type.values):
+                    return (
+                        Stripped(
+                            f"{csharp_common.COMMON_CLASS}.DictHelpers.GetValueOrNull"
+                            f"({instance}, {unwrapped_args[0]})"
+                        ),
+                        None,
+                    )
+
+                return (
+                    Stripped(
+                        f"{parenthesized_instance}.GetValueOrDefault"
+                        f"({unwrapped_args[0]})"
+                    ),
+                    None,
+                )
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_POP:
+                key, error = self._transform_and_unwrap_narrowed_nullable_value(
+                    node.args[0]
+                )
+                if error is not None:
+                    return None, error
+
+                assert key is not None
+
+                # NOTE (mristin):
+                # ``Remove`` does nothing on a missing key, just as
+                # ``pop(k, None)`` in Python.
+                return Stripped(f"{parenthesized_instance}.Remove({key})"), None
+
             else:
                 assert_never(kind)
 
@@ -1064,6 +1240,7 @@ class Transpiler(
                     (
                         intermediate_type_inference.ListTypeAnnotation,
                         intermediate_type_inference.SetTypeAnnotation,
+                        intermediate_type_inference.DictTypeAnnotation,
                     ),
                 ):
                     return Stripped(f"{collection}.Count"), None
@@ -1177,6 +1354,16 @@ class Transpiler(
                     return None, Error(node.original_node, error_message)
 
                 return Stripped(f"new {set_type}()"), None
+
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.DICT
+            ):
+                dict_type, error_message = generate_type(self.type_map[node])
+                if error_message is not None:
+                    return None, Error(node.original_node, error_message)
+
+                return Stripped(f"new {dict_type}()"), None
 
             else:
                 assert_never(func_type.func.kind)
@@ -1709,6 +1896,15 @@ class Transpiler(
                 assert iteration is not None
                 source = iteration
 
+            # NOTE (mristin):
+            # A dictionary enumerates its key-value pairs in C#, while Python
+            # iterates over the keys.
+            if isinstance(
+                self.type_map[node.generator.iteration],
+                intermediate_type_inference.DictTypeAnnotation,
+            ):
+                source = Stripped(f"{source}.Keys")
+
         elif isinstance(node.generator, parse_tree.ForRange):
             assert start is not None
             assert end is not None
@@ -2037,23 +2233,70 @@ return (
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        variable_name = node.generator.variable.identifier
-        variable_type = self.type_map[node.generator.variable]
-        variable = csharp_naming.variable_name(variable_name)
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
 
         header: Optional[str] = None
         if isinstance(node.generator, parse_tree.ForEach):
+            variable = csharp_naming.variable_name(node.generator.variable.identifier)
+
             iteration, error = self.transform(node.generator.iteration)
             if error is not None:
                 errors.append(error)
             else:
                 assert iteration is not None
+
+                # NOTE (mristin):
+                # A dictionary enumerates its key-value pairs in C#, while Python
+                # iterates over the keys.
+                if isinstance(
+                    self.type_map[node.generator.iteration],
+                    intermediate_type_inference.DictTypeAnnotation,
+                ):
+                    if not isinstance(
+                        node.generator.iteration,
+                        (
+                            parse_tree.Member,
+                            parse_tree.MethodCall,
+                            parse_tree.FunctionCall,
+                            parse_tree.Name,
+                            parse_tree.Index,
+                        ),
+                    ):
+                        iteration = Stripped(f"({iteration})")
+
+                    iteration = Stripped(f"{iteration}.Keys")
+
                 header = (
                     f"foreach (var {variable} in "
                     f"{indent_but_first_line(iteration, I)})"
                 )
 
+        elif isinstance(node.generator, parse_tree.ForEachItem):
+            key = csharp_naming.variable_name(node.generator.key.identifier)
+            value = csharp_naming.variable_name(node.generator.value.identifier)
+
+            mapping, error = self.transform(node.generator.mapping)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert mapping is not None
+
+                # NOTE (mristin):
+                # We deconstruct the ``KeyValuePair``, which is supported since
+                # .NET Core 2.0 and .NET Standard 2.1.
+                header = (
+                    f"foreach (var ({key}, {value}) in "
+                    f"{indent_but_first_line(mapping, I)})"
+                )
+
         elif isinstance(node.generator, parse_tree.ForRange):
+            variable = csharp_naming.variable_name(node.generator.variable.identifier)
+            variable_type = self.type_map[node.generator.variable]
+
             start, error = self.transform(node.generator.start)
             if error is not None:
                 errors.append(error)
@@ -2107,8 +2350,12 @@ for (
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(identifier=variable_name, type_annotation=variable_type)
-        self._variable_name_set.add(variable_name)
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self.type_map[loop_variable],
+            )
+            self._variable_name_set.add(loop_variable.identifier)
 
         self._environment = loop_environment
         try:

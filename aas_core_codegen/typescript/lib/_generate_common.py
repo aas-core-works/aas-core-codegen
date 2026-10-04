@@ -124,6 +124,62 @@ export function setDifference<T>(
     ),
 ]
 
+#: Look up the values of the dictionaries as in Python
+DICT_LOOK_UPS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+/**
+ * Get the value of the `key` in the `map`, as `map[key]` does in Python.
+ *
+ * @remarks
+ * Unlike `Map.get`, we throw on a missing key so that we follow the semantics of
+ * the meta-model. The values of the maps are never `undefined`.
+ *
+ * @param map - to look up the `key` in
+ * @param key - to be looked up
+ * @returns value of the `key`
+ * @throws {{@link RangeError}} if `key` is missing in the `map`
+ * @typeParam K - type of the keys
+ * @typeParam V - type of the values
+ */
+export function mapGetOrThrow<K, V>(
+{I}map: ReadonlyMap<K, V>,
+{I}key: K
+): V {{
+{I}const value = map.get(key);
+{I}if (value === undefined) {{
+{II}throw new RangeError(`The key ${{String(key)}} is missing in the map`);
+{I}}}
+{I}return value;
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * Get the value of the `key` in the `map`, or the `defaultValue` if the `key`
+ * is missing, as `map.get(key, defaultValue)` does in Python.
+ *
+ * @remarks
+ * The values of the maps are never `undefined`.
+ *
+ * @param map - to look up the `key` in
+ * @param key - to be looked up
+ * @param defaultValue - to be given if the `key` is missing
+ * @returns value of the `key`, or `defaultValue`
+ * @typeParam K - type of the keys
+ * @typeParam V - type of the values
+ */
+export function mapGetOr<K, V>(
+{I}map: ReadonlyMap<K, V>,
+{I}key: K,
+{I}defaultValue: V
+): V {{
+{I}const value = map.get(key);
+{I}return value === undefined ? defaultValue : value;
+}}"""
+    ),
+]
+
 #: Sort the items of the sets in the properties in the same order as all the SDKs
 SET_SORTING: Final[Sequence[Stripped]] = [
     Stripped(
@@ -945,6 +1001,13 @@ export function findStr(text: string, sub: string, start = 0): number {{
     # an intersection or a difference of sets.
     if intermediate_uses.set_operations(symbol_table):
         for block in SET_OPERATIONS:
+            blocks.insert(len(blocks) - 1, block)
+
+    # NOTE (mristin):
+    # Analogous to the modulo, we add the helpers only if the meta-model might
+    # look up the values of a dictionary.
+    if intermediate_uses.dicts(symbol_table):
+        for block in DICT_LOOK_UPS:
             blocks.insert(len(blocks) - 1, block)
 
     # NOTE (mristin):

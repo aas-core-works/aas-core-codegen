@@ -590,6 +590,34 @@ public static class SetHelpers
     )
 
 
+_DICT_HELPERS: Final[Stripped] = Stripped(
+    f"""\
+/// <summary>
+/// Provide the helpers for the dictionaries used by the transpiled code.
+/// </summary>
+public static class DictHelpers
+{{
+{I}/// <summary>
+{I}/// Get the value of <paramref name="key" />, or <c>null</c> if the key is
+{I}/// missing in <paramref name="dictionary" />.
+{I}/// </summary>
+{I}/// <remarks>
+{I}/// We need this helper only for the values of value types, since
+{I}/// <c>GetValueOrDefault</c> gives their default, such as <c>0</c> or
+{I}/// <c>false</c>, instead of <c>null</c> on a missing key.
+{I}/// </remarks>
+{I}public static TValue? GetValueOrNull<TKey, TValue>(
+{II}System.Collections.Generic.IReadOnlyDictionary<TKey, TValue> dictionary,
+{II}TKey key) where TValue : struct
+{I}{{
+{II}return dictionary.TryGetValue(key, out TValue value)
+{III}? value
+{III}: (TValue?)null;
+{I}}}
+}}  // public static class DictHelpers"""
+)
+
+
 def generate(
     symbol_table: intermediate.SymbolTable,
     namespace: csharp_common.NamespaceIdentifier,
@@ -611,6 +639,12 @@ def generate(
 
     if intermediate_uses.set_properties(symbol_table):
         blocks.append(_generate_set_helpers(symbol_table))
+
+    # NOTE (mristin):
+    # We over-approximate and add the helpers for any dictionary, as we do not
+    # infer the types here. In the worst case, the helpers are unused.
+    if intermediate_uses.dicts(symbol_table):
+        blocks.append(_DICT_HELPERS)
 
     # NOTE (mristin):
     # We add the helper only if the meta-model uses the modulo so that we do not

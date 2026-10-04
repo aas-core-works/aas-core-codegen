@@ -334,6 +334,33 @@ class Tuple(Expression):
         visitor.visit_tuple(self)
 
 
+class DictLiteral(Expression):
+    """
+    Represent a dictionary literal such as ``{}`` or ``{"a": 1, "b": 2}``.
+
+    The :attr:`keys` and the :attr:`values` are paired by their positions.
+    """
+
+    def __init__(
+        self,
+        keys: Sequence["Expression"],
+        values: Sequence["Expression"],
+        original_node: ast.AST,
+    ) -> None:
+        """Initialize with the given values."""
+        Expression.__init__(self, original_node=original_node)
+        self.keys = keys
+        self.values = values
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_dict_literal(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_dict_literal(self)
+
+
 class IsNone(Expression):
     """Represent a check whether something ``is None``."""
 
@@ -584,6 +611,37 @@ class ForRange(Node):
 ForUnion = Union[ForEach, ForRange]
 
 
+class ForEachItem(Node):
+    """
+    Structure the iteration over the items of a dictionary, ``for k, v in x.items()``.
+
+    We support it only in the for-loop statements, but not in ``any(...)`` and
+    ``all(...)``, see :py:class:`For`.
+    """
+
+    def __init__(
+        self, key: Name, value: Name, mapping: Expression, original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Node.__init__(self, original_node=original_node)
+        self.key = key
+        self.value = value
+        self.mapping = mapping
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_for_each_item(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_for_each_item(self)
+
+
+#: Generator of a for-loop statement, where we also iterate over the items of
+#: a dictionary, unlike in ``any(...)`` and ``all(...)``
+ForStatementUnion = Union[ForEach, ForEachItem, ForRange]
+
+
 class Any(Expression):
     """Represent an ``any(...)`` expression."""
 
@@ -753,15 +811,15 @@ class Switch(Statement):
 class For(Statement):
     """Represent a for-loop statement over a collection or a range of integers."""
 
-    #: Loop variable together with the collection or the range we iterate over
-    generator: ForUnion
+    #: Loop variables together with the collection or the range we iterate over
+    generator: ForStatementUnion
 
     #: Statements executed on each iteration; empty if the original body was ``pass``
     body: Sequence["StatementUnion"]
 
     def __init__(
         self,
-        generator: ForUnion,
+        generator: ForStatementUnion,
         body: Sequence["StatementUnion"],
         original_node: ast.AST,
     ) -> None:
@@ -1052,6 +1110,12 @@ class Visitor(DBC):
         for value in node.values:
             self.visit(value)
 
+    def visit_dict_literal(self, node: DictLiteral) -> None:
+        """Visit a dictionary literal."""
+        for key, value in zip(node.keys, node.values):
+            self.visit(key)
+            self.visit(value)
+
     def visit_is_none(self, node: IsNone) -> None:
         """Visit an is-none check."""
         self.visit(node.value)
@@ -1114,6 +1178,10 @@ class Visitor(DBC):
     def visit_for_each(self, node: ForEach) -> None:
         """Visit a for-each in a generator."""
         self.visit(node.iteration)
+
+    def visit_for_each_item(self, node: ForEachItem) -> None:
+        """Visit a for-each over the items of a dictionary."""
+        self.visit(node.mapping)
 
     def visit_for_range(self, node: ForRange) -> None:
         """Visit a for-range in a generator."""
@@ -1253,6 +1321,11 @@ class Transformer(Generic[T], DBC):
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
+    def transform_dict_literal(self, node: DictLiteral) -> T:
+        """Transform a dictionary literal into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
     def transform_is_none(self, node: IsNone) -> T:
         """Transform an is-none check into something."""
         raise NotImplementedError(f"{node=}")
@@ -1315,6 +1388,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_for_each(self, node: ForEach) -> T:
         """Transform the for-each in a generator into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_for_each_item(self, node: ForEachItem) -> T:
+        """Transform the for-each over the items of a dictionary into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -1507,6 +1585,18 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_dict_literal(self, node: DictLiteral) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("keys", [self.transform(key) for key in node.keys]),
+                stringify.Property(
+                    "values", [self.transform(value) for value in node.values]
+                ),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_is_none(self, node: IsNone) -> stringify.Entity:
         return stringify.Entity(
             name=node.__class__.__name__,
@@ -1640,6 +1730,17 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("variable", self.transform(node.variable)),
                 stringify.Property("iteration", self.transform(node.iteration)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_for_each_item(self, node: ForEachItem) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("key", self.transform(node.key)),
+                stringify.Property("value", self.transform(node.value)),
+                stringify.Property("mapping", self.transform(node.mapping)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )
@@ -1887,6 +1988,10 @@ class RestrictedTransformer(Transformer[T]):
         """Transform a tuple literal into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
+    def transform_dict_literal(self, node: DictLiteral) -> T:
+        """Transform a dictionary literal into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
     def transform_is_none(self, node: IsNone) -> T:
         """Transform an is-none check into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -1937,6 +2042,10 @@ class RestrictedTransformer(Transformer[T]):
 
     def transform_for_each(self, node: ForEach) -> T:
         """Transform a for-each in a generator expression into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_for_each_item(self, node: ForEachItem) -> T:
+        """Transform a for-each over the items of a dictionary into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_for_range(self, node: ForRange) -> T:
@@ -2055,6 +2164,12 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
         for value in node.values:
             yield from self.transform(value)
 
+    def transform_dict_literal(self, node: DictLiteral) -> Iterator[Node]:
+        yield node
+        for key, value in zip(node.keys, node.values):
+            yield from self.transform(key)
+            yield from self.transform(value)
+
     def transform_is_none(self, node: IsNone) -> Iterator[Node]:
         yield node
         yield from self.transform(node.value)
@@ -2118,6 +2233,12 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
         yield node
         yield from self.transform(node.variable)
         yield from self.transform(node.iteration)
+
+    def transform_for_each_item(self, node: ForEachItem) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.key)
+        yield from self.transform(node.value)
+        yield from self.transform(node.mapping)
 
     def transform_for_range(self, node: ForRange) -> Iterator[Node]:
         yield node

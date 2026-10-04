@@ -167,6 +167,13 @@ def moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
     elif isinstance(type_annotation, intermediate.SetTypeAnnotation):
         return f"setOf_{moniker(type_annotation.items)}"
 
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_annotation}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_annotation)
 
@@ -389,6 +396,13 @@ def collect_nested_containers(
         """Collect the containers nested in ``type_annotation``, and itself if ``nested``."""
         if not isinstance(type_annotation, intermediate.ContainerTypeAnnotationAsTuple):
             return
+
+        if isinstance(type_annotation, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_annotation}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
 
         items = (
             type_annotation.items

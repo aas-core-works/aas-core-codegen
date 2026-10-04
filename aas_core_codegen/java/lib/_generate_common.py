@@ -588,6 +588,59 @@ public final class SetHelpers {{
     return Stripped("\n\n".join(blocks))
 
 
+def _generate_map_helpers(package: java_common.PackageIdentifier) -> Stripped:
+    """Generate the helpers for the dictionaries, which are maps in Java."""
+    code = Stripped(
+        f"""\
+/**
+ * Provide the operations on maps which Java does not provide out of the box.
+ */
+public final class MapHelpers {{
+{I}private MapHelpers() {{
+{II}// Prevent instantiation
+{I}}}
+
+{I}/**
+{I} * Get the value of the {{@code key}} in {{@code that}}, as Python does with
+{I} * {{@code that[key]}}.
+{I} *
+{I} * <p>The values of the maps are never {{@code null}}, so {{@code null}}
+{I} * stands for a missing key.
+{I} *
+{I} * @param that map to look the key up in
+{I} * @param key to be looked up
+{I} * @param <K> type of the keys
+{I} * @param <V> type of the values
+{I} * @return the value of the key
+{I} * @throws NoSuchElementException if the key is missing
+{I} */
+{I}public static <K, V> V getOrThrow(Map<K, V> that, K key) {{
+{II}final V value = that.get(key);
+{II}if (value == null) {{
+{III}throw new NoSuchElementException(
+{IIII}"The key is missing from the map: " + key);
+{II}}}
+
+{II}return value;
+{I}}}
+}}"""
+    )
+
+    blocks = [
+        java_common.WARNING,
+        Stripped(f"package {package}.common;"),
+        Stripped(
+            """\
+import java.util.Map;
+import java.util.NoSuchElementException;"""
+        ),
+        code,
+        java_common.WARNING,
+    ]  # type: List[Stripped]
+
+    return Stripped("\n\n".join(blocks))
+
+
 def generate(
     package: java_common.PackageIdentifier,
     symbol_table: intermediate.SymbolTable,
@@ -628,6 +681,13 @@ def generate(
             ),
         )
         files.append(java_common.JavaFile("SetHelpers.java", f"{set_helpers}\n"))
+
+    if intermediate_uses.dicts(symbol_table):
+        files.append(
+            java_common.JavaFile(
+                "MapHelpers.java", f"{_generate_map_helpers(package)}\n"
+            )
+        )
 
     for arity in range(1, java_common.MAX_TUPLE_ARITY + 1):
         name = f"Tuple{arity}"

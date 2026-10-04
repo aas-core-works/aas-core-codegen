@@ -1,0 +1,1 @@
+We do not support the dictionaries in the properties yet, but the property 'counts' of the class 'Something' has the type Dict[str, int]. The dictionaries are supported only in the arguments, the return values and the variables of the verification functions and of the methods.

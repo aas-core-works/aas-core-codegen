@@ -932,6 +932,13 @@ AsTuple{len(type_anno.items)}<{item_types_joined}>(
 {I}{indent_but_first_line(item_deserializers_joined, I)})"""
         )
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -2268,6 +2275,13 @@ SerializeTuple{len(type_anno.items)}<{item_types_joined}>(
 {I}{indent_but_first_line(item_serializers_joined, I)})"""
         )
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     else:
         assert_never(type_anno)
 
@@ -2395,6 +2409,13 @@ def _generate_transform_property(
         # The serializers of the nested lists, tuples and sets are composed
         # recursively, see :py:func:`_serializer_expr`.
         serializer_name = _serializer_name(type_anno)
+
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
 
     else:
         assert_never(type_anno)

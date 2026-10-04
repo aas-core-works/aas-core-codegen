@@ -42,7 +42,8 @@ class _Category(enum.Enum):
     #: the instances are shared pointers
     VALUE = 1
 
-    #: Lists, sets, tuples and JSON-able values, which C++ copies deeply
+    #: Lists, sets, dictionaries, tuples and JSON-able values, which C++ copies
+    #: deeply
     CONTAINER = 2
 
 
@@ -57,6 +58,7 @@ def _categorize(
         (
             intermediate_type_inference.ListTypeAnnotation,
             intermediate_type_inference.SetTypeAnnotation,
+            intermediate_type_inference.DictTypeAnnotation,
             intermediate_type_inference.TupleTypeAnnotation,
             intermediate_type_inference.JsonValueTypeAnnotation,
             intermediate_type_inference.JsonArrayTypeAnnotation,
@@ -126,7 +128,8 @@ class _Binding:
     kind: Final[_BindingKind]
 
     #: The assignment defining a local variable, or the generator defining a loop
-    #: variable; None for an argument
+    #: variable; None for an argument. The generator over the items of
+    #: a dictionary defines both the key and the value.
     definition: Final[Optional[parse_tree.Node]]
 
     def __init__(
@@ -178,8 +181,9 @@ class _Collector(parse_tree.Visitor):
         self.reassigned = set()  # type: Set[_Binding]
 
         #: Expressions whose values are mutated in place: the collections of
-        #: the index targets, the sets which we add to, and the lists and the sets
-        #: passed to the mutable arguments
+        #: the index targets, the sets which we add to, the dictionaries which we
+        #: remove from, and the lists, the sets and the dictionaries passed to
+        #: the mutable arguments
         self.mutated = []  # type: List[parse_tree.Expression]
 
         #: Names of the properties replaced by a setter
@@ -192,15 +196,20 @@ class _Collector(parse_tree.Visitor):
         #: values, including the instances of the non-``@non_mutating`` method calls
         self.passes_mutable_non_primitive = False
 
-        #: Set if the function mutates a list or a set in place
+        #: Set if the function mutates a list, a set or a dictionary in place
         self.mutates_in_place = False
 
         #: Nodes whose values are copied in C++ from an access path, while Python
         #: shares them
         self.copies = []  # type: List[Tuple[parse_tree.Node, str]]
 
-        #: Local sets which we move into a returned tuple literal
+        #: Local sets and dictionaries which we move into a returned tuple literal
         self.moved = set()  # type: Set[parse_tree.Node]
+
+        #: Generators over the items of a dictionary whose loop bodies neither
+        #: replace a non-primitive item nor remove a key of any dictionary, see
+        #: :py:func:`analyze`
+        self.items_loops_keeping_values = set()  # type: Set[parse_tree.ForEachItem]
 
         #: Generators of the ``any`` and ``all`` expressions, whose loop variables
         #: are parameters of lambdas in C++
@@ -234,10 +243,10 @@ class _Collector(parse_tree.Visitor):
     def _visit_in_new_scope(
         self,
         statements: Sequence[parse_tree.StatementUnion],
-        loop_binding: Optional[_Binding] = None,
+        loop_bindings: Sequence[_Binding] = (),
     ) -> None:
         self._scopes.append(
-            dict() if loop_binding is None else {loop_binding.identifier: loop_binding}
+            {loop_binding.identifier: loop_binding for loop_binding in loop_bindings}
         )
         try:
             for stmt in statements:
@@ -341,6 +350,13 @@ class _Collector(parse_tree.Visitor):
 
                 if not _is_primitive_or_enumeration(type_anno.items):
                     self.passes_mutable_non_primitive = True
+            elif isinstance(type_anno, intermediate_type_inference.DictTypeAnnotation):
+                self.mutated.append(arg_node)
+
+                # NOTE (mristin):
+                # The keys are always primitive values or enumeration literals.
+                if not _is_primitive_or_enumeration(type_anno.values):
+                    self.passes_mutable_non_primitive = True
             else:
                 self.passes_mutable_non_primitive = True
 
@@ -363,12 +379,13 @@ class _Collector(parse_tree.Visitor):
 
         method_type = self.type_map.get(node.member, None)
 
-        if (
-            isinstance(
-                method_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
-            )
-            and method_type.method.kind
+        if isinstance(
+            method_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
+        ) and (
+            method_type.method.kind
             is intermediate_type_inference.BuiltinMethodKind.SET_ADD
+            or method_type.method.kind
+            is intermediate_type_inference.BuiltinMethodKind.DICT_POP
         ):
             self.mutated.append(node.member.instance)
             self.mutates_in_place = True
@@ -396,6 +413,16 @@ class _Collector(parse_tree.Visitor):
             ) is _Category.CONTAINER and _is_access_path(value):
                 self.copies.append((value, "constructing a tuple"))
 
+    def visit_dict_literal(self, node: parse_tree.DictLiteral) -> None:
+        for key, value in zip(node.keys, node.values):
+            self.visit(key)
+            self.visit(value)
+
+            if _categorize(
+                self.type_map[value]
+            ) is _Category.CONTAINER and _is_access_path(value):
+                self.copies.append((value, "constructing a dictionary"))
+
     def visit_return(self, node: parse_tree.Return) -> None:
         if node.value is None:
             return
@@ -414,7 +441,8 @@ class _Collector(parse_tree.Visitor):
 
         # NOTE (mristin):
         # C++ moves a local variable implicitly only if it is returned on its own,
-        # but not as an item of a tuple, so we move the local sets explicitly.
+        # but not as an item of a tuple, so we move the local sets and
+        # dictionaries explicitly.
         # They are fresh, and the function ends here. We must not move a variable
         # which occurs more than once in the returned value, as its later
         # occurrences would see the moved-from variable.
@@ -434,7 +462,10 @@ class _Collector(parse_tree.Visitor):
                 and binding.kind is _BindingKind.LOCAL
                 and isinstance(
                     intermediate_type_inference.beneath_optional(self.type_map[value]),
-                    intermediate_type_inference.SetTypeAnnotation,
+                    (
+                        intermediate_type_inference.SetTypeAnnotation,
+                        intermediate_type_inference.DictTypeAnnotation,
+                    ),
                 )
                 and occurrences_by_identifier[value.identifier] == 1
             ):
@@ -487,6 +518,58 @@ class _Collector(parse_tree.Visitor):
     def visit_for(self, node: parse_tree.For) -> None:
         self.visit(node.generator)
 
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            # NOTE (mristin):
+            # The key is never mutated, so we track only the value by
+            # the generator, see :py:func:`analyze`.
+            key_binding = _Binding(
+                identifier=node.generator.key.identifier,
+                kind=_BindingKind.LOOP,
+                definition=None,
+            )
+
+            value_binding = _Binding(
+                identifier=node.generator.value.identifier,
+                kind=_BindingKind.LOOP,
+                definition=node.generator,
+            )
+            self.binding_by_definition[node.generator] = value_binding
+
+            keeps_values = True
+            for stmt in node.body:
+                for some_node in parse_tree.over_nodes(stmt):
+                    if (
+                        isinstance(some_node, parse_tree.Assignment)
+                        and isinstance(some_node.target, parse_tree.Index)
+                        and not _is_primitive_or_enumeration(
+                            self.type_map[some_node.value]
+                        )
+                    ):
+                        keeps_values = False
+
+                    elif isinstance(some_node, parse_tree.MethodCall):
+                        member_type = self.type_map.get(some_node.member, None)
+                        if (
+                            isinstance(
+                                member_type,
+                                intermediate_type_inference.BuiltinMethodTypeAnnotation,
+                            )
+                            and member_type.method.kind
+                            is intermediate_type_inference.BuiltinMethodKind.DICT_POP
+                        ):
+                            keeps_values = False
+
+                    else:
+                        pass
+
+            if keeps_values:
+                self.items_loops_keeping_values.add(node.generator)
+
+            self._visit_in_new_scope(
+                node.body, loop_bindings=(key_binding, value_binding)
+            )
+            return
+
         binding = _Binding(
             identifier=node.generator.variable.identifier,
             kind=_BindingKind.LOOP,
@@ -494,7 +577,7 @@ class _Collector(parse_tree.Visitor):
         )
         self.binding_by_definition[node.generator] = binding
 
-        self._visit_in_new_scope(node.body, loop_binding=binding)
+        self._visit_in_new_scope(node.body, loop_bindings=(binding,))
 
 
 class Aliasing:
@@ -560,12 +643,22 @@ def analyze(
         segments.reverse()
         return binding, segments
 
-    def reference_is_faithful(path: _Path, through_item: bool) -> bool:
+    def reference_is_faithful(
+        path: _Path, through_item: bool, keeps_values: bool = False
+    ) -> bool:
         """
         Check that a reference to ``path`` behaves as in Python.
 
         If ``through_item`` is set, the reference is to an item of the collection
         at ``path``, as a loop variable.
+
+        If ``keeps_values`` is set, the reference is to a value of a dictionary
+        in a loop over its items whose body neither replaces a non-primitive item
+        nor removes a key, so we ignore the replacements elsewhere in the function.
+        The type inference refuses to mutate the dictionary in the loop over it,
+        and ``std::unordered_map`` keeps the references to its values valid when
+        other keys are inserted. Hence, the referenced value stays in place for
+        the whole body, as in Python.
         """
         binding, segments = path
 
@@ -583,7 +676,7 @@ def analyze(
             isinstance(segment, parse_tree.Index) for segment in segments
         )
 
-        if collector.replaces_non_primitive_item and through_index:
+        if collector.replaces_non_primitive_item and through_index and not keeps_values:
             return False
 
         if collector.passes_mutable_non_primitive and (
@@ -631,6 +724,10 @@ def analyze(
         elif binding.kind is _BindingKind.LOOP:
             if isinstance(binding.definition, parse_tree.ForEach):
                 worklist.append(binding.definition.iteration)
+            elif isinstance(binding.definition, parse_tree.ForEachItem):
+                worklist.append(binding.definition.mapping)
+            else:
+                pass
 
         elif binding.kind is _BindingKind.ARGUMENT:
             pass
@@ -724,19 +821,36 @@ def analyze(
                     )
                 )
 
-        elif isinstance(definition, (parse_tree.ForEach, parse_tree.ForRange)):
+        elif isinstance(
+            definition,
+            (parse_tree.ForEach, parse_tree.ForEachItem, parse_tree.ForRange),
+        ):
             if isinstance(definition, parse_tree.ForRange):
                 declaration_by_definition[definition] = Declaration.DEFAULT
                 continue
 
-            iteration_path = path_of(definition.iteration)
+            # NOTE (mristin):
+            # We declare the value of the iteration over the items of a dictionary,
+            # as the key is never mutated.
+            iterated: parse_tree.Expression
+            variable: parse_tree.Name
+            if isinstance(definition, parse_tree.ForEach):
+                iterated = definition.iteration
+                variable = definition.variable
+            elif isinstance(definition, parse_tree.ForEachItem):
+                iterated = definition.mapping
+                variable = definition.value
+            else:
+                assert_never(definition)
+
+            iteration_path = path_of(iterated)
 
             if iteration_path is not None and not reference_is_faithful(
                 iteration_path, through_item=False
             ):
                 errors.append(
                     Error(
-                        definition.iteration.original_node,
+                        iterated.original_node,
                         "We can not iterate over the collection in C++, since "
                         "the collection, or the variable it comes from, is "
                         "re-assigned, or the collection is replaced in its "
@@ -746,10 +860,12 @@ def analyze(
                 )
                 continue
 
-            category = _categorize(type_map[definition.variable])
+            category = _categorize(type_map[variable])
 
             is_reference_faithful = iteration_path is None or reference_is_faithful(
-                iteration_path, through_item=True
+                iteration_path,
+                through_item=True,
+                keeps_values=definition in collector.items_loops_keeping_values,
             )
 
             if category is _Category.CHEAP:
@@ -765,7 +881,7 @@ def analyze(
                     if definition in collector.lambda_generators:
                         errors.append(
                             Error(
-                                definition.variable.original_node,
+                                variable.original_node,
                                 f"The loop variable {binding.identifier!r} of "
                                 f"the generator expression is mutated in place, "
                                 f"which is not supported yet in C++, as we would "
@@ -778,7 +894,7 @@ def analyze(
                     if not is_reference_faithful:
                         errors.append(
                             Error(
-                                definition.variable.original_node,
+                                variable.original_node,
                                 f"The loop variable {binding.identifier!r} is "
                                 f"mutated in place, so we would need to declare it "
                                 f"as a reference in C++. However, the reference "
@@ -799,7 +915,7 @@ def analyze(
                 else:
                     errors.append(
                         Error(
-                            definition.variable.original_node,
+                            variable.original_node,
                             f"We can neither reference nor copy the loop variable "
                             f"{binding.identifier!r} in C++. A reference would not "
                             f"behave as in Python, since the items are replaced in "

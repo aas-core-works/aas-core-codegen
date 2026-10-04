@@ -837,6 +837,32 @@ __xml_namespace__ = "https://dummy.com"
 
         self.assertIsInstance(unpickled, intermediate_types.SetTypeAnnotation)
 
+    def test_dict_type_annotation(self) -> None:
+        source = """\
+@verification
+def is_counted(text: str, counts: Mapping[str, int]) -> bool:
+    return text in counts
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        if error is not None:
+            raise AssertionError(tests.common.most_underlying_messages(error))
+        assert symbol_table is not None
+
+        type_annotation = (
+            symbol_table.verification_functions[0].arguments[1].type_annotation
+        )
+
+        pickled_data = pickle.dumps(type_annotation)
+        unpickled = pickle.loads(pickled_data)
+
+        self.assertIsInstance(unpickled, intermediate_types.DictTypeAnnotation)
+
     def test_tuple_type_annotation(self) -> None:
         source = """\
 class Some_class:

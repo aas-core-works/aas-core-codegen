@@ -307,6 +307,11 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="deep_class_hierarchy"
         )
 
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP, case_name="dicts"
+        )
+
     def test_expected_empty_class(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="empty_class"
@@ -548,6 +553,11 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="deep_class_hierarchy"
         )
 
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP, case_name="dicts"
+        )
+
     def test_expected_empty_class(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="empty_class"
@@ -764,6 +774,11 @@ class Test_golang(_TestCase):
     def test_expected_deep_class_hierarchy(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="deep_class_hierarchy"
+        )
+
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG, case_name="dicts"
         )
 
     def test_expected_empty_class(self) -> None:
@@ -991,6 +1006,11 @@ class Test_java(_TestCase):
             target=aas_core_codegen.main.Target.JAVA, case_name="deep_class_hierarchy"
         )
 
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA, case_name="dicts"
+        )
+
     def test_expected_empty_class(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="empty_class"
@@ -1209,6 +1229,11 @@ class Test_jsonschema(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
             case_name="deep_class_hierarchy",
+        )
+
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="dicts"
         )
 
     def test_expected_empty_class(self) -> None:
@@ -1442,6 +1467,11 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="deep_class_hierarchy"
         )
 
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON, case_name="dicts"
+        )
+
     def test_expected_empty_class(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="empty_class"
@@ -1660,6 +1690,11 @@ class Test_typescript(_TestCase):
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
             case_name="deep_class_hierarchy",
+        )
+
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="dicts"
         )
 
     def test_expected_empty_class(self) -> None:
@@ -1882,6 +1917,11 @@ class Test_xsd(_TestCase):
     def test_expected_deep_class_hierarchy(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="deep_class_hierarchy"
+        )
+
+    def test_expected_dicts(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD, case_name="dicts"
         )
 
     def test_expected_empty_class(self) -> None:

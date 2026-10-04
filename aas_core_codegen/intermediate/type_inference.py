@@ -212,6 +212,8 @@ class BuiltinFunctionKind(enum.Enum):
             ...
         elif func.kind is BuiltinFunctionKind.LIST:
             ...
+        elif func.kind is BuiltinFunctionKind.DICT:
+            ...
         else:
             assert_never(func.kind)
     """
@@ -221,6 +223,7 @@ class BuiltinFunctionKind(enum.Enum):
     INT = "int"
     SET = "set"
     LIST = "list"
+    DICT = "dict"
 
 
 class BuiltinFunction:
@@ -285,6 +288,8 @@ class BuiltinMethodKind(enum.Enum):
     SET_ADD = "set.add"
     SET_INTERSECTION = "set.intersection"
     SET_DIFFERENCE = "set.difference"
+    DICT_GET = "dict.get"
+    DICT_POP = "dict.pop"
 
 
 class BuiltinMethod:
@@ -321,8 +326,8 @@ class BuiltinMethodTypeAnnotation(AtomicTypeAnnotation):
     """
     Represent a type of built-in method bound to an instance of a primitive.
 
-    We mark the methods bound to a set which is declared read-only, *i.e.*,
-    a constant set, a read-only set argument or a local set declared as
+    We mark the methods bound to a set or a dictionary which is declared read-only,
+    *i.e.*, a constant set, a read-only argument or a local variable declared as
     ``Final[...]``, with :attr:`read_only_receiver`.
     The targets need it if they generate such sets with a type of their own.
     For example, Python generates them as ``AbstractSet``, which has neither
@@ -375,8 +380,9 @@ class BuiltinMethodTypeAnnotation(AtomicTypeAnnotation):
         """Initialize with the given values."""
         self.method = method
 
-        #: Set if the method is bound to a set declared read-only, *i.e.*,
-        #: a constant set, a read-only set argument or a ``Final[...]`` local set
+        #: Set if the method is bound to a set or a dictionary declared read-only,
+        #: *i.e.*, a constant set, a read-only argument or a ``Final[...]`` local
+        #: variable
         self.read_only_receiver = read_only_receiver
 
     def __str__(self) -> str:
@@ -473,6 +479,43 @@ SET_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
 }
 
 
+#: Represent ``dict.get(key)`` and ``dict.get(key, default)``.
+#:
+#: Without the default, the result is optional, and ``None`` if the key is
+#: missing. With the default, the result is the value of the dictionary, and
+#: the default if the key is missing.
+DICT_GET = BuiltinMethod(
+    kind=BuiltinMethodKind.DICT_GET,
+    name=Identifier("get"),
+    returns=None,
+    min_arg_count=1,
+    max_arg_count=2,
+)
+
+
+#: Represent ``dict.pop(key, None)``.
+#:
+#: The call removes the key, and does nothing if the key is missing. We require
+#: the default ``None`` so that the call never raises a ``KeyError`` in Python,
+#: as the other targets silently ignore a missing key. The dictionary has to be
+#: mutable. The call returns nothing in the targets, so it can only be
+#: a statement on its own.
+DICT_POP = BuiltinMethod(
+    kind=BuiltinMethodKind.DICT_POP,
+    name=Identifier("pop"),
+    returns=PrimitiveTypeAnnotation(PrimitiveType.NONE),
+    min_arg_count=2,
+    max_arg_count=2,
+)
+
+
+#: Map the names of the built-in methods on dictionaries to their definitions
+DICT_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
+    DICT_GET.name: DICT_GET,
+    DICT_POP.name: DICT_POP,
+}
+
+
 class MethodTypeAnnotation(AtomicTypeAnnotation):
     """Represent a type of class method."""
 
@@ -515,6 +558,17 @@ class SetTypeAnnotation(SubscriptedTypeAnnotation):
 
     def __str__(self) -> str:
         return f"Set[{self.items}]"
+
+
+class DictTypeAnnotation(SubscriptedTypeAnnotation):
+    """Represent a type annotation involving a ``Dict[...]``."""
+
+    def __init__(self, keys: "TypeAnnotationUnion", values: "TypeAnnotationUnion"):
+        self.keys = keys
+        self.values = values
+
+    def __str__(self) -> str:
+        return f"Dict[{self.keys}, {self.values}]"
 
 
 class TupleTypeAnnotation(SubscriptedTypeAnnotation):
@@ -660,6 +714,14 @@ def _type_annotations_equal(
             return False
         else:
             return _type_annotations_equal(that.items, other.items)
+
+    elif isinstance(that, DictTypeAnnotation):
+        if not isinstance(other, DictTypeAnnotation):
+            return False
+        else:
+            return _type_annotations_equal(
+                that.keys, other.keys
+            ) and _type_annotations_equal(that.values, other.values)
 
     elif isinstance(that, TupleTypeAnnotation):
         if not isinstance(other, TupleTypeAnnotation):
@@ -868,6 +930,17 @@ def _assignable(
             # in implementation targets such as C++ and Golang.
             return _type_annotations_equal(target_type.items, value_type.items)
 
+    elif isinstance(target_type, DictTypeAnnotation):
+        if not isinstance(value_type, DictTypeAnnotation):
+            return False
+        else:
+            # NOTE (mristin):
+            # We assume the dictionaries to be invariant, analogous to the lists and
+            # the sets above.
+            return _type_annotations_equal(
+                target_type.keys, value_type.keys
+            ) and _type_annotations_equal(target_type.values, value_type.values)
+
     elif isinstance(target_type, TupleTypeAnnotation):
         if not isinstance(value_type, TupleTypeAnnotation):
             return False
@@ -1001,6 +1074,12 @@ def convert_type_annotation(
     elif isinstance(type_annotation, _types.SetTypeAnnotation):
         return SetTypeAnnotation(items=convert_type_annotation(type_annotation.items))
 
+    elif isinstance(type_annotation, _types.DictTypeAnnotation):
+        return DictTypeAnnotation(
+            keys=convert_type_annotation(type_annotation.keys),
+            values=convert_type_annotation(type_annotation.values),
+        )
+
     elif isinstance(type_annotation, _types.TupleTypeAnnotation):
         return TupleTypeAnnotation(
             items=[convert_type_annotation(item) for item in type_annotation.items]
@@ -1026,6 +1105,84 @@ def convert_type_annotation(
         assert_never(type_annotation)
 
     raise AssertionError("Should not have gotten here")
+
+
+def refusal_of_dict_keys(keys: "TypeAnnotationUnion") -> Optional[str]:
+    """
+    Explain why the ``keys`` can not be the keys of a dictionary.
+
+    We support only the dictionaries with the keys of strings, integers,
+    the constrained primitives of them, and the enumeration literals.
+
+    :return: the explanation, or None if the ``keys`` are supported
+    """
+    a_type = try_primitive_type(keys)
+
+    if a_type in (PrimitiveType.STR, PrimitiveType.INT):
+        return None
+
+    if a_type is PrimitiveType.BOOL:
+        return (
+            f"We do not support the dictionaries with boolean keys, but got "
+            f"the keys of type {keys}. Python considers ``True`` and ``1`` to be "
+            f"the same key, while the other targets do not, and a dictionary of "
+            f"two keys is better written as two variables."
+        )
+
+    if a_type is PrimitiveType.FLOAT:
+        return (
+            f"We do not support the dictionaries with floating-point keys, but "
+            f"got the keys of type {keys}. The targets disagree on the equality "
+            f"of NaN and of 0.0 and -0.0 as keys, and on how to write such a key "
+            f"in JSON."
+        )
+
+    if a_type is PrimitiveType.BYTEARRAY:
+        return (
+            f"We do not support the dictionaries with keys of byte arrays, but "
+            f"got the keys of type {keys}. A bytearray is mutable and hence "
+            f"unhashable in Python, so it can not be a key of a dictionary."
+        )
+
+    if isinstance(keys, OurTypeAnnotation):
+        if isinstance(keys.our_type, _types.Enumeration):
+            return None
+
+        return (
+            f"We support only the strings, the integers, the constrained "
+            f"primitives of them and the enumeration literals as the keys of "
+            f"a dictionary, but got the keys of type {keys}, which is "
+            f"a {'named union' if isinstance(keys.our_type, _types.NamedUnion) else 'class'}. "
+            f"Please contact the developers if you need the instances as keys."
+        )
+
+    if isinstance(keys, OptionalTypeAnnotation):
+        return (
+            f"We do not support None as a key of a dictionary, but got the keys "
+            f"of type {keys}. Some targets can not hold a null key in "
+            f"a dictionary, *e.g.*, a string key of a map in Go can not be nil."
+        )
+
+    if isinstance(keys, (ListTypeAnnotation, SetTypeAnnotation, DictTypeAnnotation)):
+        return (
+            f"We do not support the lists, the sets or the dictionaries as "
+            f"the keys of a dictionary, but got the keys of type {keys}. They are "
+            f"mutable and hence unhashable in Python."
+        )
+
+    if isinstance(keys, TupleTypeAnnotation):
+        return (
+            f"We do not support the tuples as the keys of a dictionary, but got "
+            f"the keys of type {keys}. Only some of the targets can hash a tuple "
+            f"out of the box. Please contact the developers if you need "
+            f"this feature."
+        )
+
+    return (
+        f"We support only the strings, the integers, the constrained primitives "
+        f"of them and the enumeration literals as the keys of a dictionary, "
+        f"but got the keys of type {keys}."
+    )
 
 
 def refusal_of_set_items(items: "TypeAnnotationUnion") -> Optional[str]:
@@ -1082,6 +1239,13 @@ def refusal_of_set_items(items: "TypeAnnotationUnion") -> Optional[str]:
         return (
             f"We do not support the sets of lists or sets, but got the items "
             f"of type {items}. The lists and the sets are mutable and hence "
+            f"unhashable in Python, so they can not be items of a set."
+        )
+
+    if isinstance(items, DictTypeAnnotation):
+        return (
+            f"We do not support the sets of dictionaries, but got the items "
+            f"of type {items}. The dictionaries are mutable and hence "
             f"unhashable in Python, so they can not be items of a set."
         )
 
@@ -1406,6 +1570,16 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_dict_literal(self, node: parse_tree.DictLiteral) -> str:
+        items_joined = ", ".join(
+            f"{self.transform(key)}: {self.transform(value)}"
+            for key, value in zip(node.keys, node.values)
+        )
+
+        result = f"{{{items_joined}}}"
+        self.representation_map[node] = result
+        return result
+
     def transform_is_none(self, node: parse_tree.IsNone) -> str:
         value = self.transform(node.value)
         if not _Canonicalizer._needs_no_brackets(node.value):
@@ -1543,6 +1717,17 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
             iteration = f"({iteration})"
 
         result = f"for {variable} in {iteration}"
+        self.representation_map[node] = result
+        return result
+
+    def transform_for_each_item(self, node: parse_tree.ForEachItem) -> str:
+        key = self.transform(node.key)
+        value = self.transform(node.value)
+        mapping = self.transform(node.mapping)
+        if not _Canonicalizer._needs_no_brackets(node.mapping):
+            mapping = f"({mapping})"
+
+        result = f"for {key}, {value} in {mapping}.items()"
         self.representation_map[node] = result
         return result
 
@@ -2211,6 +2396,7 @@ TypeAnnotationUnion = Union[
     MethodTypeAnnotation,
     ListTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
     TupleTypeAnnotation,
     OptionalTypeAnnotation,
     EnumerationAsTypeTypeAnnotation,
@@ -2233,13 +2419,16 @@ def _can_be_mutated(type_annotation: "TypeAnnotationUnion") -> bool:
     """
     Check whether a value of ``type_annotation`` can be mutated in place.
 
-    Only the lists, the sets and the instances of the classes can be mutated,
-    possibly reached through a tuple. The primitive values and the enumerations are
-    immutable, and we do not support mutating the JSON-able values.
+    Only the lists, the sets, the dictionaries and the instances of the classes can
+    be mutated, possibly reached through a tuple. The primitive values and
+    the enumerations are immutable, and we do not support mutating the JSON-able
+    values.
     """
     type_anno = beneath_optional(type_annotation)
 
-    if isinstance(type_anno, (ListTypeAnnotation, SetTypeAnnotation)):
+    if isinstance(
+        type_anno, (ListTypeAnnotation, SetTypeAnnotation, DictTypeAnnotation)
+    ):
         return True
 
     if isinstance(type_anno, OurTypeAnnotation):
@@ -2257,34 +2446,43 @@ _COLLECTION_TYPE_ANNOTATIONS = (
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
 )  # type: Final
 
 
-def _holds_set(type_annotation: "TypeAnnotationUnion") -> bool:
-    """Check whether a value of ``type_annotation`` is or contains a set at any depth."""
+def _holds_set_or_dict(type_annotation: "TypeAnnotationUnion") -> bool:
+    """
+    Check whether a value of ``type_annotation`` is or contains a set or
+    a dictionary at any depth.
+    """
     type_anno = beneath_optional(type_annotation)
 
-    if isinstance(type_anno, SetTypeAnnotation):
+    if isinstance(type_anno, (SetTypeAnnotation, DictTypeAnnotation)):
         return True
 
     if isinstance(type_anno, ListTypeAnnotation):
-        return _holds_set(type_anno.items)
+        return _holds_set_or_dict(type_anno.items)
 
     if isinstance(type_anno, TupleTypeAnnotation):
-        return any(_holds_set(item) for item in type_anno.items)
+        return any(_holds_set_or_dict(item) for item in type_anno.items)
 
     return False
 
 
-def _holds_list_or_set(type_annotation: "TypeAnnotationUnion") -> bool:
-    """Check whether a value of ``type_annotation`` is or contains a list or a set."""
+def _holds_list_set_or_dict(type_annotation: "TypeAnnotationUnion") -> bool:
+    """
+    Check whether a value of ``type_annotation`` is or contains a list, a set or
+    a dictionary.
+    """
     type_anno = beneath_optional(type_annotation)
 
-    if isinstance(type_anno, (ListTypeAnnotation, SetTypeAnnotation)):
+    if isinstance(
+        type_anno, (ListTypeAnnotation, SetTypeAnnotation, DictTypeAnnotation)
+    ):
         return True
 
     if isinstance(type_anno, TupleTypeAnnotation):
-        return any(_holds_list_or_set(item) for item in type_anno.items)
+        return any(_holds_list_set_or_dict(item) for item in type_anno.items)
 
     return False
 
@@ -2300,6 +2498,18 @@ def _is_access_path(node: parse_tree.Expression) -> bool:
 def _is_set_call(node: parse_tree.Node) -> bool:
     """Check whether ``node`` is a call to the built-in ``set``."""
     return isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "set"
+
+
+def _is_new_dict(node: parse_tree.Node) -> bool:
+    """
+    Check whether ``node`` gives a new dictionary.
+
+    A new dictionary is created by ``dict()`` or by a dictionary literal, so it
+    shares nothing with any other dictionary.
+    """
+    return isinstance(node, parse_tree.DictLiteral) or (
+        isinstance(node, parse_tree.FunctionCall) and node.name.identifier == "dict"
+    )
 
 
 def _is_list_copy(
@@ -2338,6 +2548,15 @@ def _is_new_set(
         member_type.method.kind is BuiltinMethodKind.SET_INTERSECTION
         or member_type.method.kind is BuiltinMethodKind.SET_DIFFERENCE
     )
+
+
+#: Explain where we support a new dictionary
+_NEW_DICT_REFUSAL: Final[str] = (
+    "We support ``dict()``, ``{}`` and a dictionary literal only as the value "
+    "assigned to a variable declared as a dictionary, *e.g.*, "
+    "``x: Dict[str, int] = {}``, since the targets need to know the type of "
+    "the keys and of the values of the new dictionary."
+)
 
 
 class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
@@ -2510,17 +2729,23 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
     def _is_copy(self, node: parse_tree.Expression) -> bool:
         """
-        Check that all the lists and the sets held by ``node`` are copies.
+        Check that all the lists, the sets and the dictionaries held by ``node`` are
+        copies.
 
-        A copy is a list copied with ``list(...)`` or a new set, possibly as an item
-        of a tuple literal.
+        A copy is a list copied with ``list(...)``, a new set or a new dictionary,
+        possibly as an item of a tuple literal.
         """
-        if _is_list_copy(node, self.type_map) or _is_new_set(node, self.type_map):
+        if (
+            _is_list_copy(node, self.type_map)
+            or _is_new_set(node, self.type_map)
+            or _is_new_dict(node)
+        ):
             return True
 
         if isinstance(node, parse_tree.Tuple):
             return all(
-                not _holds_list_or_set(self.type_map[value]) or self._is_copy(value)
+                not _holds_list_set_or_dict(self.type_map[value])
+                or self._is_copy(value)
                 for value in node.values
             )
 
@@ -2559,6 +2784,16 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         f"the argument {identifier!r} is declared as "
                         f"an AbstractSet, which is read-only. Please declare it as "
                         f"a Set if the {what} mutates it"
+                    )
+
+                if isinstance(
+                    beneath_optional(convert_type_annotation(argument.type_annotation)),
+                    DictTypeAnnotation,
+                ):
+                    return (
+                        f"the argument {identifier!r} is declared as "
+                        f"a Mapping, which is read-only. Please declare it as "
+                        f"a Dict if the {what} mutates it"
                     )
 
                 return (
@@ -2634,27 +2869,34 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             # A new set is a fresh value, and hence mutable.
             return None
 
+        if _is_new_dict(node):
+            # NOTE (mristin):
+            # A new dictionary is a fresh value, and hence mutable.
+            return None
+
         if isinstance(node, parse_tree.MethodCall):
             return "the result of a method call is read-only"
 
         return (
             "the value is neither a variable, nor a property, nor an item "
-            "of a list or a tuple"
+            "of a list, a tuple or a dictionary"
         )
 
     def _is_fresh(self, node: parse_tree.Expression) -> bool:
         """
-        Check that all the lists and the sets held by ``node`` are fresh.
+        Check that all the lists, the sets and the dictionaries held by ``node`` are
+        fresh.
 
-        A fresh list or set is shared with no other value. These are:
+        A fresh list, set or dictionary is shared with no other value. These are:
 
         * ``None``,
-        * a list copied with ``list(...)``, if its items hold no lists and no sets,
-          since the copy is shallow,
-        * a new set,
-        * a local set variable, which is neither a loop variable nor read-only,
-          since the local set variables can be assigned only the new sets and
-          the results of the calls, see :py:func:`_check_sets`,
+        * a list copied with ``list(...)``, if its items hold no lists, no sets and
+          no dictionaries, since the copy is shallow,
+        * a new set or a new dictionary,
+        * a local set or dictionary variable, which is neither a loop variable nor
+          read-only, since such local variables can be assigned only the new sets
+          and dictionaries, and the results of the calls, see
+          :py:func:`_check_sets_and_dicts`,
         * the result of a call, since the verification functions and the methods
           return only the fresh values themselves, and
         * a tuple literal of fresh values.
@@ -2664,16 +2906,22 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if _is_list_copy(node, self.type_map):
             list_type = beneath_optional(self.type_map[node])
-            return isinstance(list_type, ListTypeAnnotation) and not _holds_list_or_set(
-                list_type.items
-            )
+            return isinstance(
+                list_type, ListTypeAnnotation
+            ) and not _holds_list_set_or_dict(list_type.items)
+
+        if _is_new_dict(node):
+            return True
 
         if isinstance(node, (parse_tree.FunctionCall, parse_tree.MethodCall)):
             return True
 
         if isinstance(node, parse_tree.Name):
             return (
-                isinstance(beneath_optional(self.type_map[node]), SetTypeAnnotation)
+                isinstance(
+                    beneath_optional(self.type_map[node]),
+                    (SetTypeAnnotation, DictTypeAnnotation),
+                )
                 and node.identifier not in self._argument_by_name
                 and node.identifier not in self._loop_variable_set
                 and self._read_only_reason(node) is None
@@ -2681,7 +2929,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if isinstance(node, parse_tree.Tuple):
             return all(
-                not _holds_list_or_set(self.type_map[value]) or self._is_fresh(value)
+                not _holds_list_set_or_dict(self.type_map[value])
+                or self._is_fresh(value)
                 for value in node.values
             )
 
@@ -3109,6 +3358,40 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             self.type_map[node] = set_method_type
             return set_method_type
 
+        if isinstance(instance_type, DictTypeAnnotation):
+            dict_method = DICT_METHODS_BY_NAME.get(node.name, None)
+            if dict_method is None:
+                supported = ", ".join(
+                    repr(name) for name in sorted(DICT_METHODS_BY_NAME.keys())
+                )
+
+                if node.name == "items":
+                    message = (
+                        f"We support ``items()`` of a dictionary only in "
+                        f"a for-loop statement, ``for k, v in x.items()``. "
+                        f"Otherwise, we support only the following methods on "
+                        f"dictionaries: {supported}"
+                    )
+                else:
+                    message = (
+                        f"The member {node.name!r} is not supported on "
+                        f"dictionaries; we support only the following methods: "
+                        f"{supported}"
+                    )
+
+                self.errors.append(Error(node.original_node, message))
+                return None
+
+            dict_method_type = BuiltinMethodTypeAnnotation(
+                method=dict_method,
+                read_only_receiver=(
+                    isinstance(node.instance, parse_tree.Name)
+                    and self._read_only_reason(node.instance) is not None
+                ),
+            )
+            self.type_map[node] = dict_method_type
+            return dict_method_type
+
         if try_primitive_type(instance_type) is PrimitiveType.STR:
             builtin_method = STR_METHODS_BY_NAME.get(node.name, None)
             if builtin_method is None:
@@ -3374,11 +3657,36 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
+        if isinstance(collection_type, DictTypeAnnotation):
+            # NOTE (mristin):
+            # The targets look up the key in a hash map, so the key has to be of
+            # the same type as the keys. We accept the constrained primitives in
+            # either direction, as they are represented by their constrainees.
+            if not (
+                _assignable(target_type=collection_type.keys, value_type=index_type)
+                or _assignable(target_type=index_type, value_type=collection_type.keys)
+            ):
+                self.errors.append(
+                    Error(
+                        node.index.original_node,
+                        f"Expected the key to be of the type of the keys of "
+                        f"the dictionary {collection_type}, but got: {index_type}",
+                    )
+                )
+                return None
+
+            # NOTE (mristin):
+            # A missing key raises a ``KeyError`` in Python, and throws or panics
+            # in the targets, so the value is never optional.
+            result = collection_type.values
+            self.type_map[node] = result
+            return result
+
         if not isinstance(collection_type, ListTypeAnnotation):
             self.errors.append(
                 Error(
                     node.collection.original_node,
-                    f"Expected an index access on a list or a tuple, "
+                    f"Expected an index access on a list, a tuple or a dictionary, "
                     f"but got: {collection_type}",
                 )
             )
@@ -3671,8 +3979,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             self.errors.append(
                 Error(
                     node.member.original_node,
-                    f"We do not support looking up a list, a tuple or a set "
-                    f"with ``in``, but the member is inferred to be {member_type}. "
+                    f"We do not support looking up a list, a tuple, a set or "
+                    f"a dictionary with ``in``, but the member is inferred to be "
+                    f"{member_type}. "
                     f"The targets disagree on the comparison: Python compares "
                     f"the items item by item, while C#, Java and TypeScript "
                     f"compare their references.",
@@ -3696,6 +4005,22 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     node.member.original_node,
                     f"Expected the member to be of the type of the items of "
                     f"the set {container_type}, but got: {member_type}",
+                )
+            )
+            return None
+
+        # NOTE (mristin):
+        # The ``in`` checks the keys of a dictionary, which the targets look up in
+        # a hash map, as for the sets above.
+        if isinstance(container_type, DictTypeAnnotation) and not (
+            _assignable(target_type=container_type.keys, value_type=member_type)
+            or _assignable(target_type=member_type, value_type=container_type.keys)
+        ):
+            self.errors.append(
+                Error(
+                    node.member.original_node,
+                    f"Expected the member to be of the type of the keys of "
+                    f"the dictionary {container_type}, but got: {member_type}",
                 )
             )
             return None
@@ -3872,6 +4197,18 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         arg_types: Sequence["TypeAnnotationUnion"],
     ) -> Optional["TypeAnnotationUnion"]:
         """Check the arguments of a call to a built-in method, and infer the result."""
+        if method.kind is BuiltinMethodKind.DICT_POP and len(node.args) == 1:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    "We support ``pop`` only as ``x.pop(k, None)``, which removes "
+                    "the key and does nothing if the key is missing. Python raises "
+                    "a ``KeyError`` on a missing key without the default ``None``, "
+                    "while the other targets silently ignore it.",
+                )
+            )
+            return None
+
         if not method.min_arg_count <= len(node.args) <= method.max_arg_count:
             if method.min_arg_count == method.max_arg_count:
                 expected = f"{method.min_arg_count}"
@@ -3964,12 +4301,110 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
+        elif method.kind is BuiltinMethodKind.DICT_GET:
+            dict_type = self.type_map[node.member.instance]
+            assert isinstance(dict_type, DictTypeAnnotation)
+
+            success = True
+
+            if not (
+                _assignable(target_type=dict_type.keys, value_type=arg_types[0])
+                or _assignable(target_type=arg_types[0], value_type=dict_type.keys)
+            ):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the key of ``get`` to be of the type of the keys "
+                        f"of the dictionary {dict_type}, but got: {arg_types[0]}",
+                    )
+                )
+                success = False
+
+            if len(arg_types) == 2 and not _assignable(
+                target_type=dict_type.values, value_type=arg_types[1]
+            ):
+                self.errors.append(
+                    Error(
+                        node.args[1].original_node,
+                        f"Expected the default of ``get`` to be assignable to "
+                        f"the values of the dictionary {dict_type}, "
+                        f"but got: {arg_types[1]}"
+                        + (
+                            ". Please call ``get`` without the default to get "
+                            "``None`` on a missing key."
+                            if isinstance(node.args[1], parse_tree.Constant)
+                            and node.args[1].value is None
+                            else ""
+                        ),
+                    )
+                )
+                success = False
+
+            if not success:
+                return None
+
+        elif method.kind is BuiltinMethodKind.DICT_POP:
+            dict_type = self.type_map[node.member.instance]
+            assert isinstance(dict_type, DictTypeAnnotation)
+
+            if not (
+                _assignable(target_type=dict_type.keys, value_type=arg_types[0])
+                or _assignable(target_type=arg_types[0], value_type=dict_type.keys)
+            ):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the key of ``pop`` to be of the type of the keys "
+                        f"of the dictionary {dict_type}, but got: {arg_types[0]}",
+                    )
+                )
+                return None
+
+            if not (
+                isinstance(node.args[1], parse_tree.Constant)
+                and node.args[1].value is None
+            ):
+                self.errors.append(
+                    Error(
+                        node.args[1].original_node,
+                        f"We support ``pop`` only as ``x.pop(k, None)``, which "
+                        f"removes the key and does nothing if the key is missing, "
+                        f"but got the default: "
+                        f"{self._representation_map[node.args[1]]}. "
+                        f"The targets do not return the removed value, and Python "
+                        f"raises a ``KeyError`` on a missing key without "
+                        f"the default, while the other targets silently ignore it.",
+                    )
+                )
+                return None
+
+            reason = self._read_only_reason(node.member.instance)
+            if reason is not None:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The ``pop`` mutates the dictionary, but {reason}.",
+                    )
+                )
+                return None
+
         else:
             assert_never(method.kind)
 
         result: TypeAnnotationUnion
         if method.returns is not None:
             result = method.returns
+        elif method.kind is BuiltinMethodKind.DICT_GET:
+            dict_type = self.type_map[node.member.instance]
+            assert isinstance(dict_type, DictTypeAnnotation)
+
+            # NOTE (mristin):
+            # Without the default, ``get`` gives ``None`` on a missing key.
+            result = (
+                dict_type.values
+                if len(arg_types) == 2
+                else OptionalTypeAnnotation(value=dict_type.values)
+            )
         else:
             # NOTE (mristin):
             # The intersection and the difference give a new set of the items
@@ -4008,7 +4443,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             argument_type = convert_type_annotation(argument.type_annotation)
             if (
                 arg_type is not None
-                and (_holds_set(arg_type) or _holds_set(argument_type))
+                and (_holds_set_or_dict(arg_type) or _holds_set_or_dict(argument_type))
                 and not _assignable(target_type=argument_type, value_type=arg_type)
             ):
                 self.errors.append(
@@ -4226,6 +4661,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     )
                     failed = True
 
+                elif func_type.func.kind is BuiltinFunctionKind.DICT:
+                    self.errors.append(Error(node.original_node, _NEW_DICT_REFUSAL))
+                    failed = True
+
                 elif func_type.func.returns is not None:
                     result = func_type.func.returns
                 else:
@@ -4240,6 +4679,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     MethodTypeAnnotation,
                     ListTypeAnnotation,
                     SetTypeAnnotation,
+                    DictTypeAnnotation,
                     TupleTypeAnnotation,
                     OptionalTypeAnnotation,
                     EnumerationAsTypeTypeAnnotation,
@@ -4340,6 +4780,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     (
                         ListTypeAnnotation,
                         SetTypeAnnotation,
+                        DictTypeAnnotation,
                         TupleTypeAnnotation,
                         JsonArrayTypeAnnotation,
                         JsonObjectTypeAnnotation,
@@ -4350,8 +4791,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     Error(
                         node.args[0].original_node,
                         f"Expected the argument of ``len`` to be a string, "
-                        f"a bytearray, a list, a set, a tuple, a JSONArray or "
-                        f"a JSONObject, since we know how to compute the length "
+                        f"a bytearray, a list, a set, a dictionary, a tuple, "
+                        f"a JSONArray or a JSONObject, since we know how to compute "
+                        f"the length "
                         f"only of these types in all the target languages, "
                         f"but got: {arg_type}",
                     )
@@ -4433,15 +4875,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 )
                 return None
 
-            if _holds_list_or_set(arg_type.items):
+            if _holds_list_set_or_dict(arg_type.items):
                 self.errors.append(
                     Error(
                         node.original_node,
                         f"We can not copy the list of type {arg_type} with "
-                        f"``list(...)``, since its items hold lists or sets "
-                        f"themselves. Python copies the list shallowly, so that "
-                        f"the copy shares the inner lists and sets, while C++ "
-                        f"copies them as well. We do not support deep copies at "
+                        f"``list(...)``, since its items hold lists, sets or "
+                        f"dictionaries themselves. Python copies the list "
+                        f"shallowly, so that the copy shares the inner "
+                        f"collections, while C++ copies them as well. We do not support deep copies at "
                         f"the moment. Please contact the developers if you need "
                         f"this feature.",
                     )
@@ -4978,21 +5420,81 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             return None
 
         # NOTE (mristin):
-        # The order of the items in a set differs among the targets. The meta-model
-        # has to make sure that the result does not depend on it.
-        if not isinstance(iter_type, (ListTypeAnnotation, SetTypeAnnotation)):
+        # The order of the items in a set and of the keys in a dictionary differs
+        # among the targets. The meta-model has to make sure that the result does
+        # not depend on it.
+        loop_variable_type: TypeAnnotationUnion
+        if isinstance(iter_type, (ListTypeAnnotation, SetTypeAnnotation)):
+            loop_variable_type = iter_type.items
+        elif isinstance(iter_type, DictTypeAnnotation):
+            loop_variable_type = iter_type.keys
+        else:
             self.errors.append(
                 Error(
                     node.iteration.original_node,
-                    f"Expected an iteration over a list or a set, "
+                    f"Expected an iteration over a list, a set or a dictionary, "
                     f"but got: {iter_type}",
                 )
             )
             return None
 
-        loop_variable_type = iter_type.items
-
         self.type_map[node.variable] = loop_variable_type
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
+    def transform_for_each_item(
+        self, node: parse_tree.ForEachItem
+    ) -> Optional["TypeAnnotationUnion"]:
+        if node.key.identifier == node.value.identifier:
+            self.errors.append(
+                Error(
+                    node.value.original_node,
+                    f"The key and the value of the iteration over the items of "
+                    f"a dictionary must be two different variables, but got "
+                    f"{node.key.identifier!r} for both",
+                )
+            )
+            return None
+
+        for variable in (node.key, node.value):
+            if self._environment.find(variable.identifier) is not None:
+                self.errors.append(
+                    Error(
+                        variable.original_node,
+                        f"The variable {variable.identifier} "
+                        f"has been already defined before",
+                    )
+                )
+                return None
+
+        mapping_type = self.transform(node.mapping)
+        if mapping_type is None:
+            return None
+
+        if isinstance(mapping_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.mapping.original_node,
+                    f"Expected the dictionary which we iterate over to be "
+                    f"a non-None, but got: {mapping_type}",
+                )
+            )
+            return None
+
+        if not isinstance(mapping_type, DictTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.mapping.original_node,
+                    f"Expected an iteration over the items of a dictionary, "
+                    f"but got: {mapping_type}",
+                )
+            )
+            return None
+
+        self.type_map[node.key] = mapping_type.keys
+        self.type_map[node.value] = mapping_type.values
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result
@@ -5236,12 +5738,14 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         Resolve the type annotation of a variable declaration.
 
         We resolve the primitive types, our types, including the named unions,
-        and ``Optional``, ``List``, ``Sequence``, ``Set`` and ``Tuple`` of them. We refuse
-        inline ``Union[...]``, as the targets need a named type to represent a union.
+        and ``Optional``, ``List``, ``Sequence``, ``Set``, ``AbstractSet``, ``Dict``,
+        ``Mapping`` and ``Tuple`` of them. We refuse inline ``Union[...]``, as
+        the targets need a named type to represent a union.
 
         If ``read_only`` is set, the annotation is beneath ``Final[...]``, and we
-        require the read-only spelling of the containers, ``Sequence[...]`` and
-        ``AbstractSet[...]``, so that mypy also refuses to mutate them.
+        require the read-only spelling of the containers, ``Sequence[...]``,
+        ``AbstractSet[...]`` and ``Mapping[...]``, so that mypy also refuses to
+        mutate them.
 
         Record the error, if any, and return ``None`` on failure.
         """
@@ -5305,8 +5809,12 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             # NOTE (mristin):
             # The ``Sequence`` marks a read-only list in the arguments. The variables
             # are read-only if their values are, so both denote the same list here.
-            if read_only and generic in ("List", "Set"):
-                read_only_generic = "Sequence" if generic == "List" else "AbstractSet"
+            if read_only and generic in ("List", "Set", "Dict"):
+                read_only_generic = {
+                    "List": "Sequence",
+                    "Set": "AbstractSet",
+                    "Dict": "Mapping",
+                }[generic]
                 self.errors.append(
                     Error(
                         node.original_node,
@@ -5361,6 +5869,62 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
                 return SetTypeAnnotation(items=set_items)
 
+            if generic == "Mapping" and not read_only:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        "We do not support declaring a variable as "
+                        "a ``Mapping[...]``, since it would share a dictionary "
+                        "with another variable, and the targets disagree on "
+                        "that: C++ copies the dictionary, while the other targets "
+                        "share it. Please declare a new dictionary as "
+                        "``Dict[...]`` and initialize it with ``dict()``, ``{}`` "
+                        "or a dictionary literal.",
+                    )
+                )
+                return None
+
+            if generic in ("Dict", "Mapping"):
+                if not (
+                    isinstance(node.index, parse_tree.Tuple)
+                    and len(node.index.values) == 2
+                ):
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            f"Expected exactly two subscripts, the keys and "
+                            f"the values, in ``{generic}[...]``, but got: "
+                            f"{ast.unparse(node.original_node)}",
+                        )
+                    )
+                    return None
+
+                keys = self._resolve_annotation(node.index.values[0], read_only)
+                if keys is None:
+                    return None
+
+                refusal = refusal_of_dict_keys(keys)
+                if refusal is not None:
+                    self.errors.append(Error(node.original_node, refusal))
+                    return None
+
+                values = self._resolve_annotation(node.index.values[1], read_only)
+                if values is None:
+                    return None
+
+                if isinstance(values, OptionalTypeAnnotation):
+                    self.errors.append(
+                        Error(
+                            node.original_node,
+                            f"We support Optional only at the top of a type "
+                            f"annotation, so the values of a dictionary can not be "
+                            f"optional, but got: {generic}[{keys}, {values}]",
+                        )
+                    )
+                    return None
+
+                return DictTypeAnnotation(keys=keys, values=values)
+
             if generic == "Tuple":
                 item_nodes = (
                     node.index.values
@@ -5393,7 +5957,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 Error(
                     node.original_node,
                     f"We support only ``Optional[...]``, ``List[...]``, "
-                    f"``Sequence[...]``, ``Set[...]`` and ``Tuple[...]`` as "
+                    f"``Sequence[...]``, ``Set[...]``, ``AbstractSet[...]``, "
+                    f"``Dict[...]``, ``Mapping[...]`` and ``Tuple[...]`` as "
                     f"generic types in the type annotations of the variables, "
                     f"but got: {generic}[...]",
                 )
@@ -5405,7 +5970,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     node.original_node,
                     f"We support only the primitive types, our types, and "
                     f"``Optional[...]``, ``List[...]``, ``Sequence[...]``, "
-                    f"``Set[...]`` and ``Tuple[...]`` of them in the type "
+                    f"``Set[...]``, ``AbstractSet[...]``, ``Dict[...]``, "
+                    f"``Mapping[...]`` and ``Tuple[...]`` of them in the type "
                     f"annotations of the variables, but got: "
                     f"{ast.unparse(node.original_node)}",
                 )
@@ -5475,6 +6041,211 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         self.type_map[node] = target_type_beneath
         return target_type_beneath
+
+    def _transform_new_dict(
+        self,
+        node: Union[parse_tree.FunctionCall, parse_tree.DictLiteral],
+        target_type: Optional["TypeAnnotationUnion"],
+    ) -> Optional["TypeAnnotationUnion"]:
+        """
+        Infer the type of ``dict()`` or of a dictionary literal from the ``target_type``.
+
+        Python infers the type of the keys and of the values from the declaration,
+        *e.g.*, ``x: Dict[str, int] = {}``, and so do we.
+
+        The keys of a dictionary literal need to be literal constants or
+        enumeration literals, all distinct. Python keeps the last value of
+        the duplicate keys, while a C++ initializer list keeps the first one,
+        and Java's ``Map.ofEntries`` throws. We can not tell whether the keys
+        computed at run time collide, so we accept only the keys which we can
+        compare here.
+        """
+        if isinstance(node, parse_tree.FunctionCall):
+            if self.transform(node.name) is None:
+                return None
+
+            if len(node.args) > 0:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"We support only ``dict()`` without arguments to create "
+                        f"a new dictionary, but got {len(node.args)} argument(s). "
+                        f"Please use a dictionary literal, *e.g.*, "
+                        f"``{{'a': 1, 'b': 2}}``, instead.",
+                    )
+                )
+                return None
+
+        target_type_beneath = (
+            beneath_optional(target_type) if target_type is not None else None
+        )
+        if not isinstance(target_type_beneath, DictTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    _NEW_DICT_REFUSAL
+                    + (
+                        ""
+                        if target_type is None
+                        else f" The target is of type {target_type}."
+                    ),
+                )
+            )
+            return None
+
+        if isinstance(node, parse_tree.DictLiteral):
+            success = True
+
+            observed_keys = (
+                dict()
+            )  # type: MutableMapping[Tuple[str, Union[int, str]], parse_tree.Expression]
+
+            for key, value in zip(node.keys, node.values):
+                key_type = self.transform(key)
+                value_type = self.transform(value)
+                if key_type is None or value_type is None:
+                    success = False
+                    continue
+
+                comparable_key: Optional[Tuple[str, Union[int, str]]] = None
+                if (
+                    isinstance(key, parse_tree.Constant)
+                    and isinstance(key.value, (int, str))
+                    and not isinstance(key.value, bool)
+                ):
+                    comparable_key = (type(key.value).__name__, key.value)
+                elif isinstance(key, parse_tree.Member) and isinstance(
+                    self.type_map.get(key.instance, None),
+                    EnumerationAsTypeTypeAnnotation,
+                ):
+                    comparable_key = ("enum", self._representation_map[key])
+                else:
+                    pass
+
+                if comparable_key is None:
+                    self.errors.append(
+                        Error(
+                            key.original_node,
+                            f"We support only the literal constants and "
+                            f"the enumeration literals as the keys of a dictionary "
+                            f"literal, but got: {self._representation_map[key]}. "
+                            f"Python keeps the last value if the keys collide, while "
+                            f"a C++ initializer list keeps the first one, and "
+                            f"Java's ``Map.ofEntries`` throws. We can not tell "
+                            f"whether the keys computed at run time collide, so "
+                            f"please assign such keys one by one, *e.g.*, "
+                            f"``x[k] = v``.",
+                        )
+                    )
+                    success = False
+                    continue
+
+                previous_key = observed_keys.get(comparable_key, None)
+                if previous_key is not None:
+                    self.errors.append(
+                        Error(
+                            key.original_node,
+                            f"The key {self._representation_map[key]} is "
+                            f"duplicated in the dictionary literal. Python keeps "
+                            f"the last value of the duplicate keys, while a C++ "
+                            f"initializer list keeps the first one, and Java's "
+                            f"``Map.ofEntries`` throws. Please list each key "
+                            f"only once.",
+                        )
+                    )
+                    success = False
+                    continue
+
+                observed_keys[comparable_key] = key
+
+                if not (
+                    _assignable(
+                        target_type=target_type_beneath.keys, value_type=key_type
+                    )
+                    or _assignable(
+                        target_type=key_type, value_type=target_type_beneath.keys
+                    )
+                ):
+                    self.errors.append(
+                        Error(
+                            key.original_node,
+                            f"Expected the key to be of the type of the keys of "
+                            f"the dictionary {target_type_beneath}, "
+                            f"but got: {key_type}",
+                        )
+                    )
+                    success = False
+                    continue
+
+                if not _assignable(
+                    target_type=target_type_beneath.values, value_type=value_type
+                ):
+                    self.errors.append(
+                        Error(
+                            value.original_node,
+                            f"Expected the value to be assignable to the values of "
+                            f"the dictionary {target_type_beneath}, "
+                            f"but got: {value_type}",
+                        )
+                    )
+                    success = False
+                    continue
+
+                # NOTE (mristin):
+                # Python shares a stored list, set or dictionary, while C++ copies
+                # it. The sets and the dictionaries at the top are checked in
+                # :py:func:`_check_sets_and_dicts`, so we do not report them twice.
+                if (
+                    _holds_list_set_or_dict(value_type)
+                    and not isinstance(
+                        beneath_optional(value_type),
+                        (SetTypeAnnotation, DictTypeAnnotation),
+                    )
+                    and not self._is_copy(value)
+                ):
+                    self.errors.append(
+                        Error(
+                            value.original_node,
+                            f"The value of the key {self._representation_map[key]} "
+                            f"in the dictionary literal holds lists, sets or "
+                            f"dictionaries, which Python would share, but C++ would "
+                            f"copy. We can not transpile the sharing to C++, so "
+                            f"please use explicit copies of them, *e.g.*, "
+                            f"a list copied with ``list(...)``.",
+                        )
+                    )
+                    success = False
+                    continue
+
+                # NOTE (mristin):
+                # The new dictionary is mutable, so a read-only value would become
+                # mutable through it.
+                if _can_be_mutated(value_type):
+                    reason = self._read_only_reason(value)
+                    if reason is not None:
+                        self.errors.append(
+                            Error(
+                                value.original_node,
+                                f"The value of the key "
+                                f"{self._representation_map[key]} would become "
+                                f"mutable through the new dictionary, so it needs "
+                                f"to be mutable itself, but {reason}.",
+                            )
+                        )
+                        success = False
+                        continue
+
+            if not success:
+                return None
+
+        self.type_map[node] = target_type_beneath
+        return target_type_beneath
+
+    def transform_dict_literal(
+        self, node: parse_tree.DictLiteral
+    ) -> Optional["TypeAnnotationUnion"]:
+        self.errors.append(Error(node.original_node, _NEW_DICT_REFUSAL))
+        return None
 
     def transform_assignment(
         self, node: parse_tree.Assignment
@@ -5641,10 +6412,12 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     f"We do not support mutating JSON-able values, so the item "
                     f"of {collection_type} can not be assigned to."
                 )
-            elif not isinstance(collection_type, ListTypeAnnotation):
+            elif not isinstance(
+                collection_type, (ListTypeAnnotation, DictTypeAnnotation)
+            ):
                 message = (
-                    f"Only an item of a list can be assigned to, but "
-                    f"the collection is inferred to be {collection_type}."
+                    f"Only an item of a list or of a dictionary can be assigned to, "
+                    f"but the collection is inferred to be {collection_type}."
                 )
 
             if message is not None:
@@ -5656,8 +6429,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 Error(
                     node.target.original_node,
                     f"Expected the target of an assignment to be a variable, "
-                    f"a property of a class or an item of a list, "
-                    f"but got: {type(node.target).__name__}",
+                    f"a property of a class or an item of a list or of "
+                    f"a dictionary, but got: {type(node.target).__name__}",
                 )
             )
             return None
@@ -5665,6 +6438,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if _is_set_call(node.value):
             assert isinstance(node.value, parse_tree.FunctionCall)
             value_type = self._transform_new_set(
+                node=node.value, target_type=target_type
+            )
+        elif _is_new_dict(node.value):
+            assert isinstance(
+                node.value, (parse_tree.FunctionCall, parse_tree.DictLiteral)
+            )
+            value_type = self._transform_new_dict(
                 node=node.value, target_type=target_type
             )
         else:
@@ -5785,11 +6565,13 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 else node.target.collection
             )
 
-            what = (
-                f"the property {node.target.name!r}"
-                if isinstance(node.target, parse_tree.Member)
-                else "an item of the list"
-            )
+            what: str
+            if isinstance(node.target, parse_tree.Member):
+                what = f"the property {node.target.name!r}"
+            elif isinstance(self.type_map[node.target.collection], DictTypeAnnotation):
+                what = "an item of the dictionary"
+            else:
+                what = "an item of the list"
 
             reason = self._read_only_reason(receiver)
             if reason is not None:
@@ -5803,20 +6585,23 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 return None
 
             # NOTE (mristin):
-            # Python shares a stored list or set, while C++ copies it, as its lists
-            # and sets are values. We can not faithfully transpile the sharing to
-            # C++, so we require an explicit copy of every stored list and set, in
-            # all the targets. The sets at the top are checked in
-            # :py:func:`_check_sets`, so we do not report them twice.
+            # Python shares a stored list, set or dictionary, while C++ copies it,
+            # as its collections are values. We can not faithfully transpile
+            # the sharing to C++, so we require an explicit copy of every stored
+            # collection, in all the targets. The sets and the dictionaries at
+            # the top are checked in :py:func:`_check_sets_and_dicts`, so we do not
+            # report them twice.
             value_type_beneath = beneath_optional(value_type)
             if (
-                _holds_list_or_set(value_type)
-                and not isinstance(value_type_beneath, SetTypeAnnotation)
+                _holds_list_set_or_dict(value_type)
+                and not isinstance(
+                    value_type_beneath, (SetTypeAnnotation, DictTypeAnnotation)
+                )
                 and not self._is_copy(node.value)
             ):
                 if isinstance(
                     value_type_beneath, ListTypeAnnotation
-                ) and not _holds_list_or_set(value_type_beneath.items):
+                ) and not _holds_list_set_or_dict(value_type_beneath.items):
                     self.errors.append(
                         Error(
                             node.value.original_node,
@@ -5833,15 +6618,15 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         Error(
                             node.value.original_node,
                             f"The value assigned to {what} "
-                            f"of {self._representation_map[receiver]} holds lists "
-                            f"or sets, which Python would share, but C++ would "
-                            f"copy. We can not transpile the sharing to C++, so "
-                            f"please assign explicit copies of them, *e.g.*, "
-                            f"a tuple literal of the lists copied with "
+                            f"of {self._representation_map[receiver]} holds lists, "
+                            f"sets or dictionaries, which Python would share, but "
+                            f"C++ would copy. We can not transpile the sharing to "
+                            f"C++, so please assign explicit copies of them, "
+                            f"*e.g.*, a tuple literal of the lists copied with "
                             f"``list(...)``. "
-                            f"We do not support deep copies of the nested lists "
-                            f"and sets at the moment. Please contact the developers "
-                            f"if you need this feature.",
+                            f"We do not support deep copies of the nested lists, "
+                            f"sets and dictionaries at the moment. Please contact "
+                            f"the developers if you need this feature.",
                         )
                     )
                 return None
@@ -5908,13 +6693,17 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             elif _can_be_mutated(variable_type):
                 # NOTE (mristin):
-                # An optional set declared with ``None`` is mutable, since it can
-                # later be assigned only a new set or the result of a call, which
-                # is fresh, see :py:func:`_check_sets`.
+                # An optional set or dictionary declared with ``None`` is mutable,
+                # since it can later be assigned only a new set or dictionary, or
+                # the result of a call, which is fresh, see
+                # :py:func:`_check_sets_and_dicts`.
                 reason = (
                     None
                     if (
-                        isinstance(beneath_optional(variable_type), SetTypeAnnotation)
+                        isinstance(
+                            beneath_optional(variable_type),
+                            (SetTypeAnnotation, DictTypeAnnotation),
+                        )
                         and isinstance(node.value, parse_tree.Constant)
                         and node.value.value is None
                     )
@@ -6067,7 +6856,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             # it, as its lists and sets are values. We can not faithfully transpile
             # the sharing to C++, so we require fresh lists and sets in the returned
             # values, in all the targets.
-            if _holds_list_or_set(self._returns) and not self._is_fresh(node.value):
+            if _holds_list_set_or_dict(self._returns) and not self._is_fresh(
+                node.value
+            ):
                 self.errors.append(
                     Error(
                         node.value.original_node,
@@ -6374,28 +7165,42 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         if self.transform(node.generator) is None:
             return None
 
-        if not self._check_consistent_type_of_definition(
-            variable=node.generator.variable,
-            type_annotation=self.type_map[node.generator.variable],
-        ):
-            return None
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
 
-        loop_variable = node.generator.variable.identifier
+        for variable in loop_variables:
+            if not self._check_consistent_type_of_definition(
+                variable=variable,
+                type_annotation=self.type_map[variable],
+            ):
+                return None
+
+            # NOTE (mristin):
+            # The generator refused the shadowing, so the loop variable can not be
+            # the loop variable of an enclosing for-loop.
+            assert variable.identifier not in self._loop_variable_set
 
         # NOTE (mristin):
-        # The generator refused the shadowing, so the loop variable can not be
-        # the loop variable of an enclosing for-loop.
-        assert loop_variable not in self._loop_variable_set
-
-        # NOTE (mristin):
-        # The loop variable inherits the mutability of the collection. The scope
-        # removes it from the mutable variables once we leave the loop body.
+        # The loop variable over a collection, or over the values of a dictionary,
+        # inherits the mutability of the collection. The keys are immutable. The scope
+        # removes the loop variable from the mutable variables once we leave the loop
+        # body.
         if (
             isinstance(node.generator, parse_tree.ForEach)
             and _can_be_mutated(self.type_map[node.generator.variable])
             and self._read_only_reason(node.generator.iteration) is None
         ):
-            self._mutable_name_set.add(loop_variable)
+            self._mutable_name_set.add(node.generator.variable.identifier)
+
+        elif (
+            isinstance(node.generator, parse_tree.ForEachItem)
+            and _can_be_mutated(self.type_map[node.generator.value])
+            and self._read_only_reason(node.generator.mapping) is None
+        ):
+            self._mutable_name_set.add(node.generator.value.identifier)
 
         # NOTE (mristin):
         # The body of the loop can be executed many times, so the assignments in
@@ -6438,14 +7243,21 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         facts_before = self._facts
 
-        self._loop_variable_set.add(loop_variable)
+        self._loop_variable_set.update(
+            variable.identifier for variable in loop_variables
+        )
         try:
             success = self._transform_in_new_scope(
                 node.body,
-                variables={loop_variable: self.type_map[node.generator.variable]},
+                variables={
+                    variable.identifier: self.type_map[variable]
+                    for variable in loop_variables
+                },
             )
         finally:
-            self._loop_variable_set.remove(loop_variable)
+            self._loop_variable_set.difference_update(
+                variable.identifier for variable in loop_variables
+            )
             self._assigned_in_loop_body_set = assigned_in_loop_body_set_before
 
             # NOTE (mristin):
@@ -6723,6 +7535,14 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         func=BuiltinFunction(kind=BuiltinFunctionKind.LIST, returns=None)
     )
 
+    # NOTE (mristin):
+    # The type of ``dict()`` is given by the declaration of the variable which it
+    # initializes, *e.g.*, ``x: Dict[str, int] = dict()``, see
+    # :py:meth:`_Inferrer.transform_assignment`.
+    mapping[Identifier("dict")] = BuiltinFunctionTypeAnnotation(
+        func=BuiltinFunction(kind=BuiltinFunctionKind.DICT, returns=None)
+    )
+
     for constant in symbol_table.constants:
         if isinstance(constant, _types.ConstantPrimitive):
             mapping[constant.name] = PrimitiveTypeAnnotation(
@@ -6855,51 +7675,68 @@ def _check_nones(
     return errors
 
 
-def _check_sets(
+def _check_sets_and_dicts(
     body: Sequence[parse_tree.Node],
     type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
     representation_map: Mapping[parse_tree.Node, str],
 ) -> List[Error]:
     """
-    Check that the sets in the ``body`` are used only where we can transpile them.
+    Check that the sets and the dictionaries in the ``body`` are used only where we
+    can transpile them.
 
-    A set can be the container of ``in``, the collection or the variable of
-    a for-loop, the receiver of its methods, an argument of a call, the target of
-    an assignment, the value of a nullness check, and the returned value or its
-    item in a returned tuple literal. A new set, *e.g.*, from ``set()`` or
-    ``intersection``, and the result of a call can also be assigned. Elsewhere,
-    *e.g.*, in
-    ``b = a``, the targets would need to either copy or share the set, and they
-    disagree on that: C++ copies it, while the other targets share it. The type
-    inference checks the arguments of the calls with more specific errors, *e.g.*,
-    that a set is passed only to a set argument.
+    A set or a dictionary can be the container of ``in``, the collection or
+    the variable of a for-loop, the receiver of its methods, an argument of a call,
+    the target of an assignment, the value of a nullness check, and the returned
+    value or its item in a returned tuple literal. A dictionary can also be indexed.
+    A new set, *e.g.*, from ``set()`` or ``intersection``, a new dictionary, *e.g.*,
+    from ``dict()`` or a dictionary literal, and the result of a call can also be
+    assigned, or be a value of a dictionary literal. Elsewhere, *e.g.*, in
+    ``b = a``, the targets would need to either copy or share the set or
+    the dictionary, and they disagree on that: C++ copies it, while the other
+    targets share it. The type inference checks the arguments of the calls with
+    more specific errors, *e.g.*, that a set is passed only to a set argument.
 
-    The ``add`` returns nothing, so it can only be a statement on its own.
+    The ``add`` of a set and the ``pop`` of a dictionary return nothing in
+    the targets, so they can only be statements on their own.
 
-    A set can not be mutated in a for-loop over it, as the targets disagree on
-    that: Python and Java throw, C++ is undefined, while Go and TypeScript carry on.
+    A set or a dictionary can not be mutated in a for-loop over it, as the targets
+    disagree on that: Python and Java throw, C++ is undefined, while Go and
+    TypeScript carry on.
     """
     allowed_set = set()  # type: Set[parse_tree.Node]
     statement_calls = set()  # type: Set[parse_tree.Node]
     set_nodes = []  # type: List[parse_tree.Node]
+    dict_nodes = []  # type: List[parse_tree.Node]
     adds = []  # type: List[parse_tree.MethodCall]
+    pops = []  # type: List[parse_tree.MethodCall]
 
     # NOTE (mristin):
-    # We collect the sets passed to the mutable arguments together with the calls.
+    # We collect the sets and the dictionaries passed to the mutable arguments,
+    # and the dictionaries whose items are assigned to, together with the calls
+    # to ``add`` and ``pop`` below.
     mutated_set_nodes = []  # type: List[parse_tree.Expression]
+    mutated_dict_nodes = []  # type: List[parse_tree.Expression]
 
-    loops_over_sets = []  # type: List[parse_tree.For]
+    loops_over_sets = []  # type: List[Tuple[parse_tree.For, parse_tree.Expression]]
+    loops_over_dicts = []  # type: List[Tuple[parse_tree.For, parse_tree.Expression]]
 
     for node_in_body in body:
         for node in parse_tree.over_nodes(node_in_body):
-            if (
-                isinstance(node, parse_tree.For)
-                and isinstance(node.generator, parse_tree.ForEach)
-                and isinstance(
-                    type_map.get(node.generator.iteration, None), SetTypeAnnotation
-                )
-            ):
-                loops_over_sets.append(node)
+            if isinstance(node, parse_tree.For):
+                if isinstance(node.generator, parse_tree.ForEach):
+                    iteration_type = type_map.get(node.generator.iteration, None)
+                    if isinstance(iteration_type, SetTypeAnnotation):
+                        loops_over_sets.append((node, node.generator.iteration))
+                    elif isinstance(iteration_type, DictTypeAnnotation):
+                        loops_over_dicts.append((node, node.generator.iteration))
+                    else:
+                        pass
+
+                elif isinstance(node.generator, parse_tree.ForEachItem):
+                    loops_over_dicts.append((node, node.generator.mapping))
+
+                else:
+                    pass
 
             arguments = None  # type: Optional[Sequence[_types.Argument]]
             call_args = ()  # type: Sequence[parse_tree.Expression]
@@ -6919,12 +7756,15 @@ def _check_sets(
             if arguments is not None:
                 for arg_node, argument in zip(call_args, arguments):
                     arg_type = type_map.get(arg_node, None)
-                    if (
-                        argument.mutable
-                        and arg_type is not None
-                        and isinstance(beneath_optional(arg_type), SetTypeAnnotation)
-                    ):
+                    if not argument.mutable or arg_type is None:
+                        continue
+
+                    if isinstance(beneath_optional(arg_type), SetTypeAnnotation):
                         mutated_set_nodes.append(arg_node)
+                    elif isinstance(beneath_optional(arg_type), DictTypeAnnotation):
+                        mutated_dict_nodes.append(arg_node)
+                    else:
+                        pass
 
             if isinstance(node, parse_tree.IsIn):
                 allowed_set.add(node.container)
@@ -6936,16 +7776,37 @@ def _check_sets(
                 allowed_set.add(node.target)
 
                 # NOTE (mristin):
-                # The result of a call is a fresh set, as the returned values hold
-                # only the fresh sets, see :py:meth:`_Inferrer._is_fresh`.
-                if _is_new_set(node.value, type_map) or isinstance(
-                    node.value, (parse_tree.FunctionCall, parse_tree.MethodCall)
+                # The result of a call is a fresh set or dictionary, as
+                # the returned values hold only the fresh ones, see
+                # :py:meth:`_Inferrer._is_fresh`.
+                if (
+                    _is_new_set(node.value, type_map)
+                    or _is_new_dict(node.value)
+                    or isinstance(
+                        node.value, (parse_tree.FunctionCall, parse_tree.MethodCall)
+                    )
                 ):
                     allowed_set.add(node.value)
 
+                if isinstance(node.target, parse_tree.Index) and isinstance(
+                    type_map.get(node.target.collection, None), DictTypeAnnotation
+                ):
+                    mutated_dict_nodes.append(node.target.collection)
+
+            elif isinstance(node, parse_tree.DictLiteral):
+                allowed_set.update(
+                    value
+                    for value in node.values
+                    if _is_new_set(value, type_map)
+                    or _is_new_dict(value)
+                    or isinstance(
+                        value, (parse_tree.FunctionCall, parse_tree.MethodCall)
+                    )
+                )
+
             elif isinstance(node, parse_tree.Return):
                 # NOTE (mristin):
-                # The returned sets are checked to be fresh in
+                # The returned sets and dictionaries are checked to be fresh in
                 # :py:meth:`_Inferrer.transform_return`.
                 if node.value is not None:
                     allowed_set.add(node.value)
@@ -6960,11 +7821,13 @@ def _check_sets(
                 allowed_set.update(node.args)
 
                 member_type = type_map.get(node.member, None)
-                if (
-                    isinstance(member_type, BuiltinMethodTypeAnnotation)
-                    and member_type.method.kind is BuiltinMethodKind.SET_ADD
-                ):
-                    adds.append(node)
+                if isinstance(member_type, BuiltinMethodTypeAnnotation):
+                    if member_type.method.kind is BuiltinMethodKind.SET_ADD:
+                        adds.append(node)
+                    elif member_type.method.kind is BuiltinMethodKind.DICT_POP:
+                        pops.append(node)
+                    else:
+                        pass
 
             elif isinstance(node, parse_tree.FunctionCall):
                 allowed_set.update(node.args)
@@ -6972,35 +7835,84 @@ def _check_sets(
             elif isinstance(node, parse_tree.Member):
                 allowed_set.add(node.instance)
 
+            elif isinstance(node, parse_tree.Index):
+                allowed_set.add(node.collection)
+
             elif isinstance(node, parse_tree.ForEach):
                 allowed_set.add(node.iteration)
 
                 # NOTE (mristin):
-                # The loop variable over the nested sets, *e.g.*, in a list of
-                # sets, refers to the set in the collection in all the targets.
+                # The loop variable over the nested sets or dictionaries, *e.g.*,
+                # in a list of sets, refers to the collection in the collection in
+                # all the targets.
                 allowed_set.add(node.variable)
+
+            elif isinstance(node, parse_tree.ForEachItem):
+                allowed_set.add(node.mapping)
+
+                # NOTE (mristin):
+                # The value refers to the nested set or dictionary in all
+                # the targets, as the loop variable over a collection above.
+                allowed_set.add(node.value)
+
+            else:
+                pass
 
             if isinstance(node, parse_tree.Expression):
                 type_anno = type_map.get(node, None)
-                if type_anno is not None and isinstance(
-                    beneath_optional(type_anno), SetTypeAnnotation
-                ):
-                    set_nodes.append(node)
+                if type_anno is not None:
+                    type_anno_beneath = beneath_optional(type_anno)
+                    if isinstance(type_anno_beneath, SetTypeAnnotation):
+                        set_nodes.append(node)
+                    elif isinstance(type_anno_beneath, DictTypeAnnotation):
+                        dict_nodes.append(node)
+                    else:
+                        pass
+
+            # NOTE (mristin):
+            # The value of a for-loop over the items of a dictionary is a name, but
+            # not an expression of its own in the generator.
+            if isinstance(node, parse_tree.ForEachItem):
+                value_type = type_map.get(node.value, None)
+                if value_type is not None:
+                    if isinstance(beneath_optional(value_type), SetTypeAnnotation):
+                        set_nodes.append(node.value)
+                    elif isinstance(beneath_optional(value_type), DictTypeAnnotation):
+                        dict_nodes.append(node.value)
+                    else:
+                        pass
 
     errors = [
         Error(
             node.original_node,
             "We support a set only as the container of ``in``, the collection "
             "or the variable of a for-loop, the receiver of its methods, "
-            "an argument of a call, the target of an assignment, the value of a nullness check, "
-            "the returned value, and a new set or the result of a call as "
-            "the assigned value. Elsewhere, the targets would need "
-            "to either copy or share the set, and they disagree on that: C++ "
-            "copies it, while the other targets share it.",
+            "an argument of a call, the target of an assignment, the value of "
+            "a nullness check, the returned value, and a new set or the result of "
+            "a call as the assigned value or as a value of a dictionary literal. "
+            "Elsewhere, the targets would need to either copy or share the set, "
+            "and they disagree on that: C++ copies it, while the other targets "
+            "share it.",
         )
         for node in set_nodes
         if node not in allowed_set
     ]  # type: List[Error]
+
+    errors.extend(
+        Error(
+            node.original_node,
+            "We support a dictionary only as the container of ``in``, "
+            "the collection or the variable of a for-loop, the receiver of its "
+            "methods, an indexed collection, an argument of a call, the target of "
+            "an assignment, the value of a nullness check, the returned value, and "
+            "a new dictionary or the result of a call as the assigned value or as "
+            "a value of a dictionary literal. Elsewhere, the targets would need to "
+            "either copy or share the dictionary, and they disagree on that: C++ "
+            "copies it, while the other targets share it.",
+        )
+        for node in dict_nodes
+        if node not in allowed_set
+    )
 
     errors.extend(
         Error(
@@ -7012,27 +7924,41 @@ def _check_sets(
         if add not in statement_calls
     )
 
-    mutated_set_nodes.extend(add.member.instance for add in adds)
-
-    for loop in loops_over_sets:
-        assert isinstance(loop.generator, parse_tree.ForEach)
-        iterated = representation_map[loop.generator.iteration]
-
-        nodes_in_loop = {
-            node for stmt in loop.body for node in parse_tree.over_nodes(stmt)
-        }
-
-        errors.extend(
-            Error(
-                mutated.original_node,
-                f"The set {iterated} can not be mutated in the for-loop over it, "
-                f"since the targets disagree on that: Python and Java throw "
-                f"an exception, the behavior is undefined in C++, while Go and "
-                f"TypeScript carry on.",
-            )
-            for mutated in mutated_set_nodes
-            if mutated in nodes_in_loop and representation_map[mutated] == iterated
+    errors.extend(
+        Error(
+            pop.original_node,
+            "The ``pop`` of a dictionary returns nothing in the targets, so it can "
+            "only be called as a statement on its own.",
         )
+        for pop in pops
+        if pop not in statement_calls
+    )
+
+    mutated_set_nodes.extend(add.member.instance for add in adds)
+    mutated_dict_nodes.extend(pop.member.instance for pop in pops)
+
+    for loops, mutated_nodes, what in (
+        (loops_over_sets, mutated_set_nodes, "set"),
+        (loops_over_dicts, mutated_dict_nodes, "dictionary"),
+    ):
+        for loop, iteration in loops:
+            iterated = representation_map[iteration]
+
+            nodes_in_loop = {
+                node for stmt in loop.body for node in parse_tree.over_nodes(stmt)
+            }
+
+            errors.extend(
+                Error(
+                    mutated.original_node,
+                    f"The {what} {iterated} can not be mutated in the for-loop over "
+                    f"it, since the targets disagree on that: Python and Java throw "
+                    f"an exception, the behavior is undefined in C++, while Go and "
+                    f"TypeScript carry on.",
+                )
+                for mutated in mutated_nodes
+                if mutated in nodes_in_loop and representation_map[mutated] == iterated
+            )
 
     return errors
 
@@ -7071,7 +7997,7 @@ def _infer_for_function(
 
     type_inferrer.errors.extend(_check_nones(body=body, returns=returns))
     type_inferrer.errors.extend(
-        _check_sets(
+        _check_sets_and_dicts(
             body=body,
             type_map=type_inferrer.type_map,
             representation_map=canonicalizer.representation_map,
@@ -7251,7 +8177,7 @@ def infer_for_invariant(
 
     type_inferrer.errors.extend(_check_nones(body=[invariant.body], returns=None))
     type_inferrer.errors.extend(
-        _check_sets(
+        _check_sets_and_dicts(
             body=[invariant.body],
             type_map=type_inferrer.type_map,
             representation_map=canonicalizer.representation_map,
@@ -7287,6 +8213,7 @@ TypeAnnotationExceptOptional = Union[
     MethodTypeAnnotation,
     ListTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
     TupleTypeAnnotation,
     EnumerationAsTypeTypeAnnotation,
     JsonValueTypeAnnotation,

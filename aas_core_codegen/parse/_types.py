@@ -33,6 +33,8 @@ GENERIC_TYPES = {
     Identifier("Mutable"),
     Identifier("Set"),
     Identifier("AbstractSet"),
+    Identifier("Dict"),
+    Identifier("Mapping"),
 }
 
 #: Generic types which declare the mutability of the parameters of the verification

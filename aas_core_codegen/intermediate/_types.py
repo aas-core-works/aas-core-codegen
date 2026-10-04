@@ -352,9 +352,42 @@ class SetTypeAnnotation(TypeAnnotation):
         return f"Set[{self.items}]"
 
 
+class DictTypeAnnotation(TypeAnnotation):
+    """
+    Represent a type annotation involving a ``Dict[...]`` or a ``Mapping[...]``.
+
+    A ``Mapping`` is a read-only dictionary. We keep the read-only flag on
+    the argument, see :py:attr:`Argument.mutable`, so that the generators need
+    not distinguish the two.
+
+    The dictionaries are allowed at any depth in the arguments and the return
+    values of the verification functions and of the methods, but not in
+    the properties.
+
+    The keys are strings, integers, constrained primitives of them and
+    enumeration literals. The values are of any type which an item of a list can
+    be of. The order of the iteration over a dictionary differs among
+    the targets.
+    """
+
+    def __init__(
+        self,
+        keys: "TypeAnnotationExceptOptional",
+        values: "TypeAnnotationExceptOptional",
+        parsed: parse.TypeAnnotation,
+    ):
+        TypeAnnotation.__init__(self, parsed=parsed)
+
+        self.keys = keys
+        self.values = values
+
+    def __str__(self) -> str:
+        return f"Dict[{self.keys}, {self.values}]"
+
+
 # NOTE (mristin):
-# We do not support other generic types except for ``List``, ``Tuple`` and ``Set``.
-# In the future we might add support for ``MutableMapping`` *etc.*
+# We do not support other generic types except for ``List``, ``Tuple``, ``Set``
+# and ``Dict``.
 
 
 class OptionalTypeAnnotation(TypeAnnotation):
@@ -427,6 +460,7 @@ TypeAnnotationUnion = Union[
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
     OptionalTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
@@ -443,6 +477,7 @@ TypeAnnotationUnionAsTuple = (
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
     OptionalTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
@@ -457,6 +492,7 @@ TypeAnnotationExceptOptional = Union[
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
     JsonObjectTypeAnnotation,
@@ -474,6 +510,7 @@ TypeAnnotationExceptOptionalAsTuple = (
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
     JsonValueTypeAnnotation,
     JsonArrayTypeAnnotation,
     JsonObjectTypeAnnotation,
@@ -524,6 +561,7 @@ assert_union_without_excluded(
         ListTypeAnnotation,
         TupleTypeAnnotation,
         SetTypeAnnotation,
+        DictTypeAnnotation,
         OptionalTypeAnnotation,
     ],
 )
@@ -532,13 +570,14 @@ assert_union_without_excluded(
 #: out of the de/serialization of its items. It is the complement of
 #: :py:data:`AtomicTypeAnnotation` beneath an optional.
 ContainerTypeAnnotation = Union[
-    ListTypeAnnotation, TupleTypeAnnotation, SetTypeAnnotation
+    ListTypeAnnotation, TupleTypeAnnotation, SetTypeAnnotation, DictTypeAnnotation
 ]
 
 ContainerTypeAnnotationAsTuple = (
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
 )
 assert ContainerTypeAnnotationAsTuple == get_args(ContainerTypeAnnotation)
 
@@ -582,6 +621,12 @@ def type_annotations_equal(
     elif isinstance(that, SetTypeAnnotation):
         assert isinstance(other, SetTypeAnnotation)
         return type_annotations_equal(that.items, other.items)
+
+    elif isinstance(that, DictTypeAnnotation):
+        assert isinstance(other, DictTypeAnnotation)
+        return type_annotations_equal(that.keys, other.keys) and type_annotations_equal(
+            that.values, other.values
+        )
 
     elif isinstance(that, TupleTypeAnnotation):
         assert isinstance(other, TupleTypeAnnotation)
@@ -3902,6 +3947,16 @@ def map_descendability(
             mapping[a_type_annotation] = result
             return result
 
+        elif isinstance(a_type_annotation, DictTypeAnnotation):
+            # NOTE (mristin):
+            # The keys are never descendable, but we recurse into them anyway so
+            # that the ``mapping`` cache is populated for them as well.
+            keys_result = recurse(a_type_annotation=a_type_annotation.keys)
+            values_result = recurse(a_type_annotation=a_type_annotation.values)
+            result = keys_result or values_result
+            mapping[a_type_annotation] = result
+            return result
+
         elif isinstance(a_type_annotation, TupleTypeAnnotation):
             # NOTE (mristin):
             # We deliberately recurse into *all* the items, and not just until
@@ -3974,6 +4029,14 @@ def over_type_annotation_and_nested_type_annotations(
     elif isinstance(type_annotation, TupleTypeAnnotation):
         for item in type_annotation.items:
             yield from over_type_annotation_and_nested_type_annotations(item)
+
+    elif isinstance(type_annotation, DictTypeAnnotation):
+        yield from over_type_annotation_and_nested_type_annotations(
+            type_annotation.keys
+        )
+        yield from over_type_annotation_and_nested_type_annotations(
+            type_annotation.values
+        )
 
     elif isinstance(type_annotation, JsonObjectTypeAnnotation):
         yield from over_type_annotation_and_nested_type_annotations(type_annotation.key)
@@ -4223,6 +4286,21 @@ def declares_local_set(function: Union[Verification, Method]) -> bool:
     )
 
 
+def declares_local_dict(function: Union[Verification, Method]) -> bool:
+    """
+    Check whether the body of the ``function`` declares a local dictionary.
+
+    A local dictionary is declared with a type annotation, *e.g.*,
+    ``x: Dict[str, int] = {}`` or ``x: Final[Mapping[str, int]] = {"a": 1}``.
+    """
+    return any(
+        isinstance(annotation_node, parse_tree.Name)
+        and annotation_node.identifier in ("Dict", "Mapping")
+        for annotation in local_declaration_annotations(function)
+        for annotation_node in parse_tree.over_nodes(annotation)
+    )
+
+
 def collect_ids_of_our_types_in_properties(
     symbol_table: SymbolTable,
 ) -> Set[IdOfOurType]:
@@ -4244,6 +4322,9 @@ def collect_ids_of_our_types_in_properties(
                     stack.append(type_anno.items)
                 elif isinstance(type_anno, TupleTypeAnnotation):
                     stack.extend(type_anno.items)
+                elif isinstance(type_anno, DictTypeAnnotation):
+                    stack.append(type_anno.keys)
+                    stack.append(type_anno.values)
                 elif isinstance(type_anno, PrimitiveTypeAnnotation):
                     pass
                 elif isinstance(type_anno, OurTypeAnnotation):

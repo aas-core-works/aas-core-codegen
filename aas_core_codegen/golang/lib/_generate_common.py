@@ -46,15 +46,15 @@ func (tuple {name}[{type_args}]) Len() int {{
     )
 
 
-#: Check if any or all the items of a set satisfy the condition
+#: Check if any or all the items of a set, or the keys of a map, satisfy the condition
 SOME_AND_ALL_KEYS: Final[Sequence[Stripped]] = [
     Stripped(
         f"""\
-// Check if any of the items of the set satisfy the condition.
+// Check if any of the keys of the map satisfy the condition.
 //
-// The set is represented as a map to empty structs.
-func SomeKey[K comparable](condition func(K) bool, set map[K]struct{{}}) bool {{
-{I}for k := range set {{
+// A set is represented as a map to empty structs, so this checks its items.
+func SomeKey[K comparable, V any](condition func(K) bool, m map[K]V) bool {{
+{I}for k := range m {{
 {II}if condition(k) {{
 {III}return true
 {II}}}
@@ -64,16 +64,63 @@ func SomeKey[K comparable](condition func(K) bool, set map[K]struct{{}}) bool {{
     ),
     Stripped(
         f"""\
-// Check if all the items of the set satisfy the condition.
+// Check if all the keys of the map satisfy the condition.
 //
-// The set is represented as a map to empty structs.
-func AllKeys[K comparable](condition func(K) bool, set map[K]struct{{}}) bool {{
-{I}for k := range set {{
+// A set is represented as a map to empty structs, so this checks its items.
+func AllKeys[K comparable, V any](condition func(K) bool, m map[K]V) bool {{
+{I}for k := range m {{
 {II}if !condition(k) {{
 {III}return false
 {II}}}
 {I}}}
 {I}return true
+}}"""
+    ),
+]
+
+#: Look up the values of a dictionary as in Python
+MAP_LOOK_UPS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+// Get the value of the key `k` in the map `m`, and panic if the key is missing.
+//
+// This is the index access of a dictionary in Python, which raises a `KeyError`
+// if the key is missing, while the native index access gives the zero value.
+func MapMustGet[K comparable, V any](m map[K]V, k K) V {{
+{I}v, ok := m[k]
+{I}if !ok {{
+{II}panic("The key is missing in the map.")
+{I}}}
+{I}return v
+}}"""
+    ),
+    Stripped(
+        f"""\
+// Get a pointer to a copy of the value of the key `k` in the map `m`, or nil
+// if the key is missing.
+//
+// This is ``get`` of a dictionary in Python without a default for the values
+// whose optionals are represented as pointers.
+func MapGetPointer[K comparable, V any](m map[K]V, k K) *V {{
+{I}v, ok := m[k]
+{I}if !ok {{
+{II}return nil
+{I}}}
+{I}return &v
+}}"""
+    ),
+    Stripped(
+        f"""\
+// Get the value of the key `k` in the map `m`, or the `defaultValue` if the key
+// is missing.
+//
+// This is ``get`` of a dictionary in Python with a default.
+func MapGetOr[K comparable, V any](m map[K]V, k K, defaultValue V) V {{
+{I}v, ok := m[k]
+{I}if !ok {{
+{II}return defaultValue
+{I}}}
+{I}return v
 }}"""
     ),
 ]
@@ -590,8 +637,11 @@ func FindStr(text string, sub string, start int64) int64 {{
     if intermediate_uses.int_call(symbol_table):
         blocks.append(PARSE_SAFE_INT)
 
-    if intermediate_uses.sets(symbol_table):
+    if intermediate_uses.sets(symbol_table) or intermediate_uses.dicts(symbol_table):
         blocks.extend(SOME_AND_ALL_KEYS)
+
+    if intermediate_uses.dicts(symbol_table):
+        blocks.extend(MAP_LOOK_UPS)
 
     if intermediate_uses.set_operations(symbol_table):
         blocks.extend(SET_OPERATIONS)

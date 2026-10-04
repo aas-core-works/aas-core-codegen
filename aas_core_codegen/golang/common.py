@@ -285,6 +285,16 @@ def generate_type(
 
         return Stripped(f"map[{item_type}]struct{{}}")
 
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        keys_type = generate_type(
+            type_annotation=type_annotation.keys, types_package=types_package
+        )
+        values_type = generate_type(
+            type_annotation=type_annotation.values, types_package=types_package
+        )
+
+        return Stripped(f"map[{keys_type}]{values_type}")
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(type_annotation=item, types_package=types_package)

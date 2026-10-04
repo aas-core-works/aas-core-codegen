@@ -19,6 +19,7 @@ from typing import (
     Set,
     Iterable,
     Iterator,
+    Final,
 )
 
 import asttokens
@@ -116,6 +117,8 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("Sequence", "typing"),
             ("Set", "typing"),
             ("AbstractSet", "typing"),
+            ("Dict", "typing"),
+            ("Mapping", "typing"),
             ("Tuple", "typing"),
             ("Union", "typing"),
             ("DBC", "icontract"),
@@ -2608,6 +2611,8 @@ def _verify_arity_of_this_type_annotation_subscript(
         "Mutable": 1,
         "Set": 1,
         "AbstractSet": 1,
+        "Dict": 2,
+        "Mapping": 2,
     }
     expected_arity = expected_arity_map.get(type_annotation.identifier, None)
     if expected_arity is None:
@@ -2680,6 +2685,8 @@ def _respell_mutability(type_annotation: TypeAnnotation, read_only: bool) -> str
         identifier = "Sequence" if read_only else "List"
     elif identifier in ("Set", "AbstractSet"):
         identifier = "AbstractSet" if read_only else "Set"
+    elif identifier in ("Dict", "Mapping"):
+        identifier = "Mapping" if read_only else "Dict"
 
     subscripts_text = ", ".join(
         _respell_mutability(subscript, read_only)
@@ -2722,16 +2729,43 @@ def _verify_optionals_only_at_top(
     return None
 
 
+def _verify_no_dicts_in_property(
+    type_annotation: TypeAnnotation, where: str
+) -> Optional[Error]:
+    """
+    Check that ``type_annotation`` of a property holds no dictionaries at any depth.
+
+    The ``where`` describes the place of ``type_annotation`` in the error message.
+    """
+    for subscripted in _over_subscripted_type_annotations(type_annotation):
+        if subscripted.identifier == "Dict":
+            nesting = (
+                "" if subscripted is type_annotation else f", which nests {subscripted}"
+            )
+
+            return Error(
+                subscripted.node,
+                f"We do not support the dictionaries in the properties yet, "
+                f"but {where} has the type {type_annotation}{nesting}. "
+                f"The dictionaries are supported only in the arguments, the return "
+                f"values and the variables of the verification functions and of "
+                f"the methods.",
+            )
+
+    return None
+
+
 def _verify_no_declared_mutability(
     type_annotation: TypeAnnotation, where: str
 ) -> Optional[Error]:
     """
-    Check that ``type_annotation`` uses neither ``Sequence``, ``AbstractSet`` nor ``Mutable``.
+    Check that ``type_annotation`` uses neither ``Sequence``, ``AbstractSet``,
+    ``Mapping`` nor ``Mutable``.
 
     Only the arguments of the verification functions and of the methods declare
     their mutability. The properties, the return values and the arguments of
-    the constructors, which mirror the properties, are spelled with ``List`` and
-    ``Set`` at every level.
+    the constructors, which mirror the properties, are spelled with ``List``,
+    ``Set`` and ``Dict`` at every level.
 
     The ``where`` describes the place of ``type_annotation`` in the error message,
     *e.g.*, ``the property 'x' of the class 'Y'``.
@@ -2739,7 +2773,7 @@ def _verify_no_declared_mutability(
     for subscripted in _over_subscripted_type_annotations(type_annotation):
         if not (
             subscripted.identifier in MUTABILITY_TYPES
-            or subscripted.identifier == "AbstractSet"
+            or subscripted.identifier in ("AbstractSet", "Mapping")
         ):
             continue
 
@@ -2752,6 +2786,8 @@ def _verify_no_declared_mutability(
             replacement = f"List[{subscripts_text}]"
         elif subscripted.identifier == "AbstractSet":
             replacement = f"Set[{subscripts_text}]"
+        elif subscripted.identifier == "Mapping":
+            replacement = f"Dict[{subscripts_text}]"
         else:
             replacement = subscripts_text
 
@@ -2769,6 +2805,17 @@ def _verify_no_declared_mutability(
     return None
 
 
+#: Describe the collection of a generic type in the error messages
+_COLLECTION_WHAT_BY_GENERIC: Final[Mapping[str, str]] = {
+    "List": "list",
+    "Sequence": "list",
+    "Set": "set",
+    "AbstractSet": "set",
+    "Dict": "dictionary",
+    "Mapping": "dictionary",
+}
+
+
 def _verify_spelling_of_declared_mutability(
     type_annotation: TypeAnnotation, where: str
 ) -> Optional[Error]:
@@ -2779,10 +2826,11 @@ def _verify_spelling_of_declared_mutability(
     or directly under ``Optional``.
 
     The mutability of an argument is deep: it flows from the argument to all
-    the values reached through it. Hence, all the nested lists and sets need to
-    be spelled the same as the outermost collection -- ``List`` and ``Set`` if
-    the argument is mutable, ``Sequence`` and ``AbstractSet`` if it is
-    read-only. A tuple at the top of an argument is read-only.
+    the values reached through it. Hence, all the nested lists, sets and
+    dictionaries need to be spelled the same as the outermost collection --
+    ``List``, ``Set`` and ``Dict`` if the argument is mutable, ``Sequence``,
+    ``AbstractSet`` and ``Mapping`` if it is read-only. A tuple at the top of
+    an argument is read-only.
 
     The ``where`` describes the place of ``type_annotation`` in the error message,
     *e.g.*, ``the argument 'x' of the verification function 'f'``.
@@ -2801,7 +2849,8 @@ def _verify_spelling_of_declared_mutability(
         wrapped = top.subscripts[0]
 
         if isinstance(wrapped, SubscriptedTypeAnnotation) and (
-            wrapped.identifier in ("List", "Sequence", "Set", "AbstractSet")
+            wrapped.identifier
+            in ("List", "Sequence", "Set", "AbstractSet", "Dict", "Mapping")
         ):
             items = ", ".join(str(subscript) for subscript in wrapped.subscripts)
 
@@ -2810,11 +2859,16 @@ def _verify_spelling_of_declared_mutability(
                 mutable_generic = "List"
                 read_only_generic = "Sequence"
                 read_only_article = "a"
-            else:
+            elif wrapped.identifier in ("Set", "AbstractSet"):
                 what = "set"
                 mutable_generic = "Set"
                 read_only_generic = "AbstractSet"
                 read_only_article = "an"
+            else:
+                what = "dictionary"
+                mutable_generic = "Dict"
+                read_only_generic = "Mapping"
+                read_only_article = "a"
 
             if wrapped.identifier == read_only_generic:
                 return Error(
@@ -2840,7 +2894,7 @@ def _verify_spelling_of_declared_mutability(
 
     read_only = not (
         isinstance(top, SubscriptedTypeAnnotation)
-        and top.identifier in ("List", "Set", "Mutable")
+        and top.identifier in ("List", "Set", "Dict", "Mutable")
     )
 
     for subscripted in _over_subscripted_type_annotations(type_annotation):
@@ -2858,8 +2912,8 @@ def _verify_spelling_of_declared_mutability(
         if subscripted is top:
             continue
 
-        if subscripted.identifier in ("List", "Set") and read_only:
-            what = "list" if subscripted.identifier == "List" else "set"
+        if subscripted.identifier in ("List", "Set", "Dict") and read_only:
+            what = _COLLECTION_WHAT_BY_GENERIC[subscripted.identifier]
 
             # NOTE (mristin):
             # A nested list or set implies a subscripted type annotation at
@@ -2875,7 +2929,7 @@ def _verify_spelling_of_declared_mutability(
             suggestion = (
                 f"Please declare it as {_respell_mutability(type_annotation, True)}"
             )
-            if top.identifier in ("Sequence", "AbstractSet"):
+            if top.identifier in ("Sequence", "AbstractSet", "Mapping"):
                 suggestion += (
                     f", or as {_respell_mutability(type_annotation, False)} "
                     f"if the function mutates the argument"
@@ -2887,12 +2941,15 @@ def _verify_spelling_of_declared_mutability(
                 f"contradictory: the argument is read-only, as {reason}, "
                 f"while {subscripted} declares a mutable {what}. "
                 f"The mutability of an argument is deep, so all the nested "
-                f"lists and sets of a read-only argument are read-only as well. "
-                f"{suggestion}.",
+                f"lists, sets and dictionaries of a read-only argument are "
+                f"read-only as well. {suggestion}.",
             )
 
-        if subscripted.identifier in ("Sequence", "AbstractSet") and not read_only:
-            what = "list" if subscripted.identifier == "Sequence" else "set"
+        if (
+            subscripted.identifier in ("Sequence", "AbstractSet", "Mapping")
+            and not read_only
+        ):
+            what = _COLLECTION_WHAT_BY_GENERIC[subscripted.identifier]
 
             assert isinstance(top, SubscriptedTypeAnnotation)
 
@@ -2902,8 +2959,8 @@ def _verify_spelling_of_declared_mutability(
                 f"contradictory: the argument is mutable, as declared by "
                 f"{top.identifier}, while {subscripted} declares a read-only "
                 f"{what}. The mutability of an argument is deep, so all "
-                f"the nested lists and sets of a mutable argument are mutable "
-                f"as well. Please declare it as "
+                f"the nested lists, sets and dictionaries of a mutable argument "
+                f"are mutable as well. Please declare it as "
                 f"{_respell_mutability(type_annotation, False)}, or as "
                 f"{_respell_mutability(type_annotation, True)} if the function "
                 f"does not mutate the argument.",
@@ -3532,6 +3589,9 @@ def _verify_symbol_table(
 
             if error is None:
                 error = _verify_no_declared_mutability(prop.type_annotation, where)
+
+            if error is None:
+                error = _verify_no_dicts_in_property(prop.type_annotation, where)
 
             if error is not None:
                 errors.append(error)

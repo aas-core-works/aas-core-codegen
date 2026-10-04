@@ -889,6 +889,13 @@ def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
             f"parse._translate._verify_symbol_table."
         )
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     return golang_common.leaf_moniker(type_anno)
 
 
@@ -1089,6 +1096,13 @@ for i, item := range that {{
                 for i, item_type_anno in enumerate(type_anno.items)
                 if _needs_verification(item_type_anno)
             )
+        )
+
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
         )
 
     else:

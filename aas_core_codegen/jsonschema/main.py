@@ -383,6 +383,13 @@ def _define_type(
                         key_all_of
                     )
 
+        elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_annotation}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
+
         else:
             assert_never(type_annotation)
 
@@ -464,6 +471,10 @@ def _over_non_optional_type_annotations(
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         for item in type_annotation.items:
             yield from _over_non_optional_type_annotations(item)
+
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        yield from _over_non_optional_type_annotations(type_annotation.keys)
+        yield from _over_non_optional_type_annotations(type_annotation.values)
 
     elif isinstance(
         type_annotation,

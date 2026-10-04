@@ -746,6 +746,107 @@ SetT Difference(
 ]
 
 
+#: Define the look-ups and the quantifiers over the dictionaries, which
+#: the transpiled code needs beyond the methods of ``std::unordered_map``
+_DICT_HELPERS_DEFINITIONS: Final[Sequence[Stripped]] = [
+    Stripped(
+        f"""\
+/**
+ * \\brief Look up the value of \\p key in \\p map, as Python's `get` without
+ * a default.
+ *
+ * We return the value by copy, as the result might be empty.
+ *
+ * \\param map to look up in
+ * \\param key to be looked up
+ * \\return the value, or nothing if \\p key is missing
+ */
+template<typename MapT>
+optional<typename MapT::mapped_type> GetOrNone(
+{I}const MapT& map,
+{I}const typename MapT::key_type& key
+) {{
+{I}const auto it = map.find(key);
+{I}if (it == map.end()) {{
+{II}return nullopt;
+{I}}}
+{I}return it->second;
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * \\brief Look up the value of \\p key in \\p map, or give
+ * \\p default_value, as Python's `get` with a default.
+ *
+ * We return the value by copy so that we never return a reference to
+ * a temporary default value.
+ *
+ * \\param map to look up in
+ * \\param key to be looked up
+ * \\param default_value to be given if \\p key is missing
+ * \\return the value, or \\p default_value if \\p key is missing
+ */
+template<typename MapT>
+typename MapT::mapped_type GetOr(
+{I}const MapT& map,
+{I}const typename MapT::key_type& key,
+{I}typename MapT::mapped_type default_value
+) {{
+{I}const auto it = map.find(key);
+{I}if (it == map.end()) {{
+{II}return default_value;
+{I}}}
+{I}return it->second;
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * Check if all the keys of the \\p map satisfy the \\p condition.
+ *
+ * \\param condition returning a boolean to be checked for each key
+ * \\param map whose keys are to be iterated through
+ * \\return `true` if all the keys of \\p map satisfy the \\p condition
+ */
+template<typename MapT, typename FunctorT>
+bool AllKeys(
+{I}FunctorT condition,
+{I}const MapT& map
+) {{
+{I}for (const auto& key_and_value : map) {{
+{II}if (!condition(key_and_value.first)) {{
+{III}return false;
+{II}}}
+{I}}}
+{I}return true;
+}}"""
+    ),
+    Stripped(
+        f"""\
+/**
+ * Check if any of the keys of the \\p map satisfy the \\p condition.
+ *
+ * \\param condition returning a boolean to be checked for each key
+ * \\param map whose keys are to be iterated through
+ * \\return `true` if any of the keys of \\p map satisfy the \\p condition
+ */
+template<typename MapT, typename FunctorT>
+bool SomeKey(
+{I}FunctorT condition,
+{I}const MapT& map
+) {{
+{I}for (const auto& key_and_value : map) {{
+{II}if (condition(key_and_value.first)) {{
+{III}return true;
+{II}}}
+{I}}}
+{I}return false;
+}}"""
+    ),
+]
+
+
 #: Declare the comparison of the strings by code points, by which we sort
 #: the items of the set properties
 _LESS_BY_CODE_POINTS_DECLARATION: Final[Stripped] = Stripped(
@@ -1340,8 +1441,14 @@ size_t LenTuple(const std::tuple<T...>&) {
             ),
             *([_SORTED_POINTERS_DEFINITION] if has_set_properties else []),
             *(
+                _DICT_HELPERS_DEFINITIONS
+                if intermediate_uses.dicts(symbol_table)
+                else []
+            ),
+            *(
                 [_ENUM_HASH_DEFINITION]
                 if intermediate_uses.sets_of_enumeration_literals(symbol_table)
+                or intermediate_uses.dicts_with_enumeration_keys(symbol_table)
                 else []
             ),
             Stripped(

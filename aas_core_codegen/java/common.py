@@ -1,6 +1,6 @@
 """Provide common functions shared among different Java code generation modules."""
 
-from typing import Final, Iterable, List, Mapping, cast, Optional, Sequence
+from typing import Final, Iterable, List, Mapping, cast, Optional, Sequence, Union
 import re
 
 from icontract import ensure, require
@@ -13,6 +13,7 @@ from aas_core_codegen.common import (
     indent_but_first_line,
 )
 from aas_core_codegen.java import naming as java_naming
+from aas_core_codegen.parse import tree as parse_tree
 
 
 @ensure(lambda result: result.startswith('"'))
@@ -199,6 +200,77 @@ def set_imports_if_necessary(
     return result
 
 
+def _holds_dict(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+    """Check whether a value of ``type_annotation`` holds a dictionary at any depth."""
+    return any(
+        isinstance(type_anno, intermediate.DictTypeAnnotation)
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_annotation
+        )
+    )
+
+
+def _body_of(
+    function: Union[intermediate.Verification, intermediate.Method]
+) -> Sequence[parse_tree.Node]:
+    """Give the transpilable body of the ``function``, or nothing."""
+    if isinstance(function, intermediate.TranspilableVerification):
+        return function.parsed.body
+
+    if isinstance(function, intermediate.UnderstoodMethod):
+        return function.body
+
+    return ()
+
+
+def dict_imports_if_necessary(
+    functions: Sequence[Union[intermediate.Verification, intermediate.Method]],
+    with_bodies: bool,
+) -> List[Stripped]:
+    """
+    Give the imports of the dictionaries if the ``functions`` use them.
+
+    We need ``Map`` for the dictionary arguments and the dictionary return values.
+    If ``with_bodies`` is set, we also consider the local dictionaries declared
+    in the bodies of the functions, which need ``HashMap`` as well.
+    """
+    uses_map = False
+    uses_hash_map = False
+
+    for function in functions:
+        if any(
+            _holds_dict(argument.type_annotation) for argument in function.arguments
+        ):
+            uses_map = True
+
+        if function.returns is not None and _holds_dict(function.returns):
+            uses_map = True
+
+        if with_bodies and (
+            intermediate.declares_local_dict(function)
+            or any(
+                isinstance(node, parse_tree.DictLiteral)
+                or (
+                    isinstance(node, parse_tree.FunctionCall)
+                    and node.name.identifier == "dict"
+                )
+                for body_node in _body_of(function)
+                for node in parse_tree.over_nodes(body_node)
+            )
+        ):
+            uses_map = True
+            uses_hash_map = True
+
+    result = []  # type: List[Stripped]
+    if uses_hash_map:
+        result.append(Stripped("java.util.HashMap"))
+
+    if uses_map:
+        result.append(Stripped("java.util.Map"))
+
+    return result
+
+
 @require(
     lambda our_type_qualifier:
     not (our_type_qualifier is not None)
@@ -262,6 +334,17 @@ def generate_type(
         )
 
         return Stripped(f"Set<{item_type}>")
+
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        keys_type = generate_type(
+            type_annotation=type_annotation.keys, our_type_qualifier=our_type_qualifier
+        )
+        values_type = generate_type(
+            type_annotation=type_annotation.values,
+            our_type_qualifier=our_type_qualifier,
+        )
+
+        return Stripped(f"Map<{keys_type}, {values_type}>")
 
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         # NOTE (mristin):

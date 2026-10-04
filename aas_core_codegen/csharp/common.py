@@ -178,6 +178,17 @@ def generate_type(
 
         return Stripped(f"HashSet<{item_type}>")
 
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        keys_type = generate_type(
+            type_annotation=type_annotation.keys, our_type_qualifier=our_type_qualifier
+        )
+        values_type = generate_type(
+            type_annotation=type_annotation.values,
+            our_type_qualifier=our_type_qualifier,
+        )
+
+        return Stripped(f"Dictionary<{keys_type}, {values_type}>")
+
     elif isinstance(type_annotation, intermediate.TupleTypeAnnotation):
         item_types = [
             generate_type(type_annotation=item, our_type_qualifier=our_type_qualifier)

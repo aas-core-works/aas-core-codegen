@@ -64,6 +64,7 @@ from aas_core_codegen.intermediate._types import (
     ListTypeAnnotation,
     TupleTypeAnnotation,
     SetTypeAnnotation,
+    DictTypeAnnotation,
     OptionalTypeAnnotation,
     OurTypeAnnotation,
     JsonValueTypeAnnotation,
@@ -1187,6 +1188,22 @@ def _to_type_annotation(
                 parsed=parsed,
             )
 
+        elif parsed.identifier in ("Dict", "Mapping"):
+            assert len(parsed.subscripts) == 2, (
+                f"Expected exactly two subscripts for the {parsed.identifier} type "
+                f"annotation, but got: {parsed}; this should have been caught before!"
+            )
+
+            # NOTE (mristin):
+            # A ``Mapping`` is a read-only dictionary. We keep the read-only flag on
+            # the argument, see :py:attr:`Argument.mutable`, so that the generators
+            # need not distinguish the two.
+            return DictTypeAnnotation(
+                keys=_to_item_type_annotation(parsed.subscripts[0]),
+                values=_to_item_type_annotation(parsed.subscripts[1]),
+                parsed=parsed,
+            )
+
         elif parsed.identifier == "Mutable":
             assert len(parsed.subscripts) == 1, (
                 f"Expected exactly one subscript for the Mutable type annotation, "
@@ -1272,8 +1289,8 @@ def _mutability_type_beneath_optional(
     parsed: parse.TypeAnnotation,
 ) -> Optional[parse.SubscriptedTypeAnnotation]:
     """
-    Find ``List``, ``Sequence``, ``Set``, ``AbstractSet`` or ``Mutable`` at the top
-    of ``parsed``.
+    Find ``List``, ``Sequence``, ``Set``, ``AbstractSet``, ``Dict``, ``Mapping`` or
+    ``Mutable`` at the top of ``parsed``.
 
     We look beneath ``Optional``, as ``Optional`` keeps the mutability.
     """
@@ -1288,6 +1305,8 @@ def _mutability_type_beneath_optional(
         "Sequence",
         "Set",
         "AbstractSet",
+        "Dict",
+        "Mapping",
         "Mutable",
     ):
         return parsed
@@ -1315,7 +1334,7 @@ def _to_arguments(parsed: Sequence[parse.Argument]) -> List[Argument]:
                 ),
                 mutable=(
                     mutability_type is not None
-                    and mutability_type.identifier in ("List", "Set", "Mutable")
+                    and mutability_type.identifier in ("List", "Set", "Dict", "Mutable")
                 ),
                 parsed=parsed_arg,
             )
@@ -1777,7 +1796,12 @@ class _CheckCodeUsesReVisitor(parse_tree.Visitor):
 
         self.visit(node.generator)
 
-        self._variable_name_set.add(node.generator.variable.identifier)
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            self._variable_name_set.add(node.generator.key.identifier)
+            self._variable_name_set.add(node.generator.value.identifier)
+        else:
+            self._variable_name_set.add(node.generator.variable.identifier)
+
         for stmt in node.body:
             self.visit(stmt)
 
@@ -2530,6 +2554,10 @@ def _over_our_type_annotations(
     elif isinstance(something, TupleTypeAnnotation):
         for item in something.items:
             yield from _over_our_type_annotations(item)
+
+    elif isinstance(something, DictTypeAnnotation):
+        yield from _over_our_type_annotations(something.keys)
+        yield from _over_our_type_annotations(something.values)
 
     elif isinstance(something, OptionalTypeAnnotation):
         yield from _over_our_type_annotations(something.value)
@@ -5770,6 +5798,25 @@ def _verify_items_of_sets(symbol_table: SymbolTable) -> List[Error]:
     return errors
 
 
+def _verify_keys_of_dicts(symbol_table: SymbolTable) -> List[Error]:
+    """Check that the dictionaries, at any depth of the type annotations, hold supported keys."""
+    errors = []  # type: List[Error]
+
+    for type_anno, node, what in _over_declared_type_annotations(symbol_table):
+        for nested in over_type_annotation_and_nested_type_annotations(type_anno):
+            if not isinstance(nested, DictTypeAnnotation):
+                continue
+
+            refusal = intermediate_type_inference.refusal_of_dict_keys(
+                intermediate_type_inference.convert_type_annotation(nested.keys)
+            )
+            if refusal is not None:
+                errors.append(Error(node, f"In {what}: {refusal}"))
+                break
+
+    return errors
+
+
 def _verify_mutable_only_around_classes(symbol_table: SymbolTable) -> List[Error]:
     """Check that ``Mutable[...]`` wraps only the classes."""
     errors = []  # type: List[Error]
@@ -5803,8 +5850,11 @@ def _verify_mutable_only_around_classes(symbol_table: SymbolTable) -> List[Error
 
         # NOTE (mristin):
         # The parser already refused ``Mutable`` around ``List``, ``Sequence``,
-        # ``Set`` and ``AbstractSet``, as it can tell them apart syntactically.
-        assert not isinstance(type_anno, (ListTypeAnnotation, SetTypeAnnotation))
+        # ``Set``, ``AbstractSet``, ``Dict`` and ``Mapping``, as it can tell them
+        # apart syntactically.
+        assert not isinstance(
+            type_anno, (ListTypeAnnotation, SetTypeAnnotation, DictTypeAnnotation)
+        )
 
         reason: str
         if isinstance(type_anno, PrimitiveTypeAnnotation) or (
@@ -6012,6 +6062,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     errors.extend(_verify_mutable_only_around_classes(symbol_table=symbol_table))
 
     errors.extend(_verify_items_of_sets(symbol_table=symbol_table))
+
+    errors.extend(_verify_keys_of_dicts(symbol_table=symbol_table))
 
     errors.extend(
         _verify_methods_refer_neither_to_constants_nor_verification_functions(

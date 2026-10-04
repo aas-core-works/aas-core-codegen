@@ -154,6 +154,24 @@ def generate_type(
 
         return Stripped(f"map[{item_type}]struct{{}}"), None
 
+    elif isinstance(type_annotation, intermediate_type_inference.DictTypeAnnotation):
+        keys_type, error_msg = generate_type(
+            type_annotation=type_annotation.keys, types_package=types_package
+        )
+        if error_msg is not None:
+            return None, error_msg
+
+        values_type, error_msg = generate_type(
+            type_annotation=type_annotation.values, types_package=types_package
+        )
+        if error_msg is not None:
+            return None, error_msg
+
+        assert keys_type is not None
+        assert values_type is not None
+
+        return Stripped(f"map[{keys_type}]{values_type}"), None
+
     elif isinstance(
         type_annotation, intermediate_type_inference.OptionalTypeAnnotation
     ):
@@ -421,6 +439,23 @@ class Transpiler(
 
         return Stripped(f"{golang_common.COMMON_PACKAGE}.NewAndPointTo({code})"), None
 
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_key(
+        self, node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` as a key of a map.
+
+        A narrowed optional is still a pointer, so we de-reference it, and
+        the lengths are ``int``'s, so we convert them to our integers.
+        """
+        key, error = self._transform_and_dereference_if_necessary(node)
+        if error is not None:
+            return None, error
+
+        assert key is not None
+        return self._as_int64_position(node, key), None
+
     @abc.abstractmethod
     def _transform_enumeration_literal(
         self, enumeration_name: Identifier, literal_name: Identifier
@@ -566,6 +601,28 @@ class Transpiler(
                 collection = Stripped(f"({collection})")
 
             return Stripped(f"{collection}.Item{index_value + 1}"), None
+
+        if isinstance(collection_type, intermediate_type_inference.DictTypeAnnotation):
+            key, error = self._transform_key(node.index)
+            if error is not None:
+                return None, error
+
+            assert key is not None
+
+            # NOTE (mristin):
+            # The native index access gives the zero value for a missing key,
+            # while Python raises a ``KeyError``. See ``MapMustGet`` in
+            # the generated common package.
+            return (
+                Stripped(
+                    f"""\
+ourcommon.MapMustGet(
+{I}{indent_but_first_line(collection, I)},
+{I}{indent_but_first_line(key, I)},
+)"""
+                ),
+                None,
+            )
 
         index, error = self.transform(node.index)
         if error is not None:
@@ -776,17 +833,25 @@ len(
 
         # NOTE (mristin):
         # The lengths are ``int``'s, so we convert them to our integers to look
-        # them up in a set.
-        if isinstance(container_type, intermediate_type_inference.SetTypeAnnotation):
-            member = self._as_int64_position(node.member, member)
-
-        # NOTE (mristin):
-        # A JSON-able object is a ``map[string]interface{}``, so the membership
-        # is a question about its keys, just as it is for a set.
+        # them up in a set or among the keys of a dictionary.
         if isinstance(
             container_type,
             (
                 intermediate_type_inference.SetTypeAnnotation,
+                intermediate_type_inference.DictTypeAnnotation,
+            ),
+        ):
+            member = self._as_int64_position(node.member, member)
+
+        # NOTE (mristin):
+        # A JSON-able object is a ``map[string]interface{}``, and a dictionary is
+        # a map, so the membership is a question about their keys, just as it is
+        # for a set.
+        if isinstance(
+            container_type,
+            (
+                intermediate_type_inference.SetTypeAnnotation,
+                intermediate_type_inference.DictTypeAnnotation,
                 intermediate_type_inference.JsonObjectTypeAnnotation,
             ),
         ):
@@ -1038,6 +1103,75 @@ ourcommon.{function_name}(
                 assert item is not None
                 item = self._as_int64_position(node.args[0], item)
                 return Stripped(f"{instance}[{item}] = struct{{}}{{}}"), None
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_GET:
+                key, error = self._transform_key(node.args[0])
+                if error is not None:
+                    return None, error
+
+                assert key is not None
+
+                if len(node.args) == 2:
+                    # NOTE (mristin):
+                    # See ``MapGetOr`` in the generated common package.
+                    default, error = self._transform_and_dereference_if_necessary(
+                        node.args[1]
+                    )
+                    if error is not None:
+                        return None, error
+
+                    assert default is not None
+                    default = self._as_int64_position(node.args[1], default)
+
+                    return (
+                        Stripped(
+                            f"""\
+ourcommon.MapGetOr(
+{I}{indent_but_first_line(instance, I)},
+{I}{indent_but_first_line(key, I)},
+{I}{indent_but_first_line(default, I)},
+)"""
+                        ),
+                        None,
+                    )
+
+                if golang_pointering.is_pointer_type(self.type_map[node]):
+                    # NOTE (mristin):
+                    # The optional value is represented as a pointer, see
+                    # ``MapGetPointer`` in the generated common package.
+                    return (
+                        Stripped(
+                            f"""\
+ourcommon.MapGetPointer(
+{I}{indent_but_first_line(instance, I)},
+{I}{indent_but_first_line(key, I)},
+)"""
+                        ),
+                        None,
+                    )
+
+                # NOTE (mristin):
+                # The optional value is nil-able, *e.g.*, an interface or a slice,
+                # and the native index access gives nil for a missing key, as
+                # Python gives ``None``.
+                if not isinstance(
+                    node.member.instance, (parse_tree.Name, parse_tree.Member)
+                ):
+                    instance = Stripped(f"({instance})")
+
+                return Stripped(f"{instance}[{key}]"), None
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_POP:
+                key, error = self._transform_key(node.args[0])
+                if error is not None:
+                    return None, error
+
+                assert key is not None
+
+                # NOTE (mristin):
+                # The native ``delete`` does nothing if the key is missing, just as
+                # ``pop`` with the default ``None`` in Python.
+                return Stripped(f"delete({instance}, {key})"), None
 
             else:
                 assert_never(kind)
@@ -1318,6 +1452,21 @@ ourcommon.{function_name}(
 
             elif (
                 func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.DICT
+            ):
+                # NOTE (mristin):
+                # We always make a new map, as writing to a nil map panics.
+                dict_type, error_msg = generate_type(
+                    self.type_map[node], types_package=self._types_package
+                )
+                if error_msg is not None:
+                    return None, Error(node.original_node, error_msg)
+
+                assert dict_type is not None
+                return Stripped(f"make({dict_type})"), None
+
+            elif (
+                func_type.func.kind
                 is intermediate_type_inference.BuiltinFunctionKind.INT
             ):
                 assert len(args) == 1, (
@@ -1405,6 +1554,101 @@ ourcommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
                 f"""\
 {go_tuple_type}{{
 {I}{indent_but_first_line(joined_item_exprs, I)},
+}}"""
+            ),
+            None,
+        )
+
+    def _wrap_into_named_union_if_necessary(
+        self,
+        value: Stripped,
+        target_type: intermediate_type_inference.TypeAnnotationUnion,
+        value_type: intermediate_type_inference.TypeAnnotationUnion,
+    ) -> Stripped:
+        """
+        Wrap the instance of a class, given as ``value``, into the named union.
+
+        A named union is a pointer to a wrapper struct in Go, so we wrap
+        the instance as the most specific root of the union.
+        """
+        if not intermediate_type_inference.needs_wrapping_into_named_union(
+            target_type=target_type, value_type=value_type
+        ):
+            return value
+
+        union_type = intermediate_type_inference.beneath_optional(target_type)
+        assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(union_type.our_type, intermediate.NamedUnion)
+        assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
+        assert isinstance(value_type.our_type, intermediate.Class)
+
+        root = union_type.our_type.most_specific_root_of(value_type.our_type)
+
+        function_name = self._our_type_name(
+            golang_naming.function_name(
+                Identifier(f"new_{union_type.our_type.name}_from_{root.name}")
+            )
+        )
+
+        return Stripped(f"{function_name}({value})")
+
+    def transform_dict_literal(
+        self, node: parse_tree.DictLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        dict_type = self.type_map[node]
+        assert isinstance(dict_type, intermediate_type_inference.DictTypeAnnotation)
+
+        go_dict_type, error_msg = generate_type(
+            type_annotation=dict_type, types_package=self._types_package
+        )
+        if error_msg is not None:
+            return None, Error(node.original_node, error_msg)
+
+        assert go_dict_type is not None
+
+        # NOTE (mristin):
+        # We always make a new map, as writing to a nil map panics.
+        if len(node.keys) == 0:
+            return Stripped(f"make({go_dict_type})"), None
+
+        errors = []  # type: List[Error]
+        items = []  # type: List[str]
+
+        for key_node, value_node in zip(node.keys, node.values):
+            key, error = self._transform_key(key_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            value, error = self._transform_and_dereference_if_necessary(value_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert key is not None
+            assert value is not None
+
+            value = self._as_int64_position(value_node, value)
+            value = self._wrap_into_named_union_if_necessary(
+                value=value,
+                target_type=dict_type.values,
+                value_type=self.type_map[value_node],
+            )
+
+            items.append(f"{key}: {indent_but_first_line(value, I)}")
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the dictionary literal", errors
+            )
+
+        items_joined = ",\n".join(items)
+
+        return (
+            Stripped(
+                f"""\
+{go_dict_type}{{
+{I}{indent_but_first_line(items_joined, I)},
 }}"""
             ),
             None,
@@ -2008,18 +2252,22 @@ fmt.Sprintf(
             assert iteration is not None
 
             # NOTE (mristin):
-            # A set is a map, so we iterate over its keys, see ``SomeKey`` and
-            # ``AllKeys`` in the generated common package.
-            over_set = isinstance(
+            # A set is a map, so we iterate over its keys, as over the keys of
+            # a dictionary, see ``SomeKey`` and ``AllKeys`` in the generated
+            # common package.
+            over_keys = isinstance(
                 self.type_map[node.generator.iteration],
-                intermediate_type_inference.SetTypeAnnotation,
+                (
+                    intermediate_type_inference.SetTypeAnnotation,
+                    intermediate_type_inference.DictTypeAnnotation,
+                ),
             )
 
             qualifier_function: str
             if isinstance(node, parse_tree.Any):
-                qualifier_function = "SomeKey" if over_set else "Some"
+                qualifier_function = "SomeKey" if over_keys else "Some"
             elif isinstance(node, parse_tree.All):
-                qualifier_function = "AllKeys" if over_set else "All"
+                qualifier_function = "AllKeys" if over_keys else "All"
             else:
                 assert_never(node)
 
@@ -2095,39 +2343,6 @@ ourcommon.{qualifier_function}(
         self, node: parse_tree.All
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return self._transform_any_or_all(node)
-
-    def _wrap_into_named_union_if_necessary(
-        self,
-        value: Stripped,
-        target_type: intermediate_type_inference.TypeAnnotationUnion,
-        value_type: intermediate_type_inference.TypeAnnotationUnion,
-    ) -> Stripped:
-        """
-        Wrap the instance of a class, given as ``value``, into the named union.
-
-        A named union is a pointer to a wrapper struct in Go, so we wrap
-        the instance as the most specific root of the union.
-        """
-        if not intermediate_type_inference.needs_wrapping_into_named_union(
-            target_type=target_type, value_type=value_type
-        ):
-            return value
-
-        union_type = intermediate_type_inference.beneath_optional(target_type)
-        assert isinstance(union_type, intermediate_type_inference.OurTypeAnnotation)
-        assert isinstance(union_type.our_type, intermediate.NamedUnion)
-        assert isinstance(value_type, intermediate_type_inference.OurTypeAnnotation)
-        assert isinstance(value_type.our_type, intermediate.Class)
-
-        root = union_type.our_type.most_specific_root_of(value_type.our_type)
-
-        function_name = self._our_type_name(
-            golang_naming.function_name(
-                Identifier(f"new_{union_type.our_type.name}_from_{root.name}")
-            )
-        )
-
-        return Stripped(f"{function_name}({value})")
 
     def transform_assignment(
         self, node: parse_tree.Assignment
@@ -2235,11 +2450,42 @@ ourcommon.{qualifier_function}(
             target, error = self.transform_name(node=node.target)
             if error is not None:
                 errors.append(error)
+        elif isinstance(node.target, parse_tree.Index) and isinstance(
+            self.type_map[node.target.collection],
+            intermediate_type_inference.DictTypeAnnotation,
+        ):
+            # NOTE (mristin):
+            # We set the item of a map with the native index access, which we
+            # can not use to read the item, see :py:meth:`transform_index`.
+            collection, error = self.transform(node.target.collection)
+            if error is not None:
+                errors.append(error)
+
+            key, error = self._transform_key(node.target.index)
+            if error is not None:
+                errors.append(error)
+
+            if collection is not None and key is not None:
+                if not isinstance(
+                    node.target.collection,
+                    (
+                        parse_tree.Member,
+                        parse_tree.FunctionCall,
+                        parse_tree.MethodCall,
+                        parse_tree.Name,
+                        parse_tree.Index,
+                    ),
+                ):
+                    collection = Stripped(f"({collection})")
+
+                target = Stripped(f"{collection}[{key}]")
+
         else:
             # NOTE (mristin):
             # The slices share their underlying arrays, so the assignment to an item
             # of a list is visible through all the references to the list, as in
-            # Python.
+            # Python. The maps are references, so the assignment to an item of
+            # a map nested in another collection is visible as well.
             target, error = self.transform(node=node.target)
             if error is not None:
                 errors.append(error)
@@ -2483,15 +2729,20 @@ return {indent_but_first_line(value, I)}"""
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        variable_name = node.generator.variable.identifier
-        variable_type_annotation = self.type_map[node.generator.variable]
-        variable = golang_naming.variable_name(variable_name)
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
 
         header = None  # type: Optional[str]
         if isinstance(node.generator, parse_tree.ForEach):
+            variable = golang_naming.variable_name(node.generator.variable.identifier)
+
             # NOTE (mristin):
             # Lists are represented as slices in Go, which are never pointers.
-            # Sets are represented as maps, and we iterate over their keys.
+            # Sets and dictionaries are represented as maps, and we iterate over
+            # their keys.
             iteration, error = self.transform(node.generator.iteration)
             if error is not None:
                 errors.append(error)
@@ -2499,7 +2750,10 @@ return {indent_but_first_line(value, I)}"""
                 assert iteration is not None
                 if isinstance(
                     self.type_map[node.generator.iteration],
-                    intermediate_type_inference.SetTypeAnnotation,
+                    (
+                        intermediate_type_inference.SetTypeAnnotation,
+                        intermediate_type_inference.DictTypeAnnotation,
+                    ),
                 ):
                     header = (
                         f"for {variable} := range "
@@ -2511,7 +2765,45 @@ return {indent_but_first_line(value, I)}"""
                         f"{indent_but_first_line(iteration, I)}"
                     )
 
+        elif isinstance(node.generator, parse_tree.ForEachItem):
+            mapping, error = self.transform(node.generator.mapping)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert mapping is not None
+
+                # NOTE (mristin):
+                # Go refuses to compile the unused variables, so we discard the key
+                # or the value if the body does not use it.
+                used_name_set = {
+                    some_node.identifier
+                    for stmt in node.body
+                    for some_node in parse_tree.over_nodes(stmt)
+                    if isinstance(some_node, parse_tree.Name)
+                }
+
+                key = (
+                    golang_naming.variable_name(node.generator.key.identifier)
+                    if node.generator.key.identifier in used_name_set
+                    else "_"
+                )
+
+                value = (
+                    golang_naming.variable_name(node.generator.value.identifier)
+                    if node.generator.value.identifier in used_name_set
+                    else None
+                )
+
+                variables = key if value is None else f"{key}, {value}"
+
+                header = (
+                    f"for {variables} := range " f"{indent_but_first_line(mapping, I)}"
+                )
+
         elif isinstance(node.generator, parse_tree.ForRange):
+            variable = golang_naming.variable_name(node.generator.variable.identifier)
+            variable_type_annotation = self.type_map[node.generator.variable]
+
             assert isinstance(
                 variable_type_annotation,
                 intermediate_type_inference.PrimitiveTypeAnnotation,
@@ -2559,16 +2851,18 @@ return {indent_but_first_line(value, I)}"""
         assert header is not None
 
         # NOTE (mristin):
-        # The loop variable is scoped to the loop, so we define it in its own
+        # The loop variables are scoped to the loop, so we define them in their own
         # environment enclosing the body.
         parent_environment = self._environment
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(
-            identifier=variable_name, type_annotation=variable_type_annotation
-        )
-        self._variable_name_set.add(variable_name)
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self.type_map[loop_variable],
+            )
+            self._variable_name_set.add(loop_variable.identifier)
 
         self._environment = loop_environment
         try:

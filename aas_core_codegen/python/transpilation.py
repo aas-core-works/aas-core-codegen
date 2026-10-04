@@ -44,9 +44,9 @@ def generate_type(
     If ``types_module`` is specified, it is prepended to all our types. Otherwise,
     we quote our types, as they might be declared later in the types module.
 
-    If ``read_only`` is set, we spell out the lists and the sets as ``Sequence``
-    and ``AbstractSet``, respectively, *e.g.*, for the variables declared as
-    ``Final[...]``.
+    If ``read_only`` is set, we spell out the lists, the sets and the dictionaries
+    as ``Sequence``, ``AbstractSet`` and ``Mapping``, respectively, *e.g.*, for
+    the variables declared as ``Final[...]``.
 
     We handle only the type annotations which can be declared for the variables.
     Otherwise, we return an error message.
@@ -116,6 +116,26 @@ def generate_type(
             generic = "Optional"
 
         return Stripped(f"{generic}[{nested}]"), None
+
+    elif isinstance(type_annotation, intermediate_type_inference.DictTypeAnnotation):
+        keys, error_message = generate_type(
+            type_annotation=type_annotation.keys,
+            types_module=types_module,
+            read_only=read_only,
+        )
+        if error_message is not None:
+            return None, error_message
+
+        values, error_message = generate_type(
+            type_annotation=type_annotation.values,
+            types_module=types_module,
+            read_only=read_only,
+        )
+        if error_message is not None:
+            return None, error_message
+
+        generic = "Mapping" if read_only else "Dict"
+        return Stripped(f"{generic}[{keys}, {values}]"), None
 
     elif isinstance(type_annotation, intermediate_type_inference.TupleTypeAnnotation):
         item_types = []  # type: List[Stripped]
@@ -609,6 +629,22 @@ not (
 
             return Stripped(f"{instance} {operator} {arg}"), None
 
+        elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_GET:
+            if not isinstance(
+                node.member.instance, (parse_tree.Name, parse_tree.Member)
+            ):
+                instance = Stripped(f"({instance})")
+
+            return Stripped(f"{instance}.get({', '.join(args)})"), None
+
+        elif kind is intermediate_type_inference.BuiltinMethodKind.DICT_POP:
+            if not isinstance(
+                node.member.instance, (parse_tree.Name, parse_tree.Member)
+            ):
+                instance = Stripped(f"({instance})")
+
+            return Stripped(f"{instance}.pop({args[0]}, None)"), None
+
         else:
             assert_never(kind)
 
@@ -813,6 +849,17 @@ not (
 
                 return Stripped(f"list({args[0]})"), None
 
+            elif (
+                func_type.func.kind
+                is intermediate_type_inference.BuiltinFunctionKind.DICT
+            ):
+                assert len(args) == 0, (
+                    f"Expected no arguments, but got: {args}; "
+                    f"this should have been caught before."
+                )
+
+                return Stripped("dict()"), None
+
             else:
                 assert_never(func_type.func.kind)
         else:
@@ -871,6 +918,49 @@ not (
 
         joined_values = ", ".join(value_reprs)
         return Stripped(f"({joined_values})"), None
+
+    def transform_dict_literal(
+        self, node: parse_tree.DictLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        items = []  # type: List[str]
+        for key_node, value_node in zip(node.keys, node.values):
+            key, error = self.transform(key_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            value, error = self.transform(value_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert key is not None
+            assert value is not None
+            items.append(f"{key}: {value}")
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the dictionary literal", errors
+            )
+
+        if len(items) == 0:
+            return Stripped("{}"), None
+
+        joined_items = ", ".join(items)
+        if "\n" not in joined_items and len(joined_items) <= 50:
+            return Stripped(f"{{{joined_items}}}"), None
+
+        items_joined_with_new_lines = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+{{
+{I}{indent_but_first_line(items_joined_with_new_lines, I)}
+}}"""
+            ),
+            None,
+        )
 
     def transform_is_none(
         self, node: parse_tree.IsNone
@@ -1369,7 +1459,7 @@ range(
             # be assigned only to a variable spelled read-only in mypy.
             is_spelled_read_only = any(
                 isinstance(annotation_node, parse_tree.Name)
-                and annotation_node.identifier in ("Sequence", "AbstractSet")
+                and annotation_node.identifier in ("Sequence", "AbstractSet", "Mapping")
                 for annotation_node in parse_tree.over_nodes(node.annotation)
             )
 
@@ -1577,6 +1667,27 @@ return (
             if error is not None:
                 errors.append(error)
 
+        elif isinstance(node.generator, parse_tree.ForEachItem):
+            mapping, error = self.transform(node.generator.mapping)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert mapping is not None
+
+                if not isinstance(
+                    node.generator.mapping,
+                    (
+                        parse_tree.Name,
+                        parse_tree.Member,
+                        parse_tree.Index,
+                        parse_tree.MethodCall,
+                        parse_tree.FunctionCall,
+                    ),
+                ):
+                    mapping = Stripped(f"({mapping})")
+
+                source = Stripped(f"{mapping}.items()")
+
         elif isinstance(node.generator, parse_tree.ForRange):
             start, error = self.transform(node.generator.start)
             if error is not None:
@@ -1609,26 +1720,37 @@ range(
         assert source is not None
 
         # NOTE (mristin):
-        # The loop variable is scoped to the loop in the other targets, so we
-        # define it in its own environment enclosing the body. The type inference
-        # refused all the usages of the loop variable after the loop.
-        variable_name = node.generator.variable.identifier
+        # The loop variables are scoped to the loop in the other targets, so we
+        # define them in their own environment enclosing the body. The type
+        # inference refused all the usages of the loop variables after the loop.
+        loop_variables: Sequence[parse_tree.Name]
+        if isinstance(node.generator, parse_tree.ForEachItem):
+            loop_variables = (node.generator.key, node.generator.value)
+        else:
+            loop_variables = (node.generator.variable,)
 
         parent_environment = self._environment
         loop_environment = intermediate_type_inference.MutableEnvironment(
             parent=parent_environment
         )
-        loop_environment.set(
-            identifier=variable_name,
-            type_annotation=self.type_map[node.generator.variable],
-        )
-        self._variable_name_set.add(variable_name)
+        for loop_variable in loop_variables:
+            loop_environment.set(
+                identifier=loop_variable.identifier,
+                type_annotation=self.type_map[loop_variable],
+            )
+            self._variable_name_set.add(loop_variable.identifier)
 
+        variables = []  # type: List[Stripped]
         self._environment = loop_environment
         try:
-            variable, error = self.transform(node.generator.variable)
-            if error is not None:
-                errors.append(error)
+            for loop_variable in loop_variables:
+                variable, error = self.transform(loop_variable)
+                if error is not None:
+                    errors.append(error)
+                    continue
+
+                assert variable is not None
+                variables.append(variable)
 
             stmts_and_defines, error = self._transform_branch(node.body)
             if error is not None:
@@ -1641,12 +1763,11 @@ range(
                 node.original_node, "Failed to transpile the for-loop", errors
             )
 
-        assert variable is not None
         assert stmts_and_defines is not None
         stmts, _ = stmts_and_defines
 
         writer = io.StringIO()
-        writer.write(f"for {variable} in {source}:")
+        writer.write(f"for {', '.join(variables)} in {source}:")
 
         if len(stmts) == 0:
             writer.write(f"\n{I}pass")

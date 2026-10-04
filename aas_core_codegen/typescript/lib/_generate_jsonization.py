@@ -1066,6 +1066,13 @@ parseTuple{len(type_anno.items)}<{item_types_joined}>(
 )"""
         )
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
+
     assert_never(type_anno)
 
 
@@ -1178,6 +1185,13 @@ def _collect_nested_containers(
         """Collect the containers nested in ``type_anno``, and itself if ``nested``."""
         if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
             return
+
+        if isinstance(type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
 
         items = (
             type_anno.items
@@ -2015,6 +2029,13 @@ def _jsonable_type(type_anno: intermediate.TypeAnnotationExceptOptional) -> Stri
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return Stripped("Array<JsonValue>")
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        raise AssertionError(
+            f"Unexpected dictionary in a property: {type_anno}; "
+            f"the dictionaries in the properties are refused in "
+            f"parse._translate._verify_symbol_table."
+        )
 
     return _jsonable_type_of_atomic(type_anno)
 
@@ -3008,6 +3029,13 @@ function newDeserializationError<T>(
             blocks.append(_generate_serialize_set(type_anno=composed_type_anno))
         elif isinstance(composed_type_anno, intermediate.TupleTypeAnnotation):
             blocks.append(_generate_serialize_tuple(type_anno=composed_type_anno))
+        elif isinstance(composed_type_anno, intermediate.DictTypeAnnotation):
+            raise AssertionError(
+                f"Unexpected dictionary in a property: {composed_type_anno}; "
+                f"the dictionaries in the properties are refused in "
+                f"parse._translate._verify_symbol_table."
+            )
+
         else:
             assert_never(composed_type_anno)
 
