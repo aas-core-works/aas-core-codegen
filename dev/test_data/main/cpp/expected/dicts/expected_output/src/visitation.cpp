@@ -40,6 +40,13 @@ void AbstractVisitor::Visit(
         >(that)
       );
       break;
+    case types::ModelType::kRegistry:
+      VisitRegistry(
+        std::dynamic_pointer_cast<
+          types::IRegistry
+        >(that)
+      );
+      break;
     default:
       throw std::logic_error(
         common::Concat(
@@ -75,6 +82,24 @@ void PassThrough_listOf_Item(
   }
 }
 
+/**
+ * Pass the \p visitor through the instances held by \p that.
+ */
+void PassThrough_dictOf_str_Item(
+  IVisitor* visitor,
+  const std::unordered_map<
+    std::wstring,
+    std::shared_ptr<types::IItem>
+  >& that
+) {
+  for (
+    const auto* item :
+    common::SortedItemPointers(that, common::LessByCodePoints)
+  ) {
+    visitor->Visit(item->second);
+  }
+}
+
 // endregion Pass-through over the containers
 
 }  // namespace
@@ -92,6 +117,16 @@ void PassThroughVisitor::VisitSomething(
 ) {
   // mutable_items
   PassThrough_listOf_Item(this, that->mutable_items());
+}
+
+void PassThroughVisitor::VisitRegistry(
+  const std::shared_ptr<types::IRegistry>& that
+) {
+  // mutable_items_by_name
+  PassThrough_dictOf_str_Item(
+    this,
+    that->mutable_items_by_name()
+  );
 }
 
 // endregion

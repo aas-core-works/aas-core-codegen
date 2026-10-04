@@ -223,6 +223,114 @@ private static Deserializer<HashSet<T>> AsSetOf<T>(
     )
 
 
+def _generate_as_dict_of_helper() -> Stripped:
+    """Generate the combinator de-serializing a JSON object into a dictionary."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// De-serialize every member of a JSON object into a dictionary, its key with
+/// <paramref name="deserializeKey" /> and its value with
+/// <paramref name="deserializeValue" />.
+/// </summary>
+/// <remarks>
+/// The key is handed over to <paramref name="deserializeKey" /> as a JSON
+/// string, so that the strings and the enumeration literals de-serialize
+/// from it exactly as their values do. The members can come in any order.
+/// </remarks>
+/// <typeparam name="TKey">Type of a key</typeparam>
+/// <typeparam name="TValue">Type of a value</typeparam>
+private static Deserializer<Dictionary<TKey, TValue>> AsDictOf<TKey, TValue>(
+{I}Deserializer<TKey> deserializeKey,
+{I}Deserializer<TValue> deserializeValue) where TKey : notnull
+{{
+{I}return (
+{II}Nodes.JsonNode? node,
+{II}out Reporting.Error? error) =>
+{II}{{
+{III}error = null;
+
+{III}Nodes.JsonObject? obj = node as Nodes.JsonObject;
+{III}if (obj == null)
+{III}{{
+{IIII}error = new Reporting.Error(
+{IIIII}$"Expected a JsonObject, but got {{Describe(node)}}");
+{IIII}return default!;
+{III}}}
+
+{III}var result = new Dictionary<TKey, TValue>(obj.Count);
+
+{III}foreach (var member in obj)
+{III}{{
+{IIII}TKey key = deserializeKey(
+{IIIII}Nodes.JsonValue.Create(member.Key),
+{IIIII}out error);
+{IIII}if (error != null)
+{IIII}{{
+{IIIII}error.PrependSegment(
+{IIIIII}new Reporting.KeySegment(member.Key));
+{IIIII}return default!;
+{IIII}}}
+
+{IIII}TValue value = deserializeValue(member.Value, out error);
+{IIII}if (error != null)
+{IIII}{{
+{IIIII}error.PrependSegment(
+{IIIIII}new Reporting.KeySegment(member.Key));
+{IIIII}return default!;
+{IIII}}}
+
+{IIII}result[key] = value;
+{III}}}
+
+{III}return result;
+{II}}};
+}}"""
+    )
+
+
+def _generate_long_key_from_helper() -> Stripped:
+    """Generate the de-serializer of the integer keys of the dictionaries."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// De-serialize an integer key of a dictionary from its canonical decimal
+/// string in <paramref name="node" />.
+/// </summary>
+/// <remarks>
+/// We accept only the canonical form, so that each integer has exactly one
+/// key: no leading zeros, no plus sign, no white space and no <c>-0</c>.
+/// </remarks>
+private static long LongKeyFrom(
+{I}Nodes.JsonNode? node,
+{I}out Reporting.Error? error)
+{{
+{I}error = null;
+
+{I}string text = node!.GetValue<string>();
+
+{I}if (
+{II}LongKeyRe.IsMatch(text)
+{II}&& long.TryParse(
+{III}text,
+{III}System.Globalization.NumberStyles.AllowLeadingSign,
+{III}System.Globalization.CultureInfo.InvariantCulture,
+{III}out long value))
+{I}{{
+{II}return value;
+{I}}}
+
+{I}error = new Reporting.Error(
+{II}"Expected the key to be an integer in the canonical decimal form, " +
+{II}$"but got: {{text}}");
+{I}return default;
+}}
+
+private static readonly System.Text.RegularExpressions.Regex LongKeyRe = (
+{I}new System.Text.RegularExpressions.Regex(
+{II}@"^(0|-?[1-9][0-9]*)$"));"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_as_tuple_helper(arity: int) -> Stripped:
     """
@@ -845,6 +953,20 @@ def _deserializer_expr(type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
     return Stripped(f"{csharp_naming.class_name(our_type.name)}From")
 
 
+def _key_deserializer_expr(keys: intermediate.TypeAnnotationUnion) -> Stripped:
+    """
+    Generate the expression de-serializing a key of a dictionary.
+
+    A key comes as a JSON string. The strings and the enumeration literals
+    de-serialize from it exactly as their values do, while the integers are
+    written as canonical decimal strings, and need a de-serializer of their own.
+    """
+    if intermediate.try_primitive_type(keys) is intermediate.PrimitiveType.INT:
+        return Stripped("LongKeyFrom")
+
+    return _deserializer_expr(keys)
+
+
 def _composed_types_in_initialization_order(
     symbol_table: intermediate.SymbolTable,
 ) -> List[intermediate.ContainerTypeAnnotation]:
@@ -875,6 +997,10 @@ def _composed_types_in_initialization_order(
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             for item_type_anno in type_anno.items:
                 register(item_type_anno)
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            # NOTE (mristin):
+            # The keys are always atomic, so only the values might need a field.
+            register(type_anno.values)
         else:
             # NOTE (mristin):
             # An atomic value de/serializes through a function of its own, so
@@ -933,10 +1059,13 @@ AsTuple{len(type_anno.items)}<{item_types_joined}>(
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        keys_type = csharp_common.generate_type(type_anno.keys)
+        values_type = csharp_common.generate_type(type_anno.values)
+        composition = Stripped(
+            f"""\
+AsDictOf<{keys_type}, {values_type}>(
+{I}{_key_deserializer_expr(type_anno.keys)},
+{I}{_deserializer_expr(type_anno.values)})"""
         )
 
     else:
@@ -1482,6 +1611,20 @@ def _generate_deserialize_impl(
     ):
         blocks.append(_generate_as_set_of_helper())
 
+    if any(
+        isinstance(type_anno, intermediate.DictTypeAnnotation)
+        for type_anno in composed_types
+    ):
+        blocks.append(_generate_as_dict_of_helper())
+
+    if any(
+        isinstance(type_anno, intermediate.DictTypeAnnotation)
+        and intermediate.try_primitive_type(type_anno.keys)
+        is intermediate.PrimitiveType.INT
+        for type_anno in composed_types
+    ):
+        blocks.append(_generate_long_key_from_helper())
+
     tuple_arities = sorted(
         {
             len(type_anno.items)
@@ -1992,9 +2135,20 @@ def _composed_primitive_types(
         elif isinstance(composed_type, intermediate.TupleTypeAnnotation):
             for item_type_anno in composed_type.items:
                 register(item_type_anno)
+        elif isinstance(composed_type, intermediate.DictTypeAnnotation):
+            # NOTE (mristin):
+            # The integer keys are serialized by a helper of their own, while
+            # the string keys are serialized by the ``ToJsonValue`` of a string.
+            if (
+                intermediate.try_primitive_type(composed_type.keys)
+                is intermediate.PrimitiveType.STR
+            ):
+                register(composed_type.keys)
+
+            register(composed_type.values)
         else:
             raise AssertionError(
-                f"Expected a list, a set or a tuple type annotation, "
+                f"Expected a list, a set, a tuple or a dictionary type annotation, "
                 f"but got {composed_type}"
             )
 
@@ -2130,6 +2284,84 @@ private static Serializer<HashSet<T>> SerializeSet<T>(
     )
 
 
+def _generate_serialize_dict_helper() -> Stripped:
+    """Generate the combinator composing the serializer of a dictionary."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Compose the serializer of a dictionary whose keys are serialized with
+/// <paramref name="serializeKey" /> and values with
+/// <paramref name="serializeValue" />, in the order of the keys given by
+/// <paramref name="comparison" />.
+/// </summary>
+/// <remarks>
+/// <paramref name="serializeKey" /> needs to give a JSON string. We serialize
+/// the members sorted by their keys, so that all the SDKs serialize
+/// a dictionary in the same order.
+/// </remarks>
+/// <typeparam name="TKey">Type of a key</typeparam>
+/// <typeparam name="TValue">Type of a value</typeparam>
+private static Serializer<Dictionary<TKey, TValue>> SerializeDict<TKey, TValue>(
+{I}Serializer<TKey> serializeKey,
+{I}Serializer<TValue> serializeValue,
+{I}System.Comparison<TKey> comparison) where TKey : notnull
+{{
+{I}return (that) =>
+{I}{{
+{II}var result = new Nodes.JsonObject();
+{II}foreach (TKey key in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(that.Keys, comparison))
+{II}{{
+{III}string? keyText = null;
+{III}try
+{III}{{
+{IIII}keyText = serializeKey(key)!.GetValue<string>();
+{IIII}result[keyText] = serializeValue(that[key]);
+{III}}}
+{III}catch (SerializationFailure failure)
+{III}{{
+{IIII}failure.Error.PrependSegment(
+{IIIII}new Reporting.KeySegment(keyText ?? $"{{key}}"));
+{IIII}throw;
+{III}}}
+{II}}}
+{II}return result;
+{I}}};
+}}"""
+    )
+
+
+def _generate_long_key_to_json_value_helper() -> Stripped:
+    """Generate the serializer of the integer keys of the dictionaries."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Serialize an integer key of a dictionary as its canonical decimal string.
+/// </summary>
+/// <remarks>
+/// <c>Nodes.JsonValue.Create</c> returns null only for a null string, which
+/// a formatted integer never is.
+/// </remarks>
+private static Nodes.JsonNode LongKeyToJsonValue(long that)
+{{
+{I}return Nodes.JsonValue.Create(
+{II}that.ToString(System.Globalization.CultureInfo.InvariantCulture))!;
+}}"""
+    )
+
+
+def _key_serializer_expr(keys: intermediate.TypeAnnotationUnion) -> Stripped:
+    """
+    Generate the expression serializing a key of a dictionary as a JSON string.
+
+    The strings and the enumeration literals are serialized exactly as their
+    values are, while the integers are written as canonical decimal strings.
+    """
+    if intermediate.try_primitive_type(keys) is intermediate.PrimitiveType.INT:
+        return Stripped("LongKeyToJsonValue")
+
+    return _serializer_expr(keys)
+
+
 def _atomic_serializer_value_type(
     type_anno: intermediate.TypeAnnotationUnion,
 ) -> Stripped:
@@ -2258,7 +2490,7 @@ SerializeList<{item_type}>(
             f"""\
 SerializeSet<{item_type}>(
 {I}{_serializer_expr(type_anno.items)},
-{I}{csharp_common.set_items_comparison(type_anno.items)})"""
+{I}{csharp_common.sorting_comparison(type_anno.items)})"""
         )
 
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
@@ -2276,10 +2508,14 @@ SerializeTuple{len(type_anno.items)}<{item_types_joined}>(
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        keys_type = csharp_common.generate_type(type_anno.keys)
+        values_type = csharp_common.generate_type(type_anno.values)
+        composition = Stripped(
+            f"""\
+SerializeDict<{keys_type}, {values_type}>(
+{I}{_key_serializer_expr(type_anno.keys)},
+{I}{_serializer_expr(type_anno.values)},
+{I}{csharp_common.sorting_comparison(type_anno.keys)})"""
         )
 
     else:
@@ -2403,19 +2639,13 @@ def _generate_transform_property(
             intermediate.ListTypeAnnotation,
             intermediate.TupleTypeAnnotation,
             intermediate.SetTypeAnnotation,
+            intermediate.DictTypeAnnotation,
         ),
     ):
         # NOTE (mristin):
-        # The serializers of the nested lists, tuples and sets are composed
-        # recursively, see :py:func:`_serializer_expr`.
+        # The serializers of the nested lists, tuples, sets and dictionaries are
+        # composed recursively, see :py:func:`_serializer_expr`.
         serializer_name = _serializer_name(type_anno)
-
-    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
 
     else:
         assert_never(type_anno)
@@ -2831,6 +3061,20 @@ private static Nodes.JsonValue ToJsonValue(double that)
             for composed_type in composed_types
         ):
             blocks.append(_generate_serialize_set_helper())
+
+        if any(
+            isinstance(composed_type, intermediate.DictTypeAnnotation)
+            for composed_type in composed_types
+        ):
+            blocks.append(_generate_serialize_dict_helper())
+
+        if any(
+            isinstance(composed_type, intermediate.DictTypeAnnotation)
+            and intermediate.try_primitive_type(composed_type.keys)
+            is intermediate.PrimitiveType.INT
+            for composed_type in composed_types
+        ):
+            blocks.append(_generate_long_key_to_json_value_helper())
 
         for arity in intermediate.tuple_arities(symbol_table):
             blocks.append(_generate_serialize_tuple_helper(arity))

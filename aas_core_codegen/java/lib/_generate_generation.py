@@ -227,6 +227,13 @@ public {builder_name} {setter_name}({arg_type} {arg_name}) {{
         for set_import in java_common.set_imports_if_necessary(cls, with_bodies=False)
     )
 
+    dict_imports = "".join(
+        f"import {dict_import};\n"
+        for dict_import in java_common.dict_imports_if_necessary(
+            functions=(), with_bodies=False, properties=cls.properties
+        )
+    )
+
     return (
         java_common.JavaFile(
             name=file_name,
@@ -242,6 +249,7 @@ import java.util.Objects;
 import java.util.Optional;
 {json_imports}\
 {set_imports}\
+{dict_imports}\
 
 /**
  * Builder for the {class_name} type.

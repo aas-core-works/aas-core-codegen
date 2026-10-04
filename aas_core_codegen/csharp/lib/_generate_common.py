@@ -418,9 +418,10 @@ public static long ParseSafeInt(string text)
 
 def _generate_set_helpers(symbol_table: intermediate.SymbolTable) -> Stripped:
     """
-    Generate the helpers which sort the items of the set properties.
+    Generate the helpers which sort the items of the set properties and the keys
+    of the dictionary properties.
 
-    The set properties are serialized sorted, in the same order in all the SDKs:
+    They are serialized sorted, in the same order in all the SDKs:
     ``false`` before ``true``, the integers numerically, and the strings and
     the serialized values of the enumeration literals by their code points.
     The C# strings, however, compare by their UTF-16 code units, which sort
@@ -492,7 +493,24 @@ public static int CompareByCodePoints(string that, string other)
         ),
     ]  # type: List[Stripped]
 
-    for enumeration in intermediate_uses.enumerations_in_set_properties(symbol_table):
+    enumerations_in_set_properties = intermediate_uses.enumerations_in_set_properties(
+        symbol_table
+    )
+    enumerations_in_dict_property_keys = (
+        intermediate_uses.enumerations_in_dict_property_keys(symbol_table)
+    )
+
+    # NOTE (mristin):
+    # We rank the enumerations in the order of their definition in the meta-model,
+    # each only once.
+    ranked_enumerations = [
+        enumeration
+        for enumeration in symbol_table.enumerations
+        if enumeration in enumerations_in_set_properties
+        or enumeration in enumerations_in_dict_property_keys
+    ]
+
+    for enumeration in ranked_enumerations:
         enum_name = csharp_naming.enum_name(enumeration.name)
         # NOTE (mristin):
         # See the note above ``csharp_common.rank_of_enumeration_name`` why these
@@ -580,8 +598,8 @@ public static System.Collections.Generic.List<T> Sorted<T>(
     return Stripped(
         f"""\
 /// <summary>
-/// Sort the items of the sets, so that they are serialized in the same order
-/// in all the SDKs.
+/// Sort the items of the sets and the keys of the dictionaries, so that they are
+/// serialized in the same order in all the SDKs.
 /// </summary>
 public static class SetHelpers
 {{
@@ -637,7 +655,9 @@ def generate(
     ) or intermediate_uses.lstrip_call(symbol_table):
         blocks.append(_generate_string_helpers(symbol_table))
 
-    if intermediate_uses.set_properties(symbol_table):
+    if intermediate_uses.set_properties(
+        symbol_table
+    ) or intermediate_uses.dict_properties(symbol_table):
         blocks.append(_generate_set_helpers(symbol_table))
 
     # NOTE (mristin):

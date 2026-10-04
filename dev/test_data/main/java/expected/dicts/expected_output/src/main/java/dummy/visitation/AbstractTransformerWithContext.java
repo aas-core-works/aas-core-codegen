@@ -36,6 +36,11 @@ public abstract class AbstractTransformerWithContext<ContextT, T>
     ISomething that,
     ContextT context
   );
+
+  public abstract T transformRegistry(
+    IRegistry that,
+    ContextT context
+  );
 }
 
 /*

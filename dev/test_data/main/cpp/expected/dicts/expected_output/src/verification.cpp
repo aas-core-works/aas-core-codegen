@@ -7,6 +7,7 @@
 #include "dummy/revm.hpp"
 #include "dummy/stringification.hpp"
 #include "dummy/verification.hpp"
+#include "dummy/wstringification.hpp"
 
 #pragma warning(push, 0)
 #include <map>
@@ -387,7 +388,8 @@ namespace {
  */
 enum class Shape : std::uint32_t {
   kCode = 0,
-  kSomething = 1
+  kSomething = 1,
+  kRegistry = 2
 };  // enum class Shape
 
 /**
@@ -519,6 +521,97 @@ bool Something_8(
   );
 }
 
+bool Registry_0(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return that->WeightIsAtMost(
+    10
+  );
+}
+
+bool Registry_1(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return !(that->optional_counts().has_value())
+  || ((*(that->optional_counts())).size() > 0);
+}
+
+bool Registry_2(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return common::AllKeys(
+    [&](std::wstring name) -> bool {
+      return common::LenStr(that->codes_by_name().at(name)) <= 5;
+    },
+    that->codes_by_name()
+  );
+}
+
+bool Registry_3(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return common::AllKeys(
+    [&](std::wstring code) -> bool {
+      return that->kinds_by_code().at(code) != types::Kind::kGamma;
+    },
+    that->kinds_by_code()
+  );
+}
+
+bool Registry_4(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return verification::NestedLabelsAreShort(
+    that->labels()
+  );
+}
+
+bool Registry_5(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return verification::ItemNamesMatchKeys(
+    that->items_by_name()
+  );
+}
+
+bool Registry_6(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return that->counts_by_number().size() <= 5;
+}
+
+bool Registry_7(
+  const void* value
+) {
+  const types::IRegistry* that = (
+    static_cast<const types::IRegistry*>(value)
+  );
+  return verification::AllCountsAreSmall(
+    that->counts_by_number()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -571,6 +664,43 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_8,
           L"Texts must be unique."
+        }
+      };
+      return checks;
+    }
+    case Shape::kRegistry: {
+      static const std::vector<Check> checks = {
+        {
+          &Registry_0,
+          L"Weights must sum up to at most 10."
+        },
+        {
+          &Registry_1,
+          L"Optional counts must not be empty, if specified."
+        },
+        {
+          &Registry_2,
+          L"Codes by name must be at most 5 characters long."
+        },
+        {
+          &Registry_3,
+          L"Kinds by code must not be gamma."
+        },
+        {
+          &Registry_4,
+          L"Labels must be short."
+        },
+        {
+          &Registry_5,
+          L"Items must be named by their keys."
+        },
+        {
+          &Registry_6,
+          L"There must be at most five counts by number."
+        },
+        {
+          &Registry_7,
+          L"Counts by number must be smaller than 3."
         }
       };
       return checks;
@@ -1040,7 +1170,217 @@ std::unique_ptr<IIterator> Each(
   return common::make_unique<EachIterator<T> >(&items, over_item, recursive);
 }
 
+/**
+ * \brief Iterate over the values of every key and every value of a dictionary,
+ * one item after another, in the order of the keys.
+ *
+ * We verify the key of an item before its value. We iterate in the order of
+ * the serialization, so that the errors come in the same order in all the SDKs.
+ * The iterator over a key or a value is built only once the iteration reaches it.
+ * If there is nothing to verify in the keys or in the values, the respective
+ * function is null.
+ */
+template<typename MapT, typename LessT>
+class EachItemSortedIterator : public IIterator {
+ public:
+  typedef typename MapT::key_type K;
+  typedef typename MapT::mapped_type V;
+  typedef typename MapT::value_type ItemT;
+
+  /**
+   * Build the iterator over the values of a key
+   */
+  typedef std::unique_ptr<IIterator> (*OverKey)(const K& key, bool recursive);
+
+  /**
+   * Build the iterator over the values of a value
+   */
+  typedef std::unique_ptr<IIterator> (*OverValue)(const V& value, bool recursive);
+
+  /**
+   * Render a key as the text of its JSON key for the path
+   */
+  typedef std::wstring (*KeyToWstring)(const K& key);
+
+  EachItemSortedIterator(
+    const MapT* map,
+    LessT less,
+    KeyToWstring key_to_wstring,
+    OverKey over_key,
+    OverValue over_value,
+    bool recursive
+  ) :
+    map_(map),
+    less_(less),
+    key_to_wstring_(key_to_wstring),
+    over_key_(over_key),
+    over_value_(over_value),
+    recursive_(recursive),
+    index_(0),
+    at_value_(false) {
+    // Intentionally empty.
+  }
+
+  EachItemSortedIterator(const EachItemSortedIterator<MapT, LessT>& other) :
+    map_(other.map_),
+    less_(other.less_),
+    key_to_wstring_(other.key_to_wstring_),
+    over_key_(other.over_key_),
+    over_value_(other.over_value_),
+    recursive_(other.recursive_),
+    sorted_(other.sorted_),
+    index_(other.index_),
+    at_value_(other.at_value_),
+    part_(other.part_ == nullptr ? nullptr : other.part_->Clone()) {
+    // Intentionally empty.
+  }
+
+  void Start() override {
+    if (sorted_ == nullptr) {
+      sorted_ = std::make_shared<std::vector<const ItemT*> >(
+        common::SortedItemPointers(*map_, less_)
+      );
+    }
+
+    index_ = 0;
+    at_value_ = false;
+    part_ = nullptr;
+    SkipDoneParts();
+  }
+
+  void Next() override {
+    part_->Next();
+    SkipDoneParts();
+  }
+
+  bool Done() const override {
+    return index_ >= sorted_->size();
+  }
+
+  const void* Value() const override {
+    return part_->Value();
+  }
+
+  Shape ShapeOf() const override {
+    return part_->ShapeOf();
+  }
+
+  void AppendToPath(iteration::Path& path) const override {
+    path.segments.emplace_back(
+      common::make_unique<iteration::KeySegment>(
+        key_to_wstring_((*sorted_)[index_]->first)
+      )
+    );
+    part_->AppendToPath(path);
+  }
+
+  std::unique_ptr<IIterator> Clone() const override {
+    return common::make_unique<EachItemSortedIterator<MapT, LessT> >(*this);
+  }
+
+ private:
+  const MapT* map_;
+  LessT less_;
+  KeyToWstring key_to_wstring_;
+  OverKey over_key_;
+  OverValue over_value_;
+  bool recursive_;
+
+  /**
+   * Pointers to the items, sorted by their keys once the iteration started,
+   * and shared among the clones as they never change
+   */
+  std::shared_ptr<const std::vector<const ItemT*> > sorted_;
+
+  /**
+   * Index of the item we currently iterate over, in the sorted order
+   */
+  std::size_t index_;
+
+  /**
+   * Set if we iterate over the value of the current item, and over its key
+   * otherwise
+   */
+  bool at_value_;
+
+  /**
+   * Iterator over the key or the value of the current item, built once we
+   * reached it
+   */
+  std::unique_ptr<IIterator> part_;
+
+  /**
+   * Move on to the next keys and values, and build their iterators, until one
+   * is not done.
+   */
+  void SkipDoneParts() {
+    while (index_ < sorted_->size()) {
+      if (part_ == nullptr) {
+        const ItemT* item = (*sorted_)[index_];
+
+        if (!at_value_) {
+          if (over_key_ != nullptr) {
+            part_ = over_key_(item->first, recursive_);
+          }
+        } else {
+          if (over_value_ != nullptr) {
+            part_ = over_value_(item->second, recursive_);
+          }
+        }
+
+        if (part_ != nullptr) {
+          part_->Start();
+        }
+      }
+
+      if (part_ != nullptr && !part_->Done()) {
+        return;
+      }
+
+      part_ = nullptr;
+
+      if (!at_value_) {
+        at_value_ = true;
+      } else {
+        at_value_ = false;
+        ++index_;
+      }
+    }
+  }
+};  // class EachItemSortedIterator
+
+template<typename MapT, typename LessT>
+std::unique_ptr<IIterator> EachItemSorted(
+  const MapT& map,
+  LessT less,
+  std::wstring (*key_to_wstring)(const typename MapT::key_type& key),
+  std::unique_ptr<IIterator> (*over_key)(
+    const typename MapT::key_type& key,
+    bool recursive
+  ),
+  std::unique_ptr<IIterator> (*over_value)(
+    const typename MapT::mapped_type& value,
+    bool recursive
+  ),
+  bool recursive
+) {
+  return common::make_unique<EachItemSortedIterator<MapT, LessT> >(
+    &map, less, key_to_wstring, over_key, over_value, recursive
+  );
+}
+
+/**
+ * Render the string \p key of a dictionary as the text of its JSON key.
+ */
+std::wstring WstringKeyToWstring(const std::wstring& key) {
+  return key;
+}
+
 using listOf_Code = std::vector<std::wstring>;
+
+using dictOf_Code_Kind = std::unordered_map<std::wstring, types::Kind>;
+
+using dictOf_str_Code = std::unordered_map<std::wstring, std::wstring>;
 
 std::unique_ptr<IIterator> Over_Code(
   const std::wstring& value,
@@ -1056,6 +1396,34 @@ std::unique_ptr<IIterator> Over_listOf_Code(
   return Each(value, &Over_Code, recursive);
 }
 
+std::unique_ptr<IIterator> Over_dictOf_Code_Kind(
+  const dictOf_Code_Kind& value,
+  bool recursive
+) {
+  return EachItemSorted(
+    value,
+    common::LessByCodePoints,
+    &WstringKeyToWstring,
+    &Over_Code,
+    nullptr,
+    recursive
+  );
+}
+
+std::unique_ptr<IIterator> Over_dictOf_str_Code(
+  const dictOf_str_Code& value,
+  bool recursive
+) {
+  return EachItemSorted(
+    value,
+    common::LessByCodePoints,
+    &WstringKeyToWstring,
+    nullptr,
+    &Over_Code,
+    recursive
+  );
+}
+
 std::unique_ptr<IIterator> Over_Something(
   const types::ISomething& that,
   bool recursive
@@ -1065,6 +1433,23 @@ std::unique_ptr<IIterator> Over_Something(
     InProperty(
       iteration::Property::kCodes,
       Over_listOf_Code(that.codes(), recursive)
+    )
+  );
+}
+
+std::unique_ptr<IIterator> Over_Registry(
+  const types::IRegistry& that,
+  bool recursive
+) {
+  return Chain(
+    One(&that, Shape::kRegistry),
+    InProperty(
+      iteration::Property::kKindsByCode,
+      Over_dictOf_Code_Kind(that.kinds_by_code(), recursive)
+    ),
+    InProperty(
+      iteration::Property::kCodesByName,
+      Over_dictOf_str_Code(that.codes_by_name(), recursive)
     )
   );
 }
@@ -1080,6 +1465,11 @@ std::unique_ptr<IIterator> DispatchOnModelType(
     case types::ModelType::kSomething:
       return Over_Something(
         dynamic_cast<const types::ISomething&>(instance),
+        recursive
+      );
+    case types::ModelType::kRegistry:
+      return Over_Registry(
+        dynamic_cast<const types::IRegistry&>(instance),
         recursive
       );
     default:

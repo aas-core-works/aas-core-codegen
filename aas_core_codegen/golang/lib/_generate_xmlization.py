@@ -35,9 +35,10 @@ class _PositionalItem:
     """
     Specify a value wrapped in an element of a fixed name.
 
-    The value is a scalar, or a list, a set or a tuple nested in another one.
-    Such an element is not self-describing: its name denotes its *position*,
-    ``v`` in a list and ``v1``, ``v2``, *etc.* in a tuple, and never its type. Both sides
+    The value is a scalar, or a list, a set, a dictionary or a tuple nested in
+    another one. Such an element is not self-describing: its name denotes its
+    *position*, ``v`` in a list, ``v1``, ``v2``, *etc.* in a tuple, and ``k`` and
+    ``v`` in an item of a dictionary, and never its type. Both sides
     therefore need a function per scalar type *and* element name: the reader checks
     the name (see :py:func:`_generate_read_positional_item`), the writer writes it (see
     :py:func:`_generate_write_positional_item`), so that neither a container nor its
@@ -70,24 +71,62 @@ class _PositionalItem:
 # emits an underscore.
 
 
-@require(lambda element_name: element_name.startswith("v"))
+@require(lambda element_name: element_name.startswith("v") or element_name == "k")
 def _positional_item_reader_name(
     type_anno: intermediate.TypeAnnotationExceptOptional, element_name: str
 ) -> Identifier:
     """Name the function reading ``type_anno`` in ``element_name``."""
     return Identifier(
-        f"readAtV{element_name[1:]}_{golang_common.type_moniker(type_anno)}"
+        f"readAt{element_name[0].upper()}{element_name[1:]}"
+        f"_{golang_common.type_moniker(type_anno)}"
     )
 
 
-@require(lambda element_name: element_name.startswith("v"))
+@require(lambda element_name: element_name.startswith("v") or element_name == "k")
 def _positional_item_writer_name(
     type_anno: intermediate.TypeAnnotationExceptOptional, element_name: str
 ) -> Identifier:
     """Name the function writing ``type_anno`` in ``element_name``."""
     return Identifier(
-        f"writeAtV{element_name[1:]}_{golang_common.type_moniker(type_anno)}"
+        f"writeAt{element_name[0].upper()}{element_name[1:]}"
+        f"_{golang_common.type_moniker(type_anno)}"
     )
+
+
+def _is_instance(type_anno: intermediate.TypeAnnotationExceptOptional) -> bool:
+    """Check whether ``type_anno`` denotes an instance or a named union."""
+    return isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type,
+        (
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+            intermediate.NamedUnion,
+        ),
+    )
+
+
+def _wrapped_instance_reader_name(
+    type_anno: intermediate.OurTypeAnnotation,
+) -> Identifier:
+    """
+    Name the function reading an instance wrapped in the element ``v``.
+
+    Unlike in a list or in a tuple, an instance as a value of a dictionary is
+    wrapped in ``<v>``, so that every item holds exactly ``<k>`` and ``<v>``.
+    """
+    return Identifier(f"readAtV_{golang_common.type_moniker(type_anno)}")
+
+
+def _wrapped_instance_writer_name(
+    type_anno: intermediate.OurTypeAnnotation,
+) -> Identifier:
+    """Name the function writing an instance wrapped in the element ``v``."""
+    return Identifier(f"writeAtV_{golang_common.type_moniker(type_anno)}")
+
+
+def _dict_content_writer_name(type_anno: intermediate.DictTypeAnnotation) -> Stripped:
+    """Name the function which writes the content of a dictionary."""
+    return Stripped(f"write{golang_common.type_moniker(type_anno)}")
 
 
 def _enum_text_reader_name(enumeration: intermediate.Enumeration) -> Identifier:
@@ -160,6 +199,8 @@ class _Requirements:
         list_items_type_annos: List[intermediate.TypeAnnotationExceptOptional],
         nested_set_type_annos: List[intermediate.SetTypeAnnotation],
         tuple_type_annos: List[intermediate.TupleTypeAnnotation],
+        dict_type_annos: List[intermediate.DictTypeAnnotation],
+        wrapped_instance_type_annos: List[intermediate.OurTypeAnnotation],
         nested_container_type_annos: List[intermediate.ContainerTypeAnnotation],
     ) -> None:
         """Initialize with the given values."""
@@ -178,6 +219,13 @@ class _Requirements:
 
         #: Tuples to be serialized, in the order of the first occurrence
         self.tuple_type_annos = tuple_type_annos
+
+        #: Dictionaries to be serialized, in the order of the first occurrence
+        self.dict_type_annos = dict_type_annos
+
+        #: Instances wrapped in ``<v>`` as the values of the dictionaries, in
+        #: the order of the first occurrence
+        self.wrapped_instance_type_annos = wrapped_instance_type_annos
 
         #: Collections nested in another one to be de-serialized, in the order of
         #: the first occurrence
@@ -209,6 +257,12 @@ def _collect_requirements(
 
     tuple_type_annos = []  # type: List[intermediate.TupleTypeAnnotation]
     observed_tuple_writers = set()  # type: Set[str]
+
+    dict_type_annos = []  # type: List[intermediate.DictTypeAnnotation]
+    observed_dict_writers = set()  # type: Set[str]
+
+    wrapped_instance_type_annos = []  # type: List[intermediate.OurTypeAnnotation]
+    observed_wrapped_instances = set()  # type: Set[str]
 
     nested_container_type_annos = []  # type: List[intermediate.ContainerTypeAnnotation]
     observed_nested_readers = set()  # type: Set[str]
@@ -284,11 +338,27 @@ def _collect_requirements(
                 tuple_type_annos.append(type_anno)
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            require_item(type_anno.keys, "k")
+
+            values_type_anno = type_anno.values
+            if _is_instance(values_type_anno):
+                assert isinstance(values_type_anno, intermediate.OurTypeAnnotation)
+
+                dispatched_type_ids.add(
+                    intermediate.runtime_id(values_type_anno.our_type)
+                )
+
+                moniker = golang_common.type_moniker(values_type_anno)
+                if moniker not in observed_wrapped_instances:
+                    observed_wrapped_instances.add(moniker)
+                    wrapped_instance_type_annos.append(values_type_anno)
+            else:
+                require_item(values_type_anno, "v")
+
+            writer_name = _dict_content_writer_name(type_anno)
+            if writer_name not in observed_dict_writers:
+                observed_dict_writers.add(writer_name)
+                dict_type_annos.append(type_anno)
 
         else:
             assert_never(type_anno)
@@ -310,6 +380,8 @@ def _collect_requirements(
         list_items_type_annos=list_items_type_annos,
         nested_set_type_annos=nested_set_type_annos,
         tuple_type_annos=tuple_type_annos,
+        dict_type_annos=dict_type_annos,
+        wrapped_instance_type_annos=wrapped_instance_type_annos,
         nested_container_type_annos=nested_container_type_annos,
     )
 
@@ -523,6 +595,207 @@ func readSetOf[T comparable](
 {I}}}
 
 {I}next = current
+{I}return
+}}"""
+    )
+
+
+def _generate_read_dict_of() -> Stripped:
+    """Generate the function to read a dictionary as a sequence of XML elements."""
+    return Stripped(
+        f"""\
+// Read a dictionary as a sequence of XML elements `i`, each holding the key in
+// the element `k` and the value in the element `v`.
+//
+// The items can come in any order, but their keys must be unique. We do not
+// drop a duplicate silently, but report it at the key of its item.
+//
+// We stop the reading as soon as we encounter a non-start element, which is
+// returned as `next` element.
+func readDictOf[K comparable, V any](
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+{I}readKey func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{II}aLocal string,
+{I}) (key K, aNext xml.Token, anErr error),
+{I}readValue func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{II}aLocal string,
+{I}) (value V, aNext xml.Token, anErr error),
+) (values map[K]V, next xml.Token, err error) {{
+{I}values = make(map[K]V)
+
+{I}i := 0
+{I}for {{
+{II}current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}if _, ok := current.(xml.StartElement); !ok {{
+{III}break
+{II}}}
+
+{II}var key K
+{II}var value V
+{II}var itemErr error
+{II}key, value, current, itemErr = readDictItem(
+{III}decoder, current, readKey, readValue,
+{II})
+{II}if itemErr != nil {{
+{III}if deseriaErr, ok := itemErr.(*DeserializationError); ok {{
+{IIII}deseriaErr.Path.PrependIndex(
+{IIIII}&ourreporting.IndexSegment{{Index: i}},
+{IIII})
+{III}}}
+{III}err = itemErr
+{III}return
+{II}}}
+
+{II}if _, has := values[key]; has {{
+{III}deseriaErr := xmlcommon.NewDeserializationError(
+{IIII}"Expected unique keys in the dictionary, but the key is a duplicate",
+{III})
+{III}deseriaErr.Path.PrependName(
+{IIII}&ourreporting.NameSegment{{Name: "k"}},
+{III})
+{III}deseriaErr.Path.PrependIndex(
+{IIII}&ourreporting.IndexSegment{{Index: i}},
+{III})
+{III}err = deseriaErr
+{III}return
+{II}}}
+
+{II}values[key] = value
+
+{II}i++
+{I}}}
+
+{I}next = current
+{I}return
+}}"""
+    )
+
+
+def _generate_read_dict_item() -> Stripped:
+    """Generate the function to read a single item of a dictionary."""
+    return Stripped(
+        f"""\
+// Read a single item of a dictionary from the XML element `i`, which holds
+// exactly the key in the element `k` and then the value in the element `v`.
+//
+// The `current` token is expected to point to the start element `i`, and
+// the resulting `next` token points to the first token just after its end
+// element.
+func readDictItem[K comparable, V any](
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+{I}readKey func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{II}aLocal string,
+{I}) (key K, aNext xml.Token, anErr error),
+{I}readValue func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{II}aLocal string,
+{I}) (value V, aNext xml.Token, anErr error),
+) (key K, value V, next xml.Token, err error) {{
+{I}var local string
+{I}local, err = xmlcommon.ParseAsStartElementAndExtractLocalName(current)
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}if local != "i" {{
+{II}err = unexpectedItemElement(local, "i")
+{II}return
+{I}}}
+
+{I}// Move the current to the content of the XML element
+{I}current, err = xmlcommon.ReadNext(decoder, current)
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}key, current, err = xmlcommon.ReadElementDispatched(decoder, current, readKey)
+{I}if err != nil {{
+{II}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{III}deseriaErr.Path.PrependName(
+{IIII}&ourreporting.NameSegment{{Name: "k"}},
+{III})
+{II}}}
+{II}return
+{I}}}
+
+{I}value, current, err = xmlcommon.ReadElementDispatched(decoder, current, readValue)
+{I}if err != nil {{
+{II}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{III}deseriaErr.Path.PrependName(
+{IIII}&ourreporting.NameSegment{{Name: "v"}},
+{III})
+{II}}}
+{II}return
+{I}}}
+
+{I}current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}err = xmlcommon.CheckEndElement(current, "i")
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}next, err = xmlcommon.ReadNext(decoder, current)
+{I}return
+}}"""
+    )
+
+
+def _generate_read_wrapped_instance(
+    type_anno: intermediate.OurTypeAnnotation,
+) -> Stripped:
+    """Generate the function to read an instance wrapped in the element ``v``."""
+    value_type = golang_common.generate_type(
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
+    )
+
+    read_dispatched = golang_naming.private_function_name(
+        Identifier(f"read_{type_anno.our_type.name}_dispatched")
+    )
+
+    return Stripped(
+        f"""\
+// Read an instance wrapped in the element `v` as a value of a dictionary.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func {_wrapped_instance_reader_name(type_anno)}(
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+{I}local string,
+) (value {value_type},
+{I}next xml.Token,
+{I}err error,
+) {{
+{I}if local != "v" {{
+{II}err = unexpectedItemElement(local, "v")
+{II}return
+{I}}}
+
+{I}value, current, err = xmlcommon.ReadElementDispatched(
+{II}decoder, current, {read_dispatched},
+{I})
+{I}if err != nil {{
+{II}return
+{I}}}
+
+{I}next, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
 {I}return
 }}"""
     )
@@ -960,6 +1233,17 @@ def _item_reader_name(
     return Stripped(_positional_item_reader_name(type_anno, element_name))
 
 
+def _dict_value_reader_name(
+    values_type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
+    """Determine the reader of a value of a dictionary in the element ``v``."""
+    if _is_instance(values_type_anno):
+        assert isinstance(values_type_anno, intermediate.OurTypeAnnotation)
+        return Stripped(_wrapped_instance_reader_name(values_type_anno))
+
+    return _item_reader_name(values_type_anno, "v")
+
+
 def _scalar_content_reader(
     type_anno: intermediate.TypeAnnotationExceptOptional,
 ) -> Stripped:
@@ -1014,11 +1298,11 @@ def _generate_read_nested_content(
             for i, item in enumerate(type_anno.items)
         ]
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        function = "readDictOf"
+        item_readers = [
+            _item_reader_name(type_anno.keys, "k"),
+            _dict_value_reader_name(type_anno.values),
+        ]
 
     else:
         assert_never(type_anno)
@@ -1257,10 +1541,14 @@ readTuple{arity}(
             )
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
+            read_key = _item_reader_name(type_anno.keys, "k")
+            read_value = _dict_value_reader_name(type_anno.values)
+
+            case_body = Stripped(
+                f"""\
+{prop_var}, current, valueErr = readDictOf(
+{I}decoder, current, {read_key}, {read_value},
+)"""
             )
 
         else:
@@ -1809,6 +2097,80 @@ func writeOptionalSlice[T any](
     )
 
 
+def _generate_write_optional_map() -> Stripped:
+    """Generate the writer of an optional dictionary, nil on its own."""
+    return Stripped(
+        f"""\
+// Write the optional dictionary `that` as an XML element with the `local` name,
+// or write nothing at all if it is not set.
+//
+// Do not flush.
+//
+// A dictionary is represented as a map, which is nil on its own, but --
+// unlike an instance in [writeOptionalInstance] -- can not be compared against
+// the zero value, as a map is not comparable at all. Mind that a nil map and
+// an empty map differ here: only the former is considered absent, while
+// the latter is written as an empty XML element.
+func writeOptionalMap[K comparable, V any](
+{I}encoder *xml.Encoder,
+{I}local string,
+{I}that map[K]V,
+{I}writeContent func(anEncoder *xml.Encoder, aValue map[K]V) (anErr error),
+) (err error) {{
+{I}if that == nil {{
+{II}return
+{I}}}
+
+{I}return xmlcommon.WriteElement(encoder, local, that, writeContent)
+}}"""
+    )
+
+
+def _generate_write_dict() -> Stripped:
+    """Generate the writer of the items of a dictionary."""
+    return Stripped(
+        f"""\
+// Write the items of the dictionary `m`, each as an XML element `i` holding
+// the key in the element `k` and the value in the element `v`.
+//
+// Do not flush.
+//
+// The `keys` are the keys of `m` in the order of the serialization, which is
+// the same in all the SDKs.
+func writeDict[K comparable, V any](
+{I}encoder *xml.Encoder,
+{I}m map[K]V,
+{I}keys []K,
+{I}writeKey func(anEncoder *xml.Encoder, aKey K) (anErr error),
+{I}writeValue func(anEncoder *xml.Encoder, aValue V) (anErr error),
+) (err error) {{
+{I}for i, key := range keys {{
+{II}err = xmlcommon.WriteStartElement(encoder, "i", false)
+{II}if err == nil {{
+{III}err = writeKey(encoder, key)
+{II}}}
+{II}if err == nil {{
+{III}err = writeValue(encoder, m[key])
+{II}}}
+{II}if err == nil {{
+{III}err = xmlcommon.WriteEndElement(encoder, "i", false)
+{II}}}
+
+{II}if err != nil {{
+{III}if seriaErr, ok := err.(*SerializationError); ok {{
+{IIII}seriaErr.Path.PrependIndex(
+{IIIII}&ourreporting.IndexSegment{{Index: i}},
+{IIII})
+{III}}}
+{III}return
+{II}}}
+{I}}}
+
+{I}return
+}}"""
+    )
+
+
 def _generate_write_list() -> Stripped:
     """Generate the writer of the items of a list."""
     return Stripped(
@@ -2137,6 +2499,9 @@ def _content_writer_expr(
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return _tuple_content_writer_name(type_anno)
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return _dict_content_writer_name(type_anno)
+
     if isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
         return Stripped("xmlrpc.WriteValueContent")
 
@@ -2307,8 +2672,8 @@ def _generate_write_set_content_writer(
     arguments_joined = golang_common.join_arguments(
         [
             "encoder",
-            golang_common.sorted_set_items_expr(
-                "set", items_type_anno, column=2 * golang_common.TAB_WIDTH
+            golang_common.sorted_keys_expr(
+                "set", type_anno, column=2 * golang_common.TAB_WIDTH
             ),
             _item_writer_expr(items_type_anno, "v"),
         ],
@@ -2325,6 +2690,90 @@ func {_set_content_writer_name(type_anno)}(
 {I}set {set_type},
 ) error {{
 {I}return writeList(
+{II}{indent_but_first_line(arguments_joined, II)}
+{I})
+}}"""
+    )
+
+
+def _generate_write_wrapped_instance(
+    type_anno: intermediate.OurTypeAnnotation,
+) -> Stripped:
+    """Generate the function to write an instance wrapped in the element ``v``."""
+    value_type = golang_common.generate_type(
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
+    )
+
+    arguments_joined = golang_common.join_arguments(
+        [
+            "encoder",
+            golang_common.string_literal("v"),
+            "value",
+            _item_writer_expr(type_anno, "v"),
+        ],
+        indention=2,
+    )
+
+    return Stripped(
+        f"""\
+// Write the instance `value` wrapped in the element `v` as a value of
+// a dictionary.
+//
+// Do not flush.
+func {_wrapped_instance_writer_name(type_anno)}(
+{I}encoder *xml.Encoder,
+{I}value {value_type},
+) error {{
+{I}return xmlcommon.WriteElement(
+{II}{indent_but_first_line(arguments_joined, II)}
+{I})
+}}"""
+    )
+
+
+def _generate_write_dict_content_writer(
+    type_anno: intermediate.DictTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the writer of the content of a dictionary.
+
+    The items are written sorted by their keys in the same order in all the SDKs.
+    """
+    dict_type = golang_common.generate_type(
+        type_annotation=type_anno, types_package=Identifier("ourtypes")
+    )
+
+    values_writer: Stripped
+    if _is_instance(type_anno.values):
+        assert isinstance(type_anno.values, intermediate.OurTypeAnnotation)
+        values_writer = Stripped(_wrapped_instance_writer_name(type_anno.values))
+    else:
+        values_writer = _item_writer_expr(type_anno.values, "v")
+
+    arguments_joined = golang_common.join_arguments(
+        [
+            "encoder",
+            "that",
+            golang_common.sorted_keys_expr(
+                "that", type_anno, column=2 * golang_common.TAB_WIDTH
+            ),
+            _item_writer_expr(type_anno.keys, "k"),
+            values_writer,
+        ],
+        indention=2,
+    )
+
+    return Stripped(
+        f"""\
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func {_dict_content_writer_name(type_anno)}(
+{I}encoder *xml.Encoder,
+{I}that {dict_type},
+) error {{
+{I}return writeDict(
 {II}{indent_but_first_line(arguments_joined, II)}
 {I})
 }}"""
@@ -2424,6 +2873,8 @@ def _generate_snippet_to_serialize_property(
         # We write the sorted items of a set as a slice. An absent set gives
         # a nil slice, see ``ourcommon.SortedKeys``.
         function_name = "writeOptionalSlice"
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        function_name = "writeOptionalMap"
     elif isinstance(type_anno, intermediate.JsonValueTypeAnnotation):
         function_name = "writeOptionalJsonValue"
     elif isinstance(type_anno, intermediate.JsonArrayTypeAnnotation):
@@ -2459,8 +2910,8 @@ def _generate_snippet_to_serialize_property(
         # NOTE (mristin):
         # The value is an argument of the write call, which is itself an argument
         # of ``finishProperty``, so it is indented by four tabs.
-        value_expr = golang_common.sorted_set_items_expr(
-            value_expr, type_anno.items, column=4 * golang_common.TAB_WIDTH
+        value_expr = golang_common.sorted_keys_expr(
+            value_expr, type_anno, column=4 * golang_common.TAB_WIDTH
         )
 
     arguments_joined = golang_common.join_arguments(
@@ -2728,7 +3179,14 @@ type DeserializationError = xmlcommon.DeserializationError"""
     if intermediate_uses.set_properties(symbol_table):
         blocks.append(_generate_read_set_of())
 
+    if intermediate_uses.dict_properties(symbol_table):
+        blocks.append(_generate_read_dict_of())
+        blocks.append(_generate_read_dict_item())
+
     requirements = _collect_requirements(symbol_table)
+
+    for wrapped_type_anno in requirements.wrapped_instance_type_annos:
+        blocks.append(_generate_read_wrapped_instance(type_anno=wrapped_type_anno))
 
     blocks.extend(_generate_json_value_readers(symbol_table=symbol_table))
 
@@ -2816,6 +3274,16 @@ type SerializationError = xmlcommon.SerializationError"""
         blocks.append(
             _generate_write_set_content_writer(type_anno=nested_set_type_anno)
         )
+
+    if intermediate_uses.dict_properties(symbol_table):
+        blocks.append(_generate_write_optional_map())
+        blocks.append(_generate_write_dict())
+
+    for dict_type_anno in requirements.dict_type_annos:
+        blocks.append(_generate_write_dict_content_writer(type_anno=dict_type_anno))
+
+    for wrapped_type_anno in requirements.wrapped_instance_type_annos:
+        blocks.append(_generate_write_wrapped_instance(type_anno=wrapped_type_anno))
 
     for tuple_type_anno in requirements.tuple_type_annos:
         blocks.append(_generate_write_tuple_content_writer(type_anno=tuple_type_anno))

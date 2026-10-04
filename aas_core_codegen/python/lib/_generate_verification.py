@@ -757,6 +757,12 @@ def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return f"set_of__{_verification_moniker(type_anno.items)}"
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return (
+            f"dict_of__{_verification_moniker(type_anno.keys)}"
+            f"__{_verification_moniker(type_anno.values)}"
+        )
+
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         joined = "__".join(_verification_moniker(item) for item in type_anno.items)
         return f"tuple{len(type_anno.items)}_of__{joined}"
@@ -792,6 +798,12 @@ def _verification_parameter_type(type_anno: intermediate.TypeAnnotationUnion) ->
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return f"AbstractSet[{_verification_parameter_type(type_anno.items)}]"
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return (
+            f"Mapping[{_verification_parameter_type(type_anno.keys)}, "
+            f"{_verification_parameter_type(type_anno.values)}]"
+        )
+
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         item_types = [_verification_parameter_type(item) for item in type_anno.items]
 
@@ -810,6 +822,29 @@ Tuple[
         return "our_types.Class"
 
     return python_common.generate_type(type_anno, types_module=Identifier("our_types"))
+
+
+def _generate_jsonable_key(
+    keys_type_annotation: intermediate.TypeAnnotationUnion, expr: str
+) -> str:
+    """
+    Generate the key at ``expr`` as it is written in a JSON object.
+
+    The paths to the values of the dictionaries render the keys as they are written
+    in JSON so that the paths are the same in all the targets.
+    """
+    if (
+        intermediate.try_primitive_type(keys_type_annotation)
+        is intermediate.PrimitiveType.INT
+    ):
+        return f"str({expr})"
+
+    if isinstance(keys_type_annotation, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_annotation.our_type, intermediate.Enumeration
+    ):
+        return f"{expr}.value"
+
+    return expr
 
 
 def _verify_container_name(
@@ -995,10 +1030,42 @@ IndexSegment(
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        key_segment = f"""\
+KeySegment(
+{I}that,
+{I}{_generate_jsonable_key(type_anno.keys, "key")}
+)"""
+
+        stmts = []  # type: List[Stripped]
+
+        # NOTE (mristin):
+        # An invalid key is reported at the key segment as well, as the key is
+        # known by the segment, and the cause says what is wrong with it.
+        if _needs_verification(type_anno.keys):
+            stmts.append(
+                _generate_verify_into(
+                    expr="key", type_anno=type_anno.keys, segments=[key_segment]
+                )
+            )
+
+        if _needs_verification(type_anno.values):
+            stmts.append(
+                _generate_verify_into(
+                    expr="that[key]", type_anno=type_anno.values, segments=[key_segment]
+                )
+            )
+
+        sorted_keys = python_common.generate_sorted_keys(type_anno.keys, "that")
+
+        stmts_joined = "\n\n".join(stmts)
+
+        # NOTE (mristin):
+        # We visit the keys in the sorted order so that the errors are reported
+        # in the same order in all the targets.
+        body = Stripped(
+            f"""\
+for key in {sorted_keys}:
+{I}{indent_but_first_line(stmts_joined, I)}"""
         )
 
     else:

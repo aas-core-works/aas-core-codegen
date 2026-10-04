@@ -370,10 +370,19 @@ return result;"""
         body = Stripped(f"return {tuple_literal};")
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        value_wrap_expr = _generate_wrap_expr(
+            expr="item.Value", type_anno=type_anno.values, descendability=descendability
+        )
+
+        body = Stripped(
+            f"""\
+var result = new {value_type}(that.Count);
+foreach (var item in that)
+{{
+{I}result[item.Key] = {indent_but_first_line(value_wrap_expr, I)};
+}}
+
+return result;"""
         )
 
     else:

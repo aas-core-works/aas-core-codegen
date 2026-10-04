@@ -192,6 +192,114 @@ namespace dummy
         }  // public static class StringHelpers
 
         /// <summary>
+        /// Sort the items of the sets and the keys of the dictionaries, so that they are
+        /// serialized in the same order in all the SDKs.
+        /// </summary>
+        public static class SetHelpers
+        {
+            /// <summary>
+            /// Decode the code point at <paramref name="offset" /> in
+            /// <paramref name="text" />.
+            /// </summary>
+            /// <remarks>
+            /// A lone surrogate is decoded as a code point of its own.
+            /// </remarks>
+            private static int CodePointAt(string text, int offset)
+            {
+                return (
+                    offset + 1 < text.Length
+                    && char.IsHighSurrogate(text[offset])
+                    && char.IsLowSurrogate(text[offset + 1])
+                )
+                    ? char.ConvertToUtf32(text[offset], text[offset + 1])
+                    : text[offset];
+            }
+
+            /// <summary>
+            /// Compare <paramref name="that" /> and <paramref name="other" /> by their
+            /// code points.
+            /// </summary>
+            /// <remarks>
+            /// Unlike <see cref="string.CompareOrdinal(string, string)" />, which compares
+            /// the UTF-16 code units, this comparison sorts the characters beyond
+            /// the Basic Multilingual Plane after all the others.
+            /// </remarks>
+            public static int CompareByCodePoints(string that, string other)
+            {
+                int length = System.Math.Min(that.Length, other.Length);
+
+                int offset = 0;
+                while (offset < length && that[offset] == other[offset])
+                {
+                    offset++;
+                }
+
+                if (offset == length)
+                {
+                    return that.Length.CompareTo(other.Length);
+                }
+
+                // NOTE: We might have stopped in the middle of a surrogate pair.
+                if (
+                    offset > 0
+                    && char.IsHighSurrogate(that[offset - 1])
+                    && (
+                        char.IsLowSurrogate(that[offset])
+                        || char.IsLowSurrogate(other[offset])
+                    )
+                )
+                {
+                    offset--;
+                }
+
+                return CodePointAt(that, offset).CompareTo(CodePointAt(other, offset));
+            }
+
+            /// <summary>
+            /// Rank <paramref name="literal" /> by its serialized value in code points.
+            /// </summary>
+            private static int RankOfDirection(Direction literal)
+            {
+                switch (literal)
+                {
+                    case Direction.South:
+                        return 0;  // "down"
+                    case Direction.East:
+                        return 1;  // "right"
+                    case Direction.North:
+                        return 2;  // "up"
+                    default:
+                        return 3;
+                }
+            }
+
+            /// <summary>
+            /// Compare the literals of <see cref="Direction" /> by their serialized
+            /// values in code points.
+            /// </summary>
+            /// <remarks>
+            /// The invalid literals, which have no serialized value, come last.
+            /// </remarks>
+            public static int CompareByRankOfDirection(Direction that, Direction other)
+            {
+                return RankOfDirection(that).CompareTo(RankOfDirection(other));
+            }
+
+            /// <summary>
+            /// Copy <paramref name="items" /> into a new list sorted by
+            /// <paramref name="comparison" />.
+            /// </summary>
+            public static System.Collections.Generic.List<T> Sorted<T>(
+                System.Collections.Generic.IEnumerable<T> items,
+                System.Comparison<T> comparison)
+            {
+                var result = new System.Collections.Generic.List<T>(items);
+                result.Sort(comparison);
+                return result;
+            }
+        }  // public static class SetHelpers
+
+        /// <summary>
         /// Provide the helpers for the dictionaries used by the transpiled code.
         /// </summary>
         public static class DictHelpers

@@ -30,6 +30,7 @@ import dummy.visitation.AbstractTransformer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import dummy.stringification.Stringification;
 import java.util.Optional;
 
 public class Verification {
@@ -323,6 +324,21 @@ public class Verification {
 
       forKind = Collections.unmodifiableSet(temp);
     }
+
+    private static final Set<Direction> forDirection;
+    static {
+      final Set<Direction> temp = new HashSet<>();
+
+      temp.add(Direction.NORTH);
+      temp.add(Direction.SOUTH);
+      temp.add(Direction.EAST);
+
+      if (!temp.containsAll(Arrays.asList(Direction.values()))) {
+        throw new IllegalStateException("Uncovered Direction");
+      }
+
+      forDirection = Collections.unmodifiableSet(temp);
+    }
   }
 
   private static final _Transformer transformer = new _Transformer();
@@ -438,6 +454,112 @@ public class Verification {
 
       return errorStream;
     }
+
+    @Override
+    public Stream<Reporting.Error> transformRegistry(
+      IRegistry that) {
+      Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!that.weightIsAtMost(10L)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Weights must sum up to at most 10.")));
+      }
+
+      if (!(
+        !(that.getOptionalCounts().isPresent())
+        || (that.getOptionalCounts().get().size() > 0))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Optional counts must not be empty, if specified.")));
+      }
+
+      if (!(
+        that.getCodesByName().keySet().stream().allMatch(
+            name -> StringHelpers.len(MapHelpers.getOrThrow(that.getCodesByName(), name)) <= 5))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Codes by name must be at most 5 characters long.")));
+      }
+
+      if (!(
+        that.getKindsByCode().keySet().stream().allMatch(
+            code -> MapHelpers.getOrThrow(that.getKindsByCode(), code) != Kind.GAMMA))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Kinds by code must not be gamma.")));
+      }
+
+      if (!nestedLabelsAreShort(that.getLabels())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Labels must be short.")));
+      }
+
+      if (!itemNamesMatchKeys(that.getItemsByName())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Items must be named by their keys.")));
+      }
+
+      if (!(that.getCountsByNumber().size() <= 5)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "There must be at most five counts by number.")));
+      }
+
+      if (!allCountsAreSmall(that.getCountsByNumber())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Counts by number must be smaller than 3.")));
+      }
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getWeights())
+          .flatMap(Verification::verifyDictOf_Direction_long)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("weights"));
+              return error;
+            }));
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getKindsByCode())
+          .flatMap(Verification::verifyDictOf_Code_Kind)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("kindsByCode"));
+              return error;
+            }));
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getCodesByName())
+          .flatMap(Verification::verifyDictOf_string_Code)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("codesByName"));
+              return error;
+            }));
+
+      errorStream = Stream.<Reporting.Error>concat(errorStream,
+        Stream.of(that.getItemsByName())
+          .flatMap(Verification::verifyDictOf_string_IItem)
+            .map(error -> {
+              error.prependSegment(
+                new Reporting.NameSegment("itemsByName"));
+              return error;
+            }));
+
+      return errorStream;
+    }
   }
 
   public static Stream<Reporting.Error> verifyToErrorStream(IClass that) {
@@ -494,6 +616,19 @@ public class Verification {
     if (!_EnumValueSet.forKind.contains(that)) {
       return Stream.of(new Reporting.Error(
         "Invalid Kind: " + that));
+    } else {
+      return Stream.empty();
+    }
+  }
+
+  /**
+   * Verify that {@code that} is a valid enumeration value.
+   */
+  public static Stream<Reporting.Error> verifyDirection(
+    Direction that) {
+    if (!_EnumValueSet.forDirection.contains(that)) {
+      return Stream.of(new Reporting.Error(
+        "Invalid Direction: " + that));
     } else {
       return Stream.empty();
     }
@@ -565,6 +700,68 @@ public class Verification {
                 new Reporting.IndexSegment(itemTuple.getFirst()));
               return error;
             }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyDictOf_Direction_long(
+    Map<Direction, Long> that) {
+    return SetHelpers.sortedBy(that.keySet(), SetHelpers::compareByRankOfDirection).stream()
+      .flatMap(key ->
+        Verification.verifyDirection(key)
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.KeySegment(Stringification.mustToString(key)));
+            return error;
+          }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyDictOf_Code_Kind(
+    Map<String, Kind> that) {
+    return SetHelpers.sortedByCodePoints(that.keySet()).stream()
+      .flatMap(key ->
+        Stream.<Reporting.Error>concat(
+          Verification.verifyCode(key),
+          Verification.verifyKind(that.get(key)))
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.KeySegment(key));
+            return error;
+          }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyDictOf_string_Code(
+    Map<String, String> that) {
+    return SetHelpers.sortedByCodePoints(that.keySet()).stream()
+      .flatMap(key ->
+        Verification.verifyCode(that.get(key))
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.KeySegment(key));
+            return error;
+          }));
+  }
+
+  /**
+   * Verify the items of {@code that} recursively.
+   */
+  private static Stream<Reporting.Error> verifyDictOf_string_IItem(
+    Map<String, IItem> that) {
+    return SetHelpers.sortedByCodePoints(that.keySet()).stream()
+      .flatMap(key ->
+        Verification.verifyToErrorStream(that.get(key))
+          .map(error -> {
+            error.prependSegment(
+              new Reporting.KeySegment(key));
+            return error;
+          }));
   }
 
   private static class _Pair<A, B> {

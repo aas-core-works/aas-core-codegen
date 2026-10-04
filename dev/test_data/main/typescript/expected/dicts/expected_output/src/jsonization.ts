@@ -367,6 +367,89 @@ function parseArray<T>(
 }
 
 /**
+ * Parse `jsonable` as a JSON object into a map, every key with `parseKey` and
+ * every value with `parseValue`.
+ *
+ * @param jsonable - to be parsed member-by-member
+ * @param parseKey - to parse a single key of `jsonable`
+ * @param parseValue - to parse a single value of `jsonable`
+ * @returns parsed map, or an error
+ * @typeParam K - type of a single parsed key
+ * @typeParam V - type of a single parsed value
+ */
+function parseMap<K, V>(
+  jsonable: JsonValue,
+  parseKey: (
+    jsonKey: string
+  ) => OurCommon.Either<K, DeserializationError>,
+  parseValue: (
+    jsonableValue: JsonValue
+  ) => OurCommon.Either<V, DeserializationError>
+): OurCommon.Either<Map<K, V>, DeserializationError> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new OurCommon.Either<Map<K, V>, DeserializationError>(
+      null,
+      objectError
+    );
+  }
+
+  const jsonObject = <JsonObject>jsonable;
+
+  const result = new Map<K, V>();
+  for (const jsonKey of Object.keys(jsonObject)) {
+    const keyOrError = parseKey(jsonKey);
+    if (keyOrError.error !== null) {
+      keyOrError.error.path.prepend(new KeySegment(jsonObject, jsonKey));
+      return new OurCommon.Either<Map<K, V>, DeserializationError>(
+        null,
+        keyOrError.error
+      );
+    }
+
+    const valueOrError = parseValue(jsonObject[jsonKey]);
+    if (valueOrError.error !== null) {
+      valueOrError.error.path.prepend(new KeySegment(jsonObject, jsonKey));
+      return new OurCommon.Either<Map<K, V>, DeserializationError>(
+        null,
+        valueOrError.error
+      );
+    }
+
+    result.set(keyOrError.mustValue(), valueOrError.mustValue());
+  }
+  return new OurCommon.Either<Map<K, V>, DeserializationError>(result, null);
+}
+
+/**
+ * Parse `jsonKey` as a canonical decimal integer, the key of a dictionary.
+ *
+ * @param jsonKey - to be parsed
+ * @returns parsed integer value, or an error
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function integerFromJsonKey(
+  jsonKey: string
+): OurCommon.Either<number, DeserializationError> {
+  if (!/^(0|-?[1-9][0-9]*)$/.test(jsonKey)) {
+    return newDeserializationError<number>(
+      "Expected a canonical decimal integer as the key, " +
+        `but got: ${JSON.stringify(jsonKey)}`
+    );
+  }
+
+  const value = Number(jsonKey);
+  if (!Number.isSafeInteger(value)) {
+    return newDeserializationError<number>(
+      "Expected the integer key to be a safe integer, " +
+        `but got: ${jsonKey}`
+    );
+  }
+
+  return new OurCommon.Either<number, DeserializationError>(value, null);
+}
+
+/**
  * Parse `jsonable` as a boolean.
  *
  * @param jsonable - to be parsed
@@ -510,6 +593,52 @@ function bytesFromJsonable(
 }
 
 /**
+ * Parse `jsonable` as a nested collection.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed value, or an error
+ */
+function parseDictOf_int_str(
+  jsonable: JsonValue
+): OurCommon.Either<Map<number, string>, DeserializationError> {
+  return parseMap(
+    jsonable,
+    integerFromJsonKey,
+    stringFromJsonable
+  );
+}
+
+/**
+ * Parse `jsonable` as a nested collection.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed value, or an error
+ */
+function parseListOf_DictOf_int_str(
+  jsonable: JsonValue
+): OurCommon.Either<Array<Map<number, string>>, DeserializationError> {
+  return parseArray(
+    jsonable,
+    parseDictOf_int_str
+  );
+}
+
+/**
+ * Parse `jsonable` as a nested collection.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed value, or an error
+ */
+function parseListOf_ListOf_DictOf_int_str(
+  jsonable: JsonValue
+): OurCommon.Either<Array<Array<Map<number, string>>>, DeserializationError> {
+  return parseArray(
+    jsonable,
+    parseListOf_DictOf_int_str
+  );
+}
+
+/**
  * Parse `jsonable` structure as a literal
  * of {@link types!Kind}.
  *
@@ -535,6 +664,36 @@ export function kindFromJsonable(
 
   return new OurCommon.Either<
     OurTypes.Kind,
+    DeserializationError
+  >(literal, null);
+}
+
+/**
+ * Parse `jsonable` structure as a literal
+ * of {@link types!Direction}.
+ *
+ * @param jsonable - to be parsed
+ * @returns parsed literal, or an error if `jsonable` invalid
+ */
+export function directionFromJsonable(
+  jsonable: JsonValue
+): OurCommon.Either<OurTypes.Direction, DeserializationError> {
+  if (typeof jsonable !== "string") {
+    return newDeserializationError<OurTypes.Direction>(
+      `Expected a string, but got: ${typeof jsonable}`
+    );
+  }
+
+  const literal = OurStringification.directionFromString(jsonable);
+  if (literal === null) {
+    return newDeserializationError<OurTypes.Direction>(
+      "Not a valid string representation of " +
+        `a literal of Direction: ${jsonable}`
+    );
+  }
+
+  return new OurCommon.Either<
+    OurTypes.Direction,
     DeserializationError
   >(literal, null);
 }
@@ -834,6 +993,248 @@ export function somethingFromJsonable(
   return parsePropertiesOfSomething(jsonObject);
 }
 
+/**
+ * Parse the properties of an instance
+ * of {@link types!Registry} from `jsonObject`.
+ *
+ * @param jsonObject - JSON object to be parsed
+ * @returns parsed instance of {@link types!Registry},
+ * or an error if any
+ */
+function parsePropertiesOfRegistry(
+  jsonObject: JsonObject
+): OurCommon.Either<
+  OurTypes.Registry,
+  DeserializationError
+> {
+  let theCounts: Map<string, number> | null = null;
+  let theCountsByNumber: Map<number, number> | null = null;
+  let theWeights: Map<OurTypes.Direction, number> | null = null;
+  let theKindsByCode: Map<string, OurTypes.Kind> | null = null;
+  let theCodesByName: Map<string, string> | null = null;
+  let theItemsByName: Map<string, OurTypes.Item> | null = null;
+  let theLabels: Map<string, Array<Array<Map<number, string>>>> | null = null;
+  let theOptionalCounts: Map<string, number> | null = null;
+
+  for (const key in jsonObject) {
+    const jsonableValue = jsonObject[key];
+
+    let propertyError: DeserializationError | null = null;
+    switch (key) {
+      case "counts": {
+        const parsed = parseMap(
+          jsonableValue,
+          stringFromJsonable,
+          integerFromJsonable
+        );
+        propertyError = parsed.error;
+        theCounts = parsed.value;
+        break;
+      }
+
+      case "countsByNumber": {
+        const parsed = parseMap(
+          jsonableValue,
+          integerFromJsonKey,
+          integerFromJsonable
+        );
+        propertyError = parsed.error;
+        theCountsByNumber = parsed.value;
+        break;
+      }
+
+      case "weights": {
+        const parsed = parseMap(
+          jsonableValue,
+          directionFromJsonable,
+          integerFromJsonable
+        );
+        propertyError = parsed.error;
+        theWeights = parsed.value;
+        break;
+      }
+
+      case "kindsByCode": {
+        const parsed = parseMap(
+          jsonableValue,
+          stringFromJsonable,
+          kindFromJsonable
+        );
+        propertyError = parsed.error;
+        theKindsByCode = parsed.value;
+        break;
+      }
+
+      case "codesByName": {
+        const parsed = parseMap(
+          jsonableValue,
+          stringFromJsonable,
+          stringFromJsonable
+        );
+        propertyError = parsed.error;
+        theCodesByName = parsed.value;
+        break;
+      }
+
+      case "itemsByName": {
+        const parsed = parseMap(
+          jsonableValue,
+          stringFromJsonable,
+          itemFromJsonable
+        );
+        propertyError = parsed.error;
+        theItemsByName = parsed.value;
+        break;
+      }
+
+      case "labels": {
+        const parsed = parseMap(
+          jsonableValue,
+          stringFromJsonable,
+          parseListOf_ListOf_DictOf_int_str
+        );
+        propertyError = parsed.error;
+        theLabels = parsed.value;
+        break;
+      }
+
+      case "optionalCounts": {
+        const parsed = parseMap(
+          jsonableValue,
+          stringFromJsonable,
+          integerFromJsonable
+        );
+        propertyError = parsed.error;
+        theOptionalCounts = parsed.value;
+        break;
+      }
+
+      // NOTE (mristin):
+      // Since we conflate here a JavaScript object with a JSON object, we ignore
+      // properties which we do not know how to de-serialize and assume they are
+      // related to the *JavaScript* properties of the object or `Object` prototype.
+      default: {
+        continue;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(
+        new PropertySegment(jsonObject, key)
+      );
+      return new OurCommon.Either<
+        OurTypes.Registry,
+        DeserializationError
+      >(
+        null,
+        propertyError
+      );
+    }
+  }
+
+  if (theCounts === null) {
+    return newDeserializationError<
+      OurTypes.Registry
+    >(
+      "The required property 'counts' is missing"
+    );
+  }
+
+  if (theCountsByNumber === null) {
+    return newDeserializationError<
+      OurTypes.Registry
+    >(
+      "The required property 'countsByNumber' is missing"
+    );
+  }
+
+  if (theWeights === null) {
+    return newDeserializationError<
+      OurTypes.Registry
+    >(
+      "The required property 'weights' is missing"
+    );
+  }
+
+  if (theKindsByCode === null) {
+    return newDeserializationError<
+      OurTypes.Registry
+    >(
+      "The required property 'kindsByCode' is missing"
+    );
+  }
+
+  if (theCodesByName === null) {
+    return newDeserializationError<
+      OurTypes.Registry
+    >(
+      "The required property 'codesByName' is missing"
+    );
+  }
+
+  if (theItemsByName === null) {
+    return newDeserializationError<
+      OurTypes.Registry
+    >(
+      "The required property 'itemsByName' is missing"
+    );
+  }
+
+  if (theLabels === null) {
+    return newDeserializationError<
+      OurTypes.Registry
+    >(
+      "The required property 'labels' is missing"
+    );
+  }
+
+  return new OurCommon.Either<
+    OurTypes.Registry,
+    DeserializationError
+  >(
+    new OurTypes.Registry(
+      theCounts,
+      theCountsByNumber,
+      theWeights,
+      theKindsByCode,
+      theCodesByName,
+      theItemsByName,
+      theLabels,
+      theOptionalCounts
+    ),
+    null
+  );
+}
+
+/**
+ * Parse an instance of {@link types!Registry} from the JSON-able
+ * structure `jsonable`.
+ *
+ * @param jsonable - structure to be parsed
+ * @returns parsed instance of {@link types!Registry},
+ * or an error if any
+ */
+export function registryFromJsonable(
+  jsonable: JsonValue
+): OurCommon.Either<
+  OurTypes.Registry,
+  DeserializationError
+> {
+  const objectError = checkIsJsonObject(jsonable);
+  if (objectError !== null) {
+    return new OurCommon.Either<
+      OurTypes.Registry,
+      DeserializationError
+    >(
+      null,
+      objectError
+    );
+  }
+  const jsonObject = <JsonObject>jsonable;
+
+  return parsePropertiesOfRegistry(jsonObject);
+}
+
 // endregion
 
 // region Serialization
@@ -932,6 +1333,26 @@ function serialize_Kind(
 }
 
 /**
+ * Serialize `that` literal to a JSON-able string.
+ *
+ * @param that - literal to be serialized
+ * @returns text of `that`
+ * @throws {@link SerializationError} if `that` is outside
+ * {@link types!Direction}
+ */
+function serialize_Direction(
+  that: OurTypes.Direction
+): string {
+  const text = OurStringification.directionToString(that);
+  if (text === null) {
+    throw new SerializationError(
+      `Invalid literal of Direction: ${that}`
+    );
+  }
+  return text;
+}
+
+/**
  * Serialize `that` to a JSON-able representation.
  *
  * @param that - instance to be serialized
@@ -996,6 +1417,63 @@ function serializeSomething(
       prop = "optionalTexts";
       jsonable["optionalTexts"] =
         Array.from(that.optionalTexts);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependProperty(prop);
+    }
+    throw error;
+  }
+
+  return jsonable;
+}
+
+/**
+ * Serialize `that` to a JSON-able representation.
+ *
+ * @param that - instance to be serialized
+ * @returns JSON-able representation
+ */
+function serializeRegistry(
+  that: OurTypes.Registry
+): JsonObject {
+  const jsonable: JsonObject = {};
+
+  // The property being serialized, for the path of a failure.
+  let prop = "";
+  try {
+    prop = "counts";
+    jsonable["counts"] =
+      serialize_DictOf_str_int(that.counts);
+
+    prop = "countsByNumber";
+    jsonable["countsByNumber"] =
+      serialize_DictOf_int_int(that.countsByNumber);
+
+    prop = "weights";
+    jsonable["weights"] =
+      serialize_DictOf_Direction_int(that.weights);
+
+    prop = "kindsByCode";
+    jsonable["kindsByCode"] =
+      serialize_DictOf_str_Kind(that.kindsByCode);
+
+    prop = "codesByName";
+    jsonable["codesByName"] =
+      serialize_DictOf_str_str(that.codesByName);
+
+    prop = "itemsByName";
+    jsonable["itemsByName"] =
+      serialize_DictOf_str_Item(that.itemsByName);
+
+    prop = "labels";
+    jsonable["labels"] =
+      serialize_DictOf_str_ListOf_ListOf_DictOf_int_str(that.labels);
+
+    if (that.optionalCounts !== null) {
+      prop = "optionalCounts";
+      jsonable["optionalCounts"] =
+        serialize_DictOf_str_int(that.optionalCounts);
     }
   } catch (error) {
     if (error instanceof SerializationError) {
@@ -1080,6 +1558,238 @@ function serialize_ListOf_Item(
 }
 
 /**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_str_int(
+  that: ReadonlyMap<string, number>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    try {
+      result[key] = integerToJsonable(value);
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_int_int(
+  that: ReadonlyMap<number, number>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareNumbers)) {
+    try {
+      result[integerToJsonable(key).toString()] = integerToJsonable(value);
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key.toString());
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_Direction_int(
+  that: ReadonlyMap<OurTypes.Direction, number>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurStringification.compareByRankOfDirection)) {
+    try {
+      result[serialize_Direction(key)] = integerToJsonable(value);
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey((OurStringification.directionToString(key) ?? key.toString()));
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_str_Kind(
+  that: ReadonlyMap<string, OurTypes.Kind>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    try {
+      result[key] = serialize_Kind(value);
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_str_str(
+  that: ReadonlyMap<string, string>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    try {
+      result[key] = value;
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_str_Item(
+  that: ReadonlyMap<string, OurTypes.Item>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    try {
+      result[key] = serializeItem(value);
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_str_ListOf_ListOf_DictOf_int_str(
+  that: ReadonlyMap<string, Array<Array<Map<number, string>>>>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    try {
+      result[key] = serialize_ListOf_ListOf_DictOf_int_str(value);
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON-able array.
+ *
+ * @param that - list to be serialized
+ * @returns JSON-able array
+ */
+function serialize_ListOf_ListOf_DictOf_int_str(
+  that: ReadonlyArray<Array<Map<number, string>>>
+): Array<Array<JsonObject>> {
+  const result = new Array<Array<JsonObject>>(that.length);
+  let i = 0;
+  try {
+    for (; i < that.length; i++) {
+      result[i] = serialize_ListOf_DictOf_int_str(that[i]);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependIndex(i);
+    }
+    throw error;
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON-able array.
+ *
+ * @param that - list to be serialized
+ * @returns JSON-able array
+ */
+function serialize_ListOf_DictOf_int_str(
+  that: ReadonlyArray<Map<number, string>>
+): Array<JsonObject> {
+  const result = new Array<JsonObject>(that.length);
+  let i = 0;
+  try {
+    for (; i < that.length; i++) {
+      result[i] = serialize_DictOf_int_str(that[i]);
+    }
+  } catch (error) {
+    if (error instanceof SerializationError) {
+      error.prependIndex(i);
+    }
+    throw error;
+  }
+  return result;
+}
+
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function serialize_DictOf_int_str(
+  that: ReadonlyMap<number, string>
+): JsonObject {
+  const result: JsonObject = {};
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareNumbers)) {
+    try {
+      result[integerToJsonable(key).toString()] = value;
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key.toString());
+      }
+      throw error;
+    }
+  }
+  return result;
+}
+
+/**
  * Dispatch the serialization on the run-time type of an instance.
  */
 class Serializer extends OurTypes.AbstractTransformer<JsonObject> {
@@ -1093,6 +1803,12 @@ class Serializer extends OurTypes.AbstractTransformer<JsonObject> {
     that: OurTypes.Something
   ): JsonObject {
     return serializeSomething(that);
+  }
+
+  transformRegistry(
+    that: OurTypes.Registry
+  ): JsonObject {
+    return serializeRegistry(that);
   }
 }
 

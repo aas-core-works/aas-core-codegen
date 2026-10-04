@@ -15,11 +15,17 @@ dictionaries.
 The order of the iteration over a dictionary differs among the targets, so
 the results must not depend on it.
 
-The invariants call the verification functions with the dictionaries built from
-the properties, so that the live tests run them. The dictionaries of instances and
-the nested lists of dictionaries can not be built in the invariants, as
-the instances are read-only there and we can not create a list. The verification
-functions over them are only compiled.
+The invariants of ``Something`` call the verification functions with
+the dictionaries built from its list properties.
+
+The class ``Registry`` holds the dictionaries in its properties, which the targets
+serialize with the keys sorted. We pick the keys so that a wrong order shows: the
+strings outside the Basic Multilingual Plane sort differently by UTF-16 code
+units than by code points, the integers differently as text than numerically, and
+the literals of ``Direction`` differently by their names or by their
+declaration than by their values. We
+also nest the dictionaries in the lists, hold the instances and the constrained
+primitives as keys and as values, and check them in the invariants.
 """
 from enum import Enum
 from typing import Dict, Final, List, Mapping, Optional, Sequence
@@ -31,6 +37,12 @@ class Kind(Enum):
     Alpha = "alpha"
     Beta = "beta"
     Gamma = "gamma"
+
+
+class Direction(Enum):
+    North = "up"
+    South = "down"
+    East = "right"
 
 
 @invariant(lambda self: len(self) > 0, "Code must not be empty.")
@@ -322,6 +334,81 @@ class Something(DBC):
         self.codes = codes
         self.items = items
         self.optional_texts = optional_texts
+
+
+@invariant(
+    lambda self: all_counts_are_small(self.counts_by_number),
+    "Counts by number must be smaller than 3.",
+)
+@invariant(
+    lambda self: len(self.counts_by_number) <= 5,
+    "There must be at most five counts by number.",
+)
+@invariant(
+    lambda self: item_names_match_keys(self.items_by_name),
+    "Items must be named by their keys.",
+)
+@invariant(
+    lambda self: nested_labels_are_short(self.labels),
+    "Labels must be short.",
+)
+@invariant(
+    lambda self: all(
+        self.kinds_by_code[code] != Kind.Gamma for code in self.kinds_by_code
+    ),
+    "Kinds by code must not be gamma.",
+)
+@invariant(
+    lambda self: all(len(self.codes_by_name[name]) <= 5 for name in self.codes_by_name),
+    "Codes by name must be at most 5 characters long.",
+)
+@invariant(
+    lambda self: not (self.optional_counts is not None)
+    or len(self.optional_counts) > 0,
+    "Optional counts must not be empty, if specified.",
+)
+@invariant(
+    lambda self: self.weight_is_at_most(10),
+    "Weights must sum up to at most 10.",
+)
+class Registry(DBC):
+    counts: Dict[str, int]
+    counts_by_number: Dict[int, int]
+    weights: Dict[Direction, int]
+    kinds_by_code: Dict[Code, Kind]
+    codes_by_name: Dict[str, Code]
+    items_by_name: Dict[str, Item]
+    labels: Dict[str, List[List[Dict[int, str]]]]
+    optional_counts: Optional[Dict[str, int]]
+
+    @non_mutating
+    def weight_is_at_most(self, maximum: int) -> bool:
+        """Check the iteration over the items of a dictionary property."""
+        total = 0
+        for direction, weight in self.weights.items():
+            total = total + weight
+
+        return total <= maximum
+
+    def __init__(
+        self,
+        counts: Dict[str, int],
+        counts_by_number: Dict[int, int],
+        weights: Dict[Direction, int],
+        kinds_by_code: Dict[Code, Kind],
+        codes_by_name: Dict[str, Code],
+        items_by_name: Dict[str, Item],
+        labels: Dict[str, List[List[Dict[int, str]]]],
+        optional_counts: Optional[Dict[str, int]] = None,
+    ) -> None:
+        self.counts = counts
+        self.counts_by_number = counts_by_number
+        self.weights = weights
+        self.kinds_by_code = kinds_by_code
+        self.codes_by_name = codes_by_name
+        self.items_by_name = items_by_name
+        self.labels = labels
+        self.optional_counts = optional_counts
 
 
 __version__ = "dummy"

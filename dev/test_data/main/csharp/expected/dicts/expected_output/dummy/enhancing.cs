@@ -189,6 +189,114 @@ namespace dummy
             }
         }
 
+        public class EnhancedRegistry<TEnhancement>
+            : Enhanced<TEnhancement>, Our.IRegistry
+            where TEnhancement : class
+        {
+            private readonly Our.IRegistry _instance;
+
+            public EnhancedRegistry(
+                Our.IRegistry instance,
+                TEnhancement enhancement
+            ) : base(enhancement)
+            {
+                _instance = instance;
+            }
+
+            public Dictionary<string, long> Counts
+            {
+                get => _instance.Counts;
+                set => _instance.Counts = value;
+            }
+
+            public Dictionary<long, long> CountsByNumber
+            {
+                get => _instance.CountsByNumber;
+                set => _instance.CountsByNumber = value;
+            }
+
+            public Dictionary<Direction, long> Weights
+            {
+                get => _instance.Weights;
+                set => _instance.Weights = value;
+            }
+
+            public Dictionary<string, Kind> KindsByCode
+            {
+                get => _instance.KindsByCode;
+                set => _instance.KindsByCode = value;
+            }
+
+            public Dictionary<string, string> CodesByName
+            {
+                get => _instance.CodesByName;
+                set => _instance.CodesByName = value;
+            }
+
+            public Dictionary<string, IItem> ItemsByName
+            {
+                get => _instance.ItemsByName;
+                set => _instance.ItemsByName = value;
+            }
+
+            public Dictionary<string, List<List<Dictionary<long, string>>>> Labels
+            {
+                get => _instance.Labels;
+                set => _instance.Labels = value;
+            }
+
+            public Dictionary<string, long>? OptionalCounts
+            {
+                get => _instance.OptionalCounts;
+                set => _instance.OptionalCounts = value;
+            }
+
+            public bool WeightIsAtMost(
+                long maximum
+            )
+            {
+                return _instance.WeightIsAtMost(
+                    maximum
+                );
+            }
+
+            public IEnumerable<Our.IClass> DescendOnce()
+            {
+                return _instance.DescendOnce();
+            }
+
+            public IEnumerable<Our.IClass> Descend()
+            {
+                return _instance.Descend();
+            }
+
+            public void Accept(Our.Visitation.IVisitor visitor)
+            {
+                visitor.VisitRegistry(_instance);
+            }
+
+            public void Accept<TContext>(
+                Visitation.IVisitorWithContext<TContext> visitor,
+                TContext context
+            )
+            {
+                visitor.VisitRegistry(_instance, context);
+            }
+
+            public T Transform<T>(Visitation.ITransformer<T> transformer)
+            {
+                return transformer.TransformRegistry(_instance);
+            }
+
+            public T Transform<TContext, T>(
+                Visitation.ITransformerWithContext<TContext, T> transformer,
+                TContext context
+            )
+            {
+                return transformer.TransformRegistry(_instance, context);
+            }
+        }
+
         internal class Wrapper<TEnhancement>
             : Our.Visitation.AbstractTransformer<Our.IClass>
             where TEnhancement : class
@@ -244,6 +352,28 @@ namespace dummy
                     );
             }
 
+            public override Our.IClass TransformRegistry(
+                Our.IRegistry that
+            )
+            {
+                if (that is Enhanced<TEnhancement>)
+                {
+                    throw new System.ArgumentException(
+                        $"The instance has been already enhanced: {that}"
+                    );
+                }
+
+                that.ItemsByName = Wrap_DictOf_string_IItem(that.ItemsByName);
+
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedRegistry<TEnhancement>(
+                        that,
+                        enhancement
+                    );
+            }
+
             /// <summary>
             /// Wrap recursively <paramref name="that" /> and keep its static type.
             /// </summary>
@@ -268,6 +398,21 @@ namespace dummy
                 foreach (var item in that)
                 {
                     result.Add(Wrap(item));
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// Wrap recursively the instances held by <paramref name="that" />.
+            /// </summary>
+            private Dictionary<string, Our.IItem> Wrap_DictOf_string_IItem(
+                Dictionary<string, Our.IItem> that)
+            {
+                var result = new Dictionary<string, Our.IItem>(that.Count);
+                foreach (var item in that)
+                {
+                    result[item.Key] = Wrap(item.Value);
                 }
 
                 return result;

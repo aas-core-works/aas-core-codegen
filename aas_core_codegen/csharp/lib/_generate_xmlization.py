@@ -814,6 +814,145 @@ private static ContentReader<HashSet<T>> AsSet<T>(
     )
 
 
+def _generate_as_dict_combinators() -> List[Stripped]:
+    """
+    Generate the combinators to read a content as a dictionary.
+
+    Each item is an ``<i>`` element holding exactly a ``<k>`` and a ``<v>``
+    element, in that order. The items can come in any order, but a duplicate
+    key is reported as an error at its ``<k>``, so that no item is silently
+    dropped.
+    """
+    return [
+        Stripped(
+            f"""\
+/// <summary>
+/// Read the content of an item of a dictionary, a <c>&lt;k&gt;</c> element
+/// read with <paramref name="readKey" /> followed by a <c>&lt;v&gt;</c>
+/// element read with <paramref name="readValue" />.
+/// </summary>
+/// <typeparam name="TKey">Type of a key</typeparam>
+/// <typeparam name="TValue">Type of a value</typeparam>
+private static ContentReader<(TKey, TValue)> AsDictItem<TKey, TValue>(
+{I}ContentReader<TKey> readKey,
+{I}ContentReader<TValue> readValue
+{I})
+{{
+{I}ElementReader<TKey> readKeyElement = AtElement(readKey, "k");
+{I}ElementReader<TValue> readValueElement = AtElement(readValue, "v");
+
+{I}return (
+{II}Xml.XmlReader reader,
+{II}bool isEmpty,
+{II}out Reporting.Error? error
+{I}) =>
+{I}{{
+{II}error = null;
+
+{II}if (isEmpty)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected an item of a dictionary with a key and a value, " +
+{IIII}"but the element was self-closing");
+{III}return default!;
+{II}}}
+
+{II}XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+{II}TKey key = readKeyElement(reader, out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment("k"));
+{III}return default!;
+{II}}}
+
+{II}XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+{II}TValue value = readValueElement(reader, out error);
+{II}if (error != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment("v"));
+{III}return default!;
+{II}}}
+
+{II}XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+{II}return (key, value);
+{I}}};
+}}"""
+        ),
+        Stripped(
+            f"""\
+/// <summary>
+/// Read a content as a dictionary of <c>&lt;i&gt;</c> items, each with
+/// a key read with <paramref name="readKey" /> and a value read with
+/// <paramref name="readValue" />.
+/// </summary>
+/// <remarks>
+/// A self-closing element represents an empty dictionary. The items can come
+/// in any order, but a duplicate key is reported as an error.
+/// </remarks>
+/// <typeparam name="TKey">Type of a key</typeparam>
+/// <typeparam name="TValue">Type of a value</typeparam>
+private static ContentReader<Dictionary<TKey, TValue>> AsDict<TKey, TValue>(
+{I}ContentReader<TKey> readKey,
+{I}ContentReader<TValue> readValue
+{I}) where TKey : notnull
+{{
+{I}ElementReader<(TKey, TValue)> readItem = AtElement(
+{II}AsDictItem(readKey, readValue), "i");
+
+{I}return (
+{II}Xml.XmlReader reader,
+{II}bool isEmpty,
+{II}out Reporting.Error? error
+{I}) =>
+{I}{{
+{II}error = null;
+{II}var result = new Dictionary<TKey, TValue>();
+
+{II}if (isEmpty)
+{II}{{
+{III}return result;
+{II}}}
+
+{II}XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+{II}int index = 0;
+{II}while (reader.NodeType == Xml.XmlNodeType.Element)
+{II}{{
+{III}(TKey key, TValue value) = readItem(reader, out error);
+{III}if (error == null && result.ContainsKey(key))
+{III}{{
+{IIII}error = new Reporting.Error(
+{IIIII}"Expected unique keys in the dictionary, but the key is a duplicate");
+{IIII}error.PrependSegment(
+{IIIII}new Reporting.NameSegment("k"));
+{III}}}
+
+{III}if (error != null)
+{III}{{
+{IIII}error.PrependSegment(
+{IIIII}new Reporting.IndexSegment(
+{IIIIII}index));
+{IIII}return result;
+{III}}}
+
+{III}result[key] = value;
+
+{III}index++;
+{III}XmlCommon.SkipNoneWhitespaceAndComments(reader);
+{II}}}
+
+{II}return result;
+{I}}};
+}}"""
+        ),
+    ]
+
+
 def _generate_as_element_combinator() -> Stripped:
     """
     Generate the combinator to read a content which is a self-describing element.
@@ -1034,6 +1173,37 @@ AsSet<{item_type}>(
 {I}{indent_but_first_line(item_reader, I)})"""
         )
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        keys_type = csharp_common.generate_type(type_anno.keys)
+        values_type = csharp_common.generate_type(type_anno.values)
+
+        values_reader: Stripped
+        if isinstance(type_anno.values, intermediate.OurTypeAnnotation) and isinstance(
+            type_anno.values.our_type,
+            (
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+                intermediate.NamedUnion,
+            ),
+        ):
+            # NOTE (mristin):
+            # A value of a class or of a named union is a self-describing element
+            # in ``<v>``, also for a concrete class without any descendant.
+            values_reader = Stripped(
+                f"""\
+AsElement<Our.{values_type}>(
+{I}{_from_element_name(type_anno.values.our_type)})"""
+            )
+        else:
+            values_reader = Stripped(_content_reader_name(type_anno.values))
+
+        return Stripped(
+            f"""\
+AsDict<{keys_type}, {values_type}>(
+{I}{_content_reader_name(type_anno.keys)},
+{I}{indent_but_first_line(values_reader, I)})"""
+        )
+
     assert isinstance(type_anno, intermediate.TupleTypeAnnotation)
 
     item_types = ", ".join(
@@ -1139,6 +1309,8 @@ def _content_types_in_initialization_order(
             item_type_annotations = [type_anno.items]
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             item_type_annotations = list(type_anno.items)
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            item_type_annotations = [type_anno.keys, type_anno.values]
         else:
             item_type_annotations = []
 
@@ -1850,6 +2022,9 @@ def _generate_deserialize_impl(
     if needed_readers.sets:
         blocks.append(_generate_as_set_combinator())
 
+    if needed_readers.dicts:
+        blocks.extend(_generate_as_dict_combinators())
+
     if needed_readers.polymorphic:
         blocks.append(_generate_as_element_combinator())
 
@@ -2391,6 +2566,54 @@ private static ContentWriter<HashSet<T>> WriteSet<T>(
     )
 
 
+def _generate_write_dict_combinator() -> Stripped:
+    """Generate the combinator to write a dictionary with its keys sorted."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Write the items of a dictionary as <c>&lt;i&gt;</c> elements, each with
+/// its key written with <paramref name="writeKey" /> in <c>&lt;k&gt;</c> and its
+/// value with <paramref name="writeValue" /> in <c>&lt;v&gt;</c>, in the order
+/// of the keys given by <paramref name="comparison" />.
+/// </summary>
+/// <remarks>
+/// We write the items sorted by their keys, so that all the SDKs serialize
+/// a dictionary in the same order. An empty dictionary writes no items at all,
+/// which the reading sees as a self-closing element.
+/// </remarks>
+/// <typeparam name="TKey">Type of a key</typeparam>
+/// <typeparam name="TValue">Type of a value</typeparam>
+private static ContentWriter<Dictionary<TKey, TValue>> WriteDict<TKey, TValue>(
+{I}ContentWriter<TKey> writeKey,
+{I}ContentWriter<TValue> writeValue,
+{I}System.Comparison<TKey> comparison
+{I}) where TKey : notnull
+{{
+{I}return (that, writer) =>
+{I}{{
+{II}int index = 0;
+{II}foreach (var key in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(that.Keys, comparison))
+{II}{{
+{III}try
+{III}{{
+{IIII}writer.WriteStartElement("i", NS);
+{IIII}WriteElement<TKey>("k", key, writer, writeKey);
+{IIII}WriteElement<TValue>("v", that[key], writer, writeValue);
+{IIII}writer.WriteEndElement();
+{III}}}
+{III}catch (SerializationFailure failure)
+{III}{{
+{IIII}failure.Error.PrependSegment(
+{IIIII}new Reporting.IndexSegment(index));
+{IIII}throw;
+{III}}}
+{III}index++;
+{II}}}
+{I}}};
+}}"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_write_tuple_combinator(arity: int) -> Stripped:
     """
@@ -2655,11 +2878,42 @@ WriteList<{item_type}>(
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         item_type = csharp_common.generate_type(type_anno.items)
         item_writer = _item_writer_expr(type_anno.items, '"v"')
-        comparison = csharp_common.set_items_comparison(type_anno.items)
+        comparison = csharp_common.sorting_comparison(type_anno.items)
         return Stripped(
             f"""\
 WriteSet<{item_type}>(
 {I}{indent_but_first_line(item_writer, I)},
+{I}{comparison})"""
+        )
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        keys_type = csharp_common.generate_type(type_anno.keys)
+        values_type = csharp_common.generate_type(type_anno.values)
+
+        values_writer: Stripped
+        if isinstance(type_anno.values, intermediate.OurTypeAnnotation) and isinstance(
+            type_anno.values.our_type, intermediate.NamedUnion
+        ):
+            values_writer = Stripped("WriteIUnion")
+        elif isinstance(
+            type_anno.values, intermediate.OurTypeAnnotation
+        ) and isinstance(
+            type_anno.values.our_type,
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
+        ):
+            # NOTE (mristin):
+            # A value of a class is a self-describing element in ``<v>``, also
+            # for a concrete class without any descendant.
+            values_writer = Stripped("WriteIClass")
+        else:
+            values_writer = Stripped(_content_writer_name(type_anno.values))
+
+        comparison = csharp_common.sorting_comparison(type_anno.keys)
+        return Stripped(
+            f"""\
+WriteDict<{keys_type}, {values_type}>(
+{I}{_content_writer_name(type_anno.keys)},
+{I}{values_writer},
 {I}{comparison})"""
         )
 
@@ -2890,6 +3144,9 @@ def _generate_visitor(
 
     if needed.sets:
         blocks.append(_generate_write_set_combinator())
+
+    if needed.dicts:
+        blocks.append(_generate_write_dict_combinator())
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_write_tuple_combinator(arity))

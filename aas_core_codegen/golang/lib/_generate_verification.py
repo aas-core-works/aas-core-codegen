@@ -890,10 +890,9 @@ def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
         )
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        return (
+            f"DictOf_{_verification_moniker(type_anno.keys)}"
+            f"_{_verification_moniker(type_anno.values)}"
         )
 
     return golang_common.leaf_moniker(type_anno)
@@ -922,6 +921,66 @@ err.Path.PrependIndex(
 {II}Index: {index_expr},
 {I}}},
 )"""
+    )
+
+
+def _json_key_of_enumeration_name(enumeration: intermediate.Enumeration) -> Identifier:
+    """Name the function rendering a key of ``enumeration`` as in the JSON."""
+    return golang_naming.private_function_name(
+        Identifier(f"json_key_of_{enumeration.name}")
+    )
+
+
+def _json_key_expr(
+    key_expr: str, keys_type_anno: intermediate.TypeAnnotationExceptOptional
+) -> str:
+    """
+    Render the key at ``key_expr`` as it is written as a key of a JSON object.
+
+    We report the errors in the values of a dictionary, and in its keys, at
+    a key segment holding this rendering, so that the path resolves in
+    the serialized data.
+    """
+    primitive_type = intermediate.try_primitive_type(keys_type_anno)
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return key_expr
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return f"strconv.FormatInt({key_expr}, 10)"
+
+    assert isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_anno.our_type, intermediate.Enumeration
+    ), (
+        f"Unexpected keys of a dictionary: {keys_type_anno}; they should have been "
+        f"refused in intermediate._translate._verify_keys_of_dicts."
+    )
+
+    return f"{_json_key_of_enumeration_name(keys_type_anno.our_type)}({key_expr})"
+
+
+def _generate_json_key_of_enumeration(
+    enumeration: intermediate.Enumeration,
+) -> Stripped:
+    """Generate the function rendering a key of ``enumeration`` as in the JSON."""
+    enum_name = golang_naming.enum_name(enumeration.name)
+
+    to_string_name = golang_naming.function_name(
+        Identifier(f"{enumeration.name}_to_string")
+    )
+
+    return Stripped(
+        f"""\
+// Render the literal `key` of [ourtypes.{enum_name}] as it is written as a key of
+// a JSON object.
+//
+// An invalid literal has no serialized value, so we render its number instead.
+func {_json_key_of_enumeration_name(enumeration)}(key ourtypes.{enum_name}) string {{
+{I}text, ok := ourstringification.{to_string_name}(key)
+{I}if !ok {{
+{II}return strconv.Itoa(int(key))
+{I}}}
+{I}return text
+}}"""
     )
 
 
@@ -1072,9 +1131,9 @@ for i, item := range that {{
 
         # NOTE (mristin):
         # The loop is indented by one tab in the body of the function.
-        sorted_items_expr = golang_common.sorted_set_items_expr(
+        sorted_items_expr = golang_common.sorted_keys_expr(
             "that",
-            type_anno.items,
+            type_anno,
             column=golang_common.TAB_WIDTH + len(loop_head),
         )
 
@@ -1099,10 +1158,53 @@ for i, item := range that {{
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        key_segment = Stripped(
+            f"""\
+err.Path.PrependKey(
+{I}&ourreporting.KeySegment{{
+{II}Key: {_json_key_expr("key", type_anno.keys)},
+{I}}},
+)"""
+        )
+
+        item_blocks = []  # type: List[Stripped]
+
+        # NOTE (mristin):
+        # We report an invalid key at the very same key segment as an invalid
+        # value, as the key identifies the item.
+        if _needs_verification(type_anno.keys):
+            item_blocks.append(
+                _generate_verify_into(
+                    expr="key", type_anno=type_anno.keys, segments=[key_segment]
+                )
+            )
+
+        if _needs_verification(type_anno.values):
+            item_blocks.append(
+                _generate_verify_into(
+                    expr="that[key]", type_anno=type_anno.values, segments=[key_segment]
+                )
+            )
+
+        item_stmts = Stripped("\n\n".join(item_blocks))
+
+        # NOTE (mristin):
+        # We go over the keys in the sorted order, so that the errors come in
+        # the same order as in the other SDKs, and not in the random order of
+        # the iteration over a Go map.
+        loop_head = "for _, key := range "
+
+        sorted_keys_expr = golang_common.sorted_keys_expr(
+            "that",
+            type_anno,
+            column=golang_common.TAB_WIDTH + len(loop_head),
+        )
+
+        body = Stripped(
+            f"""\
+{loop_head}{sorted_keys_expr} {{
+{I}{indent_but_first_line(item_stmts, I)}
+}}"""
         )
 
     else:
@@ -1380,7 +1482,11 @@ if that.{getter_name}() != nil {{
             is intermediate.PrimitiveType.BYTEARRAY
             or isinstance(
                 type_anno,
-                (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+                (
+                    intermediate.ListTypeAnnotation,
+                    intermediate.SetTypeAnnotation,
+                    intermediate.DictTypeAnnotation,
+                ),
             )
             or (
                 isinstance(type_anno, intermediate.OurTypeAnnotation)
@@ -1916,6 +2022,11 @@ func (ve *VerificationError) PathString() string {{
     for enumeration in symbol_table.enumerations:
         block = _generate_verify_enumeration(enumeration=enumeration)
         blocks.append(block)
+
+    for enumeration in intermediate_uses.enumerations_in_dict_property_keys(
+        symbol_table
+    ):
+        blocks.append(_generate_json_key_of_enumeration(enumeration=enumeration))
 
     for constrained_primitive in symbol_table.constrained_primitives:
         block, underlying_errors = _generate_verify_constrained_primitive(

@@ -541,10 +541,28 @@ return {value_type}(
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys hold no instances, so we wrap only the values.
+        value_wrap_expr = _generate_wrap_expr(
+            expr="item.second",
+            type_anno=type_anno.values,
+            descendability=descendability,
+        )
+
+        emplace_call = cpp_over.generate_call(
+            "result.emplace", ["item.first", value_wrap_expr]
+        )
+
+        body = Stripped(
+            f"""\
+{value_type} result;
+result.reserve(that.size());
+
+for (const auto& item : that) {{
+{I}{indent_but_first_line(emplace_call, I)};
+}}
+
+return result;"""
         )
 
     else:

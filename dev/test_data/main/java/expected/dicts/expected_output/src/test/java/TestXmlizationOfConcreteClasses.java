@@ -394,6 +394,99 @@ public class TestXmlizationOfConcreteClasses {
   } // public void testSomethingVerificationFail
 
   @Test
+  public void testRegistryOk() throws IOException, XMLStreamException {
+    final Path searchPath =
+      Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "registry");
+    final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+    for (Path path : paths) {
+      final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+      final XMLEventReader xmlReader =
+        xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+      final Registry instance =
+        Xmlization.Deserialize.deserializeRegistry(xmlReader);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+
+      assertSerializeDeserializeEqualsOriginal(instance, path);
+    }
+  } // public void testRegistryOk
+
+  @Test
+  public void testRegistryDeserializationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir =
+        causeDir.resolve("registry");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Registry for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        XmlCommon.DeserializeException exception = null;
+
+        try {
+          Xmlization.Deserialize.deserializeRegistry(xmlReader);
+        } catch (XmlCommon.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(exception, path);
+      }
+    }
+  }  // public void testRegistryDeserializationFail
+
+  @Test
+  public void testRegistryVerificationFail() throws IOException, XMLStreamException {
+    for (
+      Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Xml",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve(
+        "registry");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Registry for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".xml");
+      for (Path path : paths) {
+        final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        final XMLEventReader xmlReader =
+          xmlInputFactory.createXMLEventReader(Files.newInputStream(path));
+
+        final Registry instance =
+          Xmlization.Deserialize.deserializeRegistry(xmlReader);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testRegistryVerificationFail
+
+  @Test
   public void testDuplicatePropertyFails() throws IOException, XMLStreamException {
     final Path path =
       Paths.get(

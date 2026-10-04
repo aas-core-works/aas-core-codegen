@@ -15,7 +15,11 @@ package jsonization
 import (
 	"fmt"
 	"math"
+	"sort"
+	"strconv"
+	"strings"
 	b64 "encoding/base64"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourstringification "github.com/dummy-works/dummy/stringification"
 	ourtypes "github.com/dummy-works/dummy/types"
@@ -430,6 +434,117 @@ func unexpectedEnumLiteralError(
 	)
 }
 
+// Parse `jsonable` as a JSON object, and parse every key with `parseKey` and every
+// value with `parseValue` into a dictionary, or return an error.
+//
+// The keys can come in any order. We go over them sorted so that we report
+// the same error first regardless of the order of the iteration over the map.
+func parseDict[K comparable, V any](
+	jsonable interface{},
+	parseKey func(jsonable interface{}) (K, error),
+	parseValue func(jsonable interface{}) (V, error),
+) (result map[K]V, err error) {
+	jsonableMap, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Expected a JSON object, but got %T",
+				jsonable,
+			),
+		)
+		return
+	}
+
+	jsonKeys := make([]string, 0, len(jsonableMap))
+	for jsonKey := range jsonableMap {
+		jsonKeys = append(jsonKeys, jsonKey)
+	}
+	sort.Strings(jsonKeys)
+
+	result = make(map[K]V, len(jsonableMap))
+	for _, jsonKey := range jsonKeys {
+		var key K
+		key, err = parseKey(jsonKey)
+		if err != nil {
+			mustDeserializationError(err).prependKey(jsonKey)
+			return
+		}
+
+		var value V
+		value, err = parseValue(jsonableMap[jsonKey])
+		if err != nil {
+			mustDeserializationError(err).prependKey(jsonKey)
+			return
+		}
+
+		result[key] = value
+	}
+	return
+}
+
+// Parse `jsonable` as an integer key of a JSON object, or return an error.
+//
+// The key is expected to be a canonical decimal string, *i.e.*, without
+// a sign plus, without leading zeros and without a negative zero, so that
+// every integer has exactly one key.
+func int64FromJsonKey(jsonable interface{}) (result int64, err error) {
+	text, ok := jsonable.(string)
+	if !ok {
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Expected a string as the key, but got %T",
+				jsonable,
+			),
+		)
+		return
+	}
+
+	digits := strings.TrimPrefix(text, "-")
+	canonical := len(digits) > 0 &&
+		(digits == "0" || (digits[0] >= '1' && digits[0] <= '9')) &&
+		!(digits == "0" && len(text) != len(digits))
+	for i := 0; canonical && i < len(digits); i++ {
+		canonical = digits[i] >= '0' && digits[i] <= '9'
+	}
+
+	if canonical {
+		var parseErr error
+		result, parseErr = strconv.ParseInt(text, 10, 64)
+		canonical = parseErr == nil
+	}
+
+	if !canonical {
+		err = newDeserializationError(
+			fmt.Sprintf(
+				"Expected a canonical decimal integer as the key, but got: %q",
+				text,
+			),
+		)
+	}
+	return
+}
+
+// Parse `jsonable` as a nested collection.
+func parseListOf_ListOf_DictOf_long_string(
+	jsonable interface{},
+) ([][]map[int64]string, error) {
+	return parseArray(jsonable, parseListOf_DictOf_long_string)
+}
+
+// Parse `jsonable` as a nested collection.
+func parseListOf_DictOf_long_string(
+	jsonable interface{},
+) ([]map[int64]string, error) {
+	return parseArray(jsonable, parseDictOf_long_string)
+}
+
+// Parse `jsonable` as a nested collection.
+func parseDictOf_long_string(
+	jsonable interface{},
+) (map[int64]string, error) {
+	return parseDict(jsonable, int64FromJsonKey, stringFromJsonable)
+}
+
 // Parse `jsonable` as a literal of [ourtypes.Kind],
 // or return an error.
 func KindFromJsonable(
@@ -444,6 +559,24 @@ func KindFromJsonable(
 	result, ok = ourstringification.KindFromString(text)
 	if !ok {
 		err = unexpectedEnumLiteralError(text, "Kind")
+	}
+	return
+}
+
+// Parse `jsonable` as a literal of [ourtypes.Direction],
+// or return an error.
+func DirectionFromJsonable(
+	jsonable interface{},
+) (result ourtypes.Direction, err error) {
+	text, ok := jsonable.(string)
+	if !ok {
+		err = notAnEnumTextError(jsonable, "Direction")
+		return
+	}
+
+	result, ok = ourstringification.DirectionFromString(text)
+	if !ok {
+		err = unexpectedEnumLiteralError(text, "Direction")
 	}
 	return
 }
@@ -641,6 +774,164 @@ func somethingFromMapWithoutDispatch(
 	return
 }
 
+// Parse `jsonable` as an instance of [ourtypes.IRegistry],
+// or return an error.
+func RegistryFromJsonable(
+	jsonable interface{},
+) (
+	result ourtypes.IRegistry,
+	err error,
+) {
+	m, ok := jsonable.(map[string]interface{})
+	if !ok {
+		err = notAMapError(jsonable)
+		return
+	}
+
+	return registryFromMapWithoutDispatch(m)
+}
+
+// Parse [ourtypes.IRegistry] from a map,
+// or return an error, if any.
+func registryFromMapWithoutDispatch(
+	m map[string]interface{},
+) (
+	result ourtypes.IRegistry,
+	err error,
+) {
+	var theCounts map[string]int64
+	var theCountsByNumber map[int64]int64
+	var theWeights map[ourtypes.Direction]int64
+	var theKindsByCode map[string]ourtypes.Kind
+	var theCodesByName map[string]string
+	var theItemsByName map[string]ourtypes.IItem
+	var theLabels map[string][][]map[int64]string
+	var theOptionalCounts map[string]int64
+
+	foundCounts := false
+	foundCountsByNumber := false
+	foundWeights := false
+	foundKindsByCode := false
+	foundCodesByName := false
+	foundItemsByName := false
+	foundLabels := false
+
+	for k, v := range m {
+		switch k {
+		case "counts":
+			theCounts, err = parseDict(v, stringFromJsonable, int64FromJsonable)
+			foundCounts = true
+
+		case "countsByNumber":
+			theCountsByNumber, err = parseDict(v, int64FromJsonKey, int64FromJsonable)
+			foundCountsByNumber = true
+
+		case "weights":
+			theWeights, err = parseDict(v, DirectionFromJsonable, int64FromJsonable)
+			foundWeights = true
+
+		case "kindsByCode":
+			theKindsByCode, err = parseDict(v, stringFromJsonable, KindFromJsonable)
+			foundKindsByCode = true
+
+		case "codesByName":
+			theCodesByName, err = parseDict(v, stringFromJsonable, stringFromJsonable)
+			foundCodesByName = true
+
+		case "itemsByName":
+			theItemsByName, err = parseDict(v, stringFromJsonable, ItemFromJsonable)
+			foundItemsByName = true
+
+		case "labels":
+			theLabels, err = parseDict(
+				v, stringFromJsonable, parseListOf_ListOf_DictOf_long_string,
+			)
+			foundLabels = true
+
+		case "optionalCounts":
+			theOptionalCounts, err = parseDict(v, stringFromJsonable, int64FromJsonable)
+
+		default:
+			err = newDeserializationError(
+				fmt.Sprintf(
+					"Unexpected property: %s",
+					k,
+				),
+			)
+			return
+		}
+
+		if err != nil {
+			mustDeserializationError(err).prependName(k)
+			return
+		}
+	}
+
+	if !foundCounts {
+		err = newDeserializationError(
+			"The required property 'counts' is missing",
+		)
+		return
+	}
+
+	if !foundCountsByNumber {
+		err = newDeserializationError(
+			"The required property 'countsByNumber' is missing",
+		)
+		return
+	}
+
+	if !foundWeights {
+		err = newDeserializationError(
+			"The required property 'weights' is missing",
+		)
+		return
+	}
+
+	if !foundKindsByCode {
+		err = newDeserializationError(
+			"The required property 'kindsByCode' is missing",
+		)
+		return
+	}
+
+	if !foundCodesByName {
+		err = newDeserializationError(
+			"The required property 'codesByName' is missing",
+		)
+		return
+	}
+
+	if !foundItemsByName {
+		err = newDeserializationError(
+			"The required property 'itemsByName' is missing",
+		)
+		return
+	}
+
+	if !foundLabels {
+		err = newDeserializationError(
+			"The required property 'labels' is missing",
+		)
+		return
+	}
+
+	result = ourtypes.NewRegistry(
+		theCounts,
+		theCountsByNumber,
+		theWeights,
+		theKindsByCode,
+		theCodesByName,
+		theItemsByName,
+		theLabels,
+	)
+	result.SetOptionalCounts(
+		theOptionalCounts,
+	)
+
+	return
+}
+
 // endregion
 
 // region Serialization
@@ -823,6 +1114,64 @@ func serializeArray[T any](
 	return
 }
 
+// Serialize every key of `m` with `serializeKey` and every value with
+// `serializeValue` into a JSON-able object, or return an error.
+//
+// The `keys` are the keys of `m` in the order of the serialization, so that
+// the errors are reported in the same order as in the other SDKs.
+func serializeDict[K comparable, V any](
+	m map[K]V,
+	keys []K,
+	serializeKey func(key K) (string, error),
+	serializeValue func(value V) (interface{}, error),
+) (result map[string]interface{}, err error) {
+	result = make(map[string]interface{}, len(keys))
+	for i, key := range keys {
+		var jsonKey string
+		jsonKey, err = serializeKey(key)
+		if err != nil {
+			mustSerializationError(err).prependIndex(i)
+			return
+		}
+
+		result[jsonKey], err = serializeValue(m[key])
+		if err != nil {
+			mustSerializationError(err).prependKey(jsonKey)
+			return
+		}
+	}
+	return
+}
+
+// Serialize the string `key` as a key of a JSON object, which is the string itself.
+func stringAsJsonKey(key string) (string, error) {
+	return key, nil
+}
+
+// Serialize the integer `key` as a key of a JSON object, *i.e.*, as a canonical
+// decimal string.
+func int64AsJsonKey(key int64) (string, error) {
+	return strconv.FormatInt(key, 10), nil
+}
+
+// Serialize the literal `key` of [ourtypes.Direction] as a key of a JSON object,
+// *i.e.*, as its serialized value, or return an error.
+func directionAsJsonKey(
+	key ourtypes.Direction,
+) (result string, err error) {
+	var ok bool
+	result, ok = ourstringification.DirectionToString(key)
+	if !ok {
+		err = newSerializationError(
+			fmt.Sprintf(
+				"Got an invalid literal of Direction: %v",
+				key,
+			),
+		)
+	}
+	return
+}
+
 // Forward `item` as a JSON-able value, unconverted.
 func directToJsonable[T any](item T) (interface{}, error) {
 	return item, nil
@@ -856,6 +1205,32 @@ func kindAsJsonableInterface(that ourtypes.Kind) (interface{}, error) {
 	return KindToJsonable(that)
 }
 
+// Serialize `that` nested collection to a JSON-able.
+func serializeListOf_ListOf_DictOf_long_string(
+	that [][]map[int64]string,
+) (interface{}, error) {
+	return serializeArray(that, serializeListOf_DictOf_long_string)
+}
+
+// Serialize `that` nested collection to a JSON-able.
+func serializeListOf_DictOf_long_string(
+	that []map[int64]string,
+) (interface{}, error) {
+	return serializeArray(that, serializeDictOf_long_string)
+}
+
+// Serialize `that` nested collection to a JSON-able.
+func serializeDictOf_long_string(
+	that map[int64]string,
+) (interface{}, error) {
+	return serializeDict(
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[int64]),
+		int64AsJsonKey,
+		directToJsonable[string],
+	)
+}
+
 // Serialize `that` to a string, or return an error.
 func KindToJsonable(
 	that ourtypes.Kind,
@@ -868,6 +1243,27 @@ func KindToJsonable(
 		err = newSerializationError(
 			fmt.Sprintf(
 				"Got an invalid literal of Kind: %v",
+				that,
+			),
+		)
+		return
+	}
+
+	return
+}
+
+// Serialize `that` to a string, or return an error.
+func DirectionToJsonable(
+	that ourtypes.Direction,
+) (result string, err error) {
+	var ok bool
+	result, ok = ourstringification.DirectionToString(
+		that,
+	)
+	if !ok {
+		err = newSerializationError(
+			fmt.Sprintf(
+				"Got an invalid literal of Direction: %v",
 				that,
 			),
 		)
@@ -949,6 +1345,110 @@ func somethingToMap(
 	return
 }
 
+// Serialize [ourtypes.IRegistry] as a JSON-able map.
+//
+// This function performs no dispatch! It is only used to serialize
+// the properties. If you want to serialize an instance of
+// [ourtypes.IRegistry] with proper dispatch, call
+// [ToJsonable].
+func registryToMap(
+	that ourtypes.IRegistry,
+) (result map[string]interface{}, err error) {
+	result = make(map[string]interface{})
+
+	result["counts"], err = serializeDict(
+		that.Counts(),
+		ourcommon.SortedKeys(that.Counts(), ourcommon.LessOrdered[string]),
+		stringAsJsonKey,
+		int64ToJsonable,
+	)
+	if err != nil {
+		mustSerializationError(err).prependName("Counts()")
+		return
+	}
+
+	result["countsByNumber"], err = serializeDict(
+		that.CountsByNumber(),
+		ourcommon.SortedKeys(that.CountsByNumber(), ourcommon.LessOrdered[int64]),
+		int64AsJsonKey,
+		int64ToJsonable,
+	)
+	if err != nil {
+		mustSerializationError(err).prependName("CountsByNumber()")
+		return
+	}
+
+	result["weights"], err = serializeDict(
+		that.Weights(),
+		ourcommon.SortedKeys(that.Weights(), ourstringification.LessByRankOfDirection),
+		directionAsJsonKey,
+		int64ToJsonable,
+	)
+	if err != nil {
+		mustSerializationError(err).prependName("Weights()")
+		return
+	}
+
+	result["kindsByCode"], err = serializeDict(
+		that.KindsByCode(),
+		ourcommon.SortedKeys(that.KindsByCode(), ourcommon.LessOrdered[string]),
+		stringAsJsonKey,
+		kindAsJsonableInterface,
+	)
+	if err != nil {
+		mustSerializationError(err).prependName("KindsByCode()")
+		return
+	}
+
+	result["codesByName"], err = serializeDict(
+		that.CodesByName(),
+		ourcommon.SortedKeys(that.CodesByName(), ourcommon.LessOrdered[string]),
+		stringAsJsonKey,
+		directToJsonable[string],
+	)
+	if err != nil {
+		mustSerializationError(err).prependName("CodesByName()")
+		return
+	}
+
+	result["itemsByName"], err = serializeDict(
+		that.ItemsByName(),
+		ourcommon.SortedKeys(that.ItemsByName(), ourcommon.LessOrdered[string]),
+		stringAsJsonKey,
+		classAsJsonableInterface[ourtypes.IItem],
+	)
+	if err != nil {
+		mustSerializationError(err).prependName("ItemsByName()")
+		return
+	}
+
+	result["labels"], err = serializeDict(
+		that.Labels(),
+		ourcommon.SortedKeys(that.Labels(), ourcommon.LessOrdered[string]),
+		stringAsJsonKey,
+		serializeListOf_ListOf_DictOf_long_string,
+	)
+	if err != nil {
+		mustSerializationError(err).prependName("Labels()")
+		return
+	}
+
+	if that.OptionalCounts() != nil {
+		result["optionalCounts"], err = serializeDict(
+			that.OptionalCounts(),
+			ourcommon.SortedKeys(that.OptionalCounts(), ourcommon.LessOrdered[string]),
+			stringAsJsonKey,
+			int64ToJsonable,
+		)
+		if err != nil {
+			mustSerializationError(err).prependName("OptionalCounts()")
+			return
+		}
+	}
+
+	return
+}
+
 // Serialize “that“ instance to a JSON-able representation.
 //
 // Return a structure which can be readily converted to JSON,
@@ -964,6 +1464,10 @@ func ToJsonable(
 	case ourtypes.ModelTypeSomething:
 		result, err = somethingToMap(
 			that.(ourtypes.ISomething),
+		)
+	case ourtypes.ModelTypeRegistry:
+		result, err = registryToMap(
+			that.(ourtypes.IRegistry),
 		)
 	default:
 		err = newSerializationError(

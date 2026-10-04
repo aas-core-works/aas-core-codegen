@@ -89,6 +89,12 @@ def _compares_by_equals(type_anno: intermediate.TypeAnnotationUnion) -> bool:
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return all(_compares_by_equals(item) for item in type_anno.items)
 
+    # NOTE (mristin):
+    # ``Map.equals`` compares the values with their own ``equals``, and the keys
+    # always compare by value.
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return _compares_by_equals(type_anno.values)
+
     return False
 
 
@@ -136,7 +142,12 @@ def _generate_deep_equals_expr(
         return Stripped(f"transform({that}, {other})")
 
     if isinstance(
-        type_anno, (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation)
+        type_anno,
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.DictTypeAnnotation,
+        ),
     ):
         return Stripped(f"{_deep_equals_method_name(type_anno)}({that}, {other})")
 
@@ -150,7 +161,12 @@ def _generate_deep_equals_expr(
 
 @require(
     lambda type_anno: isinstance(
-        type_anno, (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation)
+        type_anno,
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.DictTypeAnnotation,
+        ),
     )
     and not _compares_by_equals(type_anno)
 )
@@ -199,10 +215,29 @@ return (
         raise AssertionError(f"Unexpected set not compared by equals: {type_anno}")
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        keys_type = java_common.generate_type(type_anno.keys)
+        values_type = java_common.generate_type(type_anno.values)
+        value_equals = _generate_deep_equals_expr(
+            "item.getValue()", "other.get(item.getKey())", type_anno.values
+        )
+
+        body = Stripped(
+            f"""\
+if (that.size() != other.size()) {{
+{I}return false;
+}}
+
+for (Map.Entry<{keys_type}, {values_type}> item : that.entrySet()) {{
+{I}if (!other.containsKey(item.getKey())) {{
+{II}return false;
+{I}}}
+
+{I}if (!{indent_but_first_line(value_equals, I)}) {{
+{II}return false;
+{I}}}
+}}
+
+return true;"""
         )
 
     else:
@@ -317,15 +352,25 @@ private Boolean transform(IUnion<?> that, IUnion<?> other) {{
 
 def _containers_compared_deeply(
     symbol_table: intermediate.SymbolTable,
-) -> List[Union[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation]]:
+) -> List[
+    Union[
+        intermediate.ListTypeAnnotation,
+        intermediate.TupleTypeAnnotation,
+        intermediate.DictTypeAnnotation,
+    ]
+]:
     """
     List the containers which are compared deeply by methods of their own.
 
     The containers are de-duplicated by their type moniker.
     """
-    result = (
-        []
-    )  # type: List[Union[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation]]
+    result: List[
+        Union[
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.DictTypeAnnotation,
+        ]
+    ] = []
 
     observed_monikers = set()  # type: Set[str]
     for cls in symbol_table.concrete_classes:
@@ -337,7 +382,11 @@ def _containers_compared_deeply(
             ):
                 if not isinstance(
                     type_anno,
-                    (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+                    (
+                        intermediate.ListTypeAnnotation,
+                        intermediate.TupleTypeAnnotation,
+                        intermediate.DictTypeAnnotation,
+                    ),
                 ) or _compares_by_equals(type_anno):
                     continue
 
@@ -354,7 +403,11 @@ def _containers_compared_deeply(
 def _generate_deep_equals_transformer(
     symbol_table: intermediate.SymbolTable,
     containers: Sequence[
-        Union[intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation]
+        Union[
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.DictTypeAnnotation,
+        ]
     ],
 ) -> Stripped:
     """
@@ -489,6 +542,17 @@ public void test{cls_name}DeepCopy() throws IOException {{
         )
     ):
         imports.append(Stripped("import java.util.Set;"))
+
+    # NOTE (mristin):
+    # The same holds for the dictionaries.
+    if any(
+        isinstance(nested, intermediate.DictTypeAnnotation)
+        for container in containers
+        for nested in intermediate.over_type_annotation_and_nested_type_annotations(
+            container
+        )
+    ):
+        imports.append(Stripped("import java.util.Map;"))
 
     # NOTE (mristin):
     # The methods comparing the containers spell out the Jackson nodes in their

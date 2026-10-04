@@ -2729,32 +2729,6 @@ def _verify_optionals_only_at_top(
     return None
 
 
-def _verify_no_dicts_in_property(
-    type_annotation: TypeAnnotation, where: str
-) -> Optional[Error]:
-    """
-    Check that ``type_annotation`` of a property holds no dictionaries at any depth.
-
-    The ``where`` describes the place of ``type_annotation`` in the error message.
-    """
-    for subscripted in _over_subscripted_type_annotations(type_annotation):
-        if subscripted.identifier == "Dict":
-            nesting = (
-                "" if subscripted is type_annotation else f", which nests {subscripted}"
-            )
-
-            return Error(
-                subscripted.node,
-                f"We do not support the dictionaries in the properties yet, "
-                f"but {where} has the type {type_annotation}{nesting}. "
-                f"The dictionaries are supported only in the arguments, the return "
-                f"values and the variables of the verification functions and of "
-                f"the methods.",
-            )
-
-    return None
-
-
 def _verify_no_declared_mutability(
     type_annotation: TypeAnnotation, where: str
 ) -> Optional[Error]:
@@ -3589,9 +3563,6 @@ def _verify_symbol_table(
 
             if error is None:
                 error = _verify_no_declared_mutability(prop.type_annotation, where)
-
-            if error is None:
-                error = _verify_no_dicts_in_property(prop.type_annotation, where)
 
             if error is not None:
                 errors.append(error)

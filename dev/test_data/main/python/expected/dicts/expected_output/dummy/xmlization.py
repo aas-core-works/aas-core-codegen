@@ -517,6 +517,185 @@ def something_from_str(
     )
 
 
+def registry_from_iterparse(
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Registry:
+    """
+    Read an instance of :py:class:`.types.Registry` from
+    the :paramref:`iterator`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import xml.etree.ElementTree as ET
+
+        import dummy.xmlization as our_xmlization
+
+        path = pathlib.Path(...)
+        with path.open("rt") as fid:
+            iterator = ET.iterparse(
+                source=fid,
+                events=['start', 'end']
+            )
+            instance = our_xmlization.registry_from_iterparse(
+                iterator
+            )
+
+        # Do something with the ``instance``
+
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Registry` read from
+        :paramref:`iterator`
+    """
+    return _read_instance_from_iterparse(
+        iterator,
+        _read_registry_as_element,
+        'Registry'
+    )
+
+
+def registry_from_stream(
+    stream: TextIO,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.Registry:
+    """
+    Read an instance of :py:class:`.types.Registry` from
+    the :paramref:`stream`.
+
+    Example usage:
+
+    .. code-block::
+
+        import dummy.xmlization as our_xmlization
+
+        with open_some_stream_over_network(...) as stream:
+            instance = our_xmlization.registry_from_stream(
+                stream
+            )
+
+        # Do something with the ``instance``
+
+    :param stream:
+        representing an instance of
+        :py:class:`.types.Registry` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Registry` read from
+        :paramref:`stream`
+    """
+    iterator = has_iterparse.iterparse(
+        stream,
+        ['start', 'end']
+    )
+    return registry_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
+def registry_from_file(
+    path: PathLike,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.Registry:
+    """
+    Read an instance of :py:class:`.types.Registry` from
+    the :paramref:`path`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as our_xmlization
+
+        path = pathlib.Path(...)
+        instance = our_xmlization.registry_from_file(
+            path
+        )
+
+        # Do something with the ``instance``
+
+    :param path:
+        to the file representing an instance of
+        :py:class:`.types.Registry` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Registry` read from
+        :paramref:`path`
+    """
+    with open(os.fspath(path), "rt", encoding='utf-8') as fid:
+        iterator = has_iterparse.iterparse(
+            fid,
+            ['start', 'end']
+        )
+        return registry_from_iterparse(
+            _with_elements_cleared_after_yield(iterator)
+        )
+
+
+def registry_from_str(
+    text: str,
+    has_iterparse: HasIterparse = xml.etree.ElementTree
+) -> our_types.Registry:
+    """
+    Read an instance of :py:class:`.types.Registry` from
+    the :paramref:`text`.
+
+    Example usage:
+
+    .. code-block::
+
+        import pathlib
+        import dummy.xmlization as our_xmlization
+
+        text = "<...>...</...>"
+        instance = our_xmlization.registry_from_str(
+            text
+        )
+
+        # Do something with the ``instance``
+
+    :param text:
+        representing an instance of
+        :py:class:`.types.Registry` in XML
+    :param has_iterparse:
+        Module containing ``iterparse`` function.
+
+        Default is to use :py:mod:`xml.etree.ElementTree` from the standard
+        library. If you have to deal with malicious input, consider using
+        a library such as `defusedxml.ElementTree`_.
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return:
+        Instance of :py:class:`.types.Registry` read from
+        :paramref:`text`
+    """
+    iterator = has_iterparse.iterparse(
+        io.StringIO(text),
+        ['start', 'end']
+    )
+    return registry_from_iterparse(
+        _with_elements_cleared_after_yield(iterator)
+    )
+
+
 def from_iterparse(
     iterator: Iterator[Tuple[str, Element]]
 ) -> our_types.Class:
@@ -719,6 +898,7 @@ def from_str(
 
 
 _ValueT = TypeVar("_ValueT")
+_KeyT = TypeVar("_KeyT")
 
 #: Read the content of an element which has already been opened, and read
 #: the corresponding end element as well
@@ -760,6 +940,60 @@ def _read_named_element(
         )
 
     return read_content(element, iterator)
+
+
+def _read_nested_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    read_element: _ContentReader[_ValueT],
+    expected_what: str
+) -> _ValueT:
+    """
+    Read the instance nested in :paramref:`element` as a discriminator element.
+
+    This looks redundant next to reading a list item, and it is not. A property
+    wraps its instance in an element of its own, so the discriminator's name has to
+    be prepended to the error path, which then reads ``value/property/idShort``.
+    A list item is not wrapped -- the item element *is* the indexed child -- so the
+    same prepend would give ``annotations/*[0]/property/idShort``, which walks one
+    level past the element that ``*[0]`` already selects, and resolves to nothing.
+
+    The end element corresponding to :paramref:`element` will be read as well.
+
+    :param element: start element enclosing the discriminator element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param read_element: to read the nested element, dispatching on its tag
+    :param expected_what: name of the expected type, for the error messages
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    next_event_element = next(iterator, None)
+    if next_event_element is None:
+        raise DeserializationException(
+            f"Expected a discriminator start element corresponding "
+            f"to {expected_what}, but got end-of-input"
+        )
+
+    next_event, nested_element = next_event_element
+    if next_event != 'start':
+        raise DeserializationException(
+            f"Expected a discriminator start element corresponding "
+            f"to {expected_what}, "
+            f"but got event {next_event!r} and element {nested_element.tag!r}"
+        )
+
+    try:
+        result = read_element(nested_element, iterator)
+    except DeserializationException as exception:
+        exception.path._prepend(ElementSegment(nested_element))
+        raise
+
+    read_end_element(element, iterator)
+
+    return result
 
 
 def _read_dispatched(
@@ -949,6 +1183,112 @@ def _read_list_of_items(
     return result
 
 
+def _read_dict_of_items(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]],
+    read_key: _ContentReader[_KeyT],
+    read_value: _ContentReader[_ValueT]
+) -> Dict[_KeyT, _ValueT]:
+    """
+    Read the children of :paramref:`element` as the items of a dictionary.
+
+    Each item is an ``<i>`` element with exactly the key in ``<k>`` and
+    the value in ``<v>``. We accept the items in any order, but refuse
+    the duplicate keys, so that no item is silently lost.
+
+    :paramref:`read_key` and :paramref:`read_value` are responsible for verifying
+    the tags of the ``<k>`` and the ``<v>`` elements themselves.
+
+    The end element corresponding to :paramref:`element` will be read as well.
+
+    :param element: start element enclosing the dictionary
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :param read_key: to read the ``<k>`` element, including its own end element
+    :param read_value: to read the ``<v>`` element, including its own end element
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed items
+    """
+    if element.text is not None and len(element.text.strip()) != 0:
+        raise DeserializationException(
+            f"Expected only item elements and whitespace text, "
+            f"but got text: {element.text!r}"
+        )
+
+    result = dict()  # type: Dict[_KeyT, _ValueT]
+
+    while True:
+        next_event_element = next(iterator, None)
+        if next_event_element is None:
+            raise DeserializationException(
+                f"Expected an item element or the end element corresponding "
+                f"to {element.tag}, but got the end-of-input"
+            )
+
+        next_event, item_element = next_event_element
+        if next_event == 'end' and item_element.tag == element.tag:
+            # We reached the end element enclosing the items.
+            break
+
+        if next_event != 'start':
+            raise DeserializationException(
+                f"Expected a start element corresponding to an item, "
+                f"but got event {next_event!r} "
+                f"and element {item_element.tag!r}"
+            )
+
+        # NOTE (mristin):
+        # We raise on a duplicate, so the number of the items read so far is also
+        # the index of the item element.
+        index = len(result)
+
+        try:
+            tag_wo_ns = parse_element_tag(item_element)
+            if tag_wo_ns != 'i':
+                raise DeserializationException(
+                    f"Expected an element with the tag 'i', "
+                    f"but got an element with tag: {tag_wo_ns!r}"
+                )
+
+            if item_element.text is not None and len(item_element.text.strip()) != 0:
+                raise DeserializationException(
+                    f"Expected only the key and the value elements and whitespace "
+                    f"text, but got text: {item_element.text!r}"
+                )
+
+            key_element = read_next_start_element(iterator, "the key element 'k'")
+            try:
+                key = read_key(key_element, iterator)
+            except DeserializationException as exception:
+                exception.path._prepend(ElementSegment(key_element))
+                raise
+
+            if key in result:
+                duplicate_exception = DeserializationException(
+                    "Expected unique keys in the dictionary, but the key is a duplicate"
+                )
+                duplicate_exception.path._prepend(ElementSegment(key_element))
+                raise duplicate_exception
+
+            value_element = read_next_start_element(iterator, "the value element 'v'")
+            try:
+                value = read_value(value_element, iterator)
+            except DeserializationException as exception:
+                exception.path._prepend(ElementSegment(value_element))
+                raise
+
+            read_end_element(item_element, iterator)
+        except DeserializationException as exception:
+            exception.path._prepend(IndexSegment(item_element, index))
+            raise
+
+        result[key] = value
+
+    return result
+
+
 def _read_instance_from_iterparse(
     iterator: Iterator[Tuple[str, Element]],
     read_as_element: _ContentReader[_ValueT],
@@ -1087,6 +1427,182 @@ def _read_enum_from_element_text(
     return literal
 
 
+def _read_dict_of__direction__int(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[our_types.Direction, int]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of :py:class:`.types.Direction` to ``int``.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_direction__at_k,
+        _read_int__at_v
+    )
+
+
+def _read_dict_of__int__int(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[int, int]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of ``int`` to ``int``.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_int__at_k,
+        _read_int__at_v
+    )
+
+
+def _read_dict_of__int__str(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[int, str]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of ``int`` to ``str``.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_int__at_k,
+        _read_str__at_v
+    )
+
+
+def _read_dict_of__int__str__at_v(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[int, str]:
+    """
+    Read the content of :paramref:`element`, which must be tagged
+    ``v``, as a dictionary of ``int`` to ``str``.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'v',
+        _read_dict_of__int__str
+    )
+
+
+def _read_dict_of__str__int(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[str, int]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of ``str`` to ``int``.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_str__at_k,
+        _read_int__at_v
+    )
+
+
+def _read_dict_of__str__item(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[str, our_types.Item]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of ``str`` to :py:class:`.types.Item`.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_str__at_k,
+        _read_nested__item__at_v
+    )
+
+
+def _read_dict_of__str__kind(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[str, our_types.Kind]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of :py:class:`.types.Code` to :py:class:`.types.Kind`.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_str__at_k,
+        _read_kind__at_v
+    )
+
+
+def _read_dict_of__str__list_of__list_of__dict_of__int__str(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[str, List[List[Dict[int, str]]]]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of ``str`` to lists of lists of dictionaries of ``int`` to ``str``.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_str__at_k,
+        _read_list_of__list_of__dict_of__int__str__at_v
+    )
+
+
+def _read_dict_of__str__str(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> Dict[str, str]:
+    """
+    Read the items of :paramref:`element` as
+    a dictionary of ``str`` to :py:class:`.types.Code`.
+    """
+    return _read_dict_of_items(
+        element,
+        iterator,
+        _read_str__at_k,
+        _read_str__at_v
+    )
+
+
+def _read_direction__at_k(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Direction:
+    """
+    Read the content of :paramref:`element`, which must be tagged
+    ``k``, as :py:class:`.types.Direction`.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'k',
+        _read_direction_from_element_text
+    )
+
+
+def _read_int__at_k(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> int:
+    """
+    Read the content of :paramref:`element`, which must be tagged
+    ``k``, as ``int``.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'k',
+        _read_int_from_element_text
+    )
+
+
 def _read_int__at_v(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -1116,6 +1632,37 @@ def _read_kind__at_v(
         iterator,
         'v',
         _read_kind_from_element_text
+    )
+
+
+def _read_list_of__dict_of__int__str(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> List[Dict[int, str]]:
+    """
+    Read the items of :paramref:`element` as a list of
+    dictionaries of ``int`` to ``str``.
+    """
+    return _read_list_of_items(
+        element,
+        iterator,
+        _read_dict_of__int__str__at_v
+    )
+
+
+def _read_list_of__dict_of__int__str__at_v(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> List[Dict[int, str]]:
+    """
+    Read the content of :paramref:`element`, which must be tagged
+    ``v``, as a list of dictionaries of ``int`` to ``str``.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'v',
+        _read_list_of__dict_of__int__str
     )
 
 
@@ -1164,6 +1711,37 @@ def _read_list_of__kind(
     )
 
 
+def _read_list_of__list_of__dict_of__int__str(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> List[List[Dict[int, str]]]:
+    """
+    Read the items of :paramref:`element` as a list of
+    lists of dictionaries of ``int`` to ``str``.
+    """
+    return _read_list_of_items(
+        element,
+        iterator,
+        _read_list_of__dict_of__int__str__at_v
+    )
+
+
+def _read_list_of__list_of__dict_of__int__str__at_v(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> List[List[Dict[int, str]]]:
+    """
+    Read the content of :paramref:`element`, which must be tagged
+    ``v``, as a list of lists of dictionaries of ``int`` to ``str``.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'v',
+        _read_list_of__list_of__dict_of__int__str
+    )
+
+
 def _read_list_of__str(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -1176,6 +1754,54 @@ def _read_list_of__str(
         element,
         iterator,
         _read_str__at_v
+    )
+
+
+def _read_nested__item(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Item:
+    """
+    Read an instance of :py:class:`.types.Item` nested in
+    :paramref:`element` as a discriminator element.
+    """
+    return _read_nested_element(
+        element,
+        iterator,
+        _read_item_as_element,
+        'Item'
+    )
+
+
+def _read_nested__item__at_v(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Item:
+    """
+    Read the instance nested in :paramref:`element`, which must be tagged
+    ``v``, as :py:class:`.types.Item`.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'v',
+        _read_nested__item
+    )
+
+
+def _read_str__at_k(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> str:
+    """
+    Read the content of :paramref:`element`, which must be tagged
+    ``k``, as ``str``.
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'k',
+        read_str_from_element_text
     )
 
 
@@ -1217,6 +1843,31 @@ def _read_kind_from_element_text(
         iterator,
         our_stringification.kind_from_str,
         'Kind'
+    )
+
+
+def _read_direction_from_element_text(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Direction:
+    """
+    Parse the text of :paramref:`element` as a literal of
+    :py:class:`.types.Direction`, and read the corresponding
+    end element from :paramref:`iterator`.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed value
+    """
+    return _read_enum_from_element_text(
+        element,
+        iterator,
+        our_stringification.direction_from_str,
+        'Direction'
     )
 
 
@@ -1372,6 +2023,111 @@ def _read_something_as_element(
     )
 
 
+def _read_registry_as_sequence(
+        element: Element,
+        iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Registry:
+    """
+    Read an instance of :py:class:`.types.Registry`
+    as a sequence of XML-encoded properties.
+
+    The end element corresponding to the :paramref:`element` will be
+    read as well.
+
+    :param element: start element, parent of the sequence
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    values = _read_properties(
+        element,
+        iterator,
+        _READERS_FOR_REGISTRY
+    )
+
+    the_counts: Optional[Dict[str, int]] = values.get('counts')
+    the_counts_by_number: Optional[Dict[int, int]] = values.get('countsByNumber')
+    the_weights: Optional[Dict[our_types.Direction, int]] = values.get('weights')
+    the_kinds_by_code: Optional[Dict[str, our_types.Kind]] = values.get('kindsByCode')
+    the_codes_by_name: Optional[Dict[str, str]] = values.get('codesByName')
+    the_items_by_name: Optional[Dict[str, our_types.Item]] = values.get('itemsByName')
+    the_labels: Optional[Dict[str, List[List[Dict[int, str]]]]] = values.get('labels')
+    the_optional_counts: Optional[Dict[str, int]] = values.get('optionalCounts')
+
+    if the_counts is None:
+        raise DeserializationException(
+            "The required property 'counts' is missing"
+        )
+
+    if the_counts_by_number is None:
+        raise DeserializationException(
+            "The required property 'countsByNumber' is missing"
+        )
+
+    if the_weights is None:
+        raise DeserializationException(
+            "The required property 'weights' is missing"
+        )
+
+    if the_kinds_by_code is None:
+        raise DeserializationException(
+            "The required property 'kindsByCode' is missing"
+        )
+
+    if the_codes_by_name is None:
+        raise DeserializationException(
+            "The required property 'codesByName' is missing"
+        )
+
+    if the_items_by_name is None:
+        raise DeserializationException(
+            "The required property 'itemsByName' is missing"
+        )
+
+    if the_labels is None:
+        raise DeserializationException(
+            "The required property 'labels' is missing"
+        )
+
+    return our_types.Registry(
+        the_counts,
+        the_counts_by_number,
+        the_weights,
+        the_kinds_by_code,
+        the_codes_by_name,
+        the_items_by_name,
+        the_labels,
+        the_optional_counts
+    )
+
+
+def _read_registry_as_element(
+    element: Element,
+    iterator: Iterator[Tuple[str, Element]]
+) -> our_types.Registry:
+    """
+    Read an instance of :py:class:`.types.Registry` from
+    :paramref:`iterator`, including the end element.
+
+    :param element: start element
+    :param iterator:
+        Input stream of ``(event, element)`` coming from
+        :py:func:`xml.etree.ElementTree.iterparse` with the argument
+        ``events=["start", "end"]``
+    :raise: :py:class:`DeserializationException` if unexpected input
+    :return: parsed instance
+    """
+    return _read_named_element(
+        element,
+        iterator,
+        'registry',
+        _read_registry_as_sequence
+    )
+
+
 def _read_as_element(
     element: Element,
     iterator: Iterator[Tuple[str, Element]]
@@ -1409,6 +2165,7 @@ _GENERAL_DISPATCH: Mapping[
 ] = {
     'item': _read_item_as_sequence,
     'something': _read_something_as_sequence,
+    'registry': _read_registry_as_sequence,
 }
 
 
@@ -1434,6 +2191,23 @@ _READERS_FOR_SOMETHING: Mapping[
     'codes': _read_list_of__str,
     'items': _read_list_of__item,
     'optionalTexts': _read_list_of__str,
+}
+
+
+#: Read the content of a property of
+#: :py:class:`.types.Registry`, by the XML name of the property
+_READERS_FOR_REGISTRY: Mapping[
+    str,
+    _ContentReader[Any]
+] = {
+    'counts': _read_dict_of__str__int,
+    'countsByNumber': _read_dict_of__int__int,
+    'weights': _read_dict_of__direction__int,
+    'kindsByCode': _read_dict_of__str__kind,
+    'codesByName': _read_dict_of__str__str,
+    'itemsByName': _read_dict_of__str__item,
+    'labels': _read_dict_of__str__list_of__list_of__dict_of__int__str,
+    'optionalCounts': _read_dict_of__str__int,
 }
 
 
@@ -1523,6 +2297,31 @@ def _attribute_to_item(
 
     failure = SerializationException(str(exception))
     failure._prepend_index(index)
+    raise failure from exception
+
+
+def _attribute_to_key(
+        exception: Exception,
+        key: str
+) -> NoReturn:
+    """
+    Re-raise the :paramref:`exception` as a failure of the item of a dictionary
+    at :paramref:`key`.
+
+    This is the counterpart of :py:func:`_attribute_to_item` for the items of
+    a dictionary. The key is given as it is written in JSON, so that the paths
+    are the same in all the SDKs.
+
+    :param exception: to be re-raised
+    :param key: of the item which was being written
+    :raise: :py:class:`SerializationException` always
+    """
+    if isinstance(exception, SerializationException):
+        exception._prepend_key(key)
+        raise exception
+
+    failure = SerializationException(str(exception))
+    failure._prepend_key(key)
     raise failure from exception
 
 
@@ -1628,6 +2427,42 @@ def _write_enum_as_element(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_nested_element(
+    name: str,
+    prop_name: Optional[str],
+    value: our_types.Class,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`value` nested in the :paramref:`name` element.
+
+    The instance writes the element which designates its model type, so it has to be
+    nested in an element of its own when it is the value of a property. Mind that
+    an *item* of a list is not nested that way -- see
+    :py:func:`_write_list_of_instances` -- as it is the item's own element which
+    already sits in the list's element.
+
+    The element which designates the model type contributes no segment to the path
+    of a :py:class:`SerializationException`. The path points into the instance which
+    was handed over for the serialization, and there that element is no level of its
+    own: ``.value.id_short`` is exactly what you would write in Python.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        serializer.writer.write_start_element(name)
+        serializer.visit(value)
+        serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 def _write_list_of_instances(
     name: str,
     prop_name: Optional[str],
@@ -1706,6 +2541,379 @@ def _write_list_of_items(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_dict_of__direction__int(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[our_types.Direction, int],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value, key=lambda literal: literal.value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_enum_as_element('k', None, key, serializer)
+                    _write_int_as_element('v', None, value[key], serializer)
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, key.value)
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_dict_of__int__int(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[int, int],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_int_as_element('k', None, key, serializer)
+                    _write_int_as_element('v', None, value[key], serializer)
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, str(key))
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_dict_of__int__str(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[int, str],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_int_as_element('k', None, key, serializer)
+                    _write_str_as_element('v', None, value[key], serializer)
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, str(key))
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_dict_of__str__int(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[str, int],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_str_as_element('k', None, key, serializer)
+                    _write_int_as_element('v', None, value[key], serializer)
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, key)
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_dict_of__str__item(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[str, our_types.Item],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_str_as_element('k', None, key, serializer)
+                    _write_nested_element('v', None, value[key], serializer)
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, key)
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_dict_of__str__kind(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[str, our_types.Kind],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_str_as_element('k', None, key, serializer)
+                    _write_enum_as_element('v', None, value[key], serializer)
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, key)
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_dict_of__str__list_of__list_of__dict_of__int__str(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[str, List[List[Dict[int, str]]]],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_str_as_element('k', None, key, serializer)
+                    _write_list_of_items(
+                        'v',
+                        None,
+                        value[key],
+                        _write_list_of__dict_of__int__str,
+                        serializer
+                    )
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, key)
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_dict_of__str__str(
+    name: str,
+    prop_name: Optional[str],
+    value: Dict[str, str],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` sorted by their keys, enclosed in
+    the :paramref:`name` element.
+
+    Each item is written as an ``<i>`` element with the key in ``<k>`` and
+    the value in ``<v>``. The keys are sorted in the same order in all
+    the SDKs. If there are no items, the enclosing element is collapsed to
+    an empty one.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        if len(value) == 0:
+            serializer.writer.write_empty_element(name)
+        else:
+            serializer.writer.write_start_element(name)
+
+            for key in sorted(value):
+                try:
+                    serializer.writer.write_start_element('i')
+                    _write_str_as_element('k', None, key, serializer)
+                    _write_str_as_element('v', None, value[key], serializer)
+                    serializer.writer.write_end_element('i')
+                except Exception as exception:
+                    _attribute_to_key(exception, key)
+
+            serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
+def _write_list_of__dict_of__int__str(
+    name: str,
+    prop_name: Optional[str],
+    value: List[Dict[int, str]],
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write the items of :paramref:`value` enclosed in the :paramref:`name` element.
+
+    :param name: of the enclosing element
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param value: to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        _write_list_of_items(name, None, value, _write_dict_of__int__str, serializer)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 def _write_item_as_element(
     name: str,
     prop_name: Optional[str],
@@ -1776,6 +2984,51 @@ def _write_something_as_element(
         _attribute_to_property(exception, prop_name)
 
 
+def _write_registry_as_element(
+    name: str,
+    prop_name: Optional[str],
+    that: our_types.Registry,
+    serializer: '_Serializer'
+) -> None:
+    """
+    Write :paramref:`that` enclosed in the :paramref:`name` element.
+
+    :param name: of the element tag. Expected to contain no XML special characters.
+    :param prop_name:
+        name of the property, as spelled in Python, whose value is written, or
+        ``None`` if the access to the value is recorded by an enclosing writer
+    :param that: instance to be serialized
+    :param serializer: to write to
+    :raise: :py:class:`SerializationException` if the value could not be written
+    """
+    try:
+        serializer.writer.write_start_element(name)
+        _write_dict_of__str__int('counts', 'counts', that.counts, serializer)
+        _write_dict_of__int__int(
+            'countsByNumber', 'counts_by_number', that.counts_by_number, serializer
+        )
+        _write_dict_of__direction__int('weights', 'weights', that.weights, serializer)
+        _write_dict_of__str__kind(
+            'kindsByCode', 'kinds_by_code', that.kinds_by_code, serializer
+        )
+        _write_dict_of__str__str(
+            'codesByName', 'codes_by_name', that.codes_by_name, serializer
+        )
+        _write_dict_of__str__item(
+            'itemsByName', 'items_by_name', that.items_by_name, serializer
+        )
+        _write_dict_of__str__list_of__list_of__dict_of__int__str(
+            'labels', 'labels', that.labels, serializer
+        )
+        if that.optional_counts is not None:
+            _write_dict_of__str__int(
+                'optionalCounts', 'optional_counts', that.optional_counts, serializer
+            )
+        serializer.writer.write_end_element(name)
+    except Exception as exception:
+        _attribute_to_property(exception, prop_name)
+
+
 class _Serializer(our_types.AbstractVisitor):
     """Encode instances as XML and write them to :py:attr:`~writer`."""
 
@@ -1823,6 +3076,20 @@ class _Serializer(our_types.AbstractVisitor):
         :param that: instance to be serialized
         """
         _write_something_as_element('something', None, that, self)
+
+    def visit_registry(
+        self,
+        that: our_types.Registry
+    ) -> None:
+        """
+        Serialize :paramref:`that` to :py:attr:`~stream` as an XML element.
+
+        The enclosing XML element designates the class of the instance, where its
+        children correspond to the properties of the instance.
+
+        :param that: instance to be serialized
+        """
+        _write_registry_as_element('registry', None, that, self)
 
 
 def write(instance: our_types.Class, stream: TextIO) -> None:

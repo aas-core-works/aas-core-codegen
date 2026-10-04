@@ -705,10 +705,47 @@ for _, item := range that {{
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys are never descendable, so we descend only into the values. We go
+        # over the keys in the sorted order, as the order of the iteration over
+        # a Golang map is random, and the descent has to be deterministic.
+        value_stmts = _generate_descend_into(
+            expr="that[key]",
+            type_anno=type_anno.values,
+            descendability=descendability,
+        )
+
+        loop_head = "for _, key := range "
+
+        sorted_keys_expr: str
+        if isinstance(type_anno.keys, intermediate.OurTypeAnnotation) and isinstance(
+            type_anno.keys.our_type, intermediate.Enumeration
+        ):
+            # NOTE (mristin):
+            # The ranks of the literals live in the stringification package,
+            # which imports this package, so we can not use them here. We sort
+            # the literals by their numbers instead, as the order only needs to
+            # be deterministic.
+            enum_name = golang_naming.enum_name(type_anno.keys.our_type.name)
+            sorted_keys_expr = f"""\
+ourcommon.SortedKeys(
+{I}that,
+{I}func(a {enum_name}, b {enum_name}) bool {{
+{II}return a < b
+{I}}},
+)"""
+        else:
+            sorted_keys_expr = golang_common.sorted_keys_expr(
+                "that",
+                type_anno,
+                column=golang_common.TAB_WIDTH + len(loop_head),
+            )
+
+        body = Stripped(
+            f"""\
+{loop_head}{sorted_keys_expr} {{
+{I}{indent_but_first_line(value_stmts, I)}
+}}"""
         )
 
     else:

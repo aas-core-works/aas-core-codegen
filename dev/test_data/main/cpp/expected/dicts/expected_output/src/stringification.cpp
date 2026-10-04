@@ -21,6 +21,10 @@ const std::unordered_map<
   {
     "Something",
     types::ModelType::kSomething
+  },
+  {
+    "Registry",
+    types::ModelType::kRegistry
   }
 };
 
@@ -61,6 +65,8 @@ std::string to_string(
     return "Item";
     case types::ModelType::kSomething:
     return "Something";
+    case types::ModelType::kRegistry:
+    return "Registry";
     default:
       throw std::invalid_argument(
         common::Concat(
@@ -144,6 +150,99 @@ std::string to_string(
         )
       );
   }
+}
+
+const std::unordered_map<
+  std::string,
+  types::Direction
+> kDirectionFromStringMap = {
+  {
+    "up",
+    types::Direction::kNorth
+  },
+  {
+    "down",
+    types::Direction::kSouth
+  },
+  {
+    "right",
+    types::Direction::kEast
+  }
+};
+
+common::optional<types::Direction> DirectionFromString(
+  const std::string& text
+) {
+  const auto it = kDirectionFromStringMap.find(
+    text
+  );
+  if (it == kDirectionFromStringMap.end()) {
+    return {};
+  }
+  return it->second;
+}
+
+types::Direction MustDirectionFromString(
+  const std::string& text
+) {
+  const auto it = kDirectionFromStringMap.find(
+    text
+  );
+  if (it == kDirectionFromStringMap.end()) {
+    throw std::invalid_argument(
+      common::Concat(
+        "Unexpected Direction literal: ",
+        text
+      )
+    );
+  }
+  return it->second;
+}
+
+std::string to_string(
+  types::Direction literal
+) {
+  switch (literal) {
+    case types::Direction::kNorth:
+      return "up";
+    case types::Direction::kSouth:
+      return "down";
+    case types::Direction::kEast:
+      return "right";
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected literal: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              literal
+            )
+          )
+        )
+      );
+  }
+}
+
+std::uint32_t RankOfDirection(
+  types::Direction literal
+) {
+  switch (literal) {
+    case types::Direction::kSouth:
+      return 0;  // "down"
+    case types::Direction::kEast:
+      return 1;  // "right"
+    case types::Direction::kNorth:
+      return 2;  // "up"
+    default:
+      return 3;
+  }
+}
+
+bool LessByRankOfDirection(
+  types::Direction that,
+  types::Direction other
+) {
+  return RankOfDirection(that) < RankOfDirection(other);
 }
 
 // The following encoder has been adapted from Jouni Malinen <j@w1.fi> to work with

@@ -176,12 +176,16 @@ def _has_deep_copy_method(type_anno: intermediate.TypeAnnotationUnion) -> bool:
     Check whether ``type_anno`` is deeply copied through a method of its own.
 
     A list or a set of values which are copied by sharing needs only a copy of
-    the container, so it gets no method of its own.
+    the container, so it gets no method of its own. The same holds for
+    a dictionary, whose keys are always copied by sharing.
     """
     if isinstance(
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
         return not _copies_by_sharing(type_anno.items)
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return not _copies_by_sharing(type_anno.values)
 
     return isinstance(
         type_anno, intermediate.TupleTypeAnnotation
@@ -257,6 +261,9 @@ def _generate_deep_copy_expr(
         if isinstance(type_anno, intermediate.SetTypeAnnotation):
             return Stripped(f"new HashSet<>({expr})")
 
+        if isinstance(type_anno, intermediate.DictTypeAnnotation):
+            return Stripped(f"new HashMap<>({expr})")
+
     raise AssertionError(
         f"Unexpected type annotation to be deeply copied: {type_anno}. "
         f"The optionals nested in the containers should have been refused in "
@@ -303,10 +310,19 @@ return result;"""
         body = Stripped(f"return {tuple_literal};")
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        keys_type = java_common.generate_type(type_anno.keys)
+        values_type = java_common.generate_type(type_anno.values)
+        value_copy = _generate_deep_copy_expr("item.getValue()", type_anno.values)
+
+        body = Stripped(
+            f"""\
+{value_type} result = new HashMap<>(that.size());
+for (Map.Entry<{keys_type}, {values_type}> item : that.entrySet()) {{
+{I}result.put(
+{II}item.getKey(),
+{II}{indent_but_first_line(value_copy, II)});
+}}
+return result;"""
         )
 
     else:
@@ -443,6 +459,10 @@ def generate(
 
     if java_common.has_set_properties(symbol_table):
         imports.append(Stripped("import java.util.HashSet;"))
+
+    if intermediate_uses.dict_properties(symbol_table):
+        imports.append(Stripped("import java.util.HashMap;"))
+        imports.append(Stripped("import java.util.Map;"))
 
     # NOTE (mristin):
     # We deeply copy the containers through methods of their own, one per

@@ -69,6 +69,19 @@ public class TestDescendOnce {
         "Something",
         "maximal.json.trace"));
   } // public void testSomething
+
+  @Test
+  public void testRegistry() throws IOException {
+    Registry instance = CommonJsonization.loadMaximalRegistry();
+
+    compareOrRerecordTrace(
+      instance,
+      Paths.get(
+        Common.TEST_DATA_DIR,
+        "DescendOnce",
+        "Registry",
+        "maximal.json.trace"));
+  } // public void testRegistry
 }  // class TestDescendOnce
 
 // package dummy.tests

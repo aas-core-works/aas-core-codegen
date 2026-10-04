@@ -28,6 +28,10 @@ public interface ITransformerWithContext<ContextT, T> {
     ISomething that,
     ContextT context
   );
+  T transformRegistry(
+    IRegistry that,
+    ContextT context
+  );
 }
 
 /*

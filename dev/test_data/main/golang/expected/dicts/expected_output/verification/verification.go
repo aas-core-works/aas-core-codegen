@@ -12,8 +12,10 @@ package verification
 
 import (
 	"fmt"
+	"strconv"
 	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
+	ourstringification "github.com/dummy-works/dummy/stringification"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
 
@@ -601,6 +603,260 @@ func VerifySomething(
 	return
 }
 
+// Verify `that` instance of [ourtypes.IRegistry].
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyRegistry(
+	that ourtypes.IRegistry,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if !that.WeightIsAtMost(10) {
+		abort = onError(
+			newVerificationError(
+				"Weights must sum up to at most 10.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!(that.OptionalCounts() != nil) ||
+		(len(that.OptionalCounts()) > 0)) {
+		abort = onError(
+			newVerificationError(
+				"Optional counts must not be empty, if specified.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.AllKeys(
+			func(name string) bool {
+				return ourcommon.LenStr(
+						ourcommon.MapMustGet(
+							that.CodesByName(),
+							name,
+						),
+					) <= 5
+			},
+			that.CodesByName(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Codes by name must be at most 5 characters long.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.AllKeys(
+			func(code string) bool {
+				return ourcommon.MapMustGet(
+						that.KindsByCode(),
+						code,
+					) != ourtypes.KindGamma
+			},
+			that.KindsByCode(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Kinds by code must not be gamma.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !NestedLabelsAreShort(that.Labels()) {
+		abort = onError(
+			newVerificationError(
+				"Labels must be short.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !ItemNamesMatchKeys(that.ItemsByName()) {
+		abort = onError(
+			newVerificationError(
+				"Items must be named by their keys.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(len(that.CountsByNumber()) <= 5) {
+		abort = onError(
+			newVerificationError(
+				"There must be at most five counts by number.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !AllCountsAreSmall(that.CountsByNumber()) {
+		abort = onError(
+			newVerificationError(
+				"Counts by number must be smaller than 3.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Counts() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Counts",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.CountsByNumber() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: CountsByNumber",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Weights() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Weights",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		abort = verifyDictOf_Direction_long(
+			that.Weights(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "Weights",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.KindsByCode() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: KindsByCode",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		abort = verifyDictOf_Code_Kind(
+			that.KindsByCode(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "KindsByCode",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.CodesByName() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: CodesByName",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		abort = verifyDictOf_string_Code(
+			that.CodesByName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "CodesByName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.ItemsByName() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: ItemsByName",
+			),
+		)
+		if abort {
+			return
+		}
+	} else {
+		abort = verifyDictOf_string_IItem(
+			that.ItemsByName(),
+			func(err *VerificationError) bool {
+				err.Path.PrependName(
+					&ourreporting.NameSegment{
+						Name: "ItemsByName",
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	if that.Labels() == nil {
+		abort = onError(
+			newVerificationError(
+				"Required property not set: Labels",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
 // Verify the items of `that` recursively.
 func verifyListOf_Kind(
 	that []ourtypes.Kind,
@@ -676,6 +932,124 @@ func verifyListOf_IItem(
 	return
 }
 
+// Verify the items of `that` recursively.
+func verifyDictOf_Direction_long(
+	that map[ourtypes.Direction]int64,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for _, key := range ourcommon.SortedKeys(
+		that,
+		ourstringification.LessByRankOfDirection,
+	) {
+		abort = VerifyDirection(
+			key,
+			func(err *VerificationError) bool {
+				err.Path.PrependKey(
+					&ourreporting.KeySegment{
+						Key: jsonKeyOfDirection(key),
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyDictOf_Code_Kind(
+	that map[string]ourtypes.Kind,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for _, key := range ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]) {
+		abort = VerifyCode(
+			key,
+			func(err *VerificationError) bool {
+				err.Path.PrependKey(
+					&ourreporting.KeySegment{
+						Key: key,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+
+		abort = VerifyKind(
+			that[key],
+			func(err *VerificationError) bool {
+				err.Path.PrependKey(
+					&ourreporting.KeySegment{
+						Key: key,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyDictOf_string_Code(
+	that map[string]string,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for _, key := range ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]) {
+		abort = VerifyCode(
+			that[key],
+			func(err *VerificationError) bool {
+				err.Path.PrependKey(
+					&ourreporting.KeySegment{
+						Key: key,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
+// Verify the items of `that` recursively.
+func verifyDictOf_string_IItem(
+	that map[string]ourtypes.IItem,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	for _, key := range ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]) {
+		abort = Verify(
+			that[key],
+			func(err *VerificationError) bool {
+				err.Path.PrependKey(
+					&ourreporting.KeySegment{
+						Key: key,
+					},
+				)
+				return onError(err)
+			},
+		)
+		if abort {
+			return
+		}
+	}
+
+	return
+}
+
 // Verify that `that` is a literal in the valid range
 // of Kind.
 //
@@ -703,6 +1077,47 @@ func VerifyKind(
 	}
 
 	return
+}
+
+// Verify that `that` is a literal in the valid range
+// of Direction.
+//
+// You have to supply the callback `onError` to iterate over the errors.
+// If `onError` returns abort `true`, this function will abort
+// further verification as well, and return abort `true`. Otherwise,
+// abort `false` is returned.
+func VerifyDirection(
+	that ourtypes.Direction,
+	onError func(*VerificationError) bool,
+) (abort bool) {
+	abort = false
+
+	if
+		that < ourtypes.DirectionNorth ||
+		that > ourtypes.DirectionEast {
+		abort = onError(
+			newVerificationError(
+				fmt.Sprintf(
+					"Invalid literal value for Direction: %v",
+					that,
+				),
+			),
+		)
+	}
+
+	return
+}
+
+// Render the literal `key` of [ourtypes.Direction] as it is written as a key of
+// a JSON object.
+//
+// An invalid literal has no serialized value, so we render its number instead.
+func jsonKeyOfDirection(key ourtypes.Direction) string {
+	text, ok := ourstringification.DirectionToString(key)
+	if !ok {
+		return strconv.Itoa(int(key))
+	}
+	return text
 }
 
 // Verify the constraints of `that` value.
@@ -750,6 +1165,11 @@ func Verify(
 	case ourtypes.ModelTypeSomething:
 		abort = VerifySomething(
 			that.(ourtypes.ISomething),
+			onError,
+		)
+	case ourtypes.ModelTypeRegistry:
+		abort = VerifyRegistry(
+			that.(ourtypes.IRegistry),
 			onError,
 		)
 	default:

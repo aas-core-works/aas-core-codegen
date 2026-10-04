@@ -6,6 +6,7 @@ package enhancing
 
 import (
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
 
@@ -212,6 +213,157 @@ func wrapSomething[E any](
 	return
 }
 
+type enhancedRegistry[E any] struct {
+	instance ourtypes.IRegistry
+	enhancement E
+}
+
+func (er *enhancedRegistry[E]) ModelType(
+) ourtypes.ModelType {
+	return er.instance.ModelType()
+}
+
+func (er *enhancedRegistry[E]) DescendOnce(
+	action func(ourtypes.IClass)bool,
+) bool {
+	return er.instance.DescendOnce(action)
+}
+
+func (er *enhancedRegistry[E]) Descend(
+	action func(ourtypes.IClass) bool,
+) bool {
+	return er.instance.Descend(action)
+}
+
+func (er *enhancedRegistry[E]) Counts(
+) map[string]int64 {
+	return er.instance.Counts()
+}
+
+func (er *enhancedRegistry[E]) SetCounts(
+	value map[string]int64,
+) {
+	er.instance.SetCounts(value)
+}
+
+func (er *enhancedRegistry[E]) CountsByNumber(
+) map[int64]int64 {
+	return er.instance.CountsByNumber()
+}
+
+func (er *enhancedRegistry[E]) SetCountsByNumber(
+	value map[int64]int64,
+) {
+	er.instance.SetCountsByNumber(value)
+}
+
+func (er *enhancedRegistry[E]) Weights(
+) map[ourtypes.Direction]int64 {
+	return er.instance.Weights()
+}
+
+func (er *enhancedRegistry[E]) SetWeights(
+	value map[ourtypes.Direction]int64,
+) {
+	er.instance.SetWeights(value)
+}
+
+func (er *enhancedRegistry[E]) KindsByCode(
+) map[string]ourtypes.Kind {
+	return er.instance.KindsByCode()
+}
+
+func (er *enhancedRegistry[E]) SetKindsByCode(
+	value map[string]ourtypes.Kind,
+) {
+	er.instance.SetKindsByCode(value)
+}
+
+func (er *enhancedRegistry[E]) CodesByName(
+) map[string]string {
+	return er.instance.CodesByName()
+}
+
+func (er *enhancedRegistry[E]) SetCodesByName(
+	value map[string]string,
+) {
+	er.instance.SetCodesByName(value)
+}
+
+func (er *enhancedRegistry[E]) ItemsByName(
+) map[string]ourtypes.IItem {
+	return er.instance.ItemsByName()
+}
+
+func (er *enhancedRegistry[E]) SetItemsByName(
+	value map[string]ourtypes.IItem,
+) {
+	er.instance.SetItemsByName(value)
+}
+
+func (er *enhancedRegistry[E]) Labels(
+) map[string][][]map[int64]string {
+	return er.instance.Labels()
+}
+
+func (er *enhancedRegistry[E]) SetLabels(
+	value map[string][][]map[int64]string,
+) {
+	er.instance.SetLabels(value)
+}
+
+func (er *enhancedRegistry[E]) OptionalCounts(
+) map[string]int64 {
+	return er.instance.OptionalCounts()
+}
+
+func (er *enhancedRegistry[E]) SetOptionalCounts(
+	value map[string]int64,
+) {
+	er.instance.SetOptionalCounts(value)
+}
+
+func (r *enhancedRegistry[E]) WeightIsAtMost(
+	maximum int64,
+) bool {
+	return r.instance.WeightIsAtMost(
+		maximum,
+	)
+}
+
+func (er *enhancedRegistry[E]) getEnhancement(
+) E {
+	return er.enhancement
+}
+
+func (er *enhancedRegistry[E]) setEnhancement(
+	value E,
+) {
+	er.enhancement = value
+}
+
+func wrapRegistry[E any](
+	that ourtypes.IRegistry,
+	factory func(ourtypes.IClass) (E, bool),
+) (result ourtypes.IRegistry) {
+	// We assume that we already checked whether `that` has been enhanced
+	// in the caller.
+
+	enh, shouldEnhance := factory(that)
+	if shouldEnhance {
+		result = &enhancedRegistry[E]{
+			instance: that,
+			enhancement: enh,
+		}
+	} else {
+		result = that
+	}
+
+	wrap_DictOf_string_IItem_inPlace[E](that.ItemsByName(), factory)
+
+	return
+}
+
 // Wrap `that` instance recursively with the enhancement produced by
 // the `factory`, and keep its static type.
 func wrapClass[E any, T ourtypes.IClass](
@@ -228,6 +380,16 @@ func wrap_ListOf_IItem_inPlace[E any](
 ) {
 	for i := range that {
 		that[i] = wrapClass[E](that[i], factory)
+	}
+}
+
+// Wrap recursively the instances held by `that` in-situ.
+func wrap_DictOf_string_IItem_inPlace[E any](
+	that map[string]ourtypes.IItem,
+	factory func(ourtypes.IClass) (E, bool),
+) {
+	for _, key := range ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]) {
+		that[key] = wrapClass[E](that[key], factory)
 	}
 }
 
@@ -262,6 +424,11 @@ func Wrap[E any](
 	case ourtypes.ModelTypeSomething:
 		result = wrapSomething[E](
 			that.(ourtypes.ISomething),
+			factory,
+		)
+	case ourtypes.ModelTypeRegistry:
+		result = wrapRegistry[E](
+			that.(ourtypes.IRegistry),
 			factory,
 		)
 	default:

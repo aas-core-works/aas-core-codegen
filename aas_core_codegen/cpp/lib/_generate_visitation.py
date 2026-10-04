@@ -453,10 +453,26 @@ for (
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys hold no instances. We visit the values in the order of
+        # the serialization, so that the order is the same in all the SDKs.
+        value_stmts = _generate_visit(
+            expr="item->second",
+            type_anno=type_anno.values,
+            visitor="visitor",
+            descendability=descendability,
+        )
+
+        less = cpp_common.generate_set_item_less(type_anno.keys)
+
+        body = Stripped(
+            f"""\
+for (
+{I}const auto* item :
+{I}common::SortedItemPointers(that, {less})
+) {{
+{I}{indent_but_first_line(value_stmts, I)}
+}}"""
         )
 
     else:

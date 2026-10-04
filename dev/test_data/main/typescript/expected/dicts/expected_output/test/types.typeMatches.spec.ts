@@ -12,6 +12,8 @@ const THE_ITEM = TestCommonJsonization.loadMinimalItem();
 
 const THE_SOMETHING = TestCommonJsonization.loadMinimalSomething();
 
+const THE_REGISTRY = TestCommonJsonization.loadMinimalRegistry();
+
 test("type matches for Item", () => {
   expect(
     OurTypes.typesMatch(
@@ -24,6 +26,13 @@ test("type matches for Item", () => {
     OurTypes.typesMatch(
       THE_ITEM,
       THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_ITEM,
+      THE_REGISTRY
     )
   ).toStrictEqual(false);
 });
@@ -40,6 +49,36 @@ test("type matches for Something", () => {
     OurTypes.typesMatch(
       THE_SOMETHING,
       THE_SOMETHING
+    )
+  ).toStrictEqual(true);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_SOMETHING,
+      THE_REGISTRY
+    )
+  ).toStrictEqual(false);
+});
+
+test("type matches for Registry", () => {
+  expect(
+    OurTypes.typesMatch(
+      THE_REGISTRY,
+      THE_ITEM
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_REGISTRY,
+      THE_SOMETHING
+    )
+  ).toStrictEqual(false);
+
+  expect(
+    OurTypes.typesMatch(
+      THE_REGISTRY,
+      THE_REGISTRY
     )
   ).toStrictEqual(true);
 });

@@ -77,6 +77,10 @@ class _AllOf:
         self.subschemas = subschemas
 
 
+#: Match the canonical decimal strings of the integer keys of the dictionaries
+_CANONICAL_INTEGER_KEY_PATTERN: Final[str] = "^(0|-?[1-9][0-9]*)$"
+
+
 def _translate_constraints(
     type_annotation: intermediate.TypeAnnotationExceptOptional,
     constraints: Optional[infer_for_schema.Constraints],
@@ -148,7 +152,10 @@ def _translate_constraints(
             if constraints.len_constraint.max_value is not None:
                 base_subschema["maxItems"] = constraints.len_constraint.max_value
 
-    if isinstance(type_annotation, intermediate.JsonObjectTypeAnnotation):
+    if isinstance(
+        type_annotation,
+        (intermediate.JsonObjectTypeAnnotation, intermediate.DictTypeAnnotation),
+    ):
         if constraints.len_constraint is not None:
             if constraints.len_constraint.min_value is not None:
                 base_subschema["minProperties"] = constraints.len_constraint.min_value
@@ -384,11 +391,60 @@ def _define_type(
                     )
 
         elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_annotation}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
+            values_type_definition, values_error = _define_type(
+                type_annotation=type_annotation.values,
+                constraints_by_value=constraints_by_value,
+                fix_pattern=fix_pattern,
             )
+
+            if values_error is not None:
+                return None, values_error
+
+            assert values_type_definition is not None
+
+            # NOTE (mristin):
+            # We serialize a dictionary as a JSON object. JSON Schema can not
+            # express the order of the keys, which we sort on serialization.
+            definition["type"] = "object"
+            definition["additionalProperties"] = values_type_definition
+
+            keys_primitive_type = intermediate.try_primitive_type(type_annotation.keys)
+
+            if keys_primitive_type is intermediate.PrimitiveType.INT:
+                # NOTE (mristin):
+                # The integer keys are written as canonical decimal strings.
+                definition["propertyNames"] = collections.OrderedDict(
+                    [("pattern", _CANONICAL_INTEGER_KEY_PATTERN)]
+                )
+
+            elif keys_primitive_type is intermediate.PrimitiveType.STR:
+                keys_all_of = _translate_constraints(
+                    type_annotation=type_annotation.keys,
+                    constraints=constraints_by_value.get(type_annotation.keys, None),
+                    fix_pattern=fix_pattern,
+                )
+
+                if keys_all_of is not None:
+                    definition["propertyNames"] = _all_of_as_jsonable_mapping(
+                        keys_all_of
+                    )
+
+            elif isinstance(
+                type_annotation.keys, intermediate.OurTypeAnnotation
+            ) and isinstance(type_annotation.keys.our_type, intermediate.Enumeration):
+                keys_model_type = naming.json_model_type(
+                    type_annotation.keys.our_type.name
+                )
+                definition["propertyNames"] = collections.OrderedDict(
+                    [("$ref", f"#/definitions/{keys_model_type}")]
+                )
+
+            else:
+                raise AssertionError(
+                    f"Unexpected keys of a dictionary: {type_annotation.keys}; "
+                    f"they should have been refused in "
+                    f"intermediate._translate._verify_keys_of_dicts."
+                )
 
         else:
             assert_never(type_annotation)

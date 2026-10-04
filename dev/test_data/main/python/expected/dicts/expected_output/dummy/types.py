@@ -15,11 +15,17 @@ dictionaries.
 The order of the iteration over a dictionary differs among the targets, so
 the results must not depend on it.
 
-The invariants call the verification functions with the dictionaries built from
-the properties, so that the live tests run them. The dictionaries of instances and
-the nested lists of dictionaries can not be built in the invariants, as
-the instances are read-only there and we can not create a list. The verification
-functions over them are only compiled.
+The invariants of ``Something`` call the verification functions with
+the dictionaries built from its list properties.
+
+The class ``Registry`` holds the dictionaries in its properties, which the targets
+serialize with the keys sorted. We pick the keys so that a wrong order shows: the
+strings outside the Basic Multilingual Plane sort differently by UTF-16 code
+units than by code points, the integers differently as text than numerically, and
+the literals of ``Direction`` differently by their names or by their
+declaration than by their values. We
+also nest the dictionaries in the lists, hold the instances and the constrained
+primitives as keys and as values, and check them in the invariants.
 """
 
 
@@ -36,6 +42,7 @@ from typing import (
     TypeVar,
     List,
     Tuple,
+    Dict,
     Mapping
 )
 
@@ -121,6 +128,16 @@ class Kind(enum.Enum):
     BETA = 'beta'
 
     GAMMA = 'gamma'
+
+
+class Direction(enum.Enum):
+    # pylint: disable=missing-class-docstring
+
+    NORTH = 'up'
+
+    SOUTH = 'down'
+
+    EAST = 'right'
 
 
 class Item(Class):
@@ -306,6 +323,116 @@ class Something(Class):
         self.optional_texts = optional_texts
 
 
+class Registry(Class):
+    # pylint: disable=missing-class-docstring
+
+    counts: Dict[str, int]
+
+    counts_by_number: Dict[int, int]
+
+    weights: Dict['Direction', int]
+
+    kinds_by_code: Dict[str, 'Kind']
+
+    codes_by_name: Dict[str, str]
+
+    items_by_name: Dict[str, 'Item']
+
+    labels: Dict[str, List[List[Dict[int, str]]]]
+
+    optional_counts: Optional[Dict[str, int]]
+
+    def weight_is_at_most(
+        self,
+        maximum: int
+    ) -> bool:
+        """Check the iteration over the items of a dictionary property."""
+        # pylint: disable=all
+        total = 0
+        for direction, weight in self.weights.items():
+            total = total + weight
+        return total <= maximum
+
+    def descend_once(self) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this instance.
+
+        We do not recurse into the referenced instance.
+
+        :yield: instances directly referenced from this instance
+        """
+        return self._descend(recurse=False)
+
+    def descend(self) -> Iterator[Class]:
+        """
+        Iterate recursively over the instances referenced from this one.
+
+        :yield: instances recursively referenced from this instance
+        """
+        return self._descend(recurse=True)
+
+    def _descend(self, recurse: bool) -> Iterator[Class]:
+        """
+        Iterate over the instances referenced from this one, and recursively
+        over their descendants if :paramref:`recurse` is set.
+
+        :param recurse: if set, descend recursively into the referenced instances
+        :yield: instances referenced from this instance
+        """
+        yield from _descend_dict_of__str__item(self.items_by_name, recurse)
+
+    def accept(self, visitor: "AbstractVisitor") -> None:
+        """Dispatch the :paramref:`visitor` on this instance."""
+        visitor.visit_registry(self)
+
+    def accept_with_context(
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
+    ) -> None:
+        """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
+        visitor.visit_registry_with_context(self, context)
+
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
+        """Dispatch the :paramref:`transformer` on this instance."""
+        return transformer.transform_registry(self)
+
+    def transform_with_context(
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
+    ) -> T:
+        """
+        Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
+        """
+        return transformer.transform_registry_with_context(
+            self, context)
+
+    def __init__(
+            self,
+            counts: Dict[str, int],
+            counts_by_number: Dict[int, int],
+            weights: Dict['Direction', int],
+            kinds_by_code: Dict[str, 'Kind'],
+            codes_by_name: Dict[str, str],
+            items_by_name: Dict[str, 'Item'],
+            labels: Dict[str, List[List[Dict[int, str]]]],
+            optional_counts: Optional[Dict[str, int]] = None
+    ) -> None:
+        """Initialize with the given values."""
+        self.counts = counts
+        self.counts_by_number = counts_by_number
+        self.weights = weights
+        self.kinds_by_code = kinds_by_code
+        self.codes_by_name = codes_by_name
+        self.items_by_name = items_by_name
+        self.labels = labels
+        self.optional_counts = optional_counts
+
+
 def _descend_list_of__item(
         that: List['Item'],
         recurse: bool
@@ -324,6 +451,24 @@ def _descend_list_of__item(
         yield item
 
         yield from item.descend()
+
+
+def _descend_dict_of__str__item(
+        that: Dict[str, 'Item'],
+        recurse: bool
+) -> Iterator[Class]:
+    """
+    Iterate over the instances held by :paramref:`that`.
+
+    If :paramref:`recurse` is set, descend recursively into the instances
+    as well.
+    """
+    for key in sorted(that):
+        value = that[key]
+        yield value
+
+        if recurse:
+            yield from value.descend()
 
 
 class AbstractVisitor:
@@ -347,6 +492,14 @@ class AbstractVisitor:
     def visit_something(
             self,
             that: Something
+    ) -> None:
+        """Visit :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def visit_registry(
+            self,
+            that: Registry
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
@@ -380,6 +533,15 @@ class AbstractVisitorWithContext(Generic[ContextT]):
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    def visit_registry_with_context(
+            self,
+            that: Registry,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
 
 class PassThroughVisitor(AbstractVisitor):
     """
@@ -406,6 +568,14 @@ class PassThroughVisitor(AbstractVisitor):
     def visit_something(
             self,
             that: Something
+    ) -> None:
+        """Visit :paramref:`that`."""
+        for another in that.descend_once():
+            self.visit(another)
+
+    def visit_registry(
+            self,
+            that: Registry
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
@@ -447,6 +617,15 @@ class PassThroughVisitorWithContext(
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
+    def visit_registry_with_context(
+            self,
+            that: Registry,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        for another in that.descend_once():
+            self.visit_with_context(another, context)
+
 
 class AbstractTransformer(Generic[T]):
     """Transform the instances of the model."""
@@ -469,6 +648,14 @@ class AbstractTransformer(Generic[T]):
     def transform_something(
             self,
             that: Something
+    ) -> T:
+        """Transform :paramref:`that`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_registry(
+            self,
+            that: Registry
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
@@ -499,6 +686,15 @@ class AbstractTransformerWithContext(
     def transform_something_with_context(
             self,
             that: Something,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_registry_with_context(
+            self,
+            that: Registry,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
@@ -540,6 +736,13 @@ class TransformerWithDefault(AbstractTransformer[T]):
         """Transform :paramref:`that`."""
         return self.default
 
+    def transform_registry(
+            self,
+            that: Registry
+    ) -> T:
+        """Transform :paramref:`that`."""
+        return self.default
+
 
 class TransformerWithDefaultAndContext(
         AbstractTransformerWithContext[ContextT, T]
@@ -576,6 +779,14 @@ class TransformerWithDefaultAndContext(
     def transform_something_with_context(
             self,
             that: Something,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        return self.default
+
+    def transform_registry_with_context(
+            self,
+            that: Registry,
             context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""

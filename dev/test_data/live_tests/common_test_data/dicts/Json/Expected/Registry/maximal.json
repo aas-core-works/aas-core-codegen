@@ -1,0 +1,45 @@
+{
+  "counts": {
+    "a": 1,
+    "�": 2,
+    "😀": 3
+  },
+  "countsByNumber": {
+    "-1": 1,
+    "9": 2,
+    "10": 1
+  },
+  "weights": {
+    "down": 1,
+    "right": 2,
+    "up": 3
+  },
+  "kindsByCode": {
+    "x": "alpha",
+    "y": "beta"
+  },
+  "codesByName": {
+    "a": "c1",
+    "b": "c22"
+  },
+  "itemsByName": {
+    "x": {
+      "name": "x"
+    }
+  },
+  "labels": {
+    "a": [
+      [
+        {
+          "1": "one",
+          "2": "two"
+        }
+      ],
+      []
+    ],
+    "b": []
+  },
+  "optionalCounts": {
+    "z": 1
+  }
+}

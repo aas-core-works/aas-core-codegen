@@ -24,6 +24,9 @@ import dummy.types.impl.*;
 import dummy.types.model.*;
 import dummy.visitation.*;
 import dummy.xmlcommon.XmlCommon;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provide de/serialization of meta-model classes to/from XML.
@@ -194,6 +197,102 @@ public class Xmlization {
     }
 
     /**
+     * Read an item of a dictionary from the {@code <i>} element which has been
+     * opened, the key with {@code readKey} from {@code <k>} and the value with
+     * {@code readValue} from {@code <v>}.
+     */
+    private static <K, V> Reporting.Result<Map.Entry<K, V>> readDictItem(
+      XMLEventReader reader,
+      boolean isEmpty,
+      XmlCommon.ContentReader<K> readKey,
+      XmlCommon.ContentReader<V> readValue) {
+      if (isEmpty) {
+        return Reporting.Result.failure(new Reporting.Error(
+          "Expected a key and a value in an item of the dictionary, " +
+          "but encountered a self-closing element"));
+      }
+
+      final Reporting.Result<? extends K> keyResult =
+        XmlCommon.readNamedElement(reader, "k", readKey);
+      if (keyResult.isError()) {
+        keyResult.getError().prependSegment(new Reporting.NameSegment("k"));
+        return Reporting.Result.failure(keyResult.getError());
+      }
+
+      final Reporting.Result<? extends V> valueResult =
+        XmlCommon.readNamedElement(reader, "v", readValue);
+      if (valueResult.isError()) {
+        valueResult.getError().prependSegment(new Reporting.NameSegment("v"));
+        return Reporting.Result.failure(valueResult.getError());
+      }
+
+      return Reporting.Result.success(
+        new AbstractMap.SimpleImmutableEntry<>(
+          keyResult.getResult(), valueResult.getResult()));
+    }
+
+    /**
+     * Read the items of a dictionary, each as an {@code <i>} element holding
+     * the key in {@code <k>} and the value in {@code <v>}.
+     *
+     * <p>Every start element is considered to mark the start of an item. Reading
+     * stops as soon as a non-start element is encountered.
+     *
+     * <p>The items can come in any order, but a duplicate key is an error, so that
+     * no item is silently dropped.
+     */
+    private static <K, V> Reporting.Result<Map<K, V>> readDict(
+      XMLEventReader reader,
+      boolean isEmpty,
+      XmlCommon.ContentReader<K> readKey,
+      XmlCommon.ContentReader<V> readValue) {
+      final Map<K, V> result = new HashMap<>();
+      if (isEmpty) {
+        return Reporting.Result.success(result);
+      }
+
+      XmlCommon.skipWhitespaceAndComments(reader);
+      int index = 0;
+      if (!XmlCommon.currentEvent(reader).isStartElement()) {
+        final Reporting.Error error = new Reporting.Error(
+          "Expected a start element opening an item of the dictionary, " +
+          "but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
+        error.prependSegment(new Reporting.IndexSegment(index));
+        return Reporting.Result.failure(error);
+      }
+
+      while (XmlCommon.currentEvent(reader).isStartElement()) {
+        final Reporting.Result<? extends Map.Entry<K, V>> itemResult =
+          XmlCommon.readNamedElement(
+            reader,
+            "i",
+            (itemReader, isEmptyItem) ->
+              readDictItem(itemReader, isEmptyItem, readKey, readValue));
+        if (itemResult.isError()) {
+          itemResult.getError()
+            .prependSegment(
+              new Reporting.IndexSegment(index));
+          return Reporting.Result.failure(itemResult.getError());
+        }
+
+        final Map.Entry<K, V> item = itemResult.getResult();
+        if (result.containsKey(item.getKey())) {
+          final Reporting.Error error = new Reporting.Error(
+            "Expected unique keys in the dictionary, but the key is a duplicate");
+          error.prependSegment(new Reporting.NameSegment("k"));
+          error.prependSegment(new Reporting.IndexSegment(index));
+          return Reporting.Result.failure(error);
+        }
+
+        result.put(item.getKey(), item.getValue());
+        index++;
+        XmlCommon.skipWhitespaceAndComments(reader);
+      }
+
+      return Reporting.Result.success(result);
+    }
+
+    /**
      * Check whether the sequence of the properties has ended.
      *
      * <p>Only the end tag of the enclosing element concludes a sequence. Reaching
@@ -288,6 +387,103 @@ public class Xmlization {
         reader, isEmpty, _DeserializeImplementation::readItemFromElement);
     }
 
+    private static Reporting.Result<Map<String, Long>> readDictOf_string_long(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_string,
+        _DeserializeImplementation::readTextAs_long);
+    }
+
+    private static Reporting.Result<Map<Long, Long>> readDictOf_long_long(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_long,
+        _DeserializeImplementation::readTextAs_long);
+    }
+
+    private static Reporting.Result<Direction> readTextAs_Direction(
+      XMLEventReader reader, boolean isEmpty) {
+      return readEnum(
+        reader,
+        isEmpty,
+        Stringification::directionFromString,
+        "Direction");
+    }
+
+    private static Reporting.Result<Map<Direction, Long>> readDictOf_Direction_long(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_Direction,
+        _DeserializeImplementation::readTextAs_long);
+    }
+
+    private static Reporting.Result<Map<String, Kind>> readDictOf_string_Kind(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_string,
+        _DeserializeImplementation::readTextAs_Kind);
+    }
+
+    private static Reporting.Result<Map<String, String>> readDictOf_string_string(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_string,
+        _DeserializeImplementation::readTextAs_string);
+    }
+
+    private static Reporting.Result<Map<String, IItem>> readDictOf_string_IItem(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_string,
+        (valueReader, isEmptyValue) ->
+          XmlCommon.readNestedElement(
+            valueReader,
+            isEmptyValue,
+            _DeserializeImplementation::readItemFromElement));
+    }
+
+    private static Reporting.Result<Map<Long, String>> readDictOf_long_string(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_long,
+        _DeserializeImplementation::readTextAs_string);
+    }
+
+    private static Reporting.Result<List<Map<Long, String>>> readListOf_DictOf_long_string(
+      XMLEventReader reader, boolean isEmpty) {
+      return readList(
+        reader, isEmpty, _DeserializeImplementation::readAtV_DictOf_long_string);
+    }
+
+    private static Reporting.Result<List<List<Map<Long, String>>>> readListOf_ListOf_DictOf_long_string(
+      XMLEventReader reader, boolean isEmpty) {
+      return readList(
+        reader, isEmpty, _DeserializeImplementation::readAtV_ListOf_DictOf_long_string);
+    }
+
+    private static Reporting.Result<Map<String, List<List<Map<Long, String>>>>> readDictOf_string_ListOf_ListOf_DictOf_long_string(
+      XMLEventReader reader, boolean isEmpty) {
+      return readDict(
+        reader,
+        isEmpty,
+        _DeserializeImplementation::readTextAs_string,
+        _DeserializeImplementation::readListOf_ListOf_DictOf_long_string);
+    }
+
     private static Reporting.Result<? extends String> readAtV_string(
       XMLEventReader reader) {
       return XmlCommon.readNamedElement(
@@ -310,6 +506,22 @@ public class Xmlization {
         reader,
         "v",
         _DeserializeImplementation::readTextAs_Kind);
+    }
+
+    private static Reporting.Result<? extends Map<Long, String>> readAtV_DictOf_long_string(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "v",
+        _DeserializeImplementation::readDictOf_long_string);
+    }
+
+    private static Reporting.Result<? extends List<Map<Long, String>>> readAtV_ListOf_DictOf_long_string(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "v",
+        _DeserializeImplementation::readListOf_DictOf_long_string);
     }
 
     /**
@@ -566,6 +778,226 @@ public class Xmlization {
         "something",
         _DeserializeImplementation::readSomethingFromSequence);
     }
+
+    /**
+     * Deserialize an instance of class Registry from a sequence of XML elements.
+     *
+     * <p>If {@code isEmptySequence} is set, we should try to deserialize
+     * the instance from an empty sequence. That is, the parent element
+     * was a self-closing element.
+     */
+    private static Reporting.Result<Registry> readRegistryFromSequence(
+      XMLEventReader reader,
+      boolean isEmptySequence) {
+      Map<String, Long> theCounts = null;
+      Map<Long, Long> theCountsByNumber = null;
+      Map<Direction, Long> theWeights = null;
+      Map<String, Kind> theKindsByCode = null;
+      Map<String, String> theCodesByName = null;
+      Map<String, IItem> theItemsByName = null;
+      Map<String, List<List<Map<Long, String>>>> theLabels = null;
+      Map<String, Long> theOptionalCounts = null;
+
+      if (!isEmptySequence) {
+        while (!atEndOfSequence(reader)) {
+          final Reporting.Result<String> tryElementName = XmlCommon.peekElementName(reader);
+          if (tryElementName.isError()) {
+            return Reporting.Result.failure(tryElementName.getError());
+          }
+
+          final String elementName = tryElementName.getResult();
+          final boolean isEmptyProperty = XmlCommon.isEmptyElement(reader);
+
+          Reporting.Error valueError = null;
+
+          switch (elementName) {
+            case "counts": {
+              if (theCounts != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<String, Long>> value =
+                readDictOf_string_long(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theCounts = value.getResult();
+              }
+              break;
+            }
+            case "countsByNumber": {
+              if (theCountsByNumber != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<Long, Long>> value =
+                readDictOf_long_long(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theCountsByNumber = value.getResult();
+              }
+              break;
+            }
+            case "weights": {
+              if (theWeights != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<Direction, Long>> value =
+                readDictOf_Direction_long(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theWeights = value.getResult();
+              }
+              break;
+            }
+            case "kindsByCode": {
+              if (theKindsByCode != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<String, Kind>> value =
+                readDictOf_string_Kind(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theKindsByCode = value.getResult();
+              }
+              break;
+            }
+            case "codesByName": {
+              if (theCodesByName != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<String, String>> value =
+                readDictOf_string_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theCodesByName = value.getResult();
+              }
+              break;
+            }
+            case "itemsByName": {
+              if (theItemsByName != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<String, IItem>> value =
+                readDictOf_string_IItem(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theItemsByName = value.getResult();
+              }
+              break;
+            }
+            case "labels": {
+              if (theLabels != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<String, List<List<Map<Long, String>>>>> value =
+                readDictOf_string_ListOf_ListOf_DictOf_long_string(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theLabels = value.getResult();
+              }
+              break;
+            }
+            case "optionalCounts": {
+              if (theOptionalCounts != null) {
+                valueError = duplicatePropertyError(elementName);
+                break;
+              }
+
+              final Reporting.Result<Map<String, Long>> value =
+                readDictOf_string_long(reader, isEmptyProperty);
+              if (value.isError()) {
+                valueError = value.getError();
+              } else {
+                theOptionalCounts = value.getResult();
+              }
+              break;
+            }
+            default:
+              return unexpectedProperty("Registry", elementName);
+          }
+
+          if (valueError != null) {
+            valueError.prependSegment(
+              new Reporting.NameSegment(
+                elementName));
+            return Reporting.Result.failure(valueError);
+          }
+
+          final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
+          if (endResult.isError()) {
+            return Reporting.Result.failure(endResult.getError());
+          }
+        }
+      }
+
+      if (theCounts == null) {
+        return missingRequiredProperty("counts", "Registry");
+      }
+
+      if (theCountsByNumber == null) {
+        return missingRequiredProperty("countsByNumber", "Registry");
+      }
+
+      if (theWeights == null) {
+        return missingRequiredProperty("weights", "Registry");
+      }
+
+      if (theKindsByCode == null) {
+        return missingRequiredProperty("kindsByCode", "Registry");
+      }
+
+      if (theCodesByName == null) {
+        return missingRequiredProperty("codesByName", "Registry");
+      }
+
+      if (theItemsByName == null) {
+        return missingRequiredProperty("itemsByName", "Registry");
+      }
+
+      if (theLabels == null) {
+        return missingRequiredProperty("labels", "Registry");
+      }
+
+      return Reporting.Result.success(new Registry(
+        theCounts,
+        theCountsByNumber,
+        theWeights,
+        theKindsByCode,
+        theCodesByName,
+        theItemsByName,
+        theLabels,
+        theOptionalCounts));
+    }
+
+    /**
+     * Deserialize an instance of class Registry from an XML element.
+     */
+    private static Reporting.Result<? extends Registry> readRegistryFromElement(
+      XMLEventReader reader) {
+      return XmlCommon.readNamedElement(
+        reader,
+        "registry",
+        _DeserializeImplementation::readRegistryFromSequence);
+    }
   }
 
   /**
@@ -632,6 +1064,29 @@ public class Xmlization {
 
       return result.onError(error -> {
         error.prependSegment(new Reporting.NameSegment("something"));
+        throw new XmlCommon.DeserializeException(
+          Reporting.generateRelativeXPath(error.getPathSegments()),
+          error.getCause());
+      });
+    }
+
+    /**
+     * Deserialize an instance of Registry from {@code reader}.
+     *
+     * @param reader Initialized XML reader with reader.peek() set to the element
+     */
+    public static Registry deserializeRegistry(
+      XMLEventReader reader) {
+
+      _DeserializeImplementation.skipStartDocument(reader);
+      XmlCommon.skipWhitespaceAndComments(reader);
+
+      Reporting.Result<? extends Registry> result =
+        _DeserializeImplementation.readRegistryFromElement(
+          reader);
+
+      return result.onError(error -> {
+        error.prependSegment(new Reporting.NameSegment("registry"));
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());
@@ -805,6 +1260,176 @@ public class Xmlization {
       }
     }
 
+    private static void writeDictOf_string_stringified(
+      Map<String, ?> that,
+      XMLStreamWriter writer) {
+      for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+        try {
+          XmlCommon.writeElement(
+            "i",
+            key,
+            writer,
+            (itemKey, itemWriter) -> {
+              XmlCommon.writeElement(
+                "k", itemKey, itemWriter, XmlCommon::writeStringifiedContent);
+              XmlCommon.writeElement(
+                "v", that.get(itemKey), itemWriter, XmlCommon::writeStringifiedContent);
+            });
+        } catch (XmlCommon.SerializeFailure failure) {
+          failure.getError().prependSegment(
+            new Reporting.KeySegment(key));
+          throw failure;
+        }
+      }
+    }
+
+    private static void writeDictOf_long_stringified(
+      Map<Long, ?> that,
+      XMLStreamWriter writer) {
+      for (Long key : SetHelpers.sorted(that.keySet())) {
+        try {
+          XmlCommon.writeElement(
+            "i",
+            key,
+            writer,
+            (itemKey, itemWriter) -> {
+              XmlCommon.writeElement(
+                "k", itemKey, itemWriter, XmlCommon::writeStringifiedContent);
+              XmlCommon.writeElement(
+                "v", that.get(itemKey), itemWriter, XmlCommon::writeStringifiedContent);
+            });
+        } catch (XmlCommon.SerializeFailure failure) {
+          failure.getError().prependSegment(
+            new Reporting.KeySegment(Long.toString(key)));
+          throw failure;
+        }
+      }
+    }
+
+    private static void writeDictOf_Direction_stringified(
+      Map<Direction, ?> that,
+      XMLStreamWriter writer) {
+      for (Direction key : SetHelpers.sortedBy(that.keySet(), SetHelpers::compareByRankOfDirection)) {
+        try {
+          XmlCommon.writeElement(
+            "i",
+            key,
+            writer,
+            (itemKey, itemWriter) -> {
+              XmlCommon.writeElement(
+                "k", itemKey, itemWriter, _VisitorWithWriter::writeEnum);
+              XmlCommon.writeElement(
+                "v", that.get(itemKey), itemWriter, XmlCommon::writeStringifiedContent);
+            });
+        } catch (XmlCommon.SerializeFailure failure) {
+          failure.getError().prependSegment(
+            new Reporting.KeySegment(Stringification.mustToString(key)));
+          throw failure;
+        }
+      }
+    }
+
+    private static void writeDictOf_string_IEnum(
+      Map<String, ? extends IEnum> that,
+      XMLStreamWriter writer) {
+      for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+        try {
+          XmlCommon.writeElement(
+            "i",
+            key,
+            writer,
+            (itemKey, itemWriter) -> {
+              XmlCommon.writeElement(
+                "k", itemKey, itemWriter, XmlCommon::writeStringifiedContent);
+              XmlCommon.writeElement(
+                "v", that.get(itemKey), itemWriter, _VisitorWithWriter::writeEnum);
+            });
+        } catch (XmlCommon.SerializeFailure failure) {
+          failure.getError().prependSegment(
+            new Reporting.KeySegment(key));
+          throw failure;
+        }
+      }
+    }
+
+    private static void writeDictOf_string_IClass(
+      Map<String, ? extends IClass> that,
+      XMLStreamWriter writer) {
+      for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+        try {
+          XmlCommon.writeElement(
+            "i",
+            key,
+            writer,
+            (itemKey, itemWriter) -> {
+              XmlCommon.writeElement(
+                "k", itemKey, itemWriter, XmlCommon::writeStringifiedContent);
+              XmlCommon.writeElement(
+                "v", that.get(itemKey), itemWriter, _VisitorWithWriter::writeClass);
+            });
+        } catch (XmlCommon.SerializeFailure failure) {
+          failure.getError().prependSegment(
+            new Reporting.KeySegment(key));
+          throw failure;
+        }
+      }
+    }
+
+    private static void writeDictOf_string_ListOf_ListOf_DictOf_long_stringified(
+      Map<String, ? extends List<? extends List<? extends Map<Long, ?>>>> that,
+      XMLStreamWriter writer) {
+      for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+        try {
+          XmlCommon.writeElement(
+            "i",
+            key,
+            writer,
+            (itemKey, itemWriter) -> {
+              XmlCommon.writeElement(
+                "k", itemKey, itemWriter, XmlCommon::writeStringifiedContent);
+              XmlCommon.writeElement(
+                "v", that.get(itemKey), itemWriter, _VisitorWithWriter::writeListOf_ListOf_DictOf_long_stringified);
+            });
+        } catch (XmlCommon.SerializeFailure failure) {
+          failure.getError().prependSegment(
+            new Reporting.KeySegment(key));
+          throw failure;
+        }
+      }
+    }
+
+    private static void writeListOf_ListOf_DictOf_long_stringified(
+      List<? extends List<? extends Map<Long, ?>>> that,
+      XMLStreamWriter writer) {
+      int index = 0;
+      try {
+        for (List<? extends Map<Long, ?>> item : that) {
+          writeAtV_ListOf_DictOf_long_stringified(item, writer);
+          index++;
+        }
+      } catch (XmlCommon.SerializeFailure failure) {
+        failure.getError().prependSegment(
+          new Reporting.IndexSegment(index));
+        throw failure;
+      }
+    }
+
+    private static void writeListOf_DictOf_long_stringified(
+      List<? extends Map<Long, ?>> that,
+      XMLStreamWriter writer) {
+      int index = 0;
+      try {
+        for (Map<Long, ?> item : that) {
+          writeAtV_DictOf_long_stringified(item, writer);
+          index++;
+        }
+      } catch (XmlCommon.SerializeFailure failure) {
+        failure.getError().prependSegment(
+          new Reporting.IndexSegment(index));
+        throw failure;
+      }
+    }
+
     private static void writeAtV_stringified(
       Object that,
       XMLStreamWriter writer) {
@@ -823,6 +1448,26 @@ public class Xmlization {
         that,
         writer,
         _VisitorWithWriter::writeEnum);
+    }
+
+    private static void writeAtV_DictOf_long_stringified(
+      Map<Long, ?> that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "v",
+        that,
+        writer,
+        _VisitorWithWriter::writeDictOf_long_stringified);
+    }
+
+    private static void writeAtV_ListOf_DictOf_long_stringified(
+      List<? extends Map<Long, ?>> that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "v",
+        that,
+        writer,
+        _VisitorWithWriter::writeListOf_DictOf_long_stringified);
     }
 
     private static void writeItemAsSequence(
@@ -904,6 +1549,78 @@ public class Xmlization {
         writer,
         withNamespace,
         _VisitorWithWriter::writeSomethingAsSequence);
+    }
+
+    private static void writeRegistryAsSequence(
+      IRegistry that,
+      XMLStreamWriter writer) {
+      writeProperty(
+        "counts",
+        "getCounts()",
+        that.getCounts(),
+        writer,
+        _VisitorWithWriter::writeDictOf_string_stringified);
+
+      writeProperty(
+        "countsByNumber",
+        "getCountsByNumber()",
+        that.getCountsByNumber(),
+        writer,
+        _VisitorWithWriter::writeDictOf_long_stringified);
+
+      writeProperty(
+        "weights",
+        "getWeights()",
+        that.getWeights(),
+        writer,
+        _VisitorWithWriter::writeDictOf_Direction_stringified);
+
+      writeProperty(
+        "kindsByCode",
+        "getKindsByCode()",
+        that.getKindsByCode(),
+        writer,
+        _VisitorWithWriter::writeDictOf_string_IEnum);
+
+      writeProperty(
+        "codesByName",
+        "getCodesByName()",
+        that.getCodesByName(),
+        writer,
+        _VisitorWithWriter::writeDictOf_string_stringified);
+
+      writeProperty(
+        "itemsByName",
+        "getItemsByName()",
+        that.getItemsByName(),
+        writer,
+        _VisitorWithWriter::writeDictOf_string_IClass);
+
+      writeProperty(
+        "labels",
+        "getLabels()",
+        that.getLabels(),
+        writer,
+        _VisitorWithWriter::writeDictOf_string_ListOf_ListOf_DictOf_long_stringified);
+
+      writeOptionalProperty(
+        "optionalCounts",
+        "getOptionalCounts()",
+        that.getOptionalCounts(),
+        writer,
+        _VisitorWithWriter::writeDictOf_string_stringified);
+    }
+
+    @Override
+    public void visitRegistry(
+      IRegistry that,
+      XMLStreamWriter writer) {
+      XmlCommon.writeElement(
+        "registry",
+        that,
+        writer,
+        withNamespace,
+        _VisitorWithWriter::writeRegistryAsSequence);
     }
   }
 

@@ -32,6 +32,24 @@ public class TestVerificationOfEnums {
     assertEquals(1, errors.size());
     assertEquals("Invalid Kind: null", errors.get(0).getCause());
   } // void testKindInvalid
+
+  @Test
+  public void testDirectionValid() {
+    final List<Reporting.Error> errors = Verification.verifyDirection(
+      Direction.NORTH).collect(Collectors.toList());
+
+    assertEquals(0, errors.size());
+  } // void testDirectionValid
+
+  @Test
+  public void testDirectionInvalid() {
+    final Direction value = null;
+    final List<Reporting.Error> errors =
+      Verification.verifyDirection(value).collect(Collectors.toList());
+
+    assertEquals(1, errors.size());
+    assertEquals("Invalid Direction: null", errors.get(0).getCause());
+  } // void testDirectionInvalid
 } // class TestVerificationOfEnums
 
 // package dummy.tests

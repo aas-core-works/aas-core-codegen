@@ -412,6 +412,190 @@ namespace dummy
             }
 
             /// <summary>
+            /// Read the content of an item of a dictionary, a <c>&lt;k&gt;</c> element
+            /// read with <paramref name="readKey" /> followed by a <c>&lt;v&gt;</c>
+            /// element read with <paramref name="readValue" />.
+            /// </summary>
+            /// <typeparam name="TKey">Type of a key</typeparam>
+            /// <typeparam name="TValue">Type of a value</typeparam>
+            private static ContentReader<(TKey, TValue)> AsDictItem<TKey, TValue>(
+                ContentReader<TKey> readKey,
+                ContentReader<TValue> readValue
+                )
+            {
+                ElementReader<TKey> readKeyElement = AtElement(readKey, "k");
+                ElementReader<TValue> readValueElement = AtElement(readValue, "v");
+
+                return (
+                    Xml.XmlReader reader,
+                    bool isEmpty,
+                    out Reporting.Error? error
+                ) =>
+                {
+                    error = null;
+
+                    if (isEmpty)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an item of a dictionary with a key and a value, " +
+                            "but the element was self-closing");
+                        return default!;
+                    }
+
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                    TKey key = readKeyElement(reader, out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment("k"));
+                        return default!;
+                    }
+
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                    TValue value = readValueElement(reader, out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment("v"));
+                        return default!;
+                    }
+
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                    return (key, value);
+                };
+            }
+
+            /// <summary>
+            /// Read a content as a dictionary of <c>&lt;i&gt;</c> items, each with
+            /// a key read with <paramref name="readKey" /> and a value read with
+            /// <paramref name="readValue" />.
+            /// </summary>
+            /// <remarks>
+            /// A self-closing element represents an empty dictionary. The items can come
+            /// in any order, but a duplicate key is reported as an error.
+            /// </remarks>
+            /// <typeparam name="TKey">Type of a key</typeparam>
+            /// <typeparam name="TValue">Type of a value</typeparam>
+            private static ContentReader<Dictionary<TKey, TValue>> AsDict<TKey, TValue>(
+                ContentReader<TKey> readKey,
+                ContentReader<TValue> readValue
+                ) where TKey : notnull
+            {
+                ElementReader<(TKey, TValue)> readItem = AtElement(
+                    AsDictItem(readKey, readValue), "i");
+
+                return (
+                    Xml.XmlReader reader,
+                    bool isEmpty,
+                    out Reporting.Error? error
+                ) =>
+                {
+                    error = null;
+                    var result = new Dictionary<TKey, TValue>();
+
+                    if (isEmpty)
+                    {
+                        return result;
+                    }
+
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                    int index = 0;
+                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    {
+                        (TKey key, TValue value) = readItem(reader, out error);
+                        if (error == null && result.ContainsKey(key))
+                        {
+                            error = new Reporting.Error(
+                                "Expected unique keys in the dictionary, but the key is a duplicate");
+                            error.PrependSegment(
+                                new Reporting.NameSegment("k"));
+                        }
+
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    index));
+                            return result;
+                        }
+
+                        result[key] = value;
+
+                        index++;
+                        XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                    }
+
+                    return result;
+                };
+            }
+
+            /// <summary>
+            /// Read a content whose value is dispatched by its own discriminator
+            /// element, such as an interface or a named union.
+            /// </summary>
+            /// <typeparam name="T">Type of the value</typeparam>
+            private static ContentReader<T> AsElement<T>(
+                ElementReader<T> readFromElement
+                )
+            {
+                return (
+                    Xml.XmlReader reader,
+                    bool isEmpty,
+                    out Reporting.Error? error
+                ) =>
+                {
+                    error = null;
+
+                    if (isEmpty)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing the value, " +
+                            "but the element was self-closing");
+                        return default!;
+                    }
+
+                    // We need to skip the whitespace here in order to be able to look ahead
+                    // the discriminator element shortly.
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing the value, " +
+                            "but reached the end-of-file");
+                        return default!;
+                    }
+
+                    // Try to look ahead the discriminator name;
+                    // we need this name only for the error reporting below.
+                    // The de-serialization function will perform more sophisticated checks.
+                    string? discriminatorElementName = null;
+                    if (reader.NodeType == Xml.XmlNodeType.Element)
+                    {
+                        discriminatorElementName = reader.LocalName;
+                    }
+
+                    T result = readFromElement(reader, out error);
+                    if (error != null)
+                    {
+                        if (discriminatorElementName != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    discriminatorElementName));
+                        }
+                        return default!;
+                    }
+
+                    return result;
+                };
+            }
+
+            /// <summary>
             /// Read an instance of class Item from its XML element.
             /// </summary>
             internal static readonly ElementReader<Our.Item> ItemFromElement = (
@@ -424,6 +608,13 @@ namespace dummy
             internal static readonly ElementReader<Our.Something> SomethingFromElement = (
                 AtElement<Our.Something>(
                     SomethingFromSequence, "something"));
+
+            /// <summary>
+            /// Read an instance of class Registry from its XML element.
+            /// </summary>
+            internal static readonly ElementReader<Our.Registry> RegistryFromElement = (
+                AtElement<Our.Registry>(
+                    RegistryFromSequence, "registry"));
 
             private static readonly ContentReader<string> Read_string = (
                 AsText<string>(ReadContentAsString, ""));
@@ -453,6 +644,79 @@ namespace dummy
             private static readonly ContentReader<List<IItem>> Read_ListOf_IItem = (
                 AsList<IItem>(
                     ItemFromElement));
+
+            private static readonly ContentReader<
+                Dictionary<string, long>
+            > Read_DictOf_string_long = (
+                AsDict<string, long>(
+                    Read_string,
+                    Read_long));
+
+            private static readonly ContentReader<Dictionary<long, long>> Read_DictOf_long_long = (
+                AsDict<long, long>(
+                    Read_long,
+                    Read_long));
+
+            private static readonly ContentReader<Direction> Read_Direction = (
+                AsEnum<Our.Direction>(
+                    Stringification.DirectionFromString));
+
+            private static readonly ContentReader<
+                Dictionary<Direction, long>
+            > Read_DictOf_Direction_long = (
+                AsDict<Direction, long>(
+                    Read_Direction,
+                    Read_long));
+
+            private static readonly ContentReader<
+                Dictionary<string, Kind>
+            > Read_DictOf_string_Kind = (
+                AsDict<string, Kind>(
+                    Read_string,
+                    Read_Kind));
+
+            private static readonly ContentReader<
+                Dictionary<string, string>
+            > Read_DictOf_string_string = (
+                AsDict<string, string>(
+                    Read_string,
+                    Read_string));
+
+            private static readonly ContentReader<
+                Dictionary<string, IItem>
+            > Read_DictOf_string_IItem = (
+                AsDict<string, IItem>(
+                    Read_string,
+                    AsElement<Our.IItem>(
+                        ItemFromElement)));
+
+            private static readonly ContentReader<
+                Dictionary<long, string>
+            > Read_DictOf_long_string = (
+                AsDict<long, string>(
+                    Read_long,
+                    Read_string));
+
+            private static readonly ContentReader<
+                List<Dictionary<long, string>>
+            > Read_ListOf_DictOf_long_string = (
+                AsList<Dictionary<long, string>>(
+                    AtElement(
+                        Read_DictOf_long_string, "v")));
+
+            private static readonly ContentReader<
+                List<List<Dictionary<long, string>>>
+            > Read_ListOf_ListOf_DictOf_long_string = (
+                AsList<List<Dictionary<long, string>>>(
+                    AtElement(
+                        Read_ListOf_DictOf_long_string, "v")));
+
+            private static readonly ContentReader<
+                Dictionary<string, List<List<Dictionary<long, string>>>>
+            > Read_DictOf_string_ListOf_ListOf_DictOf_long_string = (
+                AsDict<string, List<List<Dictionary<long, string>>>>(
+                    Read_string,
+                    Read_ListOf_ListOf_DictOf_long_string));
 
             /// <summary>
             /// Deserialize an instance of class Item from a sequence of XML elements.
@@ -740,6 +1004,239 @@ namespace dummy
                             "Unexpected null, had to be handled before"),
                     theOptionalTexts);
             }  // internal static Our.Something? SomethingFromSequence
+
+            /// <summary>
+            /// Deserialize an instance of class Registry from a sequence of XML elements.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Our.Registry RegistryFromSequence(
+                Xml.XmlReader reader,
+                bool isEmptySequence,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Dictionary<string, long>? theCounts = null;
+                Dictionary<long, long>? theCountsByNumber = null;
+                Dictionary<Direction, long>? theWeights = null;
+                Dictionary<string, Kind>? theKindsByCode = null;
+                Dictionary<string, string>? theCodesByName = null;
+                Dictionary<string, IItem>? theItemsByName = null;
+                Dictionary<string, List<List<Dictionary<long, string>>>>? theLabels = null;
+                Dictionary<string, long>? theOptionalCounts = null;
+
+                if (!isEmptySequence)
+                {
+                    XmlCommon.SkipNoneWhitespaceAndComments(reader);
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing " +
+                            "a property of an instance of class Registry, " +
+                            "but reached the end-of-file");
+                        return default!;
+                    }
+                    while (TryNextProperty(
+                            reader,
+                            out string elementName,
+                            out bool isEmptyProperty,
+                            out error))
+                    {
+                        switch (elementName)
+                        {
+                            case "counts":
+                                if (theCounts != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theCounts = Read_DictOf_string_long(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "countsByNumber":
+                                if (theCountsByNumber != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theCountsByNumber = Read_DictOf_long_long(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "weights":
+                                if (theWeights != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theWeights = Read_DictOf_Direction_long(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "kindsByCode":
+                                if (theKindsByCode != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theKindsByCode = Read_DictOf_string_Kind(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "codesByName":
+                                if (theCodesByName != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theCodesByName = Read_DictOf_string_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "itemsByName":
+                                if (theItemsByName != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theItemsByName = Read_DictOf_string_IItem(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "labels":
+                                if (theLabels != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theLabels = Read_DictOf_string_ListOf_ListOf_DictOf_long_string(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            case "optionalCounts":
+                                if (theOptionalCounts != null)
+                                {
+                                    error = DuplicatePropertyError(elementName);
+                                    break;
+                                }
+                                theOptionalCounts = Read_DictOf_string_long(
+                                    reader, isEmptyProperty, out error);
+                                break;
+                            default:
+                                error = new Reporting.Error(
+                                    "We expected properties of the class Registry, " +
+                                    "but got an unexpected element " +
+                                    $"with the name {elementName}");
+                                return default!;
+                        }
+
+                        // NOTE (mristin):
+                        // Every property is read in this very loop, so we mark the error with
+                        // the property's own element name here, once, instead of at every
+                        // single case above. For a matched case, elementName *is* that name.
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    elementName));
+                            return default!;
+                        }
+
+                        XmlCommon.ConsumeEndElement(
+                            reader, elementName, isEmptyProperty, out error);
+                        if (error != null)
+                        {
+                            return default!;
+                        }
+                    }
+
+                    // NOTE (mristin):
+                    // The loop also ends when the next property could not be read at all,
+                    // which is the only way out of it that is a failure.
+                    if (error != null)
+                    {
+                        return default!;
+                    }
+                }
+
+                if (theCounts == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Counts has not been given " +
+                        "in the XML representation of an instance of class Registry");
+                    return default!;
+                }
+
+                if (theCountsByNumber == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property CountsByNumber has not been given " +
+                        "in the XML representation of an instance of class Registry");
+                    return default!;
+                }
+
+                if (theWeights == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Weights has not been given " +
+                        "in the XML representation of an instance of class Registry");
+                    return default!;
+                }
+
+                if (theKindsByCode == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property KindsByCode has not been given " +
+                        "in the XML representation of an instance of class Registry");
+                    return default!;
+                }
+
+                if (theCodesByName == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property CodesByName has not been given " +
+                        "in the XML representation of an instance of class Registry");
+                    return default!;
+                }
+
+                if (theItemsByName == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property ItemsByName has not been given " +
+                        "in the XML representation of an instance of class Registry");
+                    return default!;
+                }
+
+                if (theLabels == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Labels has not been given " +
+                        "in the XML representation of an instance of class Registry");
+                    return default!;
+                }
+
+                return new Our.Registry(
+                    theCounts
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theCountsByNumber
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theWeights
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theKindsByCode
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theCodesByName
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theItemsByName
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theLabels
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalCounts);
+            }  // internal static Our.Registry? RegistryFromSequence
         }  // internal static class DeserializeImplementation
 
         /// <summary>
@@ -832,6 +1329,40 @@ namespace dummy
                 }
 
                 Our.Something result = DeserializeImplementation.SomethingFromElement(
+                    reader,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Xmlization.Exception(
+                        Reporting.GenerateRelativeXPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Registry from <paramref name="reader" />.
+            /// </summary>
+            /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <exception cref="Xmlization.Exception">
+            /// Thrown when the element is not a valid XML
+            /// representation of Registry.
+            /// </exception>
+            public static Our.Registry RegistryFrom(
+                Xml.XmlReader reader)
+            {
+                XmlCommon.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Registry, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
+                Our.Registry result = DeserializeImplementation.RegistryFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
@@ -1024,6 +1555,48 @@ namespace dummy
             }
 
             /// <summary>
+            /// Write the items of a dictionary as <c>&lt;i&gt;</c> elements, each with
+            /// its key written with <paramref name="writeKey" /> in <c>&lt;k&gt;</c> and its
+            /// value with <paramref name="writeValue" /> in <c>&lt;v&gt;</c>, in the order
+            /// of the keys given by <paramref name="comparison" />.
+            /// </summary>
+            /// <remarks>
+            /// We write the items sorted by their keys, so that all the SDKs serialize
+            /// a dictionary in the same order. An empty dictionary writes no items at all,
+            /// which the reading sees as a self-closing element.
+            /// </remarks>
+            /// <typeparam name="TKey">Type of a key</typeparam>
+            /// <typeparam name="TValue">Type of a value</typeparam>
+            private static ContentWriter<Dictionary<TKey, TValue>> WriteDict<TKey, TValue>(
+                ContentWriter<TKey> writeKey,
+                ContentWriter<TValue> writeValue,
+                System.Comparison<TKey> comparison
+                ) where TKey : notnull
+            {
+                return (that, writer) =>
+                {
+                    int index = 0;
+                    foreach (var key in Common.SetHelpers.Sorted(that.Keys, comparison))
+                    {
+                        try
+                        {
+                            writer.WriteStartElement("i", NS);
+                            WriteElement<TKey>("k", key, writer, writeKey);
+                            WriteElement<TValue>("v", that[key], writer, writeValue);
+                            writer.WriteEndElement();
+                        }
+                        catch (SerializationFailure failure)
+                        {
+                            failure.Error.PrependSegment(
+                                new Reporting.IndexSegment(index));
+                            throw;
+                        }
+                        index++;
+                    }
+                };
+            }
+
+            /// <summary>
             /// The one instance through which the writing is dispatched.
             /// </summary>
             /// <remarks>
@@ -1080,6 +1653,86 @@ namespace dummy
             private static readonly ContentWriter<List<IItem>> Write_ListOf_IItem = (
                 WriteList<IItem>(
                     WriteIClass));
+
+            private static readonly ContentWriter<
+                Dictionary<string, long>
+            > Write_DictOf_string_long = (
+                WriteDict<string, long>(
+                    Write_string,
+                    Write_long,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly ContentWriter<Dictionary<long, long>> Write_DictOf_long_long = (
+                WriteDict<long, long>(
+                    Write_long,
+                    Write_long,
+                    System.Collections.Generic.Comparer<long>.Default.Compare));
+
+            private static readonly ContentWriter<Direction> Write_Direction = (
+                WriteEnum<Our.Direction>(
+                    Stringification.ToString));
+
+            private static readonly ContentWriter<
+                Dictionary<Direction, long>
+            > Write_DictOf_Direction_long = (
+                WriteDict<Direction, long>(
+                    Write_Direction,
+                    Write_long,
+                    Common.SetHelpers.CompareByRankOfDirection));
+
+            private static readonly ContentWriter<
+                Dictionary<string, Kind>
+            > Write_DictOf_string_Kind = (
+                WriteDict<string, Kind>(
+                    Write_string,
+                    Write_Kind,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly ContentWriter<
+                Dictionary<string, string>
+            > Write_DictOf_string_string = (
+                WriteDict<string, string>(
+                    Write_string,
+                    Write_string,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly ContentWriter<
+                Dictionary<string, IItem>
+            > Write_DictOf_string_IItem = (
+                WriteDict<string, IItem>(
+                    Write_string,
+                    WriteIClass,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly ContentWriter<
+                Dictionary<long, string>
+            > Write_DictOf_long_string = (
+                WriteDict<long, string>(
+                    Write_long,
+                    Write_string,
+                    System.Collections.Generic.Comparer<long>.Default.Compare));
+
+            private static readonly ContentWriter<
+                List<Dictionary<long, string>>
+            > Write_ListOf_DictOf_long_string = (
+                WriteList<Dictionary<long, string>>(
+                    WrapInElement(
+                        Write_DictOf_long_string, "v")));
+
+            private static readonly ContentWriter<
+                List<List<Dictionary<long, string>>>
+            > Write_ListOf_ListOf_DictOf_long_string = (
+                WriteList<List<Dictionary<long, string>>>(
+                    WrapInElement(
+                        Write_ListOf_DictOf_long_string, "v")));
+
+            private static readonly ContentWriter<
+                Dictionary<string, List<List<Dictionary<long, string>>>>
+            > Write_DictOf_string_ListOf_ListOf_DictOf_long_string = (
+                WriteDict<string, List<List<Dictionary<long, string>>>>(
+                    Write_string,
+                    Write_ListOf_ListOf_DictOf_long_string,
+                    Common.SetHelpers.CompareByCodePoints));
 
             private static void ItemToSequence(
                 Our.IItem that,
@@ -1140,6 +1793,75 @@ namespace dummy
                     "something",
                     NS);
                 SomethingToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
+            private static void RegistryToSequence(
+                Our.IRegistry that,
+                Xml.XmlWriter writer)
+            {
+                WriteProperty(
+                    "counts", "Counts", that.Counts, writer, Write_DictOf_string_long);
+
+                WriteProperty(
+                    "countsByNumber",
+                    "CountsByNumber",
+                    that.CountsByNumber,
+                    writer,
+                    Write_DictOf_long_long);
+
+                WriteProperty(
+                    "weights", "Weights", that.Weights, writer, Write_DictOf_Direction_long);
+
+                WriteProperty(
+                    "kindsByCode",
+                    "KindsByCode",
+                    that.KindsByCode,
+                    writer,
+                    Write_DictOf_string_Kind);
+
+                WriteProperty(
+                    "codesByName",
+                    "CodesByName",
+                    that.CodesByName,
+                    writer,
+                    Write_DictOf_string_string);
+
+                WriteProperty(
+                    "itemsByName",
+                    "ItemsByName",
+                    that.ItemsByName,
+                    writer,
+                    Write_DictOf_string_IItem);
+
+                WriteProperty(
+                    "labels",
+                    "Labels",
+                    that.Labels,
+                    writer,
+                    Write_DictOf_string_ListOf_ListOf_DictOf_long_string);
+
+                if (that.OptionalCounts != null)
+                {
+                    WriteProperty(
+                        "optionalCounts",
+                        "OptionalCounts",
+                        that.OptionalCounts,
+                        writer,
+                        Write_DictOf_string_long);
+                }
+            }  // private static void RegistryToSequence
+
+            public override void VisitRegistry(
+                Our.IRegistry that,
+                Xml.XmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "registry",
+                    NS);
+                RegistryToSequence(
                     that,
                     writer);
                 writer.WriteEndElement();

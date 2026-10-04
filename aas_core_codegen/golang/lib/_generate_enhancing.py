@@ -251,7 +251,9 @@ def _generate_wrap_stmt(
         wrap_call = _generate_wrap_call(_wrap_instance_name(type_anno), target)
         return Stripped(f"{target} = {wrap_call}")
 
-    if isinstance(type_anno, intermediate.ListTypeAnnotation):
+    if isinstance(
+        type_anno, (intermediate.ListTypeAnnotation, intermediate.DictTypeAnnotation)
+    ):
         return _generate_wrap_call(_wrap_container_name(type_anno), target)
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
@@ -331,10 +333,72 @@ for i := range that {{
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys are never descendable, so we wrap only the values. A value of
+        # an existing key can be replaced while we iterate over the map, but we
+        # iterate over the sorted keys anyhow so that the wrapping is
+        # deterministic, as the order of the iteration over a Golang map is
+        # random.
+        values_type_anno = type_anno.values
+
+        value_stmt: Stripped
+        if isinstance(values_type_anno, intermediate.OurTypeAnnotation):
+            value_stmt = _generate_wrap_stmt(
+                target="that[key]",
+                type_anno=values_type_anno,
+                descendability=descendability,
+            )
+        elif isinstance(
+            values_type_anno,
+            (intermediate.ListTypeAnnotation, intermediate.DictTypeAnnotation),
+        ):
+            # NOTE (mristin):
+            # A slice and a map are wrapped in-situ through the copy of their
+            # header, so there is nothing to set back.
+            value_stmt = _generate_wrap_stmt(
+                target="that[key]",
+                type_anno=values_type_anno,
+                descendability=descendability,
+            )
+        elif isinstance(values_type_anno, intermediate.TupleTypeAnnotation):
+            # NOTE (mristin):
+            # A tuple is a struct, and a value of a map is not addressable, so we
+            # wrap a copy and set it back.
+            wrap_stmt = _generate_wrap_stmt(
+                target="value",
+                type_anno=values_type_anno,
+                descendability=descendability,
+            )
+
+            value_stmt = Stripped(
+                f"""\
+value := that[key]
+{wrap_stmt}
+that[key] = value"""
+            )
+        else:
+            raise AssertionError(
+                f"Unexpected values of a dictionary holding instances: "
+                f"{values_type_anno}"
+            )
+
+        loop_head = "for _, key := range "
+
+        sorted_keys_expr = golang_common.sorted_keys_expr(
+            "that",
+            type_anno,
+            column=golang_common.TAB_WIDTH + len(loop_head),
+        )
+
+        body = Stripped(
+            f"""\
+{loop_head}{sorted_keys_expr} {{
+{I}{indent_but_first_line(value_stmt, I)}
+}}"""
+        )
+
+        that_type = golang_common.generate_type(
+            type_anno, types_package=Identifier("ourtypes")
         )
 
     else:
@@ -413,9 +477,13 @@ that.{prop_setter_name}(
 )"""
             )
 
-        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        elif isinstance(
+            type_anno,
+            (intermediate.ListTypeAnnotation, intermediate.DictTypeAnnotation),
+        ):
             # NOTE (mristin):
-            # The list is wrapped in-situ, so there is nothing to set.
+            # The list and the dictionary are wrapped in-situ, so there is
+            # nothing to set.
             stmt = _generate_wrap_call(
                 _wrap_container_name(type_anno),
                 prop_var if is_optional else f"that.{prop_getter_name}()",
@@ -623,6 +691,10 @@ def generate(
     """Generate code for enhancing model classes."""
     ourcommon_url_literal = golang_common.string_literal(f"{repo_url}/common")
 
+    ourstringification_url_literal = golang_common.string_literal(
+        f"{repo_url}/stringification"
+    )
+
     ourtypes_url_literal = golang_common.string_literal(f"{repo_url}/types")
 
     blocks = [
@@ -758,6 +830,9 @@ func MustUnwrap[E any](that ourtypes.IClass) (enhancement E) {{
 
     if golang_common.names_package(blocks, "ourcommon"):
         import_lines.append(f"{I}ourcommon {ourcommon_url_literal}")
+
+    if golang_common.names_package(blocks, "ourstringification"):
+        import_lines.append(f"{I}ourstringification {ourstringification_url_literal}")
 
     import_lines.append(f"{I}ourtypes {ourtypes_url_literal}")
 

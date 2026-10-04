@@ -25,6 +25,9 @@ public interface ITransformer<T> {
   T transformSomething(
     ISomething that
   );
+  T transformRegistry(
+    IRegistry that
+  );
 }
 
 /*

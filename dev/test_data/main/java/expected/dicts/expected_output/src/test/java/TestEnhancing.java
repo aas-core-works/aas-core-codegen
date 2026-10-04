@@ -98,6 +98,37 @@ public class TestEnhancing {
         .max(Comparator.comparing(Long::valueOf))
         .orElseThrow(() -> new IllegalStateException("Missing max value for wrapped.")));
   } // public void testSomething
+
+  @Test
+  public void testRegistry() throws IOException {
+    final Registry instance = CommonJsonization.loadMaximalRegistry();
+
+    final Enhancer<_Enhancement> enhancer = createEnhancer();
+
+    assert !enhancer.unwrap(instance).isPresent();
+
+    final IClass wrapped = enhancer.wrap(instance);
+    assertNotNull(wrapped);
+
+    final Set<Long> idSet = new HashSet<>();
+    idSet.add(enhancer.mustUnwrap(wrapped).someCustomId);
+    wrapped
+      .descend()
+      .forEach(descendant -> idSet.add(enhancer.mustUnwrap(descendant).someCustomId));
+
+    assertFalse(enhancer.unwrap(instance).isPresent());
+    assertNotNull(wrapped);
+    assertEquals(
+      1L,
+      idSet.stream()
+        .min(Comparator.comparing(Long::valueOf))
+        .orElseThrow(() -> new IllegalStateException("Missing min value for wrapped.")));
+    assertEquals(
+      idSet.size(),
+      idSet.stream()
+        .max(Comparator.comparing(Long::valueOf))
+        .orElseThrow(() -> new IllegalStateException("Missing max value for wrapped.")));
+  } // public void testRegistry
 }  // class TestEnhancing
 // package dummy.tests
 

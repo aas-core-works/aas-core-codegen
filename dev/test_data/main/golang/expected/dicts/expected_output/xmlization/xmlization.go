@@ -11,6 +11,7 @@ package xmlization
 import (
 	"encoding/xml"
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourstringification "github.com/dummy-works/dummy/stringification"
 	ourtypes "github.com/dummy-works/dummy/types"
@@ -261,6 +262,179 @@ func concludeProperty(
 	return
 }
 
+// Read a dictionary as a sequence of XML elements `i`, each holding the key in
+// the element `k` and the value in the element `v`.
+//
+// The items can come in any order, but their keys must be unique. We do not
+// drop a duplicate silently, but report it at the key of its item.
+//
+// We stop the reading as soon as we encounter a non-start element, which is
+// returned as `next` element.
+func readDictOf[K comparable, V any](
+	decoder *xml.Decoder,
+	current xml.Token,
+	readKey func(
+		aDecoder *xml.Decoder,
+		aCurrent xml.Token,
+		aLocal string,
+	) (key K, aNext xml.Token, anErr error),
+	readValue func(
+		aDecoder *xml.Decoder,
+		aCurrent xml.Token,
+		aLocal string,
+	) (value V, aNext xml.Token, anErr error),
+) (values map[K]V, next xml.Token, err error) {
+	values = make(map[K]V)
+
+	i := 0
+	for {
+		current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+		if err != nil {
+			return
+		}
+
+		if _, ok := current.(xml.StartElement); !ok {
+			break
+		}
+
+		var key K
+		var value V
+		var itemErr error
+		key, value, current, itemErr = readDictItem(
+			decoder, current, readKey, readValue,
+		)
+		if itemErr != nil {
+			if deseriaErr, ok := itemErr.(*DeserializationError); ok {
+				deseriaErr.Path.PrependIndex(
+					&ourreporting.IndexSegment{Index: i},
+				)
+			}
+			err = itemErr
+			return
+		}
+
+		if _, has := values[key]; has {
+			deseriaErr := xmlcommon.NewDeserializationError(
+				"Expected unique keys in the dictionary, but the key is a duplicate",
+			)
+			deseriaErr.Path.PrependName(
+				&ourreporting.NameSegment{Name: "k"},
+			)
+			deseriaErr.Path.PrependIndex(
+				&ourreporting.IndexSegment{Index: i},
+			)
+			err = deseriaErr
+			return
+		}
+
+		values[key] = value
+
+		i++
+	}
+
+	next = current
+	return
+}
+
+// Read a single item of a dictionary from the XML element `i`, which holds
+// exactly the key in the element `k` and then the value in the element `v`.
+//
+// The `current` token is expected to point to the start element `i`, and
+// the resulting `next` token points to the first token just after its end
+// element.
+func readDictItem[K comparable, V any](
+	decoder *xml.Decoder,
+	current xml.Token,
+	readKey func(
+		aDecoder *xml.Decoder,
+		aCurrent xml.Token,
+		aLocal string,
+	) (key K, aNext xml.Token, anErr error),
+	readValue func(
+		aDecoder *xml.Decoder,
+		aCurrent xml.Token,
+		aLocal string,
+	) (value V, aNext xml.Token, anErr error),
+) (key K, value V, next xml.Token, err error) {
+	var local string
+	local, err = xmlcommon.ParseAsStartElementAndExtractLocalName(current)
+	if err != nil {
+		return
+	}
+
+	if local != "i" {
+		err = unexpectedItemElement(local, "i")
+		return
+	}
+
+	// Move the current to the content of the XML element
+	current, err = xmlcommon.ReadNext(decoder, current)
+	if err != nil {
+		return
+	}
+
+	key, current, err = xmlcommon.ReadElementDispatched(decoder, current, readKey)
+	if err != nil {
+		if deseriaErr, ok := err.(*DeserializationError); ok {
+			deseriaErr.Path.PrependName(
+				&ourreporting.NameSegment{Name: "k"},
+			)
+		}
+		return
+	}
+
+	value, current, err = xmlcommon.ReadElementDispatched(decoder, current, readValue)
+	if err != nil {
+		if deseriaErr, ok := err.(*DeserializationError); ok {
+			deseriaErr.Path.PrependName(
+				&ourreporting.NameSegment{Name: "v"},
+			)
+		}
+		return
+	}
+
+	current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+	if err != nil {
+		return
+	}
+
+	err = xmlcommon.CheckEndElement(current, "i")
+	if err != nil {
+		return
+	}
+
+	next, err = xmlcommon.ReadNext(decoder, current)
+	return
+}
+
+// Read an instance wrapped in the element `v` as a value of a dictionary.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtV_IItem(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value ourtypes.IItem,
+	next xml.Token,
+	err error,
+) {
+	if local != "v" {
+		err = unexpectedItemElement(local, "v")
+		return
+	}
+
+	value, current, err = xmlcommon.ReadElementDispatched(
+		decoder, current, readItemDispatched,
+	)
+	if err != nil {
+		return
+	}
+
+	next, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+	return
+}
+
 // Read a scalar item expected in the element `v`.
 //
 // The `current` token is expected to point to the content of that element, and
@@ -321,6 +495,174 @@ func readAtV_Kind(
 	return readTextAs_Kind(decoder, current)
 }
 
+// Read a scalar item expected in the element `k`.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtK_string(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value string,
+	next xml.Token,
+	err error,
+) {
+	if local != "k" {
+		err = unexpectedItemElement(local, "k")
+		return
+	}
+
+	return xmlcommon.ReadText(decoder, current)
+}
+
+// Read a scalar item expected in the element `k`.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtK_long(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value int64,
+	next xml.Token,
+	err error,
+) {
+	if local != "k" {
+		err = unexpectedItemElement(local, "k")
+		return
+	}
+
+	return xmlcommon.ReadTextAs_long(decoder, current)
+}
+
+// Read a scalar item expected in the element `k`.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtK_Direction(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value ourtypes.Direction,
+	next xml.Token,
+	err error,
+) {
+	if local != "k" {
+		err = unexpectedItemElement(local, "k")
+		return
+	}
+
+	return readTextAs_Direction(decoder, current)
+}
+
+// Read a scalar item expected in the element `v`.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtV_ListOf_ListOf_DictOf_long_string(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value [][]map[int64]string,
+	next xml.Token,
+	err error,
+) {
+	if local != "v" {
+		err = unexpectedItemElement(local, "v")
+		return
+	}
+
+	return readAs_ListOf_ListOf_DictOf_long_string(decoder, current)
+}
+
+// Read a scalar item expected in the element `v`.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtV_ListOf_DictOf_long_string(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value []map[int64]string,
+	next xml.Token,
+	err error,
+) {
+	if local != "v" {
+		err = unexpectedItemElement(local, "v")
+		return
+	}
+
+	return readAs_ListOf_DictOf_long_string(decoder, current)
+}
+
+// Read a scalar item expected in the element `v`.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAtV_DictOf_long_string(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value map[int64]string,
+	next xml.Token,
+	err error,
+) {
+	if local != "v" {
+		err = unexpectedItemElement(local, "v")
+		return
+	}
+
+	return readAs_DictOf_long_string(decoder, current)
+}
+
+// Read the content of an element as a collection nested in another one.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAs_ListOf_ListOf_DictOf_long_string(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (value [][]map[int64]string,
+	next xml.Token,
+	err error,
+) {
+	return readListOf(
+		decoder, current, readAtV_ListOf_DictOf_long_string,
+	)
+}
+
+// Read the content of an element as a collection nested in another one.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAs_ListOf_DictOf_long_string(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (value []map[int64]string,
+	next xml.Token,
+	err error,
+) {
+	return readListOf(
+		decoder, current, readAtV_DictOf_long_string,
+	)
+}
+
+// Read the content of an element as a collection nested in another one.
+//
+// The `current` token is expected to point to the content of that element, and
+// the resulting `next` token points to its end element.
+func readAs_DictOf_long_string(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (value map[int64]string,
+	next xml.Token,
+	err error,
+) {
+	return readDictOf(
+		decoder, current, readAtK_long, readAtV_string,
+	)
+}
+
 // Consume the text tokens (char data) as a string-encoded literal of
 // [ourtypes.Kind].
 //
@@ -349,6 +691,43 @@ func readTextAs_Kind(
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
 				"Unexpected literal of Kind: %v",
+				text,
+			),
+		)
+		return
+	}
+
+	return
+}
+
+// Consume the text tokens (char data) as a string-encoded literal of
+// [ourtypes.Direction].
+//
+// Any comment tokens are skipped.
+//
+// The resulting `next` token points to the first token which is neither text
+// nor comment.
+//
+// If we reached the end-of-file, `next` is an [eof] sentinel token.
+func readTextAs_Direction(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (value ourtypes.Direction,
+	next xml.Token,
+	err error,
+) {
+	var text string
+	text, next, err = xmlcommon.ReadText(decoder, current)
+	if err != nil {
+		return
+	}
+
+	var ok bool
+	value, ok = ourstringification.DirectionFromString(text)
+	if !ok {
+		err = xmlcommon.NewDeserializationError(
+			fmt.Sprintf(
+				"Unexpected literal of Direction: %v",
 				text,
 			),
 		)
@@ -588,6 +967,184 @@ func readSomethingAsSequence(
 	return
 }
 
+// De-serialize the instance of [ourtypes.IRegistry]
+// as a sequence of XML elements, each representing a property
+// of [ourtypes.IRegistry].
+//
+// The reading stops as soon as we encounter a non-start element, and we return
+// that token as the `next` token.
+func readRegistryAsSequence(
+	decoder *xml.Decoder,
+	current xml.Token,
+) (instance ourtypes.IRegistry,
+	next xml.Token,
+	err error,
+) {
+	var theCounts map[string]int64
+	var theCountsByNumber map[int64]int64
+	var theWeights map[ourtypes.Direction]int64
+	var theKindsByCode map[string]ourtypes.Kind
+	var theCodesByName map[string]string
+	var theItemsByName map[string]ourtypes.IItem
+	var theLabels map[string][][]map[int64]string
+	var theOptionalCounts map[string]int64
+
+	foundCounts := false
+	foundCountsByNumber := false
+	foundWeights := false
+	foundKindsByCode := false
+	foundCodesByName := false
+	foundItemsByName := false
+	foundLabels := false
+	foundOptionalCounts := false
+
+	for {
+		var local string
+		var ok bool
+		local, current, ok, err = nextProperty(decoder, current, "IRegistry")
+		if err != nil {
+			return
+		}
+		if !ok {
+			break
+		}
+
+		var valueErr error
+		switch local {
+		case "counts":
+			if foundCounts {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theCounts, current, valueErr = readDictOf(
+				decoder, current, readAtK_string, readAtV_long,
+			)
+			foundCounts = true
+		case "countsByNumber":
+			if foundCountsByNumber {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theCountsByNumber, current, valueErr = readDictOf(
+				decoder, current, readAtK_long, readAtV_long,
+			)
+			foundCountsByNumber = true
+		case "weights":
+			if foundWeights {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theWeights, current, valueErr = readDictOf(
+				decoder, current, readAtK_Direction, readAtV_long,
+			)
+			foundWeights = true
+		case "kindsByCode":
+			if foundKindsByCode {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theKindsByCode, current, valueErr = readDictOf(
+				decoder, current, readAtK_string, readAtV_Kind,
+			)
+			foundKindsByCode = true
+		case "codesByName":
+			if foundCodesByName {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theCodesByName, current, valueErr = readDictOf(
+				decoder, current, readAtK_string, readAtV_string,
+			)
+			foundCodesByName = true
+		case "itemsByName":
+			if foundItemsByName {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theItemsByName, current, valueErr = readDictOf(
+				decoder, current, readAtK_string, readAtV_IItem,
+			)
+			foundItemsByName = true
+		case "labels":
+			if foundLabels {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theLabels, current, valueErr = readDictOf(
+				decoder, current, readAtK_string, readAtV_ListOf_ListOf_DictOf_long_string,
+			)
+			foundLabels = true
+		case "optionalCounts":
+			if foundOptionalCounts {
+				valueErr = duplicatePropertyError(local)
+				break
+			}
+			theOptionalCounts, current, valueErr = readDictOf(
+				decoder, current, readAtK_string, readAtV_long,
+			)
+			foundOptionalCounts = true
+		default:
+			valueErr = xmlcommon.NewDeserializationError(
+				"Unexpected property",
+			)
+		}
+
+		current, err = concludeProperty(decoder, current, local, valueErr)
+		if err != nil {
+			return
+		}
+	}
+
+	next = current
+
+	if !foundCounts {
+		err = missingProperty("counts")
+		return
+	}
+
+	if !foundCountsByNumber {
+		err = missingProperty("countsByNumber")
+		return
+	}
+
+	if !foundWeights {
+		err = missingProperty("weights")
+		return
+	}
+
+	if !foundKindsByCode {
+		err = missingProperty("kindsByCode")
+		return
+	}
+
+	if !foundCodesByName {
+		err = missingProperty("codesByName")
+		return
+	}
+
+	if !foundItemsByName {
+		err = missingProperty("itemsByName")
+		return
+	}
+
+	if !foundLabels {
+		err = missingProperty("labels")
+		return
+	}
+
+	instance = ourtypes.NewRegistry(
+		theCounts,
+		theCountsByNumber,
+		theWeights,
+		theKindsByCode,
+		theCodesByName,
+		theItemsByName,
+		theLabels,
+	)
+	instance.SetOptionalCounts(theOptionalCounts)
+	return
+}
+
 // De-serialize an instance of [ourtypes.IClass] based on the `local` name
 // of its start element.
 //
@@ -606,6 +1163,8 @@ func readClassDispatched(
 		instance, next, err = readItemAsSequence(decoder, current)
 	case "something":
 		instance, next, err = readSomethingAsSequence(decoder, current)
+	case "registry":
+		instance, next, err = readRegistryAsSequence(decoder, current)
 	default:
 		err = xmlcommon.NewDeserializationError(
 			fmt.Sprintf(
@@ -867,6 +1426,78 @@ func writeAtV_Kind(
 	)
 }
 
+// Write the scalar `value` in the element `k`.
+//
+// Do not flush.
+func writeAtK_string(
+	encoder *xml.Encoder,
+	value string,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "k", value, xmlcommon.WriteAsText_string,
+	)
+}
+
+// Write the scalar `value` in the element `k`.
+//
+// Do not flush.
+func writeAtK_long(
+	encoder *xml.Encoder,
+	value int64,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "k", value, xmlcommon.WriteAsText_long,
+	)
+}
+
+// Write the scalar `value` in the element `k`.
+//
+// Do not flush.
+func writeAtK_Direction(
+	encoder *xml.Encoder,
+	value ourtypes.Direction,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "k", value, writeAsText_Direction,
+	)
+}
+
+// Write the scalar `value` in the element `v`.
+//
+// Do not flush.
+func writeAtV_ListOf_ListOf_DictOf_long_string(
+	encoder *xml.Encoder,
+	value [][]map[int64]string,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "v", value, writeListOf_ListOf_DictOf_long_string,
+	)
+}
+
+// Write the scalar `value` in the element `v`.
+//
+// Do not flush.
+func writeAtV_ListOf_DictOf_long_string(
+	encoder *xml.Encoder,
+	value []map[int64]string,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "v", value, writeListOf_DictOf_long_string,
+	)
+}
+
+// Write the scalar `value` in the element `v`.
+//
+// Do not flush.
+func writeAtV_DictOf_long_string(
+	encoder *xml.Encoder,
+	value map[int64]string,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "v", value, writeDictOf_long_string,
+	)
+}
+
 // Write the items of the `list` as a sequence of XML elements.
 //
 // Do not flush.
@@ -915,6 +1546,241 @@ func writeListOf_IItem(
 	)
 }
 
+// Write the items of the `list` as a sequence of XML elements.
+//
+// Do not flush.
+func writeListOf_DictOf_long_string(
+	encoder *xml.Encoder,
+	list []map[int64]string,
+) error {
+	return writeList(
+		encoder, list, writeAtV_DictOf_long_string,
+	)
+}
+
+// Write the items of the `list` as a sequence of XML elements.
+//
+// Do not flush.
+func writeListOf_ListOf_DictOf_long_string(
+	encoder *xml.Encoder,
+	list [][]map[int64]string,
+) error {
+	return writeList(
+		encoder, list, writeAtV_ListOf_DictOf_long_string,
+	)
+}
+
+// Write the optional dictionary `that` as an XML element with the `local` name,
+// or write nothing at all if it is not set.
+//
+// Do not flush.
+//
+// A dictionary is represented as a map, which is nil on its own, but --
+// unlike an instance in [writeOptionalInstance] -- can not be compared against
+// the zero value, as a map is not comparable at all. Mind that a nil map and
+// an empty map differ here: only the former is considered absent, while
+// the latter is written as an empty XML element.
+func writeOptionalMap[K comparable, V any](
+	encoder *xml.Encoder,
+	local string,
+	that map[K]V,
+	writeContent func(anEncoder *xml.Encoder, aValue map[K]V) (anErr error),
+) (err error) {
+	if that == nil {
+		return
+	}
+
+	return xmlcommon.WriteElement(encoder, local, that, writeContent)
+}
+
+// Write the items of the dictionary `m`, each as an XML element `i` holding
+// the key in the element `k` and the value in the element `v`.
+//
+// Do not flush.
+//
+// The `keys` are the keys of `m` in the order of the serialization, which is
+// the same in all the SDKs.
+func writeDict[K comparable, V any](
+	encoder *xml.Encoder,
+	m map[K]V,
+	keys []K,
+	writeKey func(anEncoder *xml.Encoder, aKey K) (anErr error),
+	writeValue func(anEncoder *xml.Encoder, aValue V) (anErr error),
+) (err error) {
+	for i, key := range keys {
+		err = xmlcommon.WriteStartElement(encoder, "i", false)
+		if err == nil {
+			err = writeKey(encoder, key)
+		}
+		if err == nil {
+			err = writeValue(encoder, m[key])
+		}
+		if err == nil {
+			err = xmlcommon.WriteEndElement(encoder, "i", false)
+		}
+
+		if err != nil {
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependIndex(
+					&ourreporting.IndexSegment{Index: i},
+				)
+			}
+			return
+		}
+	}
+
+	return
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_string_long(
+	encoder *xml.Encoder,
+	that map[string]int64,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]),
+		writeAtK_string,
+		writeAtV_long,
+	)
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_long_long(
+	encoder *xml.Encoder,
+	that map[int64]int64,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[int64]),
+		writeAtK_long,
+		writeAtV_long,
+	)
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_Direction_long(
+	encoder *xml.Encoder,
+	that map[ourtypes.Direction]int64,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourstringification.LessByRankOfDirection),
+		writeAtK_Direction,
+		writeAtV_long,
+	)
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_string_Kind(
+	encoder *xml.Encoder,
+	that map[string]ourtypes.Kind,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]),
+		writeAtK_string,
+		writeAtV_Kind,
+	)
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_string_string(
+	encoder *xml.Encoder,
+	that map[string]string,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]),
+		writeAtK_string,
+		writeAtV_string,
+	)
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_string_IItem(
+	encoder *xml.Encoder,
+	that map[string]ourtypes.IItem,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]),
+		writeAtK_string,
+		writeAtV_IItem,
+	)
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_long_string(
+	encoder *xml.Encoder,
+	that map[int64]string,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[int64]),
+		writeAtK_long,
+		writeAtV_string,
+	)
+}
+
+// Write the items of the dictionary `that`, sorted by their keys, as a sequence
+// of XML elements.
+//
+// Do not flush.
+func writeDictOf_string_ListOf_ListOf_DictOf_long_string(
+	encoder *xml.Encoder,
+	that map[string][][]map[int64]string,
+) error {
+	return writeDict(
+		encoder,
+		that,
+		ourcommon.SortedKeys(that, ourcommon.LessOrdered[string]),
+		writeAtK_string,
+		writeAtV_ListOf_ListOf_DictOf_long_string,
+	)
+}
+
+// Write the instance `value` wrapped in the element `v` as a value of
+// a dictionary.
+//
+// Do not flush.
+func writeAtV_IItem(
+	encoder *xml.Encoder,
+	value ourtypes.IItem,
+) error {
+	return xmlcommon.WriteElement(
+		encoder, "v", value, writeInstance[ourtypes.IItem],
+	)
+}
+
 // Write the `value` of a property as string representation
 // of [ourtypes.Kind]
 // in a text element.
@@ -931,6 +1797,32 @@ func writeAsText_Kind(
 		err = xmlcommon.NewSerializationError(
 			fmt.Sprintf(
 				"Unexpected literal of Kind: %v",
+				value,
+			),
+		)
+		return
+	}
+
+	err = xmlcommon.WriteText(encoder, text)
+	return
+}
+
+// Write the `value` of a property as string representation
+// of [ourtypes.Direction]
+// in a text element.
+//
+// Do not flush.
+func writeAsText_Direction(
+	encoder *xml.Encoder,
+	value ourtypes.Direction,
+) (err error) {
+	text, ok := ourstringification.DirectionToString(
+		value,
+	)
+	if !ok {
+		err = xmlcommon.NewSerializationError(
+			fmt.Sprintf(
+				"Unexpected literal of Direction: %v",
 				value,
 			),
 		)
@@ -1041,6 +1933,104 @@ func writeSomethingAsSequence(
 	return
 }
 
+// Serialize the instance
+// of [ourtypes.IRegistry]
+// as a sequence of properties, each represented as an XML element.
+//
+// The XML namespace is expected to be set in the one of the parent elements
+// enclosing the sequence.
+//
+// Do not flush.
+func writeRegistryAsSequence(
+	encoder *xml.Encoder,
+	that ourtypes.IRegistry,
+) (err error) {
+	err = finishProperty(
+		"Counts()",
+		xmlcommon.WriteElement(
+			encoder, "counts", that.Counts(), writeDictOf_string_long,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"CountsByNumber()",
+		xmlcommon.WriteElement(
+			encoder, "countsByNumber", that.CountsByNumber(), writeDictOf_long_long,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Weights()",
+		xmlcommon.WriteElement(
+			encoder, "weights", that.Weights(), writeDictOf_Direction_long,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"KindsByCode()",
+		xmlcommon.WriteElement(
+			encoder, "kindsByCode", that.KindsByCode(), writeDictOf_string_Kind,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"CodesByName()",
+		xmlcommon.WriteElement(
+			encoder, "codesByName", that.CodesByName(), writeDictOf_string_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"ItemsByName()",
+		xmlcommon.WriteElement(
+			encoder, "itemsByName", that.ItemsByName(), writeDictOf_string_IItem,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"Labels()",
+		xmlcommon.WriteElement(
+			encoder,
+			"labels",
+			that.Labels(),
+			writeDictOf_string_ListOf_ListOf_DictOf_long_string,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	err = finishProperty(
+		"OptionalCounts()",
+		writeOptionalMap(
+			encoder, "optionalCounts", that.OptionalCounts(), writeDictOf_string_long,
+		),
+	)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 // Serialize `that` instance as an XML element named after its model type.
 //
 // Do not flush.
@@ -1064,6 +2054,14 @@ func writeClass(
 			withNamespace,
 			that.(ourtypes.ISomething),
 			writeSomethingAsSequence,
+		)
+	case ourtypes.ModelTypeRegistry:
+		err = writeClassElement(
+			encoder,
+			"registry",
+			withNamespace,
+			that.(ourtypes.IRegistry),
+			writeRegistryAsSequence,
 		)
 	default:
 		err = xmlcommon.NewSerializationError(

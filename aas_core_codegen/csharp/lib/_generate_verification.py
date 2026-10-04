@@ -819,6 +819,12 @@ def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return f"SetOf_{_verification_moniker(type_anno.items)}"
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return (
+            f"DictOf_{_verification_moniker(type_anno.keys)}"
+            f"_{_verification_moniker(type_anno.values)}"
+        )
+
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         joined = "_".join(_verification_moniker(item) for item in type_anno.items)
         return f"TupleOf{len(type_anno.items)}_{joined}"
@@ -977,7 +983,7 @@ foreach (var item in that)
             segments=["new Reporting.IndexSegment(index)"],
         )
 
-        comparison = csharp_common.set_items_comparison(type_anno.items)
+        comparison = csharp_common.sorting_comparison(type_anno.items)
 
         # NOTE (mristin):
         # A set has no index of its own, so we report the position of the item
@@ -1009,10 +1015,46 @@ foreach (
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        key_segment = "new Reporting.KeySegment(keyText)"
+
+        item_blocks = []  # type: List[Stripped]
+        if _needs_verification(type_anno.keys):
+            # NOTE (mristin):
+            # An invalid key is reported at the same key segment as its value.
+            item_blocks.append(
+                _generate_verify_into(
+                    expr="key", type_anno=type_anno.keys, segments=[key_segment]
+                )
+            )
+
+        if _needs_verification(type_anno.values):
+            item_blocks.append(
+                _generate_verify_into(
+                    expr="that[key]", type_anno=type_anno.values, segments=[key_segment]
+                )
+            )
+
+        item_stmts = Stripped("\n\n".join(item_blocks))
+
+        comparison = csharp_common.sorting_comparison(type_anno.keys)
+        key_text_expr = csharp_common.dict_key_text_expr(
+            keys=type_anno.keys, key_expr="key"
+        )
+
+        # NOTE (mristin):
+        # We verify the items in the order of the sorted keys, the order in which
+        # we serialize them, so that the errors are reported deterministically.
+        body = Stripped(
+            f"""\
+foreach (
+{I}var key in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(
+{II}that.Keys,
+{II}{comparison}))
+{{
+{I}string keyText = {indent_but_first_line(key_text_expr, I)};
+
+{I}{indent_but_first_line(item_stmts, I)}
+}}"""
         )
 
     else:

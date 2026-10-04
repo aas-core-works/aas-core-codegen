@@ -3,6 +3,7 @@
 
 #include "dummy/common.hpp"
 #include "dummy/iteration.hpp"
+#include "dummy/wstringification.hpp"
 
 namespace dummy {
 namespace iteration {
@@ -22,18 +23,34 @@ std::wstring PropertyToWstring(
   switch (property) {
     case Property::kCodes:
       return L"codes";
+    case Property::kCodesByName:
+      return L"codes_by_name";
+    case Property::kCounts:
+      return L"counts";
+    case Property::kCountsByNumber:
+      return L"counts_by_number";
     case Property::kItems:
       return L"items";
+    case Property::kItemsByName:
+      return L"items_by_name";
     case Property::kKinds:
       return L"kinds";
+    case Property::kKindsByCode:
+      return L"kinds_by_code";
+    case Property::kLabels:
+      return L"labels";
     case Property::kName:
       return L"name";
     case Property::kNumbers:
       return L"numbers";
+    case Property::kOptionalCounts:
+      return L"optional_counts";
     case Property::kOptionalTexts:
       return L"optional_texts";
     case Property::kTexts:
       return L"texts";
+    case Property::kWeights:
+      return L"weights";
     default:
       throw std::invalid_argument(
         common::Concat(
@@ -415,6 +432,166 @@ std::unique_ptr<impl::IIterator> Each(
 }
 
 /**
+ * \brief Iterate over the instances of every value of a dictionary, one value
+ * after another, in the order of the keys.
+ *
+ * We iterate in the order of the serialization, so that the order is the same in
+ * all the SDKs. The iterator over a value is built only once the iteration
+ * reaches the value.
+ */
+template<typename MapT, typename LessT>
+class EachValueSortedIterator : public impl::IIterator {
+ public:
+  typedef typename MapT::key_type K;
+  typedef typename MapT::mapped_type V;
+  typedef typename MapT::value_type ItemT;
+
+  /**
+   * Build the iterator over the instances of a value
+   */
+  typedef std::unique_ptr<impl::IIterator> (*OverValue)(
+    const V& value,
+    bool recursive
+  );
+
+  /**
+   * Render a key as the text of its JSON key for the path
+   */
+  typedef std::wstring (*KeyToWstring)(const K& key);
+
+  EachValueSortedIterator(
+    const MapT* map,
+    LessT less,
+    KeyToWstring key_to_wstring,
+    OverValue over_value,
+    bool recursive
+  ) :
+    map_(map),
+    less_(less),
+    key_to_wstring_(key_to_wstring),
+    over_value_(over_value),
+    recursive_(recursive),
+    index_(0) {
+    // Intentionally empty.
+  }
+
+  EachValueSortedIterator(const EachValueSortedIterator<MapT, LessT>& other) :
+    map_(other.map_),
+    less_(other.less_),
+    key_to_wstring_(other.key_to_wstring_),
+    over_value_(other.over_value_),
+    recursive_(other.recursive_),
+    sorted_(other.sorted_),
+    index_(other.index_),
+    value_(other.value_ == nullptr ? nullptr : other.value_->Clone()) {
+    // Intentionally empty.
+  }
+
+  void Start() override {
+    if (sorted_ == nullptr) {
+      sorted_ = std::make_shared<std::vector<const ItemT*> >(
+        common::SortedItemPointers(*map_, less_)
+      );
+    }
+
+    index_ = 0;
+    value_ = nullptr;
+    SkipDoneValues();
+  }
+
+  void Next() override {
+    value_->Next();
+    SkipDoneValues();
+  }
+
+  bool Done() const override {
+    return index_ >= sorted_->size();
+  }
+
+  const std::shared_ptr<types::IClass>& Get() const override {
+    return value_->Get();
+  }
+
+  void AppendToPath(Path& path) const override {
+    path.segments.emplace_back(
+      common::make_unique<KeySegment>(
+        key_to_wstring_((*sorted_)[index_]->first)
+      )
+    );
+    value_->AppendToPath(path);
+  }
+
+  std::unique_ptr<impl::IIterator> Clone() const override {
+    return common::make_unique<EachValueSortedIterator<MapT, LessT> >(*this);
+  }
+
+ private:
+  const MapT* map_;
+  LessT less_;
+  KeyToWstring key_to_wstring_;
+  OverValue over_value_;
+  bool recursive_;
+
+  /**
+   * Pointers to the items, sorted by their keys once the iteration started,
+   * and shared among the clones as they never change
+   */
+  std::shared_ptr<const std::vector<const ItemT*> > sorted_;
+
+  /**
+   * Index of the item whose value we currently iterate over, in the sorted order
+   */
+  std::size_t index_;
+
+  /**
+   * Iterator over the current value, built once we reached the value
+   */
+  std::unique_ptr<impl::IIterator> value_;
+
+  /**
+   * Move on to the next values, and build their iterators, until one is not done.
+   */
+  void SkipDoneValues() {
+    while (index_ < sorted_->size()) {
+      if (value_ == nullptr) {
+        value_ = over_value_((*sorted_)[index_]->second, recursive_);
+        value_->Start();
+      }
+
+      if (!value_->Done()) {
+        return;
+      }
+
+      value_ = nullptr;
+      ++index_;
+    }
+  }
+};  // class EachValueSortedIterator
+
+template<typename MapT, typename LessT>
+std::unique_ptr<impl::IIterator> EachValueSorted(
+  const MapT& map,
+  LessT less,
+  std::wstring (*key_to_wstring)(const typename MapT::key_type& key),
+  std::unique_ptr<impl::IIterator> (*over_value)(
+    const typename MapT::mapped_type& value,
+    bool recursive
+  ),
+  bool recursive
+) {
+  return common::make_unique<EachValueSortedIterator<MapT, LessT> >(
+    &map, less, key_to_wstring, over_value, recursive
+  );
+}
+
+/**
+ * Render the string \p key of a dictionary as the text of its JSON key.
+ */
+std::wstring WstringKeyToWstring(const std::wstring& key) {
+  return key;
+}
+
+/**
  * \brief Iterate over the instances of the children, one child after another.
  *
  * A child is started only once the previous child is done.
@@ -662,11 +839,29 @@ using listOf_Item = std::vector<
   std::shared_ptr<types::IItem>
 >;
 
+using dictOf_str_Item = std::unordered_map<
+  std::wstring,
+  std::shared_ptr<types::IItem>
+>;
+
 std::unique_ptr<impl::IIterator> Over_listOf_Item(
   const listOf_Item& value,
   bool recursive
 ) {
   return Each(value, &OneThenOver<types::IItem>, recursive);
+}
+
+std::unique_ptr<impl::IIterator> Over_dictOf_str_Item(
+  const dictOf_str_Item& value,
+  bool recursive
+) {
+  return EachValueSorted(
+    value,
+    common::LessByCodePoints,
+    &WstringKeyToWstring,
+    &OneThenOver<types::IItem>,
+    recursive
+  );
 }
 
 std::unique_ptr<impl::IIterator> Over_Something(
@@ -676,6 +871,16 @@ std::unique_ptr<impl::IIterator> Over_Something(
   return InProperty(
     Property::kItems,
     Over_listOf_Item(that.items(), recursive)
+  );
+}
+
+std::unique_ptr<impl::IIterator> Over_Registry(
+  const types::IRegistry& that,
+  bool recursive
+) {
+  return InProperty(
+    Property::kItemsByName,
+    Over_dictOf_str_Item(that.items_by_name(), recursive)
   );
 }
 
@@ -694,6 +899,11 @@ std::unique_ptr<impl::IIterator> DispatchOnModelType(
     case types::ModelType::kSomething:
       return Over_Something(
         dynamic_cast<const types::ISomething&>(instance),
+        recursive
+      );
+    case types::ModelType::kRegistry:
+      return Over_Registry(
+        dynamic_cast<const types::IRegistry&>(instance),
         recursive
       );
     default:
@@ -901,6 +1111,12 @@ const std::vector<types::Kind> kOverKind = {
   types::Kind::kAlpha,
   types::Kind::kBeta,
   types::Kind::kGamma
+};
+
+const std::vector<types::Direction> kOverDirection = {
+  types::Direction::kNorth,
+  types::Direction::kSouth,
+  types::Direction::kEast
 };
 
 // endregion Over enumerations

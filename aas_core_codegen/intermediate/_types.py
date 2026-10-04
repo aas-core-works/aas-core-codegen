@@ -361,13 +361,21 @@ class DictTypeAnnotation(TypeAnnotation):
     not distinguish the two.
 
     The dictionaries are allowed at any depth in the arguments and the return
-    values of the verification functions and of the methods, but not in
+    values of the verification functions and of the methods, and in
     the properties.
 
     The keys are strings, integers, constrained primitives of them and
     enumeration literals. The values are of any type which an item of a list can
-    be of. The order of the iteration over a dictionary differs among
-    the targets.
+    be of. The order of the iteration over a dictionary in the transpiled code
+    differs among the targets.
+
+    A dictionary in a property is serialized with its keys sorted in the same
+    order in all the targets, as the items of a set: the integers numerically,
+    and the strings and the serialized values of the enumeration literals by
+    their code points. In JSON, it is an object whose integer keys are written
+    as canonical decimal strings. In XML, each item is an ``<i>`` element with
+    the key in ``<k>`` and the value in ``<v>``. The de-serialization accepts
+    the keys in any order, but refuses the duplicate keys in XML.
     """
 
     def __init__(

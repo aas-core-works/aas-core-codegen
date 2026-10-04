@@ -51,6 +51,20 @@ std::shared_ptr<
   >& factory
 );
 
+template <typename E>
+std::shared_ptr<
+  types::IRegistry
+> Wrap(
+  const std::shared_ptr<
+    types::IRegistry
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+);
+
 // endregion Forward declarations
 
 /// \cond HIDDEN
@@ -268,6 +282,201 @@ class EnhancedSomething
   std::shared_ptr<E> enhancement_;
 };
 
+template<class E>
+class EnhancedRegistry
+    : virtual public types::IRegistry,
+    virtual public IEnhanced<E> {
+ public:
+  types::ModelType model_type() const override {
+    return types::ModelType::kRegistry;
+  }
+
+  const std::unordered_map<std::wstring, int64_t>& counts() const override {
+    return instance_->counts();
+  }
+
+  std::unordered_map<std::wstring, int64_t>& mutable_counts() override {
+    return instance_->mutable_counts();
+  }
+
+  void set_counts(
+    std::unordered_map<std::wstring, int64_t> value
+  ) override {
+    instance_->set_counts(value);
+  }
+
+  const std::unordered_map<int64_t, int64_t>& counts_by_number() const override {
+    return instance_->counts_by_number();
+  }
+
+  std::unordered_map<int64_t, int64_t>& mutable_counts_by_number() override {
+    return instance_->mutable_counts_by_number();
+  }
+
+  void set_counts_by_number(
+    std::unordered_map<int64_t, int64_t> value
+  ) override {
+    instance_->set_counts_by_number(value);
+  }
+
+  const std::unordered_map<types::Direction, int64_t, common::EnumHash>& weights() const override {
+    return instance_->weights();
+  }
+
+  std::unordered_map<types::Direction, int64_t, common::EnumHash>& mutable_weights() override {
+    return instance_->mutable_weights();
+  }
+
+  void set_weights(
+    std::unordered_map<types::Direction, int64_t, common::EnumHash> value
+  ) override {
+    instance_->set_weights(value);
+  }
+
+  const std::unordered_map<std::wstring, types::Kind>& kinds_by_code() const override {
+    return instance_->kinds_by_code();
+  }
+
+  std::unordered_map<std::wstring, types::Kind>& mutable_kinds_by_code() override {
+    return instance_->mutable_kinds_by_code();
+  }
+
+  void set_kinds_by_code(
+    std::unordered_map<std::wstring, types::Kind> value
+  ) override {
+    instance_->set_kinds_by_code(value);
+  }
+
+  const std::unordered_map<std::wstring, std::wstring>& codes_by_name() const override {
+    return instance_->codes_by_name();
+  }
+
+  std::unordered_map<std::wstring, std::wstring>& mutable_codes_by_name() override {
+    return instance_->mutable_codes_by_name();
+  }
+
+  void set_codes_by_name(
+    std::unordered_map<std::wstring, std::wstring> value
+  ) override {
+    instance_->set_codes_by_name(value);
+  }
+
+  const std::unordered_map<
+    std::wstring,
+    std::shared_ptr<types::IItem>
+  >& items_by_name() const override {
+    return instance_->items_by_name();
+  }
+
+  std::unordered_map<
+    std::wstring,
+    std::shared_ptr<types::IItem>
+  >& mutable_items_by_name() override {
+    return instance_->mutable_items_by_name();
+  }
+
+  void set_items_by_name(
+    std::unordered_map<
+      std::wstring,
+      std::shared_ptr<types::IItem>
+    > value
+  ) override {
+    instance_->set_items_by_name(value);
+  }
+
+  const std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  >& labels() const override {
+    return instance_->labels();
+  }
+
+  std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  >& mutable_labels() override {
+    return instance_->mutable_labels();
+  }
+
+  void set_labels(
+    std::unordered_map<
+      std::wstring,
+      std::vector<
+        std::vector<
+          std::unordered_map<int64_t, std::wstring>
+        >
+      >
+    > value
+  ) override {
+    instance_->set_labels(value);
+  }
+
+  const common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  >& optional_counts() const override {
+    return instance_->optional_counts();
+  }
+
+  common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  >& mutable_optional_counts() override {
+    return instance_->mutable_optional_counts();
+  }
+
+  void set_optional_counts(
+    common::optional<
+      std::unordered_map<std::wstring, int64_t>
+    > value
+  ) override {
+    instance_->set_optional_counts(value);
+  }
+
+  bool WeightIsAtMost(
+    int64_t maximum
+  ) const override {
+    return instance_->WeightIsAtMost(
+      maximum
+    );
+  }
+
+  const std::shared_ptr<E>& enhancement() const {
+    return enhancement_;
+  }
+
+  std::shared_ptr<E>& mutable_enhancement() {
+    return enhancement_;
+  }
+
+  void set_enhancement(
+    std::shared_ptr<E> value
+  ) {
+    enhancement_ = std::move(value);
+  }
+
+  EnhancedRegistry(
+    std::shared_ptr<types::IRegistry> instance,
+    std::shared_ptr<E> enhancement
+  ) :
+    instance_(instance),
+    enhancement_(enhancement) {
+    // Intentionally empty.
+  }
+
+  virtual ~EnhancedRegistry() = default;
+
+ private:
+  std::shared_ptr<types::IRegistry> instance_;
+  std::shared_ptr<E> enhancement_;
+};
+
 /**
  * Wrap recursively the instances held by \p that.
  *
@@ -300,6 +509,43 @@ std::vector<
     that
   ) {
     result.emplace_back(Wrap<E>(item, factory));
+  }
+
+  return result;
+}
+
+/**
+ * Wrap recursively the instances held by \p that.
+ *
+ * \param that container of the instances to be wrapped
+ * \param factory to produce an enhancement based on an instance
+ * \return a copy of \p that with the wrapped instances
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::unordered_map<
+  std::wstring,
+  std::shared_ptr<types::IItem>
+> Wrap_dictOf_str_Item(
+  const std::unordered_map<
+    std::wstring,
+    std::shared_ptr<types::IItem>
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  std::unordered_map<
+    std::wstring,
+    std::shared_ptr<types::IItem>
+  > result;
+  result.reserve(that.size());
+
+  for (const auto& item : that) {
+    result.emplace(item.first, Wrap<E>(item.second, factory));
   }
 
   return result;
@@ -373,6 +619,44 @@ std::shared_ptr<types::ISomething> WrapSomething(
     ? that
     : std::shared_ptr<types::ISomething>(
       new EnhancedSomething<E>(
+        that,
+        enh
+      )
+    );
+}
+
+/**
+ * Wrap \p that with an enhanced instance.
+ *
+ * \param that instance to be wrapped and enhanced
+ * \param factory to produce an enhancement based on an instance
+ * \return Enhanced instance, or `that` if no enhancement produced
+ *
+ * \tparam E type of the enhancement
+ */
+template<typename E>
+std::shared_ptr<types::IRegistry> WrapRegistry(
+  const std::shared_ptr<types::IRegistry>& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  // We assume that we already checked whether `that` has been enhanced
+  // in the caller.
+
+  that->set_items_by_name(
+    Wrap_dictOf_str_Item<E>(that->items_by_name(), factory)
+  );
+
+  std::shared_ptr<E> enh(
+    factory(that)
+  );
+  return (enh == nullptr)
+    ? that
+    : std::shared_ptr<types::IRegistry>(
+      new EnhancedRegistry<E>(
         that,
         enh
       )
@@ -467,6 +751,14 @@ std::shared_ptr<
         factory
       );
       break;
+    case types::ModelType::kRegistry:
+      return impl::WrapRegistry<E>(
+        std::dynamic_pointer_cast<
+          types::IRegistry
+        >(that),
+        factory
+      );
+      break;
     default:
       throw std::invalid_argument(
         common::Concat(
@@ -543,6 +835,46 @@ std::shared_ptr<
   switch (that->model_type()) {
     case types::ModelType::kSomething:
       return impl::WrapSomething<E>(
+        that,
+        factory
+      );
+      break;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(
+              that->model_type()
+            )
+          )
+        )
+      );
+      break;
+  }
+}
+
+template <typename E>
+std::shared_ptr<
+  types::IRegistry
+> Wrap(
+  const std::shared_ptr<
+    types::IRegistry
+  >& that,
+  const std::function<
+    std::shared_ptr<E>(
+      const std::shared_ptr<types::IClass>&
+    )
+  >& factory
+) {
+  impl::AssertNotEnhanced<
+    E,
+    types::IRegistry
+  >(that);
+
+  switch (that->model_type()) {
+    case types::ModelType::kRegistry:
+      return impl::WrapRegistry<E>(
         that,
         factory
       );

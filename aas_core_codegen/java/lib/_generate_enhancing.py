@@ -477,7 +477,7 @@ def _generate_enhanced(
         imports.extend(
             Stripped(f"import {dict_import};")
             for dict_import in java_common.dict_imports_if_necessary(
-                cls.methods, with_bodies=False
+                cls.methods, with_bodies=False, properties=cls.properties
             )
         )
 
@@ -643,10 +643,21 @@ return result;"""
         body = Stripped(f"return {tuple_literal};")
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        keys_type = java_common.generate_type(type_anno.keys)
+        values_type = java_common.generate_type(type_anno.values)
+        value_wrap = _generate_wrap_expr(
+            "item.getValue()", type_anno.values, descendability
+        )
+
+        body = Stripped(
+            f"""\
+{value_type} result = new HashMap<>(that.size());
+for (Map.Entry<{keys_type}, {values_type}> item : that.entrySet()) {{
+{I}result.put(
+{II}item.getKey(),
+{II}{indent_but_first_line(value_wrap, II)});
+}}
+return result;"""
         )
 
     else:
@@ -809,6 +820,21 @@ _Wrapper(
 
                 if isinstance(type_anno, intermediate.SetTypeAnnotation):
                     imports.append(Stripped("import java.util.HashSet;"))
+
+                if isinstance(type_anno, intermediate.DictTypeAnnotation):
+                    if Stripped("import java.util.HashMap;") not in imports:
+                        imports.append(Stripped("import java.util.HashMap;"))
+
+                # NOTE (mristin):
+                # The method spells out the type of the container, so we need to
+                # import the dictionaries nested in it as well.
+                if Stripped("import java.util.Map;") not in imports and any(
+                    isinstance(nested, intermediate.DictTypeAnnotation)
+                    for nested in intermediate.over_type_annotation_and_nested_type_annotations(
+                        type_anno
+                    )
+                ):
+                    imports.append(Stripped("import java.util.Map;"))
 
                 # NOTE (mristin):
                 # The method spells out the type of the container, so we need to

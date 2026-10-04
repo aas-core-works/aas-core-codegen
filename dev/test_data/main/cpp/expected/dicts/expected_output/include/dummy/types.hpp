@@ -32,7 +32,8 @@ namespace types {
  */
 enum class ModelType : std::uint32_t {
   kItem = 0,
-  kSomething = 1
+  kSomething = 1,
+  kRegistry = 2
 };
 
 enum class Kind : std::uint32_t {
@@ -40,6 +41,12 @@ enum class Kind : std::uint32_t {
   kBeta = 1,
   kGamma = 2,
 };  // enum class Kind
+
+enum class Direction : std::uint32_t {
+  kNorth = 0,
+  kSouth = 1,
+  kEast = 2,
+};  // enum class Direction
 
 // endregion Enumerations
 
@@ -50,6 +57,8 @@ enum class Kind : std::uint32_t {
 class IItem;
 
 class ISomething;
+
+class IRegistry;
 
 // region Class interfaces
 
@@ -149,6 +158,117 @@ class ISomething
   ) const = 0;
 
   virtual ~ISomething() = default;
+};
+
+class IRegistry
+    : virtual public IClass {
+ public:
+  virtual const std::unordered_map<std::wstring, int64_t>& counts() const = 0;
+
+  virtual std::unordered_map<std::wstring, int64_t>& mutable_counts() = 0;
+
+  virtual void set_counts(
+    std::unordered_map<std::wstring, int64_t> value
+  ) = 0;
+
+  virtual const std::unordered_map<int64_t, int64_t>& counts_by_number() const = 0;
+
+  virtual std::unordered_map<int64_t, int64_t>& mutable_counts_by_number() = 0;
+
+  virtual void set_counts_by_number(
+    std::unordered_map<int64_t, int64_t> value
+  ) = 0;
+
+  virtual const std::unordered_map<Direction, int64_t, common::EnumHash>& weights() const = 0;
+
+  virtual std::unordered_map<Direction, int64_t, common::EnumHash>& mutable_weights() = 0;
+
+  virtual void set_weights(
+    std::unordered_map<Direction, int64_t, common::EnumHash> value
+  ) = 0;
+
+  virtual const std::unordered_map<std::wstring, Kind>& kinds_by_code() const = 0;
+
+  virtual std::unordered_map<std::wstring, Kind>& mutable_kinds_by_code() = 0;
+
+  virtual void set_kinds_by_code(
+    std::unordered_map<std::wstring, Kind> value
+  ) = 0;
+
+  virtual const std::unordered_map<std::wstring, std::wstring>& codes_by_name() const = 0;
+
+  virtual std::unordered_map<std::wstring, std::wstring>& mutable_codes_by_name() = 0;
+
+  virtual void set_codes_by_name(
+    std::unordered_map<std::wstring, std::wstring> value
+  ) = 0;
+
+  virtual const std::unordered_map<
+    std::wstring,
+    std::shared_ptr<IItem>
+  >& items_by_name() const = 0;
+
+  virtual std::unordered_map<
+    std::wstring,
+    std::shared_ptr<IItem>
+  >& mutable_items_by_name() = 0;
+
+  virtual void set_items_by_name(
+    std::unordered_map<
+      std::wstring,
+      std::shared_ptr<IItem>
+    > value
+  ) = 0;
+
+  virtual const std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  >& labels() const = 0;
+
+  virtual std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  >& mutable_labels() = 0;
+
+  virtual void set_labels(
+    std::unordered_map<
+      std::wstring,
+      std::vector<
+        std::vector<
+          std::unordered_map<int64_t, std::wstring>
+        >
+      >
+    > value
+  ) = 0;
+
+  virtual const common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  >& optional_counts() const = 0;
+
+  virtual common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  >& mutable_optional_counts() = 0;
+
+  virtual void set_optional_counts(
+    common::optional<
+      std::unordered_map<std::wstring, int64_t>
+    > value
+  ) = 0;
+
+  /// \brief Check the iteration over the items of a dictionary property.
+  virtual bool WeightIsAtMost(
+    int64_t maximum
+  ) const = 0;
+
+  virtual ~IRegistry() = default;
 };
 
 // endregion
@@ -309,6 +429,202 @@ class Something
   > optional_texts_;
 };
 
+class Registry
+    : public IRegistry {
+ public:
+  Registry(
+    std::unordered_map<std::wstring, int64_t> counts,
+    std::unordered_map<int64_t, int64_t> counts_by_number,
+    std::unordered_map<Direction, int64_t, common::EnumHash> weights,
+    std::unordered_map<std::wstring, Kind> kinds_by_code,
+    std::unordered_map<std::wstring, std::wstring> codes_by_name,
+    std::unordered_map<
+      std::wstring,
+      std::shared_ptr<IItem>
+    > items_by_name,
+    std::unordered_map<
+      std::wstring,
+      std::vector<
+        std::vector<
+          std::unordered_map<int64_t, std::wstring>
+        >
+      >
+    > labels,
+    common::optional<
+      std::unordered_map<std::wstring, int64_t>
+    > optional_counts = common::nullopt
+  );
+
+  ModelType model_type() const override;
+
+  // region Get and set counts_
+
+  const std::unordered_map<std::wstring, int64_t>& counts() const override;
+
+  std::unordered_map<std::wstring, int64_t>& mutable_counts() override;
+
+  void set_counts(
+    std::unordered_map<std::wstring, int64_t> value
+  ) override;
+
+  // endregion
+
+  // region Get and set counts_by_number_
+
+  const std::unordered_map<int64_t, int64_t>& counts_by_number() const override;
+
+  std::unordered_map<int64_t, int64_t>& mutable_counts_by_number() override;
+
+  void set_counts_by_number(
+    std::unordered_map<int64_t, int64_t> value
+  ) override;
+
+  // endregion
+
+  // region Get and set weights_
+
+  const std::unordered_map<Direction, int64_t, common::EnumHash>& weights() const override;
+
+  std::unordered_map<Direction, int64_t, common::EnumHash>& mutable_weights() override;
+
+  void set_weights(
+    std::unordered_map<Direction, int64_t, common::EnumHash> value
+  ) override;
+
+  // endregion
+
+  // region Get and set kinds_by_code_
+
+  const std::unordered_map<std::wstring, Kind>& kinds_by_code() const override;
+
+  std::unordered_map<std::wstring, Kind>& mutable_kinds_by_code() override;
+
+  void set_kinds_by_code(
+    std::unordered_map<std::wstring, Kind> value
+  ) override;
+
+  // endregion
+
+  // region Get and set codes_by_name_
+
+  const std::unordered_map<std::wstring, std::wstring>& codes_by_name() const override;
+
+  std::unordered_map<std::wstring, std::wstring>& mutable_codes_by_name() override;
+
+  void set_codes_by_name(
+    std::unordered_map<std::wstring, std::wstring> value
+  ) override;
+
+  // endregion
+
+  // region Get and set items_by_name_
+
+  const std::unordered_map<
+    std::wstring,
+    std::shared_ptr<IItem>
+  >& items_by_name() const override;
+
+  std::unordered_map<
+    std::wstring,
+    std::shared_ptr<IItem>
+  >& mutable_items_by_name() override;
+
+  void set_items_by_name(
+    std::unordered_map<
+      std::wstring,
+      std::shared_ptr<IItem>
+    > value
+  ) override;
+
+  // endregion
+
+  // region Get and set labels_
+
+  const std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  >& labels() const override;
+
+  std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  >& mutable_labels() override;
+
+  void set_labels(
+    std::unordered_map<
+      std::wstring,
+      std::vector<
+        std::vector<
+          std::unordered_map<int64_t, std::wstring>
+        >
+      >
+    > value
+  ) override;
+
+  // endregion
+
+  // region Get and set optional_counts_
+
+  const common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  >& optional_counts() const override;
+
+  common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  >& mutable_optional_counts() override;
+
+  void set_optional_counts(
+    common::optional<
+      std::unordered_map<std::wstring, int64_t>
+    > value
+  ) override;
+
+  // endregion
+
+  bool WeightIsAtMost(
+    int64_t maximum
+  ) const override;
+
+  ~Registry() override = default;
+
+ private:
+  std::unordered_map<std::wstring, int64_t> counts_;
+
+  std::unordered_map<int64_t, int64_t> counts_by_number_;
+
+  std::unordered_map<Direction, int64_t, common::EnumHash> weights_;
+
+  std::unordered_map<std::wstring, Kind> kinds_by_code_;
+
+  std::unordered_map<std::wstring, std::wstring> codes_by_name_;
+
+  std::unordered_map<
+    std::wstring,
+    std::shared_ptr<IItem>
+  > items_by_name_;
+
+  std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  > labels_;
+
+  common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  > optional_counts_;
+};
+
 // endregion
 
 // region Is-a functions
@@ -340,6 +656,21 @@ bool IsItem(
  * an instance of \ref ISomething
  */
 bool IsSomething(
+  const IClass& that
+);
+
+/**
+ * \brief Check whether \p that instance is of runtime type
+ * \ref IRegistry.
+ *
+ * We use `IClass::model_type` to determine the runtime type, which is
+ * a bit faster than native C++'s RTTI.
+ *
+ * \param that instance to check for runtime type
+ * \return `true` if \p that instance is indeed
+ * an instance of \ref IRegistry
+ */
+bool IsRegistry(
   const IClass& that
 );
 

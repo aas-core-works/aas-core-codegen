@@ -95,6 +95,95 @@ func deepEqualSomething(
 	return true
 }
 
+// Perform a comparison for deep equality between `that` and `other` instance.
+//
+// The deep equality means that all the properties are checked for equality recursively.
+func deepEqualRegistry(
+	that ourtypes.IRegistry,
+	other ourtypes.IRegistry,
+) bool {
+	thatCounts := that.Counts()
+	otherCounts := other.Counts()
+	if !deepEqualDictOf_string_long(
+		thatCounts,
+		otherCounts,
+	) {
+		return false
+	}
+
+	thatCountsByNumber := that.CountsByNumber()
+	otherCountsByNumber := other.CountsByNumber()
+	if !deepEqualDictOf_long_long(
+		thatCountsByNumber,
+		otherCountsByNumber,
+	) {
+		return false
+	}
+
+	thatWeights := that.Weights()
+	otherWeights := other.Weights()
+	if !deepEqualDictOf_Direction_long(
+		thatWeights,
+		otherWeights,
+	) {
+		return false
+	}
+
+	thatKindsByCode := that.KindsByCode()
+	otherKindsByCode := other.KindsByCode()
+	if !deepEqualDictOf_string_Kind(
+		thatKindsByCode,
+		otherKindsByCode,
+	) {
+		return false
+	}
+
+	thatCodesByName := that.CodesByName()
+	otherCodesByName := other.CodesByName()
+	if !deepEqualDictOf_string_string(
+		thatCodesByName,
+		otherCodesByName,
+	) {
+		return false
+	}
+
+	thatItemsByName := that.ItemsByName()
+	otherItemsByName := other.ItemsByName()
+	if !deepEqualDictOf_string_IItem(
+		thatItemsByName,
+		otherItemsByName,
+	) {
+		return false
+	}
+
+	thatLabels := that.Labels()
+	otherLabels := other.Labels()
+	if !deepEqualDictOf_string_ListOf_ListOf_DictOf_long_string(
+		thatLabels,
+		otherLabels,
+	) {
+		return false
+	}
+
+	thatOptionalCounts := that.OptionalCounts()
+	otherOptionalCounts := other.OptionalCounts()
+	if
+		(thatOptionalCounts == nil && otherOptionalCounts != nil) ||
+		(thatOptionalCounts != nil && otherOptionalCounts == nil) {
+		return false
+	}
+	if thatOptionalCounts != nil {
+		if !deepEqualDictOf_string_long(
+			thatOptionalCounts,
+			otherOptionalCounts,
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Perform a comparison for deep equality between `that` and `other` container,
 // recursing into its items.
 func deepEqualListOf_string(
@@ -174,6 +263,248 @@ func deepEqualListOf_IItem(
 	return true
 }
 
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_string_long(
+	that map[string]int64,
+	other map[string]int64,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if thatValue != otherValue {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_long_long(
+	that map[int64]int64,
+	other map[int64]int64,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if thatValue != otherValue {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_Direction_long(
+	that map[ourtypes.Direction]int64,
+	other map[ourtypes.Direction]int64,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if thatValue != otherValue {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_string_Kind(
+	that map[string]ourtypes.Kind,
+	other map[string]ourtypes.Kind,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if thatValue != otherValue {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_string_string(
+	that map[string]string,
+	other map[string]string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if thatValue != otherValue {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_string_IItem(
+	that map[string]ourtypes.IItem,
+	other map[string]ourtypes.IItem,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if !DeepEqual(
+			thatValue,
+			otherValue,
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_string_ListOf_ListOf_DictOf_long_string(
+	that map[string][][]map[int64]string,
+	other map[string][][]map[int64]string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if !deepEqualListOf_ListOf_DictOf_long_string(
+			thatValue,
+			otherValue,
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_ListOf_DictOf_long_string(
+	that [][]map[int64]string,
+	other [][]map[int64]string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !deepEqualListOf_DictOf_long_string(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualListOf_DictOf_long_string(
+	that []map[int64]string,
+	other []map[int64]string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for i := range that {
+		if !deepEqualDictOf_long_string(
+			that[i],
+			other[i],
+		) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Perform a comparison for deep equality between `that` and `other` container,
+// recursing into its items.
+func deepEqualDictOf_long_string(
+	that map[int64]string,
+	other map[int64]string,
+) bool {
+	if len(that) != len(other) {
+		return false
+	}
+
+	for k, thatValue := range that {
+		otherValue, ok := other[k]
+		if !ok {
+			return false
+		}
+
+		if thatValue != otherValue {
+			return false
+		}
+	}
+
+	return true
+}
+
 func DeepEqual(
 	that ourtypes.IClass,
 	other ourtypes.IClass,
@@ -192,6 +523,11 @@ func DeepEqual(
 		return deepEqualSomething(
 			that.(ourtypes.ISomething),
 			other.(ourtypes.ISomething),
+		)
+	case ourtypes.ModelTypeRegistry:
+		return deepEqualRegistry(
+			that.(ourtypes.IRegistry),
+			other.(ourtypes.IRegistry),
 		)
 	}
 

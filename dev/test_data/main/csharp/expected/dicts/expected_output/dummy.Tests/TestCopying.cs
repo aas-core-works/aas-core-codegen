@@ -82,6 +82,44 @@ namespace dummy.Tests
                         : that.OptionalTexts == null && casted.OptionalTexts == null));
             }
 
+            public override bool TransformRegistry(
+                Our.IRegistry that,
+                Our.IClass other)
+            {
+                if (!(other is Our.Registry casted) || ReferenceEquals(that, other))
+                {
+                    return false;
+                }
+
+                return (
+                    Check_DictOf_string_long(
+                        that.Counts,
+                        casted.Counts)
+                    && Check_DictOf_long_long(
+                        that.CountsByNumber,
+                        casted.CountsByNumber)
+                    && Check_DictOf_Direction_long(
+                        that.Weights,
+                        casted.Weights)
+                    && Check_DictOf_string_Kind(
+                        that.KindsByCode,
+                        casted.KindsByCode)
+                    && Check_DictOf_string_string(
+                        that.CodesByName,
+                        casted.CodesByName)
+                    && Check_DictOf_string_IItem(
+                        that.ItemsByName,
+                        casted.ItemsByName)
+                    && Check_DictOf_string_ListOf_ListOf_DictOf_long_string(
+                        that.Labels,
+                        casted.Labels)
+                    && ((that.OptionalCounts != null && casted.OptionalCounts != null)
+                        ? Check_DictOf_string_long(
+                            that.OptionalCounts,
+                            casted.OptionalCounts)
+                        : that.OptionalCounts == null && casted.OptionalCounts == null));
+            }
+
             private bool Check_ListOf_string(
                 List<string> that,
                 List<string> other)
@@ -167,6 +205,264 @@ namespace dummy.Tests
 
                 return true;
             }
+
+            private bool Check_DictOf_string_long(
+                Dictionary<string, long> that,
+                Dictionary<string, long> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        item.Value == otherValue))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_DictOf_long_long(
+                Dictionary<long, long> that,
+                Dictionary<long, long> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        item.Value == otherValue))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_DictOf_Direction_long(
+                Dictionary<Our.Direction, long> that,
+                Dictionary<Our.Direction, long> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        item.Value == otherValue))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_DictOf_string_Kind(
+                Dictionary<string, Our.Kind> that,
+                Dictionary<string, Our.Kind> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        item.Value == otherValue))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_DictOf_string_string(
+                Dictionary<string, string> that,
+                Dictionary<string, string> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        item.Value == otherValue))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_DictOf_string_IItem(
+                Dictionary<string, Our.IItem> that,
+                Dictionary<string, Our.IItem> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        Transform(
+                            item.Value,
+                            otherValue)))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_DictOf_string_ListOf_ListOf_DictOf_long_string(
+                Dictionary<string, List<List<Dictionary<long, string>>>> that,
+                Dictionary<string, List<List<Dictionary<long, string>>>> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        Check_ListOf_ListOf_DictOf_long_string(
+                            item.Value,
+                            otherValue)))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_ListOf_DictOf_long_string(
+                List<List<Dictionary<long, string>>> that,
+                List<List<Dictionary<long, string>>> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Check_ListOf_DictOf_long_string(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_ListOf_DictOf_long_string(
+                List<Dictionary<long, string>> that,
+                List<Dictionary<long, string>> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < that.Count; i++)
+                {
+                    if (!(
+                        Check_DictOf_long_string(
+                            that[i],
+                            other[i])))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            private bool Check_DictOf_long_string(
+                Dictionary<long, string> that,
+                Dictionary<long, string> other)
+            {
+                if (ReferenceEquals(that, other) || that.Count != other.Count)
+                {
+                    return false;
+                }
+
+                foreach (var item in that)
+                {
+                    if (!other.TryGetValue(item.Key, out var otherValue))
+                    {
+                        return false;
+                    }
+
+                    if (!(
+                        item.Value == otherValue))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         }  // internal class DeepCopyChecker
 
         private static readonly DeepCopyChecker DeepCopyCheckerInstance = (
@@ -190,6 +486,21 @@ namespace dummy.Tests
                 && that.Codes == other.Codes
                 && that.Items == other.Items
                 && that.OptionalTexts == other.OptionalTexts);
+        }
+
+        private static bool RegistryShallowEquals(
+            Our.Registry that,
+            Our.Registry other)
+        {
+            return (
+                that.Counts == other.Counts
+                && that.CountsByNumber == other.CountsByNumber
+                && that.Weights == other.Weights
+                && that.KindsByCode == other.KindsByCode
+                && that.CodesByName == other.CodesByName
+                && that.ItemsByName == other.ItemsByName
+                && that.Labels == other.Labels
+                && that.OptionalCounts == other.OptionalCounts);
         }
 
         [Test]
@@ -247,6 +558,34 @@ namespace dummy.Tests
                     instance, instanceCopy),
                 "Something");
         }  // public void Test_Something_deep_copy
+
+        [Test]
+        public void Test_Registry_shallow_copy()
+        {
+            Our.Registry instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRegistry());
+
+            var instanceCopy = Our.Copying.Shallow(instance);
+
+            Assert.IsTrue(
+                RegistryShallowEquals(
+                    instance, instanceCopy),
+                "Registry");
+        }  // public void Test_Registry_shallow_copy
+
+        [Test]
+        public void Test_Registry_deep_copy()
+        {
+            Our.Registry instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRegistry());
+
+            var instanceCopy = Our.Copying.Deep(instance);
+
+            Assert.IsTrue(
+                DeepCopyCheckerInstance.Transform(
+                    instance, instanceCopy),
+                "Registry");
+        }  // public void Test_Registry_deep_copy
     }  // class TestCopying
 }  // namespace dummy.Tests
 

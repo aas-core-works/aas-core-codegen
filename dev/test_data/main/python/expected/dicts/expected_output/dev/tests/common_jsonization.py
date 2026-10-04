@@ -122,6 +122,8 @@ _MODEL_TYPE_TO_FROM_JSONABLE: Mapping[
 ] = {
     'Item':
         our_jsonization.item_from_jsonable,
+    'Registry':
+        our_jsonization.registry_from_jsonable,
     'Something':
         our_jsonization.something_from_jsonable
 }
@@ -133,6 +135,8 @@ _MODEL_TYPE_TO_CLASS: Mapping[
 ] = {
     'Item':
         our_types.Item,
+    'Registry':
+        our_types.Registry,
     'Something':
         our_types.Something
 }

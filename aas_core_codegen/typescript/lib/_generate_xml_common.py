@@ -176,6 +176,133 @@ export function parseSet<T>(
         else []
     )  # type: List[Stripped]
 
+    # NOTE (mristin):
+    # We parse the dictionaries only for a meta-model which has a dictionary in
+    # a property.
+    map_blocks = (
+        [
+            Stripped(
+                f"""\
+/**
+ * Parse a sequence of the items of a dictionary from `cursor`, stopping
+ * (without consuming) at the first closing element.
+ *
+ * Every item is an element `<i>` holding exactly the key in an element `<k>`
+ * followed by the value in an element `<v>`. The items can come in any order,
+ * but a duplicate key is refused at its own item, so that no item is silently
+ * lost. The caller is expected to read and verify the property's own closing
+ * element afterwards.
+ *
+ * @param cursor - to read from
+ * @param parseKey - parses the content of a single `<k>`
+ * @param parseValue - parses the content of a single `<v>`
+ * @returns the parsed items, or an error
+ * @typeParam K - type of a single key
+ * @typeParam V - type of a single value
+ */
+export function parseMap<K, V>(
+{I}cursor: XmlCursor,
+{I}parseKey: ContentParser<K>,
+{I}parseValue: ContentParser<V>
+): OurCommon.Either<Map<K, V>, DeserializationError> {{
+{I}const items = new Map<K, V>();
+{I}let itemIndex = 0;
+
+{I}cursor.skipIgnorable();
+{I}// eslint-disable-next-line no-constant-condition
+{I}while (true) {{
+{II}const maybeClose = cursor.current();
+{II}if (maybeClose === null) {{
+{III}return newDeserializationError<Map<K, V>>(
+{IIII}"Expected an XML element corresponding to a dictionary item " +
+{IIIII}"or property closing element, but got end of token stream"
+{III});
+{II}}}
+
+{II}if (maybeClose instanceof CloseTagToken) {{
+{III}break;
+{II}}}
+
+{II}const startTagOrError = readNextOpenTag(cursor);
+{II}if (startTagOrError.error !== null) {{
+{III}startTagOrError.error.path.prepend(new IndexSegment(itemIndex));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}startTagOrError.error
+{III});
+{II}}}
+
+{II}const observedLocalName = localNameOfTag(startTagOrError.mustValue().tag);
+{II}if (observedLocalName !== "i") {{
+{III}const error = new DeserializationError(
+{IIII}`Expected the element 'i' of a dictionary item, ` +
+{IIIII}`but got '${{observedLocalName}}'`
+{III});
+{III}error.path.prepend(new IndexSegment(itemIndex));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}error
+{III});
+{II}}}
+
+{II}cursor.advance();
+
+{II}const keyOrError = parseNamedElement(cursor, "k", parseKey);
+{II}if (keyOrError.error !== null) {{
+{III}keyOrError.error.path.prepend(new ElementSegment("k"));
+{III}keyOrError.error.path.prepend(new IndexSegment(itemIndex));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}keyOrError.error
+{III});
+{II}}}
+
+{II}const key = keyOrError.mustValue();
+{II}if (items.has(key)) {{
+{III}const error = new DeserializationError(
+{IIII}"Expected unique keys in the dictionary, but the key is a duplicate"
+{III});
+{III}error.path.prepend(new ElementSegment("k"));
+{III}error.path.prepend(new IndexSegment(itemIndex));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}error
+{III});
+{II}}}
+
+{II}const valueOrError = parseNamedElement(cursor, "v", parseValue);
+{II}if (valueOrError.error !== null) {{
+{III}valueOrError.error.path.prepend(new ElementSegment("v"));
+{III}valueOrError.error.path.prepend(new IndexSegment(itemIndex));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}valueOrError.error
+{III});
+{II}}}
+
+{II}cursor.skipIgnorable();
+{II}const closeError = consumeCloseTag(cursor, "i");
+{II}if (closeError !== null) {{
+{III}closeError.path.prepend(new IndexSegment(itemIndex));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}closeError
+{III});
+{II}}}
+
+{II}items.set(key, valueOrError.mustValue());
+{II}itemIndex++;
+{II}cursor.skipIgnorable();
+{I}}}
+
+{I}return new OurCommon.Either<Map<K, V>, DeserializationError>(items, null);
+}}"""
+            )
+        ]
+        if intermediate_uses.dict_properties(symbol_table)
+        else []
+    )  # type: List[Stripped]
+
     blocks = [
         Stripped(
             """\
@@ -1197,6 +1324,7 @@ export function escapeXmlText(text: string): string {{
 }}"""
         ),
         *set_blocks,
+        *map_blocks,
         *in_no_namespace_blocks,
         typescript_common.WARNING,
     ]  # type: List[Stripped]

@@ -3,7 +3,7 @@
 import io
 import math
 import re
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Sequence
 
 from icontract import ensure, require
 
@@ -877,6 +877,92 @@ def generate_set_item_less(items: intermediate.TypeAnnotationUnion) -> Stripped:
     raise AssertionError(
         f"Unexpected items of a set, as the intermediate layer refuses them: {items}"
     )
+
+
+def dict_key_to_wstring_function(keys: intermediate.TypeAnnotationUnion) -> Stripped:
+    """
+    Name the function rendering a key of a dictionary as the text of its JSON key.
+
+    We use the text in the paths, so that a path points to the key exactly as
+    the key is serialized.
+
+    See :py:func:`generate_dict_key_to_wstring_definitions` for the definitions.
+    """
+    primitive_type = intermediate.try_primitive_type(keys)
+
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped("WstringKeyToWstring")
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped("Int64KeyToWstring")
+
+    if isinstance(keys, intermediate.OurTypeAnnotation) and isinstance(
+        keys.our_type, intermediate.Enumeration
+    ):
+        enum_name = cpp_naming.enum_name(keys.our_type.name)
+        return Stripped(f"EnumerationKeyToWstring<types::{enum_name}>")
+
+    raise AssertionError(
+        f"Unexpected keys of a dictionary: {keys}; they should have been refused "
+        f"in intermediate._translate._verify_keys_of_dicts."
+    )
+
+
+def generate_dict_key_to_wstring_definitions(
+    keys: Sequence[intermediate.TypeAnnotationUnion],
+) -> List[Stripped]:
+    """
+    Generate the functions rendering the ``keys`` of the dictionaries as texts.
+
+    We generate only the functions needed by the ``keys``, see
+    :py:func:`dict_key_to_wstring_function`.
+    """
+    names = {dict_key_to_wstring_function(key) for key in keys}
+
+    result = []  # type: List[Stripped]
+
+    if "WstringKeyToWstring" in names:
+        result.append(
+            Stripped(
+                f"""\
+/**
+ * Render the string \\p key of a dictionary as the text of its JSON key.
+ */
+std::wstring WstringKeyToWstring(const std::wstring& key) {{
+{INDENT}return key;
+}}"""
+            )
+        )
+
+    if "Int64KeyToWstring" in names:
+        result.append(
+            Stripped(
+                f"""\
+/**
+ * Render the integer \\p key of a dictionary as the text of its JSON key.
+ */
+std::wstring Int64KeyToWstring(const int64_t& key) {{
+{INDENT}return std::to_wstring(key);
+}}"""
+            )
+        )
+
+    if any(name.startswith("EnumerationKeyToWstring<") for name in names):
+        result.append(
+            Stripped(
+                f"""\
+/**
+ * Render the \\p key of a dictionary, a literal of an enumeration, as the text
+ * of its JSON key.
+ */
+template<typename EnumT>
+std::wstring EnumerationKeyToWstring(const EnumT& key) {{
+{INDENT}return wstringification::to_wstring(key);
+}}"""
+            )
+        )
+
+    return result
 
 
 _ANGLE_BRACKETS_IN_TYPE_RE = re.compile(r"\s*([<>])\s*")

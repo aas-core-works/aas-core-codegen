@@ -370,8 +370,9 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> Identifie
     """
     Determine the moniker of ``type_annotation`` at any depth.
 
-    A list is ``list_of__{items}``, a set ``set_of__{items}`` and a tuple
-    ``tuple{arity}_of__{item}__...``, where the monikers of the items are nested
+    A list is ``list_of__{items}``, a set ``set_of__{items}``, a dictionary
+    ``dict_of__{keys}__{values}`` and a tuple ``tuple{arity}_of__{item}__...``,
+    where the monikers of the items are nested
     recursively. The name is in Polish notation: the arity of every prefix is
     known, so the name can always be split back into its parts. The optionals
     appear only at the top, so we look beneath them.
@@ -383,6 +384,12 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> Identifie
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return Identifier(f"set_of__{type_moniker(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return Identifier(
+            f"dict_of__{type_moniker(type_anno.keys)}"
+            f"__{type_moniker(type_anno.values)}"
+        )
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return Identifier(
@@ -415,13 +422,16 @@ def errors_in_monikers(symbol_table: intermediate.SymbolTable) -> List[Error]:
 
         moniker = naming.lower_snake_case(our_type.name)
 
-        if moniker in ("list_of", "set_of") or re.fullmatch(r"tuple[0-9]+_of", moniker):
+        if moniker in ("list_of", "set_of", "dict_of") or re.fullmatch(
+            r"tuple[0-9]+_of", moniker
+        ):
             errors.append(
                 Error(
                     our_type.parsed.node,
                     f"The name of the type {our_type.name!r} gives the moniker "
                     f"{moniker!r}, which is reserved for the composed "
-                    f"de/serializers of the lists, the sets and the tuples. "
+                    f"de/serializers of the lists, the sets, the dictionaries and "
+                    f"the tuples. "
                     f"Please rename the type, or contact the developers if you "
                     f"need this feature.",
                 )
@@ -491,6 +501,12 @@ def describe_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return Stripped(f"sets of {describe_type(type_anno.items)}")
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return Stripped(
+            f"dictionaries of {describe_type(type_anno.keys)} "
+            f"to {describe_type(type_anno.values)}"
+        )
+
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return Stripped(f"tuples of {len(type_anno.items)} item(s)")
 
@@ -506,6 +522,12 @@ def describe_value_type(type_annotation: intermediate.TypeAnnotationUnion) -> St
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return Stripped(f"a set of {describe_type(type_anno.items)}")
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return Stripped(
+            f"a dictionary of {describe_type(type_anno.keys)} "
+            f"to {describe_type(type_anno.values)}"
+        )
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return Stripped(f"a tuple of {len(type_anno.items)} item(s)")
@@ -850,6 +872,32 @@ def typing_imports_for_dicts(
         result.append(Identifier("Mapping"))
 
     return result
+
+
+def generate_sorted_keys(
+    keys_type_annotation: intermediate.TypeAnnotationUnion, dictionary: str
+) -> Stripped:
+    """
+    Generate the code giving the keys of the ``dictionary`` in the sorted order.
+
+    The keys of a dictionary are sorted in the same order in all the targets,
+    whenever we serialize, verify or descend into a dictionary property. Python
+    sorts the integers numerically and the strings by their code points, which
+    is exactly the order which we need. The enumeration literals are sorted by
+    their values, which gives the ranks of the literals, see
+    :py:func:`rank_function_name`.
+    """
+    if isinstance(keys_type_annotation, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_annotation.our_type, intermediate.Enumeration
+    ):
+        return Stripped(f"sorted({dictionary}, key=lambda literal: literal.value)")
+
+    assert intermediate.try_primitive_type(keys_type_annotation) in (
+        intermediate.PrimitiveType.STR,
+        intermediate.PrimitiveType.INT,
+    ), f"Unexpected keys of a dictionary: {keys_type_annotation}"
+
+    return Stripped(f"sorted({dictionary})")
 
 
 def rank_function_name(enumeration: intermediate.Enumeration) -> Identifier:

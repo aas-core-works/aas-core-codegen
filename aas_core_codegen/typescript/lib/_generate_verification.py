@@ -807,6 +807,12 @@ def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
         monikers = "_".join(_verification_moniker(item) for item in type_anno.items)
         return f"TupleOf{len(type_anno.items)}_{monikers}"
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return (
+            f"DictOf_{_verification_moniker(type_anno.keys)}"
+            f"_{_verification_moniker(type_anno.values)}"
+        )
+
     if _is_instance(type_anno):
         return "class"
 
@@ -840,6 +846,12 @@ def _verification_parameter_type(type_anno: intermediate.TypeAnnotationUnion) ->
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return f"ReadonlySet<{_verification_parameter_type(type_anno.items)}>"
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return (
+            f"ReadonlyMap<{_verification_parameter_type(type_anno.keys)}, "
+            f"{_verification_parameter_type(type_anno.values)}>"
+        )
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         item_types = [_verification_parameter_type(item) for item in type_anno.items]
@@ -1058,10 +1070,50 @@ new IndexSegment(
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        key_segment = f"""\
+new KeySegment(
+{I}that,
+{I}{typescript_common.generate_json_key(type_anno.keys, Stripped("key"))}
+)"""
+
+        entry_blocks = []  # type: List[Stripped]
+
+        # NOTE (mristin):
+        # An erroneous key is reported at the key segment as well. The path thus
+        # leads to the item, and the message says what is wrong with the key.
+        if _needs_verification(type_anno.keys):
+            entry_blocks.append(
+                _generate_verify_into(
+                    expr="key", type_anno=type_anno.keys, segments=[key_segment]
+                )
+            )
+
+        if _needs_verification(type_anno.values):
+            entry_blocks.append(
+                _generate_verify_into(
+                    expr="value", type_anno=type_anno.values, segments=[key_segment]
+                )
+            )
+
+        entry_stmts = Stripped("\n\n".join(entry_blocks))
+
+        sorted_entries = typescript_common.generate_sorted_dict_entries(
+            type_anno=type_anno, dict_expression=Stripped("that")
+        )
+
+        # NOTE (mristin):
+        # We verify the items in the order of their keys in which they are
+        # serialized, so that the errors are reported in the same order in all
+        # the SDKs.
+        entry_variables = (
+            "[key, value]" if _needs_verification(type_anno.values) else "[key]"
+        )
+
+        body = Stripped(
+            f"""\
+for (const {entry_variables} of {sorted_entries}) {{
+{I}{indent_but_first_line(entry_stmts, I)}
+}}"""
         )
 
     else:
@@ -1619,6 +1671,90 @@ for (const error of OurVerification.verify({an_instance_variable})) {{
     return Stripped(typescript_description.documentation_comment(Stripped(text))), None
 
 
+def _generate_key_segment(symbol_table: intermediate.SymbolTable) -> Stripped:
+    """
+    Generate the segment of a path naming a member of an object or an item of
+    a dictionary.
+
+    The segment holds a map as well only if the meta-model has a dictionary in
+    a property, so that the other SDKs keep their narrower type.
+    """
+    if not intermediate_uses.dict_properties(symbol_table):
+        return Stripped(
+            f"""\
+/**
+ * Represent a member access on a path to an erroneous value.
+ *
+ * @remarks
+ *
+ * Unlike a {{@link PropertySegment}}, which names a property of one of our
+ * classes, a key names a member of an open JSON-able object. It is known only
+ * at run time, and can be any string at all, so it is always rendered as
+ * a subscript.
+ */
+export class KeySegment {{
+{I}/**
+{I} * Object containing the value at {{@link key}}
+{I} */
+{I}readonly object: {{ readonly [key: string]: unknown }};
+
+{I}/**
+{I} * Key of the value in the {{@link object}}
+{I} */
+{I}readonly key: string;
+
+{I}constructor(object: {{ readonly [key: string]: unknown }}, key: string) {{
+{II}this.object = object;
+{II}this.key = key;
+{I}}}
+
+{I}toString(): string {{
+{II}return `[${{JSON.stringify(this.key)}}]`;
+{I}}}
+}}"""
+        )
+
+    return Stripped(
+        f"""\
+/**
+ * Represent a member access on a path to an erroneous value.
+ *
+ * @remarks
+ *
+ * Unlike a {{@link PropertySegment}}, which names a property of one of our
+ * classes, a key names a member of an open JSON-able object, or an item of
+ * a dictionary. It is known only at run time, and can be any string at all, so
+ * it is always rendered as a subscript. The key of a dictionary is rendered as
+ * its JSON key, so that the path is the same in all the SDKs.
+ */
+export class KeySegment {{
+{I}/**
+{I} * Object or map containing the value at {{@link key}}
+{I} */
+{I}readonly object:
+{II}| {{ readonly [key: string]: unknown }}
+{II}| ReadonlyMap<unknown, unknown>;
+
+{I}/**
+{I} * Key of the value in the {{@link object}}, rendered as a JSON key
+{I} */
+{I}readonly key: string;
+
+{I}constructor(
+{II}object: {{ readonly [key: string]: unknown }} | ReadonlyMap<unknown, unknown>,
+{II}key: string
+{I}) {{
+{II}this.object = object;
+{II}this.key = key;
+{I}}}
+
+{I}toString(): string {{
+{II}return `[${{JSON.stringify(this.key)}}]`;
+{I}}}
+}}"""
+    )
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
@@ -1714,39 +1850,7 @@ export class IndexSegment {{
 {I}}}
 }}"""
         ),
-        Stripped(
-            f"""\
-/**
- * Represent a member access on a path to an erroneous value.
- *
- * @remarks
- *
- * Unlike a {{@link PropertySegment}}, which names a property of one of our
- * classes, a key names a member of an open JSON-able object. It is known only
- * at run time, and can be any string at all, so it is always rendered as
- * a subscript.
- */
-export class KeySegment {{
-{I}/**
-{I} * Object containing the value at {{@link key}}
-{I} */
-{I}readonly object: {{ readonly [key: string]: unknown }};
-
-{I}/**
-{I} * Key of the value in the {{@link object}}
-{I} */
-{I}readonly key: string;
-
-{I}constructor(object: {{ readonly [key: string]: unknown }}, key: string) {{
-{II}this.object = object;
-{II}this.key = key;
-{I}}}
-
-{I}toString(): string {{
-{II}return `[${{JSON.stringify(this.key)}}]`;
-{I}}}
-}}"""
-        ),
+        _generate_key_segment(symbol_table),
         Stripped("export type Segment = PropertySegment | IndexSegment | KeySegment;"),
         Stripped(
             f"""\
@@ -1946,6 +2050,18 @@ export function *verify(
         else:
             # noinspection PyTypeChecker
             assert_never(our_type)
+
+    # NOTE (mristin):
+    # The verification of a dictionary keyed by the literals of an enumeration
+    # sorts and renders the keys with the stringification module. We import it
+    # only if it is used, as TypeScript complains about the unused imports.
+    if any("OurStringification." in block for block in blocks):
+        imports_index = blocks.index(typescript_common.WARNING) + 1
+        blocks[imports_index] = Stripped(
+            f"""\
+{blocks[imports_index]}
+import * as OurStringification from "./stringification";"""
+        )
 
     blocks.append(typescript_common.WARNING)
 

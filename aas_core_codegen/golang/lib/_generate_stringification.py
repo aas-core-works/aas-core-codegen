@@ -377,9 +377,15 @@ import (
         _generate_model_type_to_string(symbol_table=symbol_table),
     ]
 
+    # NOTE (mristin):
+    # We sort the literals by their rank both in the set properties and as
+    # the keys of the dictionary properties.
     enum_ids_in_set_properties = set(
         intermediate.runtime_id(enum)
-        for enum in intermediate_uses.enumerations_in_set_properties(symbol_table)
+        for enum in (
+            *intermediate_uses.enumerations_in_set_properties(symbol_table),
+            *intermediate_uses.enumerations_in_dict_property_keys(symbol_table),
+        )
     )
 
     for enum in symbol_table.enumerations:

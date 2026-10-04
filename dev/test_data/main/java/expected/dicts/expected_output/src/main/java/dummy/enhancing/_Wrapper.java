@@ -13,6 +13,8 @@ import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.HashMap;
+import java.util.Map;
 
 class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
   private final Function<IClass, Optional<EnhancementT>> enhancementFactory;
@@ -65,6 +67,28 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
       );
   }
 
+  @Override
+  public IClass transformRegistry(
+    IRegistry that
+  ) {
+    if (that instanceof Enhanced)
+    {
+      throw new IllegalArgumentException(
+        "The instance has been already enhanced: " + that
+      );
+    }
+
+    that.setItemsByName(wrapDictOf_string_IItem(that.getItemsByName()));
+
+    Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
+    return !enhancement.isPresent()
+      ? that
+      : new EnhancedRegistry<>(
+        that,
+        enhancement.get()
+      );
+  }
+
   @SuppressWarnings("unchecked")
   private <T extends IClass> T wrap(T that) {
     return (T) transform(that);
@@ -78,6 +102,20 @@ class _Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
     List<IItem> result = new ArrayList<>(that.size());
     for (IItem item : that) {
       result.add(wrap(item));
+    }
+    return result;
+  }
+
+  /**
+   * Wrap the instances held by {@code that} recursively in a new container.
+   */
+  private Map<String, IItem> wrapDictOf_string_IItem(
+    Map<String, IItem> that) {
+    Map<String, IItem> result = new HashMap<>(that.size());
+    for (Map.Entry<String, IItem> item : that.entrySet()) {
+      result.put(
+        item.getKey(),
+        wrap(item.getValue()));
     }
     return result;
   }

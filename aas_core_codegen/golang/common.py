@@ -3,7 +3,7 @@ import io
 import math
 import re
 import urllib.parse
-from typing import Final, List, Mapping, Sequence, Tuple, Optional
+from typing import Final, List, Mapping, Sequence, Tuple, Optional, Union
 
 from icontract import ensure, require
 
@@ -431,8 +431,9 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     Name the type in a way usable as a part of a Golang identifier.
 
     The monikers are a Polish notation over ``_``-separated tokens: ``ListOf``
-    and ``SetOf`` take exactly one argument, ``TupleOf{N}`` exactly ``N`` of them, and
-    everything else is a leaf. A leaf token never contains an underscore
+    and ``SetOf`` take exactly one argument, ``DictOf`` exactly two (the keys and
+    the values), ``TupleOf{N}`` exactly ``N`` of them, and everything else is
+    a leaf. A leaf token never contains an underscore
     (see :py:func:`leaf_moniker`), so the encoding is injective -- two
     different types can not be given the same moniker, and hence neither can
     two different functions be given the same name.
@@ -442,6 +443,9 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return f"SetOf_{type_moniker(type_anno.items)}"
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return f"DictOf_{type_moniker(type_anno.keys)}_{type_moniker(type_anno.values)}"
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         joined = "_".join(type_moniker(item) for item in type_anno.items)
@@ -589,63 +593,77 @@ def names_package(blocks: Sequence[str], qualifier: str) -> bool:
     return any(pattern.search(block) is not None for block in blocks)
 
 
-def sorted_set_items_expr(
-    set_expr: str, items: intermediate.TypeAnnotationUnion, column: int
+def _less_by_serialization(type_anno: intermediate.TypeAnnotationUnion) -> str:
+    """
+    Determine the function comparing the values of ``type_anno`` for sorting.
+
+    We sort in the order of their serialization, which is the same in all
+    the targets: ``false`` before ``true``, the integers numerically, and
+    the strings and the literals of the enumerations by the code points of their
+    text. Go compares the strings byte by byte, and the order of the bytes in
+    UTF-8 is the order of the code points.
+    """
+    primitive_type = intermediate.try_primitive_type(type_anno)
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        return "ourcommon.LessBool"
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return "ourcommon.LessOrdered[int64]"
+
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return "ourcommon.LessOrdered[string]"
+
+    if primitive_type is not None:
+        raise AssertionError(
+            f"Unexpected values to be sorted of type {primitive_type}: {type_anno}"
+        )
+
+    if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type, intermediate.Enumeration
+    ):
+        return "ourstringification." + golang_naming.function_name(
+            Identifier(f"less_by_rank_of_{type_anno.our_type.name}")
+        )
+
+    raise AssertionError(f"Unexpected values to be sorted: {type_anno}")
+
+
+def sorted_keys_expr(
+    map_expr: str,
+    container: Union[intermediate.SetTypeAnnotation, intermediate.DictTypeAnnotation],
+    column: int,
 ) -> Stripped:
     """
-    Generate the expression giving the items of ``set_expr`` as a sorted slice.
+    Generate the expression giving the keys of ``map_expr`` as a sorted slice.
+
+    The ``map_expr`` is either a set, which is a Golang map to empty structs,
+    or a dictionary, as given by the ``container``.
 
     The expression is expected to start at the ``column`` of its line, counting
     a tab as :py:data:`TAB_WIDTH` characters. If it does not fit on that line,
     we split it over multiple lines.
 
-    We sort the items in the order of their serialization, which is the same in
-    all the targets: ``false`` before ``true``, the integers numerically, and
-    the strings and the literals of the enumerations by the code points of their
-    text. Go compares the strings byte by byte, and the order of the bytes in
-    UTF-8 is the order of the code points.
+    We sort the keys in the order of their serialization, which is the same in
+    all the targets, see :py:func:`_less_by_serialization`.
 
-    A nil set gives a nil slice, so that an absent optional set stays absent.
+    A nil map gives a nil slice, so that an absent optional set stays absent.
     """
     less: str
-
-    primitive_type = intermediate.try_primitive_type(items)
-    if primitive_type is intermediate.PrimitiveType.BOOL:
-        less = "ourcommon.LessBool"
-
-    elif primitive_type is intermediate.PrimitiveType.INT:
-        less = "ourcommon.LessOrdered[int64]"
-
-    elif primitive_type is intermediate.PrimitiveType.STR:
-        less = "ourcommon.LessOrdered[string]"
-
-    elif primitive_type is not None:
-        raise AssertionError(
-            f"Unexpected items of a set, as we refuse the sets of {primitive_type} "
-            f"in intermediate._translate._verify_items_of_sets: {items}"
-        )
-
-    elif isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
-        items.our_type, intermediate.Enumeration
-    ):
-        less = "ourstringification." + golang_naming.function_name(
-            Identifier(f"less_by_rank_of_{items.our_type.name}")
-        )
-
+    if isinstance(container, intermediate.SetTypeAnnotation):
+        less = _less_by_serialization(container.items)
+    elif isinstance(container, intermediate.DictTypeAnnotation):
+        less = _less_by_serialization(container.keys)
     else:
-        raise AssertionError(
-            f"Unexpected items of a set, as we refuse them "
-            f"in intermediate._translate._verify_items_of_sets: {items}"
-        )
+        assert_never(container)
 
-    single_line = f"ourcommon.SortedKeys({set_expr}, {less})"
+    single_line = f"ourcommon.SortedKeys({map_expr}, {less})"
     if column + len(single_line) <= MAX_LINE_LENGTH:
         return Stripped(single_line)
 
     return Stripped(
         f"""\
 ourcommon.SortedKeys(
-{INDENT}{set_expr},
+{INDENT}{map_expr},
 {INDENT}{less},
 )"""
     )

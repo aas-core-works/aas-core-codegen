@@ -2160,6 +2160,51 @@ std::pair<
     )
 
 
+def _generate_deserialize_sole_element_content() -> Stripped:
+    """Generate the function to deserialize a sole element enclosed in another one."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize the content which is a sole element, such as
+ * the element of an instance enclosed in a `<v>`.
+ *
+ * We skip the whitespace around the element.
+ *
+ * \\param reader to read from
+ * \\param deserialize_element de-serializes the element
+ * \\return the value, or an error, if any
+ */
+template <typename T, typename DeserializeT>
+std::pair<
+{I}common::optional<T>,
+{I}common::optional<DeserializationError>
+> DeserializeSoleElementContent(
+{I}xml_common::ReaderMergingText& reader,
+{I}const DeserializeT& deserialize_element
+) {{
+{I}common::optional<DeserializationError> error;
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}common::optional<T> value;
+{I}std::tie(value, error) = deserialize_element(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}return std::make_pair(std::move(value), common::nullopt);
+}}"""
+    )
+
+
 def _generate_deserialize_set() -> Stripped:
     """Generate a generic function to deserialize the sets."""
     return Stripped(
@@ -2230,6 +2275,194 @@ std::pair<
 {III}if (!inserted) {{
 {IIII}error = DeserializationError(
 {IIIII}L"Expected unique items in the set, but the item is a duplicate"
+{IIII});
+{III}}}
+{II}}}
+
+{II}if (error.has_value()) {{
+{III}error->path.segments.emplace_front(
+{IIII}common::make_unique<xml_path::IndexSegment>(i)
+{III});
+{III}break;
+{II}}}
+
+{II}error = SkipWhitespace(reader);
+{II}if (error.has_value()) {{
+{III}break;
+{II}}}
+
+{II}if (reader.node().kind() == xml_common::NodeKind::Stop) {{
+{III}break;
+{II}}}
+
+{II}++i;
+{I}}}
+
+{I}if (error.has_value()) {{
+{II}return std::make_pair(
+{III}common::nullopt,
+{III}std::move(error)
+{II});
+{I}}}
+
+{I}return std::make_pair(
+{II}std::move(items),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
+def _generate_deserialize_dict() -> Stripped:
+    """Generate a generic function to deserialize the dictionaries."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize the content of an item of a dictionary, its key in
+ * a `<k>` element followed by its value in a `<v>` element.
+ *
+ * \\param reader to read from
+ * \\param deserialize_key de-serializes the `<k>` element
+ * \\param deserialize_value de-serializes the `<v>` element
+ * \\return the key and the value, or an error, if any
+ */
+template <
+{I}typename K,
+{I}typename V,
+{I}typename DeserializeKeyT,
+{I}typename DeserializeValueT
+>
+std::pair<
+{I}common::optional<std::pair<K, V> >,
+{I}common::optional<DeserializationError>
+> DeserializeDictItemContent(
+{I}xml_common::ReaderMergingText& reader,
+{I}const DeserializeKeyT& deserialize_key,
+{I}const DeserializeValueT& deserialize_value
+) {{
+{I}common::optional<DeserializationError> error;
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}common::optional<K> key;
+{I}std::tie(key, error) = deserialize_key(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}common::optional<V> value;
+{I}std::tie(value, error) = deserialize_value(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(common::nullopt, std::move(error));
+{I}}}
+
+{I}return std::make_pair(
+{II}common::make_optional<std::pair<K, V> >(
+{III}std::move(*key),
+{III}std::move(*value)
+{II}),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
+def _generate_deserialize_dict_items() -> Stripped:
+    """Generate a generic function to deserialize the items of a dictionary."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize the items of a dictionary, each wrapped in its own
+ * `<i>` element.
+ *
+ * The keys can come in any order, but we refuse the duplicates, as we would
+ * lose the values silently otherwise.
+ *
+ * \\tparam MapT type of the dictionary, which might come with its own hasher
+ * \\param reader to read from
+ * \\param deserialize_item_content de-serializes the content of an `<i>`
+ * \\return the dictionary, or an error, if any
+ */
+template <typename MapT, typename DeserializeT>
+std::pair<
+{I}common::optional<MapT >,
+{I}common::optional<DeserializationError>
+> DeserializeDict(
+{I}xml_common::ReaderMergingText& reader,
+{I}const DeserializeT& deserialize_item_content
+) {{
+{I}typedef typename MapT::key_type K;
+{I}typedef typename MapT::mapped_type V;
+
+{I}#ifdef DEBUG
+{I}if (reader.node().kind() == xml_common::NodeKind::Error) {{
+{II}throw std::logic_error(
+{III}"Unexpected unhandled XML error in DeserializeDict. "
+{III}"DeserializeDict expects no error node."
+{II});
+{I}}}
+{I}#endif
+
+{I}common::optional<DeserializationError> error;
+
+{I}error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return std::make_pair(
+{III}common::nullopt,
+{III}std::move(error)
+{II});
+{I}}}
+
+{I}MapT items;
+
+{I}// If we encounter the stop element then we reached the end of the dictionary.
+{I}// If this is the first node we encounter then the dictionary is empty, *i.e.*,
+{I}// contains no items.
+{I}if (reader.node().kind() == xml_common::NodeKind::Stop) {{
+{II}return std::make_pair(
+{III}std::move(items),
+{III}common::nullopt
+{II});
+{I}}}
+
+{I}size_t i = 0;
+
+{I}while (true) {{
+{II}common::optional<std::pair<K, V> > item;
+
+{II}std::tie(
+{III}item,
+{III}error
+{II}) = DeserializeValueFromVElement<std::pair<K, V> >(
+{III}reader,
+{III}deserialize_item_content,
+{III}"i"
+{II});
+
+{II}if (!error.has_value()) {{
+{III}const bool inserted = items.insert(std::move(*item)).second;
+{III}if (!inserted) {{
+{IIII}error = DeserializationError(
+{IIIII}L"Expected unique keys in the dictionary, but the key is a duplicate"
+{IIII});
+{IIII}error->path.segments.emplace_front(
+{IIIII}common::make_unique<xml_path::ElementSegment>(L"k")
+{IIII});
+{IIII}error->path.segments.emplace_front(
+{IIIII}common::make_unique<xml_path::ElementSegment>(L"i")
 {IIII});
 {III}}}
 {II}}}
@@ -3056,6 +3289,26 @@ def _xml_deserialize_item_or_nested_expr(
     )
 
 
+def _xml_writes_own_element(
+    type_anno: intermediate.TypeAnnotationUnion,
+) -> bool:
+    """
+    Check whether a value of ``type_anno`` writes the element around itself.
+
+    An instance and a named union are self-describing -- the name of their XML
+    element is their model type -- while everything else has to be wrapped in
+    an element named after its position.
+    """
+    return isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type,
+        (
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+            intermediate.NamedUnion,
+        ),
+    )
+
+
 def _xml_deserialize_container_content_expr(
     type_anno: intermediate.ContainerTypeAnnotation, reader_expr: str
 ) -> Stripped:
@@ -3133,10 +3386,80 @@ DeserializeTuple{len(type_anno.items)}<
         )
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        dict_type = cpp_common.generate_type(
+            type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        key_type = cpp_common.generate_type(
+            type_annotation=type_anno.keys, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        value_type = cpp_common.generate_type(
+            type_annotation=type_anno.values,
+            types_namespace=cpp_common.TYPES_NAMESPACE,
+        )
+
+        assert isinstance(type_anno.keys, intermediate.AtomicTypeAnnotationAsTuple)
+        key_expr = _xml_deserialize_item_expr(
+            item_type_anno=type_anno.keys, item_type=key_type, v_element_name="k"
+        )
+
+        value_expr: Stripped
+        if _xml_writes_own_element(type_anno.values):
+            # NOTE (mristin):
+            # An instance as a value is always wrapped in a `<v>` element, unlike
+            # an instance as an item of a list, so that every item of
+            # the dictionary holds exactly a `<k>` and a `<v>`.
+            assert isinstance(
+                type_anno.values, intermediate.AtomicTypeAnnotationAsTuple
+            )
+            from_element = _xml_deserialize_item_expr(
+                item_type_anno=type_anno.values,
+                item_type=value_type,
+                v_element_name="v",
+            )
+
+            value_expr = Stripped(
+                f"""\
+[](xml_common::ReaderMergingText& a_reader) {{
+{I}return DeserializeValueFromVElement<
+{II}{indent_but_first_line(value_type, II)}
+{I}>(
+{II}a_reader,
+{II}[](xml_common::ReaderMergingText& another_reader) {{
+{III}return DeserializeSoleElementContent<
+{IIII}{indent_but_first_line(value_type, IIII)}
+{III}>(
+{IIII}another_reader,
+{IIII}{from_element}
+{III});
+{II}}},
+{II}"v"
+{I});
+}}"""
+            )
+        else:
+            value_expr = _xml_deserialize_item_or_nested_expr(
+                item_type_anno=type_anno.values, v_element_name="v"
+            )
+
+        return Stripped(
+            f"""\
+DeserializeDict<
+{I}{indent_but_first_line(dict_type, I)}
+>(
+{I}{reader_expr},
+{I}[](xml_common::ReaderMergingText& a_reader) {{
+{II}return DeserializeDictItemContent<
+{III}{indent_but_first_line(key_type, III)},
+{III}{indent_but_first_line(value_type, III)}
+{II}>(
+{III}a_reader,
+{III}{indent_but_first_line(key_expr, III)},
+{III}{indent_but_first_line(value_expr, III)}
+{II});
+{I}}}
+)"""
         )
 
     assert_never(type_anno)
@@ -3380,10 +3703,8 @@ def _generate_deserialize_property_expr(
             return _generate_deserialize_set_expr(prop=prop)
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
+            return _xml_deserialize_container_content_expr(
+                type_anno=type_anno, reader_expr="reader"
             )
 
         else:
@@ -4544,26 +4865,6 @@ def _xml_write_content_expr(
     raise AssertionError("Should not have gotten here")
 
 
-def _xml_writes_own_element(
-    type_anno: intermediate.TypeAnnotationUnion,
-) -> bool:
-    """
-    Check whether a value of ``type_anno`` writes the element around itself.
-
-    An instance and a named union are self-describing -- the name of their XML
-    element is their model type -- while everything else has to be wrapped in
-    an element named after its position.
-    """
-    return isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.our_type,
-        (
-            intermediate.AbstractClass,
-            intermediate.ConcreteClass,
-            intermediate.NamedUnion,
-        ),
-    )
-
-
 def _xml_write_own_element_expr(
     type_anno: intermediate.OurTypeAnnotation,
 ) -> Stripped:
@@ -4730,10 +5031,81 @@ if ({error_var}.has_value()) {{
         body = Stripped("\n\n".join(stmts))
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # All the SDKs write the items of a dictionary in the same order. The path
+        # of an error refers to the key of the item.
+        sorted_var = "sorted"
+        item_var = "item"
+        less = cpp_common.generate_set_item_less(type_anno.keys)
+        key_to_wstring = cpp_common.dict_key_to_wstring_function(type_anno.keys)
+
+        assert isinstance(type_anno.keys, intermediate.AtomicTypeAnnotationAsTuple)
+        key_call = _xml_write_item_call(
+            item_type_anno=type_anno.keys,
+            item_expr=f"{item_var}->first",
+            writer_expr=writer_var,
+            v_element_name="k",
+        )
+
+        value_call: Stripped
+        if _xml_writes_own_element(type_anno.values):
+            # NOTE (mristin):
+            # An instance as a value is always wrapped in a `<v>` element, see
+            # the de-serialization.
+            assert isinstance(type_anno.values, intermediate.OurTypeAnnotation)
+            value_call = Stripped(
+                f"""\
+WriteElement(
+{I}"v",
+{I}{item_var}->second,
+{I}{writer_var},
+{I}{_xml_write_own_element_expr(type_anno.values)}
+)"""
+            )
+        else:
+            value_call = _xml_write_item_call(
+                item_type_anno=type_anno.values,
+                item_expr=f"{item_var}->second",
+                writer_expr=writer_var,
+                v_element_name="v",
+            )
+
+        body = Stripped(
+            f"""\
+for (
+{I}const auto* {item_var} :
+{I}common::SortedItemPointers({value_var}, {less})
+) {{
+{I}{writer_var}.StartElement("i");
+{I}if ({writer_var}.error().has_value()) {{
+{II}return {writer_var}.move_error();
+{I}}}
+
+{I}common::optional<xml_common::SerializationError> {error_var}(
+{II}{indent_but_first_line(key_call, II)}
+{I});
+
+{I}if (!{error_var}.has_value()) {{
+{II}{error_var} = {indent_but_first_line(value_call, II)};
+{I}}}
+
+{I}if ({error_var}.has_value()) {{
+{II}{error_var}->path.segments.emplace_front(
+{III}common::make_unique<iteration::KeySegment>(
+{IIII}{key_to_wstring}({item_var}->first)
+{III})
+{II});
+
+{II}return {error_var};
+{I}}}
+
+{I}{writer_var}.StopElement("i");
+{I}if ({writer_var}.error().has_value()) {{
+{II}return {writer_var}.move_error();
+{I}}}
+}}
+
+return common::nullopt;"""
         )
 
     else:
@@ -4869,6 +5241,13 @@ def _generate_write_property_statements(prop: intermediate.Property) -> Stripped
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
         function_name = f"WriteTuple{len(type_anno.items)}Property"
         writer_exprs = _xml_write_tuple_item_exprs(type_anno)
+
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        # NOTE (mristin):
+        # The content of a dictionary is written by a function of its own, see
+        # :py:func:`_generate_write_nested_content`.
+        function_name = "WriteProperty"
+        writer_exprs = [Stripped(_write_nested_content_name(type_anno))]
 
     else:
         assert isinstance(type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
@@ -5452,6 +5831,11 @@ def _type_annotation_contains_value_in_v_element(
             ]  # type: Sequence[intermediate.TypeAnnotationUnion]
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             items = type_anno.items
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            # NOTE (mristin):
+            # The items of a dictionary are wrapped in ``<i>``, and their keys
+            # and values in ``<k>`` and ``<v>``, always.
+            return True
         else:
             continue
 
@@ -5459,6 +5843,21 @@ def _type_annotation_contains_value_in_v_element(
             return True
 
     return False
+
+
+def _dicts_in_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.DictTypeAnnotation]:
+    """List the dictionaries at any depth of the properties of the concrete classes."""
+    return [
+        type_anno
+        for cls in symbol_table.concrete_classes
+        for prop in cls.properties
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            prop.type_annotation
+        )
+        if isinstance(type_anno, intermediate.DictTypeAnnotation)
+    ]
 
 
 def _type_annotation_is_list_of_values(
@@ -5625,6 +6024,18 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
     if has_set_properties:
         blocks.append(_generate_deserialize_set())
 
+    dicts_in_properties = _dicts_in_properties(symbol_table)
+
+    if len(dicts_in_properties) > 0:
+        if any(
+            _xml_writes_own_element(dict_type_anno.values)
+            for dict_type_anno in dicts_in_properties
+        ):
+            blocks.append(_generate_deserialize_sole_element_content())
+
+        blocks.append(_generate_deserialize_dict())
+        blocks.append(_generate_deserialize_dict_items())
+
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_deserialize_tuple_function(arity))
 
@@ -5755,8 +6166,36 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
             )
         )
 
+    # NOTE (mristin):
+    # The paths render the keys of the dictionaries with these functions.
+    blocks.extend(
+        cpp_common.generate_dict_key_to_wstring_definitions(
+            [dict_type_anno.keys for dict_type_anno in dicts_in_properties]
+        )
+    )
+
     for nested_container in nested_containers:
         blocks.append(_generate_write_nested_content(nested_container))
+
+    # NOTE (mristin):
+    # A dictionary property is written by the same function as a nested one, so
+    # we generate the functions of the dictionary properties which are not
+    # nested elsewhere, after the nested ones which they call.
+    nested_monikers = {
+        cpp_over.moniker(nested_container) for nested_container in nested_containers
+    }
+    for cls in symbol_table.concrete_classes:
+        for prop in cls.properties:
+            type_anno = intermediate.beneath_optional(prop.type_annotation)
+            if not isinstance(type_anno, intermediate.DictTypeAnnotation):
+                continue
+
+            moniker = cpp_over.moniker(type_anno)
+            if moniker in nested_monikers:
+                continue
+
+            nested_monikers.add(moniker)
+            blocks.append(_generate_write_nested_content(type_anno))
 
     for cls in symbol_table.classes:
         if isinstance(cls, intermediate.ConcreteClass):

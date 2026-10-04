@@ -68,6 +68,18 @@ namespace dummy
         Gamma
     }
 
+    public enum Direction
+    {
+        [EnumMember(Value = "up")]
+        North,
+
+        [EnumMember(Value = "down")]
+        South,
+
+        [EnumMember(Value = "right")]
+        East
+    }
+
     public interface IItem : IClass
     {
         public string Name { get; set; }
@@ -290,6 +302,151 @@ namespace dummy
         }
     }
 
+    public interface IRegistry : IClass
+    {
+        public Dictionary<string, long> Counts { get; set; }
+
+        public Dictionary<long, long> CountsByNumber { get; set; }
+
+        public Dictionary<Direction, long> Weights { get; set; }
+
+        public Dictionary<string, Kind> KindsByCode { get; set; }
+
+        public Dictionary<string, string> CodesByName { get; set; }
+
+        public Dictionary<string, IItem> ItemsByName { get; set; }
+
+        public Dictionary<string, List<List<Dictionary<long, string>>>> Labels { get; set; }
+
+        public Dictionary<string, long>? OptionalCounts { get; set; }
+
+        /// <summary>
+        /// Check the iteration over the items of a dictionary property.
+        /// </summary>
+        public bool WeightIsAtMost(long maximum);
+    }
+
+    public class Registry : IRegistry
+    {
+        public Dictionary<string, long> Counts { get; set; }
+
+        public Dictionary<long, long> CountsByNumber { get; set; }
+
+        public Dictionary<Direction, long> Weights { get; set; }
+
+        public Dictionary<string, Kind> KindsByCode { get; set; }
+
+        public Dictionary<string, string> CodesByName { get; set; }
+
+        public Dictionary<string, IItem> ItemsByName { get; set; }
+
+        public Dictionary<string, List<List<Dictionary<long, string>>>> Labels { get; set; }
+
+        public Dictionary<string, long>? OptionalCounts { get; set; }
+
+        /// <summary>
+        /// Check the iteration over the items of a dictionary property.
+        /// </summary>
+        public bool WeightIsAtMost(
+            long maximum
+        )
+        {
+            long total = 0;
+            foreach (var (direction, weight) in this.Weights)
+            {
+                total = total + weight;
+            }
+            return total <= maximum;
+        }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            foreach (
+                var anItem in Descent.DescendOnce_DictOf_string_IItem(
+                    ItemsByName))
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            foreach (
+                var anItem in Descent.Descend_DictOf_string_IItem(
+                    ItemsByName))
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.VisitRegistry(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.VisitRegistry(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.TransformRegistry(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.TransformRegistry(this, context);
+        }
+
+        public Registry(
+            Dictionary<string, long> counts,
+            Dictionary<long, long> countsByNumber,
+            Dictionary<Direction, long> weights,
+            Dictionary<string, Kind> kindsByCode,
+            Dictionary<string, string> codesByName,
+            Dictionary<string, IItem> itemsByName,
+            Dictionary<string, List<List<Dictionary<long, string>>>> labels,
+            Dictionary<string, long>? optionalCounts = null)
+        {
+            Counts = counts;
+            CountsByNumber = countsByNumber;
+            Weights = weights;
+            KindsByCode = kindsByCode;
+            CodesByName = codesByName;
+            ItemsByName = itemsByName;
+            Labels = labels;
+            OptionalCounts = optionalCounts;
+        }
+    }
+
     /// <summary>
     /// Descend into the containers which hold class instances.
     /// </summary>
@@ -328,6 +485,42 @@ namespace dummy
             foreach (var item in that)
             {
                 yield return item;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances held by
+        /// <paramref name="that" />.
+        /// </summary>
+        internal static IEnumerable<IClass> Descend_DictOf_string_IItem(
+            Dictionary<string, IItem> that)
+        {
+            foreach (
+                var key in Common.SetHelpers.Sorted(
+                    that.Keys, Common.SetHelpers.CompareByCodePoints))
+            {
+                yield return that[key];
+
+                // Recurse
+                foreach (var anItem in that[key].Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over the class instances held by <paramref name="that" />
+        /// without further recursion.
+        /// </summary>
+        internal static IEnumerable<IClass> DescendOnce_DictOf_string_IItem(
+            Dictionary<string, IItem> that)
+        {
+            foreach (
+                var key in Common.SetHelpers.Sorted(
+                    that.Keys, Common.SetHelpers.CompareByCodePoints))
+            {
+                yield return that[key];
             }
         }
     }  // internal static class Descent

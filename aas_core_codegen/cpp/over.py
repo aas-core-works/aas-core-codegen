@@ -62,8 +62,9 @@ Yields = Callable[[intermediate.TypeAnnotationUnion], bool]
 # The moniker of a type is a Polish notation over ``_``-separated tokens.
 # A composite type is spelled as a head followed by its arguments, where
 # the heads ``optionalOf``, ``listOf`` and ``setOf`` take exactly one argument,
-# ``jsonObjectOf`` exactly one (the moniker of its keys), and ``tupleOf{N}``
-# exactly ``N`` of them. For example, ``Tuple[List[A], B, C]`` gives
+# ``jsonObjectOf`` exactly one (the moniker of its keys), ``dictOf`` exactly two
+# (the monikers of its keys and of its values), and ``tupleOf{N}`` exactly ``N``
+# of them. For example, ``Tuple[List[A], B, C]`` gives
 # ``tupleOf3_listOf_A_B_C``.
 #
 # Such a notation can be read back in exactly one way if no token contains
@@ -168,10 +169,9 @@ def moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
         return f"setOf_{moniker(type_annotation.items)}"
 
     elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_annotation}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        return (
+            f"dictOf_{moniker(type_annotation.keys)}_"
+            f"{moniker(type_annotation.values)}"
         )
 
     else:
@@ -257,6 +257,7 @@ def referenced_function_types(
             intermediate.ListTypeAnnotation,
             intermediate.SetTypeAnnotation,
             intermediate.TupleTypeAnnotation,
+            intermediate.DictTypeAnnotation,
         ),
     ):
         return [type_annotation]
@@ -304,6 +305,25 @@ def called_function_types(
             for item in type_annotation.items
             for called in referenced_function_types(item, yields)
         ]
+
+    if isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        # NOTE (mristin):
+        # The keys and the values with anything to yield get a function of their
+        # own, except for the instances, which are shared pointers handed over to
+        # a hand-written template, as for the lists.
+        result = []  # type: List[intermediate.TypeAnnotationUnion]
+        for part in (type_annotation.keys, type_annotation.values):
+            if not yields(part):
+                continue
+
+            if isinstance(part, intermediate.OurTypeAnnotation) and isinstance(
+                part.our_type, intermediate.Class
+            ):
+                continue
+
+            result.append(part)
+
+        return result
 
     if isinstance(type_annotation, intermediate.OurTypeAnnotation) and isinstance(
         type_annotation.our_type, intermediate.NamedUnion
@@ -380,7 +400,8 @@ def collect_nested_containers(
     classes: Sequence[intermediate.ConcreteClass],
 ) -> List[intermediate.ContainerTypeAnnotation]:
     """
-    Collect the lists, the sets and the tuples nested in other ones.
+    Collect the lists, the sets, the tuples and the dictionaries nested in other
+    ones.
 
     The de/serializers generate a named function for each of them, so that
     the generated code has no nested lambdas. The containers are deduplicated by
@@ -397,18 +418,19 @@ def collect_nested_containers(
         if not isinstance(type_annotation, intermediate.ContainerTypeAnnotationAsTuple):
             return
 
-        if isinstance(type_annotation, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_annotation}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+        items: Sequence[intermediate.TypeAnnotationExceptOptional]
+        if isinstance(type_annotation, intermediate.TupleTypeAnnotation):
+            items = type_annotation.items
+        elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+            items = [type_annotation.keys, type_annotation.values]
+        elif isinstance(
+            type_annotation,
+            (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
+        ):
+            items = [type_annotation.items]
+        else:
+            assert_never(type_annotation)
 
-        items = (
-            type_annotation.items
-            if isinstance(type_annotation, intermediate.TupleTypeAnnotation)
-            else [type_annotation.items]
-        )
         for item in items:
             collect(item, True)
 

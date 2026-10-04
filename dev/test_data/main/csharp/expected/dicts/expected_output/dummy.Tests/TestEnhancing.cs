@@ -99,6 +99,36 @@ namespace dummy.Tests
             Assert.AreEqual(1, idSet.Min());
             Assert.AreEqual(idSet.Count, idSet.Max());
         }  // public void Test_Something
+
+        [Test]
+        public void Test_Registry()
+        {
+            var instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRegistry()
+            );
+
+            var enhancer = CreateEnhancer();
+
+            Assert.IsNull(enhancer.Unwrap(instance));
+
+            var wrapped = enhancer.Wrap(instance);
+            Assert.IsNotNull(wrapped);
+
+            var idSet = new HashSet<long>();
+
+            idSet.Add(enhancer.MustUnwrap(wrapped).SomeCustomId);
+            idSet.UnionWith(
+                wrapped
+                    .Descend()
+                    .Select(
+                        (descendant) =>
+                            enhancer.MustUnwrap(descendant).SomeCustomId
+                        )
+            );
+
+            Assert.AreEqual(1, idSet.Min());
+            Assert.AreEqual(idSet.Count, idSet.Max());
+        }  // public void Test_Registry
     }  // class TestEnhancing
 }  // namespace dummy.Tests
 

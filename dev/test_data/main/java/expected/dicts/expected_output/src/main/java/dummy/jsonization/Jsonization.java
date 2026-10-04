@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * Provide de/serialization of meta-model classes to/from JSON.
@@ -264,6 +266,119 @@ public class Jsonization {
       }
 
       /**
+       * Mark the error of {@code result} as coming from the member {@code key}
+       * of a JSON object.
+       */
+      private static <T> Reporting.Result<T> prependKey(
+        Reporting.Result<?> result, String key) {
+        final Reporting.Error error = result.getError();
+        error.prependSegment(new Reporting.KeySegment(key));
+        return Reporting.Result.failure(error);
+      }
+
+      /**
+       * Parse {@code node} as a JSON object, every of its keys with
+       * {@code parseKey}, and every of its values with {@code parseValue},
+       * into a dictionary.
+       *
+       * <p>The keys can come in any order. A duplicate key can not be detected, since
+       * the JSON object has already been parsed.
+       *
+       * @param node JSON node to be parsed
+       * @param parseKey to parse a single key of the object
+       * @param parseValue to parse a single value of the object
+       */
+      private static <K, V> Reporting.Result<Map<K, V>> parseDict(
+        JsonNode node,
+        Function<String, Reporting.Result<? extends K>> parseKey,
+        Function<JsonNode, Reporting.Result<? extends V>> parseValue) {
+        if (!node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        final Map<K, V> result = new HashMap<>();
+
+        final Iterator<Map.Entry<String, JsonNode>> iterator = node.fields();
+        while (iterator.hasNext()) {
+          final Map.Entry<String, JsonNode> member = iterator.next();
+
+          final Reporting.Result<? extends K> parsedKey = parseKey.apply(member.getKey());
+          if (parsedKey.isError()) {
+            return prependKey(parsedKey, member.getKey());
+          }
+
+          final Reporting.Result<? extends V> parsedValue =
+            parseValue.apply(member.getValue());
+          if (parsedValue.isError()) {
+            return prependKey(parsedValue, member.getKey());
+          }
+
+          result.put(parsedKey.getResult(), parsedValue.getResult());
+        }
+
+        return Reporting.Result.success(result);
+      }
+
+      /**
+       * Parse {@code key} of a JSON object as a string, which it already is.
+       */
+      private static Reporting.Result<String> parseStringKey(String key) {
+        return Reporting.Result.success(key);
+      }
+
+      /**
+       * Match the canonical decimal strings of the integer keys of a JSON object.
+       */
+      private static final Pattern CANONICAL_INTEGER_KEY_PATTERN =
+        Pattern.compile("^(0|-?[1-9][0-9]*)$");
+
+      /**
+       * Parse {@code key} of a JSON object as a 64-bit integer.
+       *
+       * <p>We accept only the canonical decimal strings, so that the same key can
+       * not be written in two ways, and so that all the targets agree on the keys.
+       */
+      private static Reporting.Result<Long> parseLongKey(String key) {
+        if (!CANONICAL_INTEGER_KEY_PATTERN.matcher(key).matches()) {
+          return Reporting.Result.failure(
+            new Reporting.Error(
+              "Expected the key to be an integer written as a canonical " +
+              "decimal string, but got: " + key));
+        }
+
+        try {
+          return Reporting.Result.success(Long.parseLong(key));
+        } catch (NumberFormatException exception) {
+          return Reporting.Result.failure(
+            new Reporting.Error(
+              "Expected the key to be an integer within the 64-bit range, " +
+              "but got: " + key));
+        }
+      }
+
+      /**
+       * Parse {@code key} of a JSON object as a literal of the enumeration
+       * {@code enumType}, converted from its text by {@code fromString}.
+       *
+       * @param key key of the JSON object to be parsed
+       * @param fromString to convert the text into a literal
+       * @param enumType enumeration whose literal is expected
+       */
+      private static <T> Reporting.Result<T> tryEnumFromKey(
+        String key,
+        Function<String, Optional<T>> fromString,
+        Class<T> enumType) {
+        final Optional<T> parsed = fromString.apply(key);
+        if (!parsed.isPresent()) {
+          return Reporting.Result.failure(
+            new Reporting.Error(
+              "Not a valid JSON representation of " + enumType.getSimpleName()));
+        }
+
+        return Reporting.Result.success(parsed.get());
+      }
+
+      /**
        * Parse {@code node} as a list of {@code String}.
        *
        * @param node JSON node to be parsed
@@ -300,12 +415,136 @@ public class Jsonization {
       }
 
       /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<String, Long>> parseDictOf_string_long(JsonNode node) {
+        return parseDict(
+          node,
+          _DeserializeImplementation::parseStringKey,
+          _DeserializeImplementation::tryLongFrom);
+      }
+
+      /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<Long, Long>> parseDictOf_long_long(JsonNode node) {
+        return parseDict(
+          node,
+          _DeserializeImplementation::parseLongKey,
+          _DeserializeImplementation::tryLongFrom);
+      }
+
+      /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<Direction, Long>> parseDictOf_Direction_long(JsonNode node) {
+        return parseDict(
+          node,
+          key -> tryEnumFromKey(
+            key, Stringification::directionFromString, Direction.class),
+          _DeserializeImplementation::tryLongFrom);
+      }
+
+      /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<String, Kind>> parseDictOf_string_Kind(JsonNode node) {
+        return parseDict(
+          node,
+          _DeserializeImplementation::parseStringKey,
+          _DeserializeImplementation::tryKindFrom);
+      }
+
+      /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<String, String>> parseDictOf_string_string(JsonNode node) {
+        return parseDict(
+          node,
+          _DeserializeImplementation::parseStringKey,
+          _DeserializeImplementation::tryStringFrom);
+      }
+
+      /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<String, IItem>> parseDictOf_string_IItem(JsonNode node) {
+        return parseDict(
+          node,
+          _DeserializeImplementation::parseStringKey,
+          _DeserializeImplementation::tryItemFrom);
+      }
+
+      /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<String, List<List<Map<Long, String>>>>> parseDictOf_string_ListOf_ListOf_DictOf_long_string(JsonNode node) {
+        return parseDict(
+          node,
+          _DeserializeImplementation::parseStringKey,
+          _DeserializeImplementation::parseListOf_ListOf_DictOf_long_string);
+      }
+
+      /**
+       * Parse {@code node} as a list of {@code List<Map<Long, String>>}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<List<List<Map<Long, String>>>> parseListOf_ListOf_DictOf_long_string(JsonNode node) {
+        return parseArray(node, _DeserializeImplementation::parseListOf_DictOf_long_string);
+      }
+
+      /**
+       * Parse {@code node} as a list of {@code Map<Long, String>}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<List<Map<Long, String>>> parseListOf_DictOf_long_string(JsonNode node) {
+        return parseArray(node, _DeserializeImplementation::parseDictOf_long_string);
+      }
+
+      /**
+       * Parse {@code node} as a dictionary.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Map<Long, String>> parseDictOf_long_string(JsonNode node) {
+        return parseDict(
+          node,
+          _DeserializeImplementation::parseLongKey,
+          _DeserializeImplementation::tryStringFrom);
+      }
+
+      /**
        * Deserialize the enumeration Kind from the {@code node}.
        *
        * @param node JSON node to be parsed
        */
       private static Reporting.Result<Kind> tryKindFrom(JsonNode node) {
         return tryEnumFrom(node, Stringification::kindFromString, Kind.class);
+      }
+
+      /**
+       * Deserialize the enumeration Direction from the {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Direction> tryDirectionFrom(JsonNode node) {
+        return tryEnumFrom(node, Stringification::directionFromString, Direction.class);
       }
 
       /**
@@ -451,6 +690,141 @@ public class Jsonization {
           theItems,
           theOptionalTexts));
       }
+
+      /**
+       * Deserialize an instance of Registry from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      private static Reporting.Result<Registry> tryRegistryFrom(JsonNode node) {
+        if (node == null || !node.isObject()) {
+          return notAJsonObject(node);
+        }
+
+        Map<String, Long> theCounts = null;
+        Map<Long, Long> theCountsByNumber = null;
+        Map<Direction, Long> theWeights = null;
+        Map<String, Kind> theKindsByCode = null;
+        Map<String, String> theCodesByName = null;
+        Map<String, IItem> theItemsByName = null;
+        Map<String, List<List<Map<Long, String>>>> theLabels = null;
+        Map<String, Long> theOptionalCounts = null;
+
+        for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.hasNext(); ) {
+          final Map.Entry<String, JsonNode> keyValue = iterator.next();
+          final String key = keyValue.getKey();
+          final JsonNode value = keyValue.getValue();
+
+          switch (key) {
+            case "counts": {
+              final Reporting.Result<Map<String, Long>> parsed = parseDictOf_string_long(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theCounts = parsed.getResult();
+              break;
+            }
+            case "countsByNumber": {
+              final Reporting.Result<Map<Long, Long>> parsed = parseDictOf_long_long(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theCountsByNumber = parsed.getResult();
+              break;
+            }
+            case "weights": {
+              final Reporting.Result<Map<Direction, Long>> parsed =
+                parseDictOf_Direction_long(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theWeights = parsed.getResult();
+              break;
+            }
+            case "kindsByCode": {
+              final Reporting.Result<Map<String, Kind>> parsed = parseDictOf_string_Kind(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theKindsByCode = parsed.getResult();
+              break;
+            }
+            case "codesByName": {
+              final Reporting.Result<Map<String, String>> parsed = parseDictOf_string_string(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theCodesByName = parsed.getResult();
+              break;
+            }
+            case "itemsByName": {
+              final Reporting.Result<Map<String, IItem>> parsed = parseDictOf_string_IItem(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theItemsByName = parsed.getResult();
+              break;
+            }
+            case "labels": {
+              final Reporting.Result<Map<String, List<List<Map<Long, String>>>>> parsed =
+                parseDictOf_string_ListOf_ListOf_DictOf_long_string(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theLabels = parsed.getResult();
+              break;
+            }
+            case "optionalCounts": {
+              final Reporting.Result<Map<String, Long>> parsed = parseDictOf_string_long(value);
+              if (parsed.isError()) {
+                return prependName(parsed, key);
+              }
+              theOptionalCounts = parsed.getResult();
+              break;
+            }
+            default:
+              return unexpectedProperty(key);
+          }
+        }
+
+        if (theCounts == null) {
+          return missingRequiredProperty("counts");
+        }
+
+        if (theCountsByNumber == null) {
+          return missingRequiredProperty("countsByNumber");
+        }
+
+        if (theWeights == null) {
+          return missingRequiredProperty("weights");
+        }
+
+        if (theKindsByCode == null) {
+          return missingRequiredProperty("kindsByCode");
+        }
+
+        if (theCodesByName == null) {
+          return missingRequiredProperty("codesByName");
+        }
+
+        if (theItemsByName == null) {
+          return missingRequiredProperty("itemsByName");
+        }
+
+        if (theLabels == null) {
+          return missingRequiredProperty("labels");
+        }
+
+        return Reporting.Result.success(new Registry(
+          theCounts,
+          theCountsByNumber,
+          theWeights,
+          theKindsByCode,
+          theCodesByName,
+          theItemsByName,
+          theLabels,
+          theOptionalCounts));
+      }
     }
 
     /**
@@ -555,6 +929,23 @@ public class Jsonization {
       }
 
       /**
+       * Deserialize an instance of Direction from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static Direction deserializeDirection(JsonNode node) {
+        final Reporting.Result<? extends Direction> result =
+          _DeserializeImplementation.tryDirectionFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
        * Deserialize an instance of Item from {@code node}.
        *
        * @param node JSON node to be parsed
@@ -579,6 +970,23 @@ public class Jsonization {
       public static Something deserializeSomething(JsonNode node) {
         final Reporting.Result<? extends Something> result =
           _DeserializeImplementation.trySomethingFrom(
+            node);
+
+        return result.onError(error -> {
+          throw new DeserializeException(
+            Reporting.generateJsonPath(error.getPathSegments()),
+            error.getCause());
+        });
+      }
+
+      /**
+       * Deserialize an instance of Registry from {@code node}.
+       *
+       * @param node JSON node to be parsed
+       */
+      public static Registry deserializeRegistry(JsonNode node) {
+        final Reporting.Result<? extends Registry> result =
+          _DeserializeImplementation.tryRegistryFrom(
             node);
 
         return result.onError(error -> {
@@ -787,6 +1195,218 @@ public class Jsonization {
         return result;
       }
 
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_string_long(
+        Map<String, Long> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+          final String text = key;
+          try {
+            result.set(text, longToJsonNode(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_long_long(
+        Map<Long, Long> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (Long key : SetHelpers.sorted(that.keySet())) {
+          final String text = Long.toString(key);
+          try {
+            result.set(text, longToJsonNode(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_Direction_long(
+        Map<Direction, Long> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (Direction key : SetHelpers.sortedBy(that.keySet(), SetHelpers::compareByRankOfDirection)) {
+          final String text = Stringification.mustToString(key);
+          try {
+            result.set(text, longToJsonNode(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_string_IEnum(
+        Map<String, ? extends IEnum> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+          final String text = key;
+          try {
+            result.set(text, Serialize.toJsonValue(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_string_string(
+        Map<String, String> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+          final String text = key;
+          try {
+            result.set(text, stringToJsonNode(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_string_IClass(
+        Map<String, ? extends IClass> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+          final String text = key;
+          try {
+            result.set(text, transformClass(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_string_ListOf_ListOf_DictOf_long_string(
+        Map<String, ? extends List<? extends List<? extends Map<Long, String>>>> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (String key : SetHelpers.sortedByCodePoints(that.keySet())) {
+          final String text = key;
+          try {
+            result.set(text, serializeListOf_ListOf_DictOf_long_string(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that} into a JSON array.
+       *
+       * @param that to be serialized
+       */
+      private static ArrayNode serializeListOf_ListOf_DictOf_long_string(
+        List<? extends List<? extends Map<Long, String>>> that) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        int i = 0;
+        for (List<? extends Map<Long, String>> item : that) {
+          try {
+            result.add(serializeListOf_DictOf_long_string(item));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.IndexSegment(i));
+            throw failure;
+          }
+          i++;
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that} into a JSON array.
+       *
+       * @param that to be serialized
+       */
+      private static ArrayNode serializeListOf_DictOf_long_string(
+        List<? extends Map<Long, String>> that) {
+        final ArrayNode result = JsonNodeFactory.instance.arrayNode();
+        int i = 0;
+        for (Map<Long, String> item : that) {
+          try {
+            result.add(serializeDictOf_long_string(item));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.IndexSegment(i));
+            throw failure;
+          }
+          i++;
+        }
+        return result;
+      }
+
+      /**
+       * Serialize every item of {@code that}, in the sorted order of the keys, into a JSON object.
+       *
+       * @param that to be serialized
+       */
+      private static ObjectNode serializeDictOf_long_string(
+        Map<Long, String> that) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+        for (Long key : SetHelpers.sorted(that.keySet())) {
+          final String text = Long.toString(key);
+          try {
+            result.set(text, stringToJsonNode(that.get(key)));
+          } catch (_SerializeFailure failure) {
+            failure.getError().prependSegment(
+              new Reporting.KeySegment(text));
+            throw failure;
+          }
+        }
+        return result;
+      }
+
       @Override
       public JsonNode transformItem(
         IItem that
@@ -827,6 +1447,47 @@ public class Jsonization {
         setOptionalProperty(
           result, "optionalTexts", "getOptionalTexts()",
           that.getOptionalTexts(), _Transformer::serializeListOf_string);
+
+        return result;
+      }
+
+      @Override
+      public JsonNode transformRegistry(
+        IRegistry that
+      ) {
+        final ObjectNode result = JsonNodeFactory.instance.objectNode();
+
+        setProperty(
+          result, "counts", "getCounts()",
+          that.getCounts(), _Transformer::serializeDictOf_string_long);
+
+        setProperty(
+          result, "countsByNumber", "getCountsByNumber()",
+          that.getCountsByNumber(), _Transformer::serializeDictOf_long_long);
+
+        setProperty(
+          result, "weights", "getWeights()",
+          that.getWeights(), _Transformer::serializeDictOf_Direction_long);
+
+        setProperty(
+          result, "kindsByCode", "getKindsByCode()",
+          that.getKindsByCode(), _Transformer::serializeDictOf_string_IEnum);
+
+        setProperty(
+          result, "codesByName", "getCodesByName()",
+          that.getCodesByName(), _Transformer::serializeDictOf_string_string);
+
+        setProperty(
+          result, "itemsByName", "getItemsByName()",
+          that.getItemsByName(), _Transformer::serializeDictOf_string_IClass);
+
+        setProperty(
+          result, "labels", "getLabels()",
+          that.getLabels(), _Transformer::serializeDictOf_string_ListOf_ListOf_DictOf_long_string);
+
+        setOptionalProperty(
+          result, "optionalCounts", "getOptionalCounts()",
+          that.getOptionalCounts(), _Transformer::serializeDictOf_string_long);
 
         return result;
       }
@@ -880,6 +1541,13 @@ public class Jsonization {
        * Serialize a literal of Kind into a JSON string.
        */
       public static JsonNode kindToJsonValue(Kind that) {
+        return toJsonValue(that);
+      }
+
+      /**
+       * Serialize a literal of Direction into a JSON string.
+       */
+      public static JsonNode directionToJsonValue(Direction that) {
         return toJsonValue(that);
       }
     }

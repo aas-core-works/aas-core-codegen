@@ -9,6 +9,14 @@
   ],
   "$id": "https://dummy.com",
   "definitions": {
+    "Direction": {
+      "type": "string",
+      "enum": [
+        "down",
+        "right",
+        "up"
+      ]
+    },
     "Item": {
       "type": "object",
       "properties": {
@@ -31,6 +39,92 @@
     "ModelType": {
       "type": "string",
       "enum": []
+    },
+    "Registry": {
+      "type": "object",
+      "properties": {
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "countsByNumber": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "propertyNames": {
+            "pattern": "^(0|-?[1-9][0-9]*)$"
+          },
+          "maxProperties": 5
+        },
+        "weights": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "propertyNames": {
+            "$ref": "#/definitions/Direction"
+          }
+        },
+        "kindsByCode": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Kind"
+          },
+          "propertyNames": {
+            "minLength": 1
+          }
+        },
+        "codesByName": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "itemsByName": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Item"
+          }
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "propertyNames": {
+                  "pattern": "^(0|-?[1-9][0-9]*)$"
+                }
+              }
+            }
+          }
+        },
+        "optionalCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "minProperties": 1
+        }
+      },
+      "required": [
+        "counts",
+        "countsByNumber",
+        "weights",
+        "kindsByCode",
+        "codesByName",
+        "itemsByName",
+        "labels"
+      ]
     },
     "Something": {
       "type": "object",

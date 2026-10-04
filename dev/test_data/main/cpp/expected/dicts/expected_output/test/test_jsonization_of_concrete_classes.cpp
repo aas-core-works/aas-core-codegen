@@ -325,6 +325,62 @@ TEST_CASE("Test the de-serialization failure on an unexpected Something") {
   }
 }
 
+TEST_CASE("Test the round-trip of an expected Registry") {
+  const std::deque<std::filesystem::path> paths(
+    test::common::FindFilesBySuffixRecursively(
+      DetermineJsonDir()
+        / "Expected"
+        / "Registry",
+      ".json"
+    )
+  );
+
+  for (const std::filesystem::path& path : paths) {
+    AssertRoundTrip<
+      our::types::IRegistry
+    >(path, our::jsonization::RegistryFrom);
+  }
+}
+
+TEST_CASE("Test the de-serialization failure on an unexpected Registry") {
+  for (
+    const std::filesystem::path& causeDir
+    : test::common::ListSubdirectories(
+      DetermineJsonDir()
+        / "Unexpected"
+        / "Unserializable"
+    )
+  ) {
+    for (
+      const std::filesystem::path& path
+      : test::common::FindFilesBySuffixRecursively(
+        causeDir / "Registry",
+        ".json"
+      )
+    ) {
+      const std::filesystem::path parent(
+        (
+          DetermineErrorDir()
+          / std::filesystem::relative(path, DetermineJsonDir())
+        ).parent_path()
+      );
+
+      const std::filesystem::path error_path(
+        parent
+        / (path.filename().string() + ".error")
+      );
+
+      AssertDeserializationFailure<
+        our::types::IRegistry
+      >(
+        path,
+        our::jsonization::RegistryFrom,
+        error_path
+      );
+    }
+  }
+}
+
 TEST_CASE(
   "Test the serialization failure on an integer outside the range representable in JSON "
   "at .numbers[1] of Something"

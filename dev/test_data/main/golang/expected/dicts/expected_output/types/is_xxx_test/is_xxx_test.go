@@ -27,6 +27,14 @@ func TestIsXxxOnAnInstanceOfItem(t *testing.T) {
 			instance, instance.ModelType(),
 		)
 	}
+
+	if ourtypes.IsRegistry(instance) {
+		t.Errorf(
+			"Expected IsRegistry to be false on an instance " +
+			"of IItem with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
 }
 
 func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
@@ -44,6 +52,42 @@ func TestIsXxxOnAnInstanceOfSomething(t *testing.T) {
 		t.Errorf(
 			"Expected IsSomething to be true on an instance " +
 			"of ISomething with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsRegistry(instance) {
+		t.Errorf(
+			"Expected IsRegistry to be false on an instance " +
+			"of ISomething with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+}
+
+func TestIsXxxOnAnInstanceOfRegistry(t *testing.T) {
+	instance := ourtesting.MustLoadMinimalRegistry()
+
+	if ourtypes.IsItem(instance) {
+		t.Errorf(
+			"Expected IsItem to be false on an instance " +
+			"of IRegistry with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if ourtypes.IsSomething(instance) {
+		t.Errorf(
+			"Expected IsSomething to be false on an instance " +
+			"of IRegistry with runtime type %T and with model type %v",
+			instance, instance.ModelType(),
+		)
+	}
+
+	if !ourtypes.IsRegistry(instance) {
+		t.Errorf(
+			"Expected IsRegistry to be true on an instance " +
+			"of IRegistry with runtime type %T and with model type %v",
 			instance, instance.ModelType(),
 		)
 	}

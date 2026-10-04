@@ -7,6 +7,7 @@
 
 #pragma warning(push, 0)
 #include <cmath>
+#include <limits>
 #include <set>
 #include <sstream>
 #include <unordered_map>
@@ -59,6 +60,27 @@ std::unique_ptr<ISegment> IndexSegment::Clone() const {
 }
 
 // endregion IndexSegment
+
+// region KeySegment
+
+KeySegment::KeySegment(
+  std::wstring a_key
+) :
+  key(std::move(a_key)) {
+  // Intentionally empty.
+}
+
+std::wstring KeySegment::ToWstring() const {
+  // NOTE (mristin):
+  // We render the key exactly as we do in the paths of the iteration.
+  return iteration::KeySegment(key).ToWstring();
+}
+
+std::unique_ptr<ISegment> KeySegment::Clone() const {
+  return common::make_unique<KeySegment>(*this);
+}
+
+// endregion KeySegment
 
 // region struct Path
 
@@ -668,6 +690,248 @@ std::pair<
 }
 
 /**
+ * \brief De-serialize a dictionary from the JSON object \p json.
+ *
+ * The keys can come in any order. A JSON object can not hold duplicate keys
+ * once parsed, so there are no duplicates to refuse.
+ *
+ * \tparam MapT type of the dictionary, which might come with its own hasher
+ * \param json value expected to be an object
+ * \param deserialize_key de-serializes a key from its text
+ * \param deserialize_value de-serializes a value
+ * \return the dictionary, or an error, if any
+ */
+template <
+  typename MapT,
+  typename DeserializeKeyT,
+  typename DeserializeValueT
+>
+std::pair<
+  common::optional<MapT >,
+  common::optional<DeserializationError>
+> DeserializeDict(
+  const nlohmann::json& json,
+  DeserializeKeyT&& deserialize_key,
+  DeserializeValueT&& deserialize_value
+) {
+  typedef typename MapT::key_type K;
+  typedef typename MapT::mapped_type V;
+
+  if (!json.is_object()) {
+    std::wstring message = common::Concat(
+      L"Expected an object, but got: ",
+      common::Utf8ToWstring(
+        json.type_name()
+      )
+    );
+
+    return std::make_pair<
+      common::optional<MapT >,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        message
+      )
+    );
+  }
+
+  common::optional<MapT > map(
+    common::make_optional<MapT >()
+  );
+
+  map->reserve(json.size());
+
+  for (const auto& item : json.items()) {
+    common::optional<K> key;
+    common::optional<DeserializationError> error;
+
+    std::tie(key, error) = deserialize_key(item.key());
+
+    if (!error.has_value()) {
+      common::optional<V> value;
+      std::tie(value, error) = deserialize_value(item.value());
+
+      if (!error.has_value()) {
+        map->emplace(std::move(*key), std::move(*value));
+      }
+    }
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<KeySegment>(
+          common::Utf8ToWstring(item.key())
+        )
+      );
+
+      return std::make_pair<
+        common::optional<MapT >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+  }
+
+  return std::make_pair(
+    std::move(map),
+    common::nullopt
+  );
+}
+
+/**
+ * \brief De-serialize a string key of a dictionary from its \p text.
+ *
+ * \param text of the key in a JSON object
+ * \return the key
+ */
+std::pair<
+  common::optional<std::wstring>,
+  common::optional<DeserializationError>
+> DeserializeWstringKey(
+  const std::string& text
+) {
+  return std::make_pair<
+    common::optional<std::wstring>,
+    common::optional<DeserializationError>
+  >(
+    common::Utf8ToWstring(text),
+    common::nullopt
+  );
+}
+
+/**
+ * \brief De-serialize an integer key of a dictionary from its \p text.
+ *
+ * We accept only the canonical decimal representation, *i.e.*, an optional
+ * minus followed by the digits without leading zeros, and refuse ``-0``, so
+ * that every integer has exactly one key.
+ *
+ * \param text of the key in a JSON object
+ * \return the key, or an error, if any
+ */
+std::pair<
+  common::optional<int64_t>,
+  common::optional<DeserializationError>
+> DeserializeInt64Key(
+  const std::string& text
+) {
+  const bool negative = !text.empty() && text[0] == '-';
+  const size_t start = negative ? 1 : 0;
+
+  bool canonical = text.size() > start;
+  for (size_t i = start; canonical && i < text.size(); ++i) {
+    canonical = text[i] >= '0' && text[i] <= '9';
+  }
+
+  if (
+    canonical
+    && text[start] == '0'
+    && (text.size() > start + 1 || negative)
+  ) {
+    canonical = false;
+  }
+
+  if (!canonical) {
+    return std::make_pair<
+      common::optional<int64_t>,
+      common::optional<DeserializationError>
+    >(
+      common::nullopt,
+      common::make_optional<DeserializationError>(
+        common::Concat(
+          L"Expected the key to be an integer in its canonical decimal "
+          L"representation, but got: ",
+          common::Utf8ToWstring(text)
+        )
+      )
+    );
+  }
+
+  // NOTE (mristin):
+  // We accumulate the negative number so that we can represent the smallest
+  // 64-bit integer, which has no positive counterpart.
+  int64_t result = 0;
+  for (size_t i = start; i < text.size(); ++i) {
+    const int64_t digit = static_cast<int64_t>(text[i] - '0');
+
+    if (
+      result < (std::numeric_limits<int64_t>::min() + digit) / 10
+    ) {
+      return std::make_pair<
+        common::optional<int64_t>,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          common::Concat(
+            L"Expected the key to be a 64-bit integer, "
+            L"but got an integer which does not fit in that range: ",
+            common::Utf8ToWstring(text)
+          )
+        )
+      );
+    }
+
+    result = result * 10 - digit;
+  }
+
+  if (!negative) {
+    if (result == std::numeric_limits<int64_t>::min()) {
+      return std::make_pair<
+        common::optional<int64_t>,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        common::make_optional<DeserializationError>(
+          common::Concat(
+            L"Expected the key to be a 64-bit integer, "
+            L"but got an integer which does not fit in that range: ",
+            common::Utf8ToWstring(text)
+          )
+        )
+      );
+    }
+
+    result = -result;
+  }
+
+  return std::make_pair<
+    common::optional<int64_t>,
+    common::optional<DeserializationError>
+  >(
+    common::make_optional<int64_t>(result),
+    common::nullopt
+  );
+}
+
+/**
+ * \brief De-serialize a key of a dictionary from its \p text as a literal
+ * of an enumeration.
+ *
+ * We give the text to \p deserialize_literal as a JSON string, so that
+ * the key is de-serialized exactly as any other literal.
+ *
+ * \param text of the key in a JSON object
+ * \param deserialize_literal de-serializes a literal from a JSON value
+ * \return the key, or an error, if any
+ */
+template <typename EnumT>
+std::pair<
+  common::optional<EnumT>,
+  common::optional<DeserializationError>
+> DeserializeEnumerationKey(
+  const std::string& text,
+  std::pair<
+    common::optional<EnumT>,
+    common::optional<DeserializationError>
+  > (*deserialize_literal)(const nlohmann::json&)
+) {
+  return deserialize_literal(nlohmann::json(text));
+}
+
+/**
  * \brief De-serialize a literal of an enumeration from \p json.
  *
  * \p from_wstring is a template argument taken by reference, so the call is
@@ -736,6 +1000,19 @@ std::pair<
   );
 }
 
+std::pair<
+  common::optional<types::Direction>,
+  common::optional<DeserializationError>
+> DeserializeDirection(
+  const nlohmann::json& json
+) {
+  return DeserializeEnumeration<types::Direction>(
+    json,
+    wstringification::DirectionFromWstring,
+    L"Direction"
+  );
+}
+
 namespace properties {
 
 enum class OfItem : std::uint32_t {
@@ -750,6 +1027,17 @@ enum class OfSomething : std::uint32_t {
   kItems,
   kOptionalTexts
 };  // enum class OfSomething
+
+enum class OfRegistry : std::uint32_t {
+  kCounts,
+  kCountsByNumber,
+  kWeights,
+  kKindsByCode,
+  kCodesByName,
+  kItemsByName,
+  kLabels,
+  kOptionalCounts
+};  // enum class OfRegistry
 
 const std::unordered_map<
   std::string,
@@ -788,6 +1076,44 @@ const std::unordered_map<
   {
     "optionalTexts",
     OfSomething::kOptionalTexts
+  }
+};
+
+const std::unordered_map<
+  std::string,
+  OfRegistry
+> kMapOfRegistry = {
+  {
+    "counts",
+    OfRegistry::kCounts
+  },
+  {
+    "countsByNumber",
+    OfRegistry::kCountsByNumber
+  },
+  {
+    "weights",
+    OfRegistry::kWeights
+  },
+  {
+    "kindsByCode",
+    OfRegistry::kKindsByCode
+  },
+  {
+    "codesByName",
+    OfRegistry::kCodesByName
+  },
+  {
+    "itemsByName",
+    OfRegistry::kItemsByName
+  },
+  {
+    "labels",
+    OfRegistry::kLabels
+  },
+  {
+    "optionalCounts",
+    OfRegistry::kOptionalCounts
   }
 };
 
@@ -1044,6 +1370,123 @@ std::pair<
   const nlohmann::json& json,
   bool additional_properties
 );
+
+/**
+ * \brief Parse the properties of an instance of types::IRegistry.
+ *
+ * The model type, if the class carries one, is expected to have been verified
+ * by the caller, which is what lets a dispatcher avoid verifying it twice.
+ *
+ * \param json object whose properties are to be parsed
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IRegistry>
+  >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfRegistry(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief Deserialize \p json to an instance of types::IRegistry.
+ *
+ * No dispatch is performed. The model type, if the class carries one, is
+ * verified here, since the caller has not read it.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return the de-serialized instance, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IRegistry>
+  >,
+  common::optional<DeserializationError>
+> DeserializeRegistry(
+  const nlohmann::json& json,
+  bool additional_properties
+);
+
+/**
+ * \brief De-serialize a nested collection from \p json.
+ *
+ * \param json value to be de-serialized
+ * \return the de-serialized value, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::unordered_map<int64_t, std::wstring>
+  >,
+  common::optional<DeserializationError>
+> Deserialize_dictOf_int_str(
+  const nlohmann::json& json
+) {
+  return DeserializeDict<
+    std::unordered_map<int64_t, std::wstring>
+  >(
+    json,
+    DeserializeInt64Key,
+    DeserializeWstring
+  );
+}
+
+/**
+ * \brief De-serialize a nested collection from \p json.
+ *
+ * \param json value to be de-serialized
+ * \return the de-serialized value, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::vector<
+      std::unordered_map<int64_t, std::wstring>
+    >
+  >,
+  common::optional<DeserializationError>
+> Deserialize_listOf_dictOf_int_str(
+  const nlohmann::json& json
+) {
+  return DeserializeList<
+    std::unordered_map<int64_t, std::wstring>
+  >(
+    json,
+    Deserialize_dictOf_int_str
+  );
+}
+
+/**
+ * \brief De-serialize a nested collection from \p json.
+ *
+ * \param json value to be de-serialized
+ * \return the de-serialized value, or an error, if any
+ */
+std::pair<
+  common::optional<
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  >,
+  common::optional<DeserializationError>
+> Deserialize_listOf_listOf_dictOf_int_str(
+  const nlohmann::json& json
+) {
+  return DeserializeList<
+    std::vector<
+      std::unordered_map<int64_t, std::wstring>
+    >
+  >(
+    json,
+    Deserialize_listOf_dictOf_int_str
+  );
+}
 
 std::pair<
   common::optional<
@@ -1336,6 +1779,282 @@ std::pair<
   return ParsePropertiesOfSomething(json, additional_properties);
 }
 
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IRegistry>
+  >,
+  common::optional<DeserializationError>
+> ParsePropertiesOfRegistry(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<std::unordered_map<std::wstring, int64_t> > the_counts;
+
+  common::optional<std::unordered_map<int64_t, int64_t> > the_counts_by_number;
+
+  common::optional<std::unordered_map<types::Direction, int64_t, common::EnumHash> > the_weights;
+
+  common::optional<std::unordered_map<std::wstring, types::Kind> > the_kinds_by_code;
+
+  common::optional<std::unordered_map<std::wstring, std::wstring> > the_codes_by_name;
+
+  common::optional<
+    std::unordered_map<
+      std::wstring,
+      std::shared_ptr<types::IItem>
+    >
+  > the_items_by_name;
+
+  common::optional<
+    std::unordered_map<
+      std::wstring,
+      std::vector<
+        std::vector<
+          std::unordered_map<int64_t, std::wstring>
+        >
+      >
+    >
+  > the_labels;
+
+  common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  > the_optional_counts;
+
+  common::optional<DeserializationError> error(
+    ParseProperties(
+      json,
+      properties::kMapOfRegistry,
+      additional_properties,
+      [&](
+        properties::OfRegistry property,
+        const nlohmann::json& value
+      ) -> common::optional<DeserializationError> {
+        switch (property) {
+          case properties::OfRegistry::kCounts:
+            return ParseInto(
+              the_counts,
+              DeserializeDict<
+                std::unordered_map<std::wstring, int64_t>
+              >(
+                value,
+                DeserializeWstringKey,
+                DeserializeInt64
+              )
+            );
+          case properties::OfRegistry::kCountsByNumber:
+            return ParseInto(
+              the_counts_by_number,
+              DeserializeDict<
+                std::unordered_map<int64_t, int64_t>
+              >(
+                value,
+                DeserializeInt64Key,
+                DeserializeInt64
+              )
+            );
+          case properties::OfRegistry::kWeights:
+            return ParseInto(
+              the_weights,
+              DeserializeDict<
+                std::unordered_map<types::Direction, int64_t, common::EnumHash>
+              >(
+                value,
+                [](const std::string& a_text) {
+                  return DeserializeEnumerationKey<types::Direction>(
+                    a_text,
+                    DeserializeDirection
+                  );
+                },
+                DeserializeInt64
+              )
+            );
+          case properties::OfRegistry::kKindsByCode:
+            return ParseInto(
+              the_kinds_by_code,
+              DeserializeDict<
+                std::unordered_map<std::wstring, types::Kind>
+              >(
+                value,
+                DeserializeWstringKey,
+                DeserializeKind
+              )
+            );
+          case properties::OfRegistry::kCodesByName:
+            return ParseInto(
+              the_codes_by_name,
+              DeserializeDict<
+                std::unordered_map<std::wstring, std::wstring>
+              >(
+                value,
+                DeserializeWstringKey,
+                DeserializeWstring
+              )
+            );
+          case properties::OfRegistry::kItemsByName:
+            return ParseInto(
+              the_items_by_name,
+              DeserializeDict<
+                std::unordered_map<
+                  std::wstring,
+                  std::shared_ptr<types::IItem>
+                >
+              >(
+                value,
+                DeserializeWstringKey,
+                [&additional_properties](const nlohmann::json& a_json) {
+                  return DeserializeItem(a_json, additional_properties);
+                }
+              )
+            );
+          case properties::OfRegistry::kLabels:
+            return ParseInto(
+              the_labels,
+              DeserializeDict<
+                std::unordered_map<
+                  std::wstring,
+                  std::vector<
+                    std::vector<
+                      std::unordered_map<int64_t, std::wstring>
+                    >
+                  >
+                >
+              >(
+                value,
+                DeserializeWstringKey,
+                Deserialize_listOf_listOf_dictOf_int_str
+              )
+            );
+          case properties::OfRegistry::kOptionalCounts:
+            return ParseInto(
+              the_optional_counts,
+              DeserializeDict<
+                std::unordered_map<std::wstring, int64_t>
+              >(
+                value,
+                DeserializeWstringKey,
+                DeserializeInt64
+              )
+            );
+          default:
+            throw UnexpectedPropertyLiteralError(
+              "properties::OfRegistry",
+              property
+            );
+        }
+      }
+    )
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<types::IRegistry>
+    >(
+      std::move(*error)
+    );
+  }
+
+  if (!the_counts.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IRegistry>
+    >(
+      L"The required property counts is missing"
+    );
+  }
+
+  if (!the_counts_by_number.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IRegistry>
+    >(
+      L"The required property countsByNumber is missing"
+    );
+  }
+
+  if (!the_weights.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IRegistry>
+    >(
+      L"The required property weights is missing"
+    );
+  }
+
+  if (!the_kinds_by_code.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IRegistry>
+    >(
+      L"The required property kindsByCode is missing"
+    );
+  }
+
+  if (!the_codes_by_name.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IRegistry>
+    >(
+      L"The required property codesByName is missing"
+    );
+  }
+
+  if (!the_items_by_name.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IRegistry>
+    >(
+      L"The required property itemsByName is missing"
+    );
+  }
+
+  if (!the_labels.has_value()) {
+    return NoInstanceAndDeserializationErrorWithCause<
+      std::shared_ptr<types::IRegistry>
+    >(
+      L"The required property labels is missing"
+    );
+  }
+
+  return std::make_pair(
+    common::make_optional<
+      std::shared_ptr<types::IRegistry>
+    >(
+      // NOTE (mristin):
+      // We deliberately do not use std::make_shared here to avoid an unnecessary
+      // upcast.
+      new types::Registry(
+        std::move(*the_counts),
+        std::move(*the_counts_by_number),
+        std::move(*the_weights),
+        std::move(*the_kinds_by_code),
+        std::move(*the_codes_by_name),
+        std::move(*the_items_by_name),
+        std::move(*the_labels),
+        std::move(the_optional_counts)
+      )
+    ),
+    common::nullopt
+  );
+}
+
+std::pair<
+  common::optional<
+    std::shared_ptr<types::IRegistry>
+  >,
+  common::optional<DeserializationError>
+> DeserializeRegistry(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  common::optional<DeserializationError> error(
+    CheckJsonObject(json)
+  );
+
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<
+      std::shared_ptr<types::IRegistry>
+    >(
+      std::move(*error)
+    );
+  }
+
+  return ParsePropertiesOfRegistry(json, additional_properties);
+}
+
 /**
  * \brief De-serialize \p json and render the outcome as an expected value.
  *
@@ -1406,6 +2125,22 @@ common::expected<
     json,
     additional_properties,
     DeserializeSomething
+  );
+}
+
+common::expected<
+  std::shared_ptr<types::IRegistry>,
+  DeserializationError
+> RegistryFrom(
+  const nlohmann::json& json,
+  bool additional_properties
+) {
+  return DeserializeFrom<
+    std::shared_ptr<types::IRegistry>
+  >(
+    json,
+    additional_properties,
+    DeserializeRegistry
   );
 }
 
@@ -1876,6 +2611,157 @@ inline std::pair<
 }
 
 /**
+ * \brief Give out the instance behind \p pointer.
+ *
+ * The items of a tuple are heterogeneous, so ``SerializeTuple{N}`` can not
+ * know which of them are instances -- held as a ``std::shared_ptr`` -- and
+ * which are values. It asks per item instead, and this is the answer for
+ * a pointer. See the overload for everything else.
+ */
+template <typename T>
+const T& Deref(const std::shared_ptr<T>& pointer) {
+  return *pointer;
+}
+
+/**
+ * @copybrief Deref
+ *
+ * The item is the value itself, so there is nothing to dereference.
+ */
+template <typename T>
+const T& Deref(const T& value) {
+  return value;
+}
+
+/**
+ * Serialize the given dictionary to a JSON object, with the keys sorted by
+ * \p less, where value serialization might fail.
+ *
+ * The path of an error refers to the key of the value.
+ */
+template<
+  typename MapT,
+  typename LessT,
+  typename SerializeKeyT,
+  typename FallibleSerializeValueT
+>
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeDictWithFallible(
+  const MapT& map,
+  LessT less,
+  SerializeKeyT&& serialize_key,
+  FallibleSerializeValueT&& fallible_serialize_value
+) {
+  typedef typename MapT::value_type ItemT;
+
+  const std::vector<const ItemT*> sorted(
+    common::SortedItemPointers(map, less)
+  );
+
+  nlohmann::json serialized = nlohmann::json::object();
+
+  for (const ItemT* item : sorted) {
+    const std::string key(serialize_key(item->first));
+
+    common::optional<nlohmann::json> json_value;
+    common::optional<SerializationError> error;
+
+    std::tie(
+      json_value,
+      error
+    ) = fallible_serialize_value(Deref(item->second));
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::KeySegment>(
+          common::Utf8ToWstring(key)
+        )
+      );
+
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    serialized[key] = std::move(*json_value);
+  }
+
+  return std::make_pair(
+    std::move(serialized),
+    common::nullopt
+  );
+}
+
+/**
+ * Serialize the given dictionary to a JSON object, with the keys sorted by
+ * \p less, where value serialization can not fail.
+ */
+template<
+  typename MapT,
+  typename LessT,
+  typename SerializeKeyT,
+  typename InfallibleSerializeValueT
+>
+nlohmann::json SerializeDictWithInfallible(
+  const MapT& map,
+  LessT less,
+  SerializeKeyT&& serialize_key,
+  InfallibleSerializeValueT&& infallible_serialize_value
+) {
+  typedef typename MapT::value_type ItemT;
+
+  const std::vector<const ItemT*> sorted(
+    common::SortedItemPointers(map, less)
+  );
+
+  nlohmann::json serialized = nlohmann::json::object();
+
+  for (const ItemT* item : sorted) {
+    serialized[serialize_key(item->first)] = infallible_serialize_value(
+      Deref(item->second)
+    );
+  }
+
+  return serialized;
+}
+
+/**
+ * Serialize the string key \p that of a dictionary to the text of the key.
+ */
+std::string SerializeWstringKey(
+  const std::wstring& that
+) {
+  return common::WstringToUtf8(that);
+}
+
+/**
+ * Serialize the integer key \p that of a dictionary to the text of the key,
+ * in its canonical decimal representation.
+ */
+std::string SerializeInt64Key(
+  const int64_t& that
+) {
+  return std::to_string(that);
+}
+
+/**
+ * Serialize the key \p that of a dictionary, a literal of an enumeration,
+ * to the text of the key.
+ */
+template <typename EnumT>
+std::string SerializeEnumerationKey(
+  const EnumT& that
+) {
+  return stringification::to_string(that);
+}
+
+/**
  * Serialize the literal \p that of an enumeration to a JSON value.
  *
  * \param that literal to be serialized
@@ -1924,6 +2810,54 @@ std::pair<
 > SerializeSomething(
   const types::ISomething& that
 );
+
+/**
+ * \brief Serialize \p that instance of types::IRegistry to a JSON value.
+ *
+ * \param that instance to be serialized
+ * \return the JSON value , or an error, if any
+ */
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
+> SerializeRegistry(
+  const types::IRegistry& that
+);
+
+nlohmann::json Serialize_dictOf_int_str(
+  const std::unordered_map<int64_t, std::wstring>& that
+) {
+  return SerializeDictWithInfallible(
+    that,
+    std::less<int64_t>(),
+    SerializeInt64Key,
+    SerializeWstring
+  );
+}
+
+nlohmann::json Serialize_listOf_dictOf_int_str(
+  const std::vector<
+    std::unordered_map<int64_t, std::wstring>
+  >& that
+) {
+  return SerializeListWithInfallible(
+    that,
+    Serialize_dictOf_int_str
+  );
+}
+
+nlohmann::json Serialize_listOf_listOf_dictOf_int_str(
+  const std::vector<
+    std::vector<
+      std::unordered_map<int64_t, std::wstring>
+    >
+  >& that
+) {
+  return SerializeListWithInfallible(
+    that,
+    Serialize_listOf_dictOf_int_str
+  );
+}
 
 nlohmann::json SerializeItem(
   const types::IItem& that
@@ -2006,6 +2940,128 @@ std::pair<
 std::pair<
   common::optional<nlohmann::json>,
   common::optional<SerializationError>
+> SerializeRegistry(
+  const types::IRegistry& that
+) {
+  nlohmann::json result = nlohmann::json::object();
+
+  common::optional<SerializationError> error;
+
+  error = SerializeInto(
+    result,
+    "counts",
+    iteration::Property::kCounts,
+    SerializeDictWithFallible(
+      that.counts(),
+      common::LessByCodePoints,
+      SerializeWstringKey,
+      SerializeInt64
+    )
+  );
+  if (error.has_value()) {
+    return NoJsonAndSerializationError(
+      std::move(*error)
+    );
+  }
+
+  error = SerializeInto(
+    result,
+    "countsByNumber",
+    iteration::Property::kCountsByNumber,
+    SerializeDictWithFallible(
+      that.counts_by_number(),
+      std::less<int64_t>(),
+      SerializeInt64Key,
+      SerializeInt64
+    )
+  );
+  if (error.has_value()) {
+    return NoJsonAndSerializationError(
+      std::move(*error)
+    );
+  }
+
+  error = SerializeInto(
+    result,
+    "weights",
+    iteration::Property::kWeights,
+    SerializeDictWithFallible(
+      that.weights(),
+      stringification::LessByRankOfDirection,
+      SerializeEnumerationKey<types::Direction>,
+      SerializeInt64
+    )
+  );
+  if (error.has_value()) {
+    return NoJsonAndSerializationError(
+      std::move(*error)
+    );
+  }
+
+  result["kindsByCode"] = SerializeDictWithInfallible(
+    that.kinds_by_code(),
+    common::LessByCodePoints,
+    SerializeWstringKey,
+    SerializeEnumeration<types::Kind>
+  );
+
+  result["codesByName"] = SerializeDictWithInfallible(
+    that.codes_by_name(),
+    common::LessByCodePoints,
+    SerializeWstringKey,
+    SerializeWstring
+  );
+
+  result["itemsByName"] = SerializeDictWithInfallible(
+    that.items_by_name(),
+    common::LessByCodePoints,
+    SerializeWstringKey,
+    SerializeItem
+  );
+
+  result["labels"] = SerializeDictWithInfallible(
+    that.labels(),
+    common::LessByCodePoints,
+    SerializeWstringKey,
+    Serialize_listOf_listOf_dictOf_int_str
+  );
+
+  const common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  >& maybe_optional_counts(
+    that.optional_counts()
+  );
+  if (maybe_optional_counts.has_value()) {
+    error = SerializeInto(
+      result,
+      "optionalCounts",
+      iteration::Property::kOptionalCounts,
+      SerializeDictWithFallible(
+        *maybe_optional_counts,
+        common::LessByCodePoints,
+        SerializeWstringKey,
+        SerializeInt64
+      )
+    );
+    if (error.has_value()) {
+      return NoJsonAndSerializationError(
+        std::move(*error)
+      );
+    }
+  }
+
+  return std::make_pair<
+    common::optional<nlohmann::json>,
+    common::optional<SerializationError>
+  >(
+    common::make_optional<nlohmann::json>(std::move(result)),
+    common::nullopt
+  );
+}
+
+std::pair<
+  common::optional<nlohmann::json>,
+  common::optional<SerializationError>
 > SerializeIClass(
   const types::IClass& that
 ) {
@@ -2019,6 +3075,10 @@ std::pair<
     case types::ModelType::kSomething:
       return SerializeSomething(
         dynamic_cast<const types::ISomething&>(that)
+      );
+    case types::ModelType::kRegistry:
+      return SerializeRegistry(
+        dynamic_cast<const types::IRegistry&>(that)
       );
     default: {
       std::string message = common::Concat(

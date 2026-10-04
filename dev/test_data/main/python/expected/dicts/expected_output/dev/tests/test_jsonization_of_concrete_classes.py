@@ -70,6 +70,30 @@ class TestRoundTrips(unittest.TestCase):
             )
             self.assertListEqual([], list(map(str, mismatches)))
 
+    def test_registry(self) -> None:
+        for path in sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Json"
+                / "Expected"
+                / 'Registry'
+            ).glob("**/*.json")
+        ):
+            with path.open("rt") as fid:
+                original_jsonable = json.load(fid)
+
+            instance = our_jsonization.registry_from_jsonable(
+                original_jsonable
+            )
+
+            another_jsonable = our_jsonization.to_jsonable(instance)
+
+            mismatches = tests.common_jsonization.check_equal(
+                original_jsonable,
+                another_jsonable
+            )
+            self.assertListEqual([], list(map(str, mismatches)))
+
 
 def _load_the_first_expected(model_type: str) -> Any:
     """Load the first recorded example of the ``model_type``."""

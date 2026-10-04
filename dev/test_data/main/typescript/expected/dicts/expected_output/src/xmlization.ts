@@ -34,6 +34,7 @@ import {
   nextPropertyOpenTag,
   parseElementContent,
   parseList,
+  parseMap,
   parseNamedElement,
   parseTextContent,
   readRequiredRootOpenTag,
@@ -240,6 +241,16 @@ function parse_Kind(
   );
 }
 
+function parse_Direction(
+  cursor: XmlCursor
+): OurCommon.Either<OurTypes.Direction, DeserializationError> {
+  return parseEnumerationContent(
+    cursor,
+    "Direction",
+    OurStringification.directionFromString
+  );
+}
+
 function write_Kind(
   parts: Array<string>,
   value: OurTypes.Kind
@@ -252,6 +263,28 @@ function write_Kind(
   );
 }
 
+function write_Direction(
+  parts: Array<string>,
+  value: OurTypes.Direction
+): void {
+  writeEnumerationContent(
+    parts,
+    value,
+    "Direction",
+    OurStringification.directionToString
+  );
+}
+
+function parseAtV_DictOf_int_str(
+  cursor: XmlCursor
+): OurCommon.Either<Map<number, string>, DeserializationError> {
+  return parseNamedElement(
+    cursor,
+    "v",
+    parse_DictOf_int_str
+  );
+}
+
 function parseAtV_Kind(
   cursor: XmlCursor
 ): OurCommon.Either<OurTypes.Kind, DeserializationError> {
@@ -259,6 +292,16 @@ function parseAtV_Kind(
     cursor,
     "v",
     parse_Kind
+  );
+}
+
+function parseAtV_ListOf_DictOf_int_str(
+  cursor: XmlCursor
+): OurCommon.Either<Array<Map<number, string>>, DeserializationError> {
+  return parseNamedElement(
+    cursor,
+    "v",
+    parse_ListOf_DictOf_int_str
   );
 }
 
@@ -292,6 +335,129 @@ function parseElement_Item(
   );
 }
 
+function parseWrapped_Item(
+  cursor: XmlCursor
+): OurCommon.Either<OurTypes.Item, DeserializationError> {
+  const valueOrError = parseElement_Item(
+    cursor
+  );
+  cursor.skipIgnorable();
+  return valueOrError;
+}
+
+function parse_DictOf_Direction_int(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<OurTypes.Direction, number>,
+  DeserializationError
+> {
+  return parseMap<OurTypes.Direction, number>(
+    cursor,
+    parse_Direction,
+    parse_int
+  );
+}
+
+function parse_DictOf_int_int(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<number, number>,
+  DeserializationError
+> {
+  return parseMap<number, number>(
+    cursor,
+    parse_int,
+    parse_int
+  );
+}
+
+function parse_DictOf_int_str(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<number, string>,
+  DeserializationError
+> {
+  return parseMap<number, string>(
+    cursor,
+    parse_int,
+    parse_str
+  );
+}
+
+function parse_DictOf_str_Item(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<string, OurTypes.Item>,
+  DeserializationError
+> {
+  return parseMap<string, OurTypes.Item>(
+    cursor,
+    parse_str,
+    parseWrapped_Item
+  );
+}
+
+function parse_DictOf_str_Kind(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<string, OurTypes.Kind>,
+  DeserializationError
+> {
+  return parseMap<string, OurTypes.Kind>(
+    cursor,
+    parse_str,
+    parse_Kind
+  );
+}
+
+function parse_DictOf_str_ListOf_ListOf_DictOf_int_str(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<string, Array<Array<Map<number, string>>>>,
+  DeserializationError
+> {
+  return parseMap<string, Array<Array<Map<number, string>>>>(
+    cursor,
+    parse_str,
+    parse_ListOf_ListOf_DictOf_int_str
+  );
+}
+
+function parse_DictOf_str_int(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<string, number>,
+  DeserializationError
+> {
+  return parseMap<string, number>(
+    cursor,
+    parse_str,
+    parse_int
+  );
+}
+
+function parse_DictOf_str_str(
+  cursor: XmlCursor
+): OurCommon.Either<
+  Map<string, string>,
+  DeserializationError
+> {
+  return parseMap<string, string>(
+    cursor,
+    parse_str,
+    parse_str
+  );
+}
+
+function parse_ListOf_DictOf_int_str(
+  cursor: XmlCursor
+): OurCommon.Either<Array<Map<number, string>>, DeserializationError> {
+  return parseList<Map<number, string>>(
+    cursor,
+    parseAtV_DictOf_int_str
+  );
+}
+
 function parse_ListOf_Item(
   cursor: XmlCursor
 ): OurCommon.Either<Array<OurTypes.Item>, DeserializationError> {
@@ -307,6 +473,15 @@ function parse_ListOf_Kind(
   return parseList<OurTypes.Kind>(
     cursor,
     parseAtV_Kind
+  );
+}
+
+function parse_ListOf_ListOf_DictOf_int_str(
+  cursor: XmlCursor
+): OurCommon.Either<Array<Array<Map<number, string>>>, DeserializationError> {
+  return parseList<Array<Map<number, string>>>(
+    cursor,
+    parseAtV_ListOf_DictOf_int_str
   );
 }
 
@@ -328,6 +503,18 @@ function parse_ListOf_str(
   );
 }
 
+function writeAtV_DictOf_int_str(
+  parts: Array<string>,
+  value: Map<number, string>
+): void {
+  writeElement(
+    parts,
+    "v",
+    value,
+    write_DictOf_int_str
+  );
+}
+
 function writeAtV_Kind(
   parts: Array<string>,
   value: OurTypes.Kind
@@ -337,6 +524,18 @@ function writeAtV_Kind(
     "v",
     value,
     write_Kind
+  );
+}
+
+function writeAtV_ListOf_DictOf_int_str(
+  parts: Array<string>,
+  value: Array<Map<number, string>>
+): void {
+  writeElement(
+    parts,
+    "v",
+    value,
+    write_ListOf_DictOf_int_str
   );
 }
 
@@ -364,6 +563,169 @@ function writeAtV_str(
   );
 }
 
+function write_DictOf_Direction_int(
+  parts: Array<string>,
+  values: Map<OurTypes.Direction, number>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurStringification.compareByRankOfDirection)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_Direction);
+      writeElement(parts, "v", value, write_int);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey((OurStringification.directionToString(key) ?? key.toString()));
+      }
+      throw error;
+    }
+  }
+}
+
+function write_DictOf_int_int(
+  parts: Array<string>,
+  values: Map<number, number>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurCommon.compareNumbers)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_int);
+      writeElement(parts, "v", value, write_int);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key.toString());
+      }
+      throw error;
+    }
+  }
+}
+
+function write_DictOf_int_str(
+  parts: Array<string>,
+  values: Map<number, string>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurCommon.compareNumbers)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_int);
+      writeElement(parts, "v", value, write_str);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key.toString());
+      }
+      throw error;
+    }
+  }
+}
+
+function write_DictOf_str_Item(
+  parts: Array<string>,
+  values: Map<string, OurTypes.Item>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurCommon.compareByCodePoints)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_str);
+      writeElement(parts, "v", value, writeClass);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+}
+
+function write_DictOf_str_Kind(
+  parts: Array<string>,
+  values: Map<string, OurTypes.Kind>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurCommon.compareByCodePoints)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_str);
+      writeElement(parts, "v", value, write_Kind);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+}
+
+function write_DictOf_str_ListOf_ListOf_DictOf_int_str(
+  parts: Array<string>,
+  values: Map<string, Array<Array<Map<number, string>>>>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurCommon.compareByCodePoints)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_str);
+      writeElement(parts, "v", value, write_ListOf_ListOf_DictOf_int_str);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+}
+
+function write_DictOf_str_int(
+  parts: Array<string>,
+  values: Map<string, number>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurCommon.compareByCodePoints)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_str);
+      writeElement(parts, "v", value, write_int);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+}
+
+function write_DictOf_str_str(
+  parts: Array<string>,
+  values: Map<string, string>
+): void {
+  for (const [key, value] of OurCommon.sortedEntries(values, OurCommon.compareByCodePoints)) {
+    try {
+      parts.push("<i>");
+      writeElement(parts, "k", key, write_str);
+      writeElement(parts, "v", value, write_str);
+      parts.push("</i>");
+    } catch (error) {
+      if (error instanceof SerializationError) {
+        error.prependKey(key);
+      }
+      throw error;
+    }
+  }
+}
+
+function write_ListOf_DictOf_int_str(
+  parts: Array<string>,
+  values: Array<Map<number, string>>
+): void {
+  writeList(
+    parts,
+    values,
+    writeAtV_DictOf_int_str
+  );
+}
+
 function write_ListOf_Kind(
   parts: Array<string>,
   values: Array<OurTypes.Kind>
@@ -372,6 +734,17 @@ function write_ListOf_Kind(
     parts,
     values,
     writeAtV_Kind
+  );
+}
+
+function write_ListOf_ListOf_DictOf_int_str(
+  parts: Array<string>,
+  values: Array<Array<Map<number, string>>>
+): void {
+  writeList(
+    parts,
+    values,
+    writeAtV_ListOf_DictOf_int_str
   );
 }
 
@@ -682,6 +1055,253 @@ function parseSomethingFromSequence(
 }
 
 /**
+ * Parse the sequence of properties of an instance
+ * of {@link types!Registry}.
+ *
+ * The opening tag is expected to have been already read by the caller, and
+ * the caller is expected to read and verify the corresponding closing tag
+ * after this function returns successfully. This is the contract of
+ * a `ContentParser`, so this function is used as one wherever an instance
+ * of {@link types!Registry} is embedded.
+ */
+function parseRegistryFromSequence(
+  cursor: XmlCursor
+): OurCommon.Either<OurTypes.Registry, DeserializationError> {
+  let theCounts: Map<string, number> | null = null;
+  let theCountsByNumber: Map<number, number> | null = null;
+  let theWeights: Map<OurTypes.Direction, number> | null = null;
+  let theKindsByCode: Map<string, OurTypes.Kind> | null = null;
+  let theCodesByName: Map<string, string> | null = null;
+  let theItemsByName: Map<string, OurTypes.Item> | null = null;
+  let theLabels: Map<string, Array<Array<Map<number, string>>>> | null = null;
+  let theOptionalCounts: Map<string, number> | null = null;
+
+  const className = OurTypes.Registry.name;
+
+  cursor.skipIgnorable();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const nextTagOrError = nextPropertyOpenTag(cursor, className);
+    if (nextTagOrError === null) {
+      break;
+    }
+    if (nextTagOrError instanceof DeserializationError) {
+      return new OurCommon.Either<OurTypes.Registry, DeserializationError>(
+        null,
+        nextTagOrError
+      );
+    }
+
+    const propertyLocalName = localNameOfTag(nextTagOrError.tag);
+
+    let propertyError: DeserializationError | null = null;
+    switch (propertyLocalName) {
+      case "counts": {
+        if (theCounts !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_str_int
+        );
+        propertyError = parsed.error;
+        theCounts = parsed.value;
+        break;
+      }
+
+      case "countsByNumber": {
+        if (theCountsByNumber !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_int_int
+        );
+        propertyError = parsed.error;
+        theCountsByNumber = parsed.value;
+        break;
+      }
+
+      case "weights": {
+        if (theWeights !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_Direction_int
+        );
+        propertyError = parsed.error;
+        theWeights = parsed.value;
+        break;
+      }
+
+      case "kindsByCode": {
+        if (theKindsByCode !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_str_Kind
+        );
+        propertyError = parsed.error;
+        theKindsByCode = parsed.value;
+        break;
+      }
+
+      case "codesByName": {
+        if (theCodesByName !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_str_str
+        );
+        propertyError = parsed.error;
+        theCodesByName = parsed.value;
+        break;
+      }
+
+      case "itemsByName": {
+        if (theItemsByName !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_str_Item
+        );
+        propertyError = parsed.error;
+        theItemsByName = parsed.value;
+        break;
+      }
+
+      case "labels": {
+        if (theLabels !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_str_ListOf_ListOf_DictOf_int_str
+        );
+        propertyError = parsed.error;
+        theLabels = parsed.value;
+        break;
+      }
+
+      case "optionalCounts": {
+        if (theOptionalCounts !== null) {
+          propertyError = duplicatePropertyError(propertyLocalName);
+          break;
+        }
+
+        const parsed = parseElementContent(
+          cursor,
+          propertyLocalName,
+          parse_DictOf_str_int
+        );
+        propertyError = parsed.error;
+        theOptionalCounts = parsed.value;
+        break;
+      }
+
+      default: {
+        propertyError = new DeserializationError(
+          `Unexpected XML property: ${propertyLocalName}`
+        );
+        break;
+      }
+    }
+
+    if (propertyError !== null) {
+      propertyError.path.prepend(new ElementSegment(propertyLocalName));
+      return new OurCommon.Either<OurTypes.Registry, DeserializationError>(
+        null,
+        propertyError
+      );
+    }
+
+    cursor.skipIgnorable();
+  }
+
+  if (theCounts === null) {
+    return newDeserializationError<OurTypes.Registry>(
+      "The required property 'counts' is missing"
+    );
+  }
+
+  if (theCountsByNumber === null) {
+    return newDeserializationError<OurTypes.Registry>(
+      "The required property 'countsByNumber' is missing"
+    );
+  }
+
+  if (theWeights === null) {
+    return newDeserializationError<OurTypes.Registry>(
+      "The required property 'weights' is missing"
+    );
+  }
+
+  if (theKindsByCode === null) {
+    return newDeserializationError<OurTypes.Registry>(
+      "The required property 'kindsByCode' is missing"
+    );
+  }
+
+  if (theCodesByName === null) {
+    return newDeserializationError<OurTypes.Registry>(
+      "The required property 'codesByName' is missing"
+    );
+  }
+
+  if (theItemsByName === null) {
+    return newDeserializationError<OurTypes.Registry>(
+      "The required property 'itemsByName' is missing"
+    );
+  }
+
+  if (theLabels === null) {
+    return newDeserializationError<OurTypes.Registry>(
+      "The required property 'labels' is missing"
+    );
+  }
+
+  const instance = new OurTypes.Registry(
+    theCounts,
+    theCountsByNumber,
+    theWeights,
+    theKindsByCode,
+    theCodesByName,
+    theItemsByName,
+    theLabels,
+    theOptionalCounts
+  );
+  return new OurCommon.Either<OurTypes.Registry, DeserializationError>(
+    instance,
+    null
+  );
+}
+
+/**
  * Write the properties of an instance
  * of {@link types!Item}, and neither the opening
  * nor the closing tag of the element which holds them -- which is the contract of
@@ -747,12 +1367,73 @@ function writeSomethingAsSequence(
   );
 }
 
+/**
+ * Write the properties of an instance
+ * of {@link types!Registry}, and neither the opening
+ * nor the closing tag of the element which holds them -- which is the contract of
+ * a `ContentWriter`, so this function is used as one.
+ */
+function writeRegistryAsSequence(
+  parts: Array<string>,
+  that: OurTypes.Registry
+): void {
+  writeProperty(
+    parts,
+    "counts",
+    that.counts,
+    write_DictOf_str_int
+  );
+  writeProperty(
+    parts,
+    "countsByNumber",
+    that.countsByNumber,
+    write_DictOf_int_int
+  );
+  writeProperty(
+    parts,
+    "weights",
+    that.weights,
+    write_DictOf_Direction_int
+  );
+  writeProperty(
+    parts,
+    "kindsByCode",
+    that.kindsByCode,
+    write_DictOf_str_Kind
+  );
+  writeProperty(
+    parts,
+    "codesByName",
+    that.codesByName,
+    write_DictOf_str_str
+  );
+  writeProperty(
+    parts,
+    "itemsByName",
+    that.itemsByName,
+    write_DictOf_str_Item
+  );
+  writeProperty(
+    parts,
+    "labels",
+    that.labels,
+    write_DictOf_str_ListOf_ListOf_DictOf_int_str
+  );
+  writeOptionalProperty(
+    parts,
+    "optionalCounts",
+    that.optionalCounts,
+    write_DictOf_str_int
+  );
+}
+
 const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
   string,
   ContentParser<OurTypes.Class>
 >([
   ["item", parseItemFromSequence],
-  ["something", parseSomethingFromSequence]
+  ["something", parseSomethingFromSequence],
+  ["registry", parseRegistryFromSequence]
 ]);
 
 /**
@@ -971,6 +1652,18 @@ class Serializer extends OurTypes.AbstractVisitorWithContext<Array<string>> {
       "something",
       that,
       writeSomethingAsSequence
+    );
+  }
+
+  visitRegistryWithContext(
+    that: OurTypes.Registry,
+    parts: Array<string>
+  ): void {
+    writeElement(
+      parts,
+      "registry",
+      that,
+      writeRegistryAsSequence
     );
   }
 }

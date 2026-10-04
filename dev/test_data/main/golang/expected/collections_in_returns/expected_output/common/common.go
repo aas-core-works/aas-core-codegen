@@ -317,23 +317,24 @@ func AllKeys[K comparable, V any](condition func(K) bool, m map[K]V) bool {
 	return true
 }
 
-// Collect the items of the set into a slice, sorted by `less`.
+// Collect the keys of the map `m` into a slice, sorted by `less`.
 //
-// The set is represented as a map to empty structs. A nil set gives
-// a nil slice, so that an absent optional set stays absent.
+// A set is represented as a map to empty structs, so this gives its items.
+// A nil map gives a nil slice, so that an absent optional set stays absent.
 //
-// We serialize the sets as arrays whose items are sorted in the same order
-// in all the SDKs, see [LessBool] and [LessOrdered].
-func SortedKeys[K comparable](
-	set map[K]struct{},
+// We serialize the sets as arrays whose items are sorted, and the dictionaries
+// with their keys sorted, in the same order in all the SDKs, see [LessBool]
+// and [LessOrdered].
+func SortedKeys[K comparable, V any](
+	m map[K]V,
 	less func(that K, other K) bool,
 ) []K {
-	if set == nil {
+	if m == nil {
 		return nil
 	}
 
-	result := make([]K, 0, len(set))
-	for k := range set {
+	result := make([]K, 0, len(m))
+	for k := range m {
 		result = append(result, k)
 	}
 

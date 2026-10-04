@@ -121,9 +121,10 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
     """
     Determine the moniker of the ``type_annotation``.
 
-    A moniker of a list, of a set or of a tuple is a Polish notation over
-    ``_``-separated tokens: ``ListOf_{M}`` and ``SetOf_{M}`` take exactly one
-    argument, and ``TupleOf{N}_{M}...`` exactly ``N`` of them. As a leaf moniker never contains an underscore, such
+    A moniker of a list, of a set, of a tuple or of a dictionary is a Polish
+    notation over ``_``-separated tokens: ``ListOf_{M}`` and ``SetOf_{M}`` take
+    exactly one argument, ``DictOf_{K}_{V}`` exactly two, and
+    ``TupleOf{N}_{M}...`` exactly ``N`` of them. As a leaf moniker never contains an underscore, such
     a name can always be split back into its parts, so the monikers are unique by
     construction and we need no check for collisions.
     """
@@ -139,6 +140,9 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
         monikers = "_".join(type_moniker(item) for item in type_anno.items)
         return f"TupleOf{len(type_anno.items)}_{monikers}"
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return f"DictOf_{type_moniker(type_anno.keys)}_{type_moniker(type_anno.values)}"
+
     return atomic_moniker(type_anno)
 
 
@@ -147,59 +151,122 @@ def type_moniker(type_annotation: intermediate.TypeAnnotationUnion) -> str:
 # region Sorting of the sets
 
 
+def _comparator(type_anno: intermediate.TypeAnnotationUnion, what: str) -> Stripped:
+    """
+    Name the function comparing the values of ``type_anno`` in the sort order.
+
+    The order is the same in all the SDKs: ``false`` before ``true``, the integers
+    numerically, and the strings and the literals of enumerations by the code
+    points of their serialized values. The enumerations are compared in
+    the stringification module, where we rank their literals at the generation
+    time.
+
+    The ``what`` names the sorted values in the assertion messages, *e.g.*,
+    ``the items of the set Set[str]``.
+    """
+    primitive_type = intermediate.try_primitive_type(type_anno)
+
+    if primitive_type is not None:
+        if primitive_type is intermediate.PrimitiveType.BOOL:
+            return Stripped("OurCommon.compareBooleans")
+        elif primitive_type is intermediate.PrimitiveType.INT:
+            return Stripped("OurCommon.compareNumbers")
+        elif primitive_type is intermediate.PrimitiveType.STR:
+            return Stripped("OurCommon.compareByCodePoints")
+        elif primitive_type is intermediate.PrimitiveType.FLOAT:
+            raise AssertionError(
+                f"Unexpected floats as {what}, which should have been refused in "
+                f"the intermediate stage"
+            )
+        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+            raise AssertionError(
+                f"Unexpected byte arrays as {what}, which should have been refused "
+                f"in the intermediate stage"
+            )
+        else:
+            assert_never(primitive_type)
+
+    assert isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type, intermediate.Enumeration
+    ), (
+        f"Expected primitives, constrained primitives or enumeration literals as "
+        f"{what}, as the others should have been refused in the intermediate stage"
+    )
+
+    compare = typescript_naming.function_name(
+        Identifier(f"compare_by_rank_of_{type_anno.our_type.name}")
+    )
+
+    return Stripped(f"OurStringification.{compare}")
+
+
 def generate_sorted_set_items(
     type_anno: intermediate.SetTypeAnnotation, set_expression: Stripped
 ) -> Stripped:
     """
     Generate the expression giving the items of the ``set_expression`` in an array.
 
-    The items are sorted in the order which is the same in all the SDKs: ``false``
-    before ``true``, the integers numerically, and the strings and the literals of
-    enumerations by the code points of their serialized values. The expression
-    names the helpers of the common module, and the stringification module
-    for the enumerations, where we rank the literals at the generation time.
+    The items are sorted in the order which is the same in all the SDKs, see
+    :py:func:`_comparator`.
     """
-    primitive_type = intermediate.try_primitive_type(type_anno.items)
+    comparator = _comparator(type_anno.items, what=f"the items of the set {type_anno}")
 
-    if primitive_type is not None:
-        comparator: str
-        if primitive_type is intermediate.PrimitiveType.BOOL:
-            comparator = "OurCommon.compareBooleans"
-        elif primitive_type is intermediate.PrimitiveType.INT:
-            comparator = "OurCommon.compareNumbers"
-        elif primitive_type is intermediate.PrimitiveType.STR:
-            comparator = "OurCommon.compareByCodePoints"
-        elif primitive_type is intermediate.PrimitiveType.FLOAT:
-            raise AssertionError(
-                f"Unexpected set of floats, which should have been refused in "
-                f"the intermediate stage: {type_anno}"
-            )
-        elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-            raise AssertionError(
-                f"Unexpected set of byte arrays, which should have been refused in "
-                f"the intermediate stage: {type_anno}"
-            )
-        else:
-            assert_never(primitive_type)
+    return Stripped(f"Array.from({set_expression}).sort({comparator})")
 
-        return Stripped(f"Array.from({set_expression}).sort({comparator})")
 
-    assert isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.items.our_type, intermediate.Enumeration
+def generate_sorted_dict_entries(
+    type_anno: intermediate.DictTypeAnnotation, dict_expression: Stripped
+) -> Stripped:
+    """
+    Generate the expression giving the entries of the ``dict_expression``
+    in an array.
+
+    The entries are sorted by their keys in the order which is the same in all
+    the SDKs, see :py:func:`_comparator`.
+    """
+    comparator = _comparator(
+        type_anno.keys, what=f"the keys of the dictionary {type_anno}"
+    )
+
+    return Stripped(f"OurCommon.sortedEntries({dict_expression}, {comparator})")
+
+
+def generate_json_key(
+    keys_type_anno: intermediate.TypeAnnotationUnion, key_expression: Stripped
+) -> Stripped:
+    """
+    Generate the expression rendering the key of a dictionary as a JSON key.
+
+    A JSON key is always a string: the integers are rendered as decimal numbers,
+    and the literals of the enumerations as their serialized values. We use
+    the JSON key in the paths of the errors so that they are the same in all
+    the SDKs. A literal outside of the enumeration is rendered as its number,
+    so that the reporting never throws.
+    """
+    primitive_type = intermediate.try_primitive_type(keys_type_anno)
+
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return key_expression
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped(f"{key_expression}.toString()")
+
+    assert isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_anno.our_type, intermediate.Enumeration
     ), (
-        f"Expected a set of primitives, constrained primitives or enumeration "
-        f"literals, as the other items should have been refused in "
-        f"the intermediate stage, but got: {type_anno}"
+        f"Expected strings, integers, constrained primitives or enumeration literals "
+        f"as the keys of a dictionary, as the others should have been refused in "
+        f"the intermediate stage, but got: {keys_type_anno}"
     )
 
-    compare = typescript_naming.function_name(
-        Identifier(f"compare_by_rank_of_{type_anno.items.our_type.name}")
+    to_string = typescript_naming.function_name(
+        Identifier(f"{keys_type_anno.our_type.name}_to_string")
     )
 
-    return Stripped(f"Array.from({set_expression}).sort(OurStringification.{compare})")
-
-
-# endregion
+    return Stripped(
+        f"(OurStringification.{to_string}({key_expression}) ?? "
+        f"{key_expression}.toString())"
+    )
 
 
 def boolean_literal(value: bool) -> Stripped:

@@ -81,6 +81,40 @@ namespace dummy.Tests
 
             return instance;
         }  // public static Our.Something LoadMinimalSomething
+
+        public static Our.Registry LoadMaximalRegistry()
+        {
+            string path = Path.Combine(
+                Our.Tests.Common.TestDataDir,
+                "Json",
+                "Expected",
+                "Registry",
+                "maximal.json");
+
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
+
+            var instance = Our.Jsonization.Deserialize.RegistryFrom(
+                node);
+
+            return instance;
+        }  // public static Our.Registry LoadMaximalRegistry
+
+        public static Our.Registry LoadMinimalRegistry()
+        {
+            string path = Path.Combine(
+                Our.Tests.Common.TestDataDir,
+                "Json",
+                "Expected",
+                "Registry",
+                "minimal.json");
+
+            var node = Our.Tests.CommonJson.ReadFromFile(path);
+
+            var instance = Our.Jsonization.Deserialize.RegistryFrom(
+                node);
+
+            return instance;
+        }  // public static Our.Registry LoadMinimalRegistry
     }  // class CommonJsonization
 }  // namespace dummy.Tests
 

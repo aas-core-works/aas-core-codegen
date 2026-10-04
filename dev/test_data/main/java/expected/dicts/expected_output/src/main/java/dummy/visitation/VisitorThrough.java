@@ -37,6 +37,15 @@ public class VisitorThrough implements IVisitor {
       visit(something);
     }
   }
+
+  public void visitRegistry(
+    IRegistry that
+  ) {
+    // Just descend through, do nothing with {@code that}
+    for (IClass something : that.descendOnce()) {
+      visit(something);
+    }
+  }
 }
 
 /*

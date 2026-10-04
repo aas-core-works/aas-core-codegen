@@ -116,6 +116,23 @@ common::expected<
   const ReadingOptions& options = {}
 );
 
+/**
+ * Deserialize an instance of types::IRegistry from an XML
+ * read from the stream \p is.
+ *
+ * \param is stream to read XML from
+ * \param options reading options to be tweaked for special cases. The defaults should
+ * work in most cases.
+ * \return the parsed types::IRegistry, or an error if any
+ */
+common::expected<
+  std::shared_ptr<types::IRegistry>,
+  DeserializationError
+> RegistryFrom(
+  std::istream& is,
+  const ReadingOptions& options = {}
+);
+
 // endregion Deserialization
 
 // region Serialization

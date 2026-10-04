@@ -376,19 +376,26 @@ def enumerations_in_set_properties(
 def _items_of(
     type_annotation: _types.TypeAnnotationExceptOptional,
 ) -> Sequence[_types.TypeAnnotationUnion]:
-    """Give the items of a list or of a tuple, and nothing for anything else."""
+    """
+    Give the items of a list or of a tuple, the keys and the values of
+    a dictionary, and nothing for anything else.
+    """
     if isinstance(type_annotation, _types.ListTypeAnnotation):
         return [type_annotation.items]
 
     if isinstance(type_annotation, _types.TupleTypeAnnotation):
         return type_annotation.items
 
+    if isinstance(type_annotation, _types.DictTypeAnnotation):
+        return [type_annotation.keys, type_annotation.values]
+
     return []
 
 
 def sets_nested_in_properties(symbol_table: _types.SymbolTable) -> bool:
     """
-    Check whether any property holds a set nested in a list or in a tuple.
+    Check whether any property holds a set nested in a list, in a tuple or in
+    a dictionary.
 
     The generators need this check to import the type of the set where they
     spell out the types of such lists and tuples, but not those of the sets
@@ -399,6 +406,84 @@ def sets_nested_in_properties(symbol_table: _types.SymbolTable) -> bool:
         for cls in symbol_table.classes
         for prop in cls.properties
         for item_type_anno in _items_of(_types.beneath_optional(prop.type_annotation))
+    )
+
+
+def dict_properties(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether any class of the ``symbol_table`` has a property holding a dictionary.
+
+    The dictionary can be at any depth of the property's type annotation, *e.g.*,
+    ``List[Dict[str, int]]``. The keys of the dictionaries are serialized sorted,
+    so we need to generate the helpers for sorting them only if there are any.
+    """
+    return any(
+        any(True for _ in _nested_dicts(prop.type_annotation))
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    )
+
+
+def dicts_nested_in_properties(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether any property holds a dictionary nested in a list, in a tuple or
+    in another dictionary.
+
+    The generators need this check to import the type of the dictionary where
+    they spell out the types of such collections, but not those of
+    the dictionaries themselves, *e.g.*, in the deep copies.
+    """
+    return any(
+        any(True for _ in _nested_dicts(item_type_anno))
+        for cls in symbol_table.classes
+        for prop in cls.properties
+        for item_type_anno in _items_of(_types.beneath_optional(prop.type_annotation))
+    )
+
+
+def enumerations_in_dict_property_keys(
+    symbol_table: _types.SymbolTable,
+) -> List[_types.Enumeration]:
+    """
+    List the enumerations whose literals are the keys of the dictionaries in
+    the properties.
+
+    The dictionaries can be at any depth of the properties' type annotations.
+    The targets sort the keys of such a dictionary by the ranks of the literals
+    when they serialize it, as for the sets, so they need the helpers ranking
+    the literals of these enumerations.
+
+    The enumerations are listed in the order of their definition in
+    the meta-model, each only once.
+    """
+    ids_in_keys = set()  # type: Set[int]
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            for dict_type_anno in _nested_dicts(prop.type_annotation):
+                if isinstance(
+                    dict_type_anno.keys, _types.OurTypeAnnotation
+                ) and isinstance(dict_type_anno.keys.our_type, _types.Enumeration):
+                    ids_in_keys.add(id(dict_type_anno.keys.our_type))
+
+    return [
+        enumeration
+        for enumeration in symbol_table.enumerations
+        if id(enumeration) in ids_in_keys
+    ]
+
+
+def dicts_with_string_keys_in_properties(symbol_table: _types.SymbolTable) -> bool:
+    """
+    Check whether any property holds a dictionary keyed by strings or by
+    constrained strings.
+
+    The targets sort such keys by their code points when they serialize them.
+    """
+    return any(
+        _types.try_primitive_type(dict_type_anno.keys) is _types.PrimitiveType.STR
+        for cls in symbol_table.classes
+        for prop in cls.properties
+        for dict_type_anno in _nested_dicts(prop.type_annotation)
     )
 
 
@@ -487,11 +572,19 @@ def dicts_with_enumeration_keys(symbol_table: _types.SymbolTable) -> bool:
     """
     Check whether the meta-model uses a dictionary keyed by enumeration literals.
 
-    The dictionaries are the dictionary arguments, the dictionary return values
-    and the local dictionaries. We do not have the types of the local
-    dictionaries at hand here, so we resolve the keys of ``Dict[...]`` and
-    ``Mapping[...]`` in the annotations of the local declarations.
+    The dictionaries are the dictionary properties, the dictionary arguments,
+    the dictionary return values and the local dictionaries. We do not have
+    the types of the local dictionaries at hand here, so we resolve the keys of
+    ``Dict[...]`` and ``Mapping[...]`` in the annotations of the local
+    declarations.
     """
+    if any(
+        _holds_dict_with_enumeration_keys(prop.type_annotation)
+        for cls in symbol_table.classes
+        for prop in cls.properties
+    ):
+        return True
+
     functions = [
         *symbol_table.verification_functions,
         *(method for cls in symbol_table.classes for method in cls.methods),

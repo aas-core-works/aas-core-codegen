@@ -24,6 +24,9 @@ namespace dummy
             public void VisitSomething(
                 ISomething that
             );
+            public void VisitRegistry(
+                IRegistry that
+            );
         }  // public interface IVisitor
 
         /// <summary>
@@ -62,6 +65,17 @@ namespace dummy
                     Visit(something);
                 }
             }
+
+            public virtual void VisitRegistry(
+                IRegistry that
+            )
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
         }  // public class VisitorThrough
 
         /// <summary>
@@ -78,6 +92,9 @@ namespace dummy
             );
             public abstract void VisitSomething(
                 ISomething that
+            );
+            public abstract void VisitRegistry(
+                IRegistry that
             );
         }  // public abstract class AbstractVisitor
 
@@ -99,6 +116,10 @@ namespace dummy
             );
             public void VisitSomething(
                 ISomething that,
+                TContext context
+            );
+            public void VisitRegistry(
+                IRegistry that,
                 TContext context
             );
         }  // public interface IVisitorWithContext
@@ -123,6 +144,10 @@ namespace dummy
                 ISomething that,
                 TContext context
             );
+            public abstract void VisitRegistry(
+                IRegistry that,
+                TContext context
+            );
         }  // public abstract class AbstractVisitorWithContext
 
         /// <summary>
@@ -144,6 +169,9 @@ namespace dummy
             public T TransformSomething(
                 ISomething that
             );
+            public T TransformRegistry(
+                IRegistry that
+            );
         }  // public interface ITransformer
 
         /// <summary>
@@ -164,6 +192,10 @@ namespace dummy
 
             public abstract T TransformSomething(
                 ISomething that
+            );
+
+            public abstract T TransformRegistry(
+                IRegistry that
             );
         }  // public abstract class AbstractTransformer
 
@@ -187,6 +219,10 @@ namespace dummy
             );
             public T TransformSomething(
                 ISomething that,
+                TContext context
+            );
+            public T TransformRegistry(
+                IRegistry that,
                 TContext context
             );
         }  // public interface ITransformerWithContext
@@ -217,6 +253,11 @@ namespace dummy
 
             public abstract T TransformSomething(
                 ISomething that,
+                TContext context
+            );
+
+            public abstract T TransformRegistry(
+                IRegistry that,
                 TContext context
             );
         }  // public abstract class AbstractTransformerWithContext

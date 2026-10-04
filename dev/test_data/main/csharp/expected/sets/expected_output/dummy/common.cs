@@ -192,8 +192,8 @@ namespace dummy
         }  // public static class StringHelpers
 
         /// <summary>
-        /// Sort the items of the sets, so that they are serialized in the same order
-        /// in all the SDKs.
+        /// Sort the items of the sets and the keys of the dictionaries, so that they are
+        /// serialized in the same order in all the SDKs.
         /// </summary>
         public static class SetHelpers
         {

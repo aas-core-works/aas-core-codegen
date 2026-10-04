@@ -39,6 +39,16 @@ const char* StaticTypeName<
   our::types::ISomething
 >::name = "ISomething";
 
+template<>
+struct StaticTypeName<
+  our::types::IRegistry
+> {
+  static const char* name;
+};
+const char* StaticTypeName<
+  our::types::IRegistry
+>::name = "IRegistry";
+
 std::shared_ptr<
   our::types::IItem
 > LoadItem(
@@ -169,6 +179,73 @@ std::shared_ptr<
   );
 
   return LoadSomething(
+    path
+  );
+}
+
+std::shared_ptr<
+  our::types::IRegistry
+> LoadRegistry(
+  const std::filesystem::path& path
+) {
+  
+
+  std::shared_ptr<
+    our::types::IClass
+  > abstract = test::common::xmlization::MustReadInstance(
+    path
+  );
+
+  std::shared_ptr<
+    our::types::IRegistry
+  > instance(
+    std::dynamic_pointer_cast<
+      our::types::IRegistry
+    >(
+      abstract
+    )
+  );
+
+  if (instance == nullptr) {
+    throw std::runtime_error(
+      our::common::Concat(
+        "Failed to cast the instance to IRegistry from ",
+        path.string()
+      )
+    );
+  }
+
+  return instance;
+}
+
+std::shared_ptr<
+  our::types::IRegistry
+> LoadMinRegistry() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "registry"
+      / "minimal.xml"
+  );
+
+  return LoadRegistry(
+    path
+  );
+}
+
+std::shared_ptr<
+  our::types::IRegistry
+> LoadMaxRegistry() {
+  const std::filesystem::path path(
+    test::common::DetermineTestDataDir()
+      / "Xml"
+      / "Expected"
+      / "registry"
+      / "maximal.xml"
+  );
+
+  return LoadRegistry(
     path
   );
 }

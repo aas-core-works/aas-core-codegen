@@ -198,10 +198,32 @@ return (
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        value_check = _generate_check_expr(
+            that_expr="item.Value", other_expr="otherValue", type_anno=type_anno.values
+        )
+
+        body = Stripped(
+            f"""\
+if (ReferenceEquals(that, other) || that.Count != other.Count)
+{{
+{I}return false;
+}}
+
+foreach (var item in that)
+{{
+{I}if (!other.TryGetValue(item.Key, out var otherValue))
+{I}{{
+{II}return false;
+{I}}}
+
+{I}if (!(
+{II}{indent_but_first_line(value_check, II)}))
+{I}{{
+{II}return false;
+{I}}}
+}}
+
+return true;"""
         )
 
     else:

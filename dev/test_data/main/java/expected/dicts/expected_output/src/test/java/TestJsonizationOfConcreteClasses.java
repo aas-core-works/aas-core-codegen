@@ -280,6 +280,105 @@ public class TestJsonizationOfConcreteClasses {
     }
   } // public void testSomethingVerificationFail
 
+  @Test
+  public void testRegistryOk() throws IOException {
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    final Path searchPath = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Registry");
+    final List<Path> paths = Common.findPaths(searchPath, ".json");
+
+    for (Path path : paths) {
+      final JsonNode node = objectMapper.readTree(path.toFile());
+      final Registry instance = Jsonization.Deserialize.deserializeRegistry(node);
+
+      final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+      final List<Reporting.Error> errors = Common.asList(errorIter);
+      Common.assertNoVerificationErrors(errors, path);
+    }
+  } // public void testRegistryOk
+
+  @Test
+  public void testRegistryDeserializationFromNonObjectFail() throws IOException {
+    final JsonNode node = JsonNodeFactory.instance.textNode("INVALID");
+
+    Jsonization.DeserializeException exception = null;
+    try {
+      final Registry unused = Jsonization.Deserialize.deserializeRegistry(node);
+    } catch (Jsonization.DeserializeException observedException) {
+      exception = observedException;
+    }
+
+    assert exception != null : "Expected an exception, but got none";
+    assert exception.getMessage().startsWith("Expected a JsonObject, but got ") :
+      "Unexpected exception message: " + exception.getMessage();
+  } // public void testRegistryDeserializationFromNonObjectFail
+
+  @Test
+  public void testRegistryDeserializationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Unserializable"))) {
+      final Path clsDir = causeDir.resolve("Registry");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Registry for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        Jsonization.DeserializeException exception = null;
+        try {
+          final Registry var = Jsonization.Deserialize.deserializeRegistry(node);
+        } catch (Jsonization.DeserializeException observedException) {
+          exception = observedException;
+        }
+
+        assertEqualsExpectedOrRerecordDeserializationException(
+          exception, path);
+      }
+    }
+  } // public void testRegistryDeserializationFail
+
+  @Test
+  public void testRegistryVerificationFail() throws IOException {
+    for (Path causeDir :
+      Common.findDirs(
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Json",
+          "Unexpected",
+          "Invalid"))) {
+      final Path clsDir = causeDir.resolve("Registry");
+
+      if (!Files.exists(clsDir)) {
+        // No examples of Registry for the failure cause.
+        continue;
+      }
+
+      final List<Path> paths = Common.findPaths(clsDir, ".json");
+      for (Path path : paths) {
+        final JsonNode node = CommonJson.readFromFile(path);
+
+        final Registry instance = Jsonization.Deserialize.deserializeRegistry(node);
+
+        final Iterable<Reporting.Error> errorIter = Verification.verify(instance);
+        final List<Reporting.Error> errors = Common.asList(errorIter);
+        Common.assertEqualsExpectedOrRerecordVerificationErrors(errors, path);
+      }
+    }
+  } // public void testRegistryVerificationFail
+
   private static JsonNode loadTheFirstExpected(String modelType) throws IOException {
     final List<Path> paths =
       Common.findPaths(

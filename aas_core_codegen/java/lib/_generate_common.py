@@ -1,5 +1,6 @@
 """Generate code shared across the generated Java packages."""
 
+import itertools
 from typing import List, Sequence
 
 from aas_core_codegen import intermediate
@@ -670,15 +671,32 @@ def generate(
         )
 
     with_operations = intermediate_uses.set_operations(symbol_table)
-    with_sorting = java_common.has_set_properties(symbol_table)
+
+    # NOTE (mristin):
+    # The keys of the dictionaries in the properties are sorted exactly as
+    # the items of the sets, so they share the helpers.
+    with_sorting = java_common.has_set_properties(
+        symbol_table
+    ) or intermediate_uses.dict_properties(symbol_table)
+
     if with_operations or with_sorting:
+        ranked_enumeration_ids = {
+            id(enumeration)
+            for enumeration in itertools.chain(
+                intermediate_uses.enumerations_in_set_properties(symbol_table),
+                intermediate_uses.enumerations_in_dict_property_keys(symbol_table),
+            )
+        }
+
         set_helpers = _generate_set_helpers(
             package=package,
             with_operations=with_operations,
             with_sorting=with_sorting,
-            ranked_enumerations=intermediate_uses.enumerations_in_set_properties(
-                symbol_table
-            ),
+            ranked_enumerations=[
+                enumeration
+                for enumeration in symbol_table.enumerations
+                if id(enumeration) in ranked_enumeration_ids
+            ],
         )
         files.append(java_common.JavaFile("SetHelpers.java", f"{set_helpers}\n"))
 

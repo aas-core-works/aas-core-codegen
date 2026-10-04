@@ -990,6 +990,7 @@ def _is_enclosed_in_a_prescribed_element(
             intermediate.ListTypeAnnotation,
             intermediate.TupleTypeAnnotation,
             intermediate.SetTypeAnnotation,
+            intermediate.DictTypeAnnotation,
         ),
     )
 
@@ -1070,19 +1071,25 @@ def _content_reader_name(
             intermediate.ListTypeAnnotation,
             intermediate.TupleTypeAnnotation,
             intermediate.SetTypeAnnotation,
+            intermediate.DictTypeAnnotation,
         ),
     ):
         return Identifier(f"_read_{python_common.type_moniker(type_anno)}")
 
-    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
-
     else:
         assert_never(type_anno)
+
+
+def _is_instance(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+    """Check whether ``type_annotation`` denotes an instance of one of our classes."""
+    return isinstance(type_annotation, intermediate.OurTypeAnnotation) and isinstance(
+        type_annotation.our_type,
+        (
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+            intermediate.NamedUnion,
+        ),
+    )
 
 
 def _element_reader_name(
@@ -1116,6 +1123,26 @@ def _element_reader_name(
     return python_naming.function_name(
         Identifier(f"_read_{type_anno.our_type.name}_as_element")
     )
+
+
+def _dict_value_reader_name(
+    values_type_annotation: intermediate.TypeAnnotationUnion,
+) -> Identifier:
+    """
+    Give out the name of the reader of the ``<v>`` element of an item of
+    a dictionary with the values of ``values_type_annotation``.
+
+    Unlike in a list, an instance is always wrapped in ``<v>``, so that
+    the readers expect exactly ``<k>`` and ``<v>`` in every item.
+    """
+    if _is_instance(values_type_annotation):
+        assert isinstance(values_type_annotation, intermediate.OurTypeAnnotation)
+        return Identifier(
+            f"_read_nested__{python_common.atomic_moniker(values_type_annotation)}"
+            f"__at_v"
+        )
+
+    return _element_reader_name(values_type_annotation, expected_tag="v")
 
 
 class _ReaderRegistry:
@@ -1288,6 +1315,144 @@ def {name}(
             ),
         )
 
+    def _register_nested_reader(
+        self, type_annotation: intermediate.OurTypeAnnotation
+    ) -> None:
+        """Register the reader of an instance nested in a discriminator element."""
+        self.note_needed_helper("_read_nested_element")
+
+        our_type = type_annotation.our_type
+
+        # NOTE (mristin):
+        # This is the content reader of a polymorphic class and of a named union, see
+        # :py:func:`_content_reader_name`. A class without concrete descendants is
+        # read nested only as a value of a dictionary, see
+        # :py:meth:`_register_dict_value_reader`, so we name the reader explicitly.
+        name = Identifier(
+            f"_read_nested__{python_common.atomic_moniker(type_annotation)}"
+        )
+
+        value_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("our_types")
+        )
+
+        read_as_element = python_naming.function_name(
+            Identifier(f"_read_{our_type.name}_as_element")
+        )
+
+        type_name = (
+            python_naming.union_name(our_type.name)
+            if isinstance(our_type, intermediate.NamedUnion)
+            else python_naming.class_name(our_type.name)
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+def {name}(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]]
+) -> {value_type}:
+{I}\"\"\"
+{I}Read an instance of :py:class:`.types.{type_name}` nested in
+{I}:paramref:`element` as a discriminator element.
+{I}\"\"\"
+{I}return _read_nested_element(
+{II}element,
+{II}iterator,
+{II}{read_as_element},
+{II}{python_common.string_literal(type_name)}
+{I})"""
+            ),
+        )
+
+    def _register_dict_value_reader(
+        self, values_type_annotation: intermediate.TypeAnnotationUnion
+    ) -> None:
+        """
+        Register the reader of the ``<v>`` element of an item of a dictionary with
+        the values of ``values_type_annotation``.
+        """
+        if not _is_instance(values_type_annotation):
+            self._register_element_reader(values_type_annotation, expected_tag="v")
+            return
+
+        assert isinstance(values_type_annotation, intermediate.OurTypeAnnotation)
+
+        self._register_nested_reader(values_type_annotation)
+        self.note_needed_helper("_read_named_element")
+
+        name = _dict_value_reader_name(values_type_annotation)
+
+        value_type = python_common.generate_type(
+            values_type_annotation, types_module=Identifier("our_types")
+        )
+
+        nested_reader = Identifier(
+            f"_read_nested__{python_common.atomic_moniker(values_type_annotation)}"
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+def {name}(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]]
+) -> {value_type}:
+{I}\"\"\"
+{I}Read the instance nested in :paramref:`element`, which must be tagged
+{I}``v``, as {python_common.describe_value_type(values_type_annotation)}.
+{I}\"\"\"
+{I}return _read_named_element(
+{II}element,
+{II}iterator,
+{II}'v',
+{II}{nested_reader}
+{I})"""
+            ),
+        )
+
+    def _register_dict_reader(
+        self, type_annotation: intermediate.DictTypeAnnotation
+    ) -> None:
+        """Register the reader of a dictionary of the ``type_annotation``."""
+        self.note_needed_helper("_read_dict_of_items")
+
+        self._register_element_reader(type_annotation.keys, expected_tag="k")
+        self._register_dict_value_reader(type_annotation.values)
+
+        name = _content_reader_name(type_annotation)
+
+        dict_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("our_types")
+        )
+
+        read_key = _element_reader_name(type_annotation.keys, expected_tag="k")
+        read_value = _dict_value_reader_name(type_annotation.values)
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+def {name}(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]]
+) -> {dict_type}:
+{I}\"\"\"
+{I}Read the items of :paramref:`element` as
+{I}{python_common.describe_value_type(type_annotation)}.
+{I}\"\"\"
+{I}return _read_dict_of_items(
+{II}element,
+{II}iterator,
+{II}{read_key},
+{II}{read_value}
+{I})"""
+            ),
+        )
+
     def _register_tuple_reader(
         self, type_annotation: intermediate.TupleTypeAnnotation
     ) -> None:
@@ -1340,51 +1505,6 @@ def {name}(
 {II}element,
 {II}iterator,
 {II}{indent_but_first_line(joined_read_items, II)}
-{I})"""
-            ),
-        )
-
-    def _register_nested_reader(
-        self, type_annotation: intermediate.OurTypeAnnotation
-    ) -> None:
-        """Register the reader of an instance nested in a discriminator element."""
-        self.note_needed_helper("_read_nested_element")
-
-        our_type = type_annotation.our_type
-
-        name = _content_reader_name(type_annotation)
-
-        value_type = python_common.generate_type(
-            type_annotation, types_module=Identifier("our_types")
-        )
-
-        read_as_element = python_naming.function_name(
-            Identifier(f"_read_{our_type.name}_as_element")
-        )
-
-        type_name = (
-            python_naming.union_name(our_type.name)
-            if isinstance(our_type, intermediate.NamedUnion)
-            else python_naming.class_name(our_type.name)
-        )
-
-        self._add(
-            name,
-            Stripped(
-                f"""\
-def {name}(
-{I}element: Element,
-{I}iterator: Iterator[Tuple[str, Element]]
-) -> {value_type}:
-{I}\"\"\"
-{I}Read an instance of :py:class:`.types.{type_name}` nested in
-{I}:paramref:`element` as a discriminator element.
-{I}\"\"\"
-{I}return _read_nested_element(
-{II}element,
-{II}iterator,
-{II}{read_as_element},
-{II}{python_common.string_literal(type_name)}
 {I})"""
             ),
         )
@@ -1458,11 +1578,7 @@ def {name}(
             self._register_set_reader(type_anno)
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            self._register_dict_reader(type_anno)
 
         else:
             assert_never(type_anno)
@@ -1906,10 +2022,11 @@ def _container_writer_name(
         intermediate.ListTypeAnnotation,
         intermediate.TupleTypeAnnotation,
         intermediate.SetTypeAnnotation,
+        intermediate.DictTypeAnnotation,
     ],
 ) -> Identifier:
     """
-    Give out the name of the writer of a list, a tuple or a set.
+    Give out the name of the writer of a list, a tuple, a set or a dictionary.
 
     A list is written by a writer of its own only if it is an item of another list,
     see :py:meth:`_WriterRegistry._register_list_writer`.
@@ -2055,18 +2172,16 @@ def _element_writer_call(
         )
 
     elif isinstance(
-        type_anno, (intermediate.TupleTypeAnnotation, intermediate.SetTypeAnnotation)
+        type_anno,
+        (
+            intermediate.TupleTypeAnnotation,
+            intermediate.SetTypeAnnotation,
+            intermediate.DictTypeAnnotation,
+        ),
     ):
         return (
             _container_writer_name(type_anno),
             [prop_literal, value, "serializer"],
-        )
-
-    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
         )
 
     else:
@@ -2339,6 +2454,109 @@ def {name}(
             ),
         )
 
+    def _register_dict_writer(
+        self, type_annotation: intermediate.DictTypeAnnotation
+    ) -> None:
+        """Register the writer of a dictionary of the ``type_annotation``."""
+        self.register_property_writer(type_annotation.keys)
+
+        name = _container_writer_name(type_annotation)
+
+        value_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("our_types")
+        )
+
+        key_function, key_arguments = _element_writer_call(
+            type_annotation.keys, None, "key"
+        )
+        write_key = _join_arguments(
+            key_function, ["'k'"] + key_arguments, columns=len(IIIII)
+        )
+
+        write_value: Stripped
+        if _is_instance(type_annotation.values):
+            # NOTE (mristin):
+            # Unlike in a list, an instance is always wrapped in ``<v>``, so that
+            # the readers expect exactly ``<k>`` and ``<v>`` in every item.
+            self.note_needed_helper("_write_nested_element")
+            write_value = _join_arguments(
+                Identifier("_write_nested_element"),
+                ["'v'", "None", "value[key]", "serializer"],
+                columns=len(IIIII),
+            )
+        else:
+            self.register_property_writer(type_annotation.values)
+
+            value_function, value_arguments = _element_writer_call(
+                type_annotation.values, None, "value[key]"
+            )
+            write_value = _join_arguments(
+                value_function, ["'v'"] + value_arguments, columns=len(IIIII)
+            )
+
+        sorted_keys = python_common.generate_sorted_keys(type_annotation.keys, "value")
+
+        jsonable_key: str
+        if (
+            intermediate.try_primitive_type(type_annotation.keys)
+            is intermediate.PrimitiveType.INT
+        ):
+            jsonable_key = "str(key)"
+        elif isinstance(
+            type_annotation.keys, intermediate.OurTypeAnnotation
+        ) and isinstance(type_annotation.keys.our_type, intermediate.Enumeration):
+            jsonable_key = "key.value"
+        else:
+            jsonable_key = "key"
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+def {name}(
+{I}name: str,
+{I}prop_name: Optional[str],
+{I}value: {indent_but_first_line(value_type, I)},
+{I}serializer: '_Serializer'
+) -> None:
+{I}\"\"\"
+{I}Write the items of :paramref:`value` sorted by their keys, enclosed in
+{I}the :paramref:`name` element.
+
+{I}Each item is written as an ``<i>`` element with the key in ``<k>`` and
+{I}the value in ``<v>``. The keys are sorted in the same order in all
+{I}the SDKs. If there are no items, the enclosing element is collapsed to
+{I}an empty one.
+
+{I}:param name: of the enclosing element
+{I}:param prop_name:
+{II}name of the property, as spelled in Python, whose value is written, or
+{II}``None`` if the access to the value is recorded by an enclosing writer
+{I}:param value: to be serialized
+{I}:param serializer: to write to
+{I}:raise: :py:class:`SerializationException` if the value could not be written
+{I}\"\"\"
+{I}try:
+{II}if len(value) == 0:
+{III}serializer.writer.write_empty_element(name)
+{II}else:
+{III}serializer.writer.write_start_element(name)
+
+{III}for key in {sorted_keys}:
+{IIII}try:
+{IIIII}serializer.writer.write_start_element('i')
+{IIIII}{indent_but_first_line(write_key, IIIII)}
+{IIIII}{indent_but_first_line(write_value, IIIII)}
+{IIIII}serializer.writer.write_end_element('i')
+{IIII}except Exception as exception:
+{IIIII}_attribute_to_key(exception, {jsonable_key})
+
+{III}serializer.writer.write_end_element(name)
+{I}except Exception as exception:
+{II}_attribute_to_property(exception, prop_name)"""
+            ),
+        )
+
     def register_property_writer(
         self, type_annotation: intermediate.TypeAnnotationUnion
     ) -> None:
@@ -2413,11 +2631,7 @@ def {name}(
             self._register_set_writer(type_anno)
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            self._register_dict_writer(type_anno)
 
         else:
             assert_never(type_anno)
@@ -2785,6 +2999,7 @@ _HELPER_DEPENDENCIES = {
     "_read_properties": [],
     "_read_list_of_items": [],
     "_read_set_of_items": [],
+    "_read_dict_of_items": [],
     "_read_tuple_item": [],
     "_read_instance_from_iterparse": [],
     "_remove_whitespace": [],
@@ -3178,6 +3393,113 @@ def _read_set_of_items(
 {III}raise duplicate_exception
 
 {II}result.add(item)
+
+{I}return result"""
+        ),
+        "_read_dict_of_items": Stripped(
+            f"""\
+def _read_dict_of_items(
+{I}element: Element,
+{I}iterator: Iterator[Tuple[str, Element]],
+{I}read_key: _ContentReader[_KeyT],
+{I}read_value: _ContentReader[_ValueT]
+) -> Dict[_KeyT, _ValueT]:
+{I}\"\"\"
+{I}Read the children of :paramref:`element` as the items of a dictionary.
+
+{I}Each item is an ``<i>`` element with exactly the key in ``<k>`` and
+{I}the value in ``<v>``. We accept the items in any order, but refuse
+{I}the duplicate keys, so that no item is silently lost.
+
+{I}:paramref:`read_key` and :paramref:`read_value` are responsible for verifying
+{I}the tags of the ``<k>`` and the ``<v>`` elements themselves.
+
+{I}The end element corresponding to :paramref:`element` will be read as well.
+
+{I}:param element: start element enclosing the dictionary
+{I}:param iterator:
+{II}Input stream of ``(event, element)`` coming from
+{II}:py:func:`xml.etree.ElementTree.iterparse` with the argument
+{II}``events=["start", "end"]``
+{I}:param read_key: to read the ``<k>`` element, including its own end element
+{I}:param read_value: to read the ``<v>`` element, including its own end element
+{I}:raise: :py:class:`DeserializationException` if unexpected input
+{I}:return: parsed items
+{I}\"\"\"
+{I}if element.text is not None and len(element.text.strip()) != 0:
+{II}raise DeserializationException(
+{III}f"Expected only item elements and whitespace text, "
+{III}f"but got text: {{element.text!r}}"
+{II})
+
+{I}result = dict()  # type: Dict[_KeyT, _ValueT]
+
+{I}while True:
+{II}next_event_element = next(iterator, None)
+{II}if next_event_element is None:
+{III}raise DeserializationException(
+{IIII}f"Expected an item element or the end element corresponding "
+{IIII}f"to {{element.tag}}, but got the end-of-input"
+{III})
+
+{II}next_event, item_element = next_event_element
+{II}if next_event == 'end' and item_element.tag == element.tag:
+{III}# We reached the end element enclosing the items.
+{III}break
+
+{II}if next_event != 'start':
+{III}raise DeserializationException(
+{IIII}f"Expected a start element corresponding to an item, "
+{IIII}f"but got event {{next_event!r}} "
+{IIII}f"and element {{item_element.tag!r}}"
+{III})
+
+{II}# NOTE (mristin):
+{II}# We raise on a duplicate, so the number of the items read so far is also
+{II}# the index of the item element.
+{II}index = len(result)
+
+{II}try:
+{III}tag_wo_ns = parse_element_tag(item_element)
+{III}if tag_wo_ns != 'i':
+{IIII}raise DeserializationException(
+{IIIII}f"Expected an element with the tag 'i', "
+{IIIII}f"but got an element with tag: {{tag_wo_ns!r}}"
+{IIII})
+
+{III}if item_element.text is not None and len(item_element.text.strip()) != 0:
+{IIII}raise DeserializationException(
+{IIIII}f"Expected only the key and the value elements and whitespace "
+{IIIII}f"text, but got text: {{item_element.text!r}}"
+{IIII})
+
+{III}key_element = read_next_start_element(iterator, "the key element 'k'")
+{III}try:
+{IIII}key = read_key(key_element, iterator)
+{III}except DeserializationException as exception:
+{IIII}exception.path._prepend(ElementSegment(key_element))
+{IIII}raise
+
+{III}if key in result:
+{IIII}duplicate_exception = DeserializationException(
+{IIIII}"Expected unique keys in the dictionary, but the key is a duplicate"
+{IIII})
+{IIII}duplicate_exception.path._prepend(ElementSegment(key_element))
+{IIII}raise duplicate_exception
+
+{III}value_element = read_next_start_element(iterator, "the value element 'v'")
+{III}try:
+{IIII}value = read_value(value_element, iterator)
+{III}except DeserializationException as exception:
+{IIII}exception.path._prepend(ElementSegment(value_element))
+{IIII}raise
+
+{III}read_end_element(item_element, iterator)
+{II}except DeserializationException as exception:
+{III}exception.path._prepend(IndexSegment(item_element, index))
+{III}raise
+
+{II}result[key] = value
 
 {I}return result"""
         ),
@@ -4447,11 +4769,18 @@ def _with_elements_cleared_after_yield(
 
     blocks.append(_READING_PATTERN_NOTE)
 
+    # NOTE (mristin):
+    # We define the type of the keys only for the dictionaries so that the type
+    # variable is never unused.
+    key_type_var = (
+        '_KeyT = TypeVar("_KeyT")\n' if "_read_dict_of_items" in needed_helpers else ""
+    )
+
     blocks.append(
         Stripped(
             f"""\
 _ValueT = TypeVar("_ValueT")
-
+{key_type_var}
 #: Read the content of an element which has already been opened, and read
 #: the corresponding end element as well
 _ContentReader = Callable[
@@ -4598,6 +4927,36 @@ def _attribute_to_item(
 {I}raise failure from exception"""
         )
     )
+
+    if intermediate_uses.dict_properties(symbol_table):
+        blocks.append(
+            Stripped(
+                f"""\
+def _attribute_to_key(
+{II}exception: Exception,
+{II}key: str
+) -> NoReturn:
+{I}\"\"\"
+{I}Re-raise the :paramref:`exception` as a failure of the item of a dictionary
+{I}at :paramref:`key`.
+
+{I}This is the counterpart of :py:func:`_attribute_to_item` for the items of
+{I}a dictionary. The key is given as it is written in JSON, so that the paths
+{I}are the same in all the SDKs.
+
+{I}:param exception: to be re-raised
+{I}:param key: of the item which was being written
+{I}:raise: :py:class:`SerializationException` always
+{I}\"\"\"
+{I}if isinstance(exception, SerializationException):
+{II}exception._prepend_key(key)
+{II}raise exception
+
+{I}failure = SerializationException(str(exception))
+{I}failure._prepend_key(key)
+{I}raise failure from exception"""
+            )
+        )
 
     if "_write_list_of_items" in needed_writing_helpers:
         blocks.append(

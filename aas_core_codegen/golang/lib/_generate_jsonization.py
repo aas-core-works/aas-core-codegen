@@ -535,6 +535,108 @@ func parseSet[T comparable](
     )
 
 
+def _generate_parse_dict() -> Stripped:
+    """Generate the generic helper to parse a JSON object into a dictionary."""
+    return Stripped(
+        f"""\
+// Parse `jsonable` as a JSON object, and parse every key with `parseKey` and every
+// value with `parseValue` into a dictionary, or return an error.
+//
+// The keys can come in any order. We go over them sorted so that we report
+// the same error first regardless of the order of the iteration over the map.
+func parseDict[K comparable, V any](
+{I}jsonable interface{{}},
+{I}parseKey func(jsonable interface{{}}) (K, error),
+{I}parseValue func(jsonable interface{{}}) (V, error),
+) (result map[K]V, err error) {{
+{I}jsonableMap, ok := jsonable.(map[string]interface{{}})
+{I}if !ok {{
+{II}err = newDeserializationError(
+{III}fmt.Sprintf(
+{IIII}"Expected a JSON object, but got %T",
+{IIII}jsonable,
+{III}),
+{II})
+{II}return
+{I}}}
+
+{I}jsonKeys := make([]string, 0, len(jsonableMap))
+{I}for jsonKey := range jsonableMap {{
+{II}jsonKeys = append(jsonKeys, jsonKey)
+{I}}}
+{I}sort.Strings(jsonKeys)
+
+{I}result = make(map[K]V, len(jsonableMap))
+{I}for _, jsonKey := range jsonKeys {{
+{II}var key K
+{II}key, err = parseKey(jsonKey)
+{II}if err != nil {{
+{III}mustDeserializationError(err).prependKey(jsonKey)
+{III}return
+{II}}}
+
+{II}var value V
+{II}value, err = parseValue(jsonableMap[jsonKey])
+{II}if err != nil {{
+{III}mustDeserializationError(err).prependKey(jsonKey)
+{III}return
+{II}}}
+
+{II}result[key] = value
+{I}}}
+{I}return
+}}"""
+    )
+
+
+def _generate_int64_from_json_key() -> Stripped:
+    """Generate the function parsing an integer key of a JSON object."""
+    return Stripped(
+        f"""\
+// Parse `jsonable` as an integer key of a JSON object, or return an error.
+//
+// The key is expected to be a canonical decimal string, *i.e.*, without
+// a sign plus, without leading zeros and without a negative zero, so that
+// every integer has exactly one key.
+func int64FromJsonKey(jsonable interface{{}}) (result int64, err error) {{
+{I}text, ok := jsonable.(string)
+{I}if !ok {{
+{II}err = newDeserializationError(
+{III}fmt.Sprintf(
+{IIII}"Expected a string as the key, but got %T",
+{IIII}jsonable,
+{III}),
+{II})
+{II}return
+{I}}}
+
+{I}digits := strings.TrimPrefix(text, "-")
+{I}canonical := len(digits) > 0 &&
+{II}(digits == "0" || (digits[0] >= '1' && digits[0] <= '9')) &&
+{II}!(digits == "0" && len(text) != len(digits))
+{I}for i := 0; canonical && i < len(digits); i++ {{
+{II}canonical = digits[i] >= '0' && digits[i] <= '9'
+{I}}}
+
+{I}if canonical {{
+{II}var parseErr error
+{II}result, parseErr = strconv.ParseInt(text, 10, 64)
+{II}canonical = parseErr == nil
+{I}}}
+
+{I}if !canonical {{
+{II}err = newDeserializationError(
+{III}fmt.Sprintf(
+{IIII}"Expected a canonical decimal integer as the key, but got: %q",
+{IIII}text,
+{III}),
+{II})
+{I}}}
+{I}return
+}}"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_parse_tuple_helper(arity: int) -> Stripped:
     """
@@ -1163,6 +1265,26 @@ def _nested_containers(
     return result
 
 
+def _parse_key_function(
+    keys_type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
+    """Determine the function parsing a key of a JSON object as ``keys_type_anno``."""
+    if (
+        intermediate.try_primitive_type(keys_type_anno)
+        is intermediate.PrimitiveType.INT
+    ):
+        return Stripped("int64FromJsonKey")
+
+    # NOTE (mristin):
+    # A string key and a key of an enumeration literal are parsed exactly as
+    # the strings and the enumeration literals anywhere else.
+    assert isinstance(keys_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+        f"Unexpected keys of a dictionary: {keys_type_anno}; they should have been "
+        f"refused in intermediate._translate._verify_keys_of_dicts."
+    )
+    return _determine_parse_function_for_atomic_value(keys_type_anno)
+
+
 def _parse_function_and_arguments(
     type_anno: intermediate.TypeAnnotationExceptOptional,
     jsonable_expr: str,
@@ -1189,11 +1311,11 @@ def _parse_function_and_arguments(
         ]
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        return "parseDict", [
+            jsonable_expr,
+            _parse_key_function(type_anno.keys),
+            _parse_function_reference(type_anno.values),
+        ]
 
     assert_never(type_anno)
 
@@ -1755,6 +1877,133 @@ func serializeArray[T any](
     )
 
 
+def _generate_serialize_dict() -> Stripped:
+    """Generate the generic helper to serialize a dictionary into a JSON object."""
+    return Stripped(
+        f"""\
+// Serialize every key of `m` with `serializeKey` and every value with
+// `serializeValue` into a JSON-able object, or return an error.
+//
+// The `keys` are the keys of `m` in the order of the serialization, so that
+// the errors are reported in the same order as in the other SDKs.
+func serializeDict[K comparable, V any](
+{I}m map[K]V,
+{I}keys []K,
+{I}serializeKey func(key K) (string, error),
+{I}serializeValue func(value V) (interface{{}}, error),
+) (result map[string]interface{{}}, err error) {{
+{I}result = make(map[string]interface{{}}, len(keys))
+{I}for i, key := range keys {{
+{II}var jsonKey string
+{II}jsonKey, err = serializeKey(key)
+{II}if err != nil {{
+{III}mustSerializationError(err).prependIndex(i)
+{III}return
+{II}}}
+
+{II}result[jsonKey], err = serializeValue(m[key])
+{II}if err != nil {{
+{III}mustSerializationError(err).prependKey(jsonKey)
+{III}return
+{II}}}
+{I}}}
+{I}return
+}}"""
+    )
+
+
+def _json_key_serializer_of_enumeration(
+    enumeration: intermediate.Enumeration,
+) -> Identifier:
+    """Name the function serializing a literal of ``enumeration`` as a JSON key."""
+    return golang_naming.private_function_name(
+        Identifier(f"{enumeration.name}_as_json_key")
+    )
+
+
+def _generate_json_key_serializers(
+    symbol_table: intermediate.SymbolTable,
+) -> List[Stripped]:
+    """
+    Generate the functions serializing the keys of the dictionaries to JSON keys.
+
+    The integer keys are written as canonical decimal strings, and the keys of
+    the enumeration literals as their serialized values.
+    """
+    blocks = [
+        Stripped(
+            f"""\
+// Serialize the string `key` as a key of a JSON object, which is the string itself.
+func stringAsJsonKey(key string) (string, error) {{
+{I}return key, nil
+}}"""
+        ),
+        Stripped(
+            f"""\
+// Serialize the integer `key` as a key of a JSON object, *i.e.*, as a canonical
+// decimal string.
+func int64AsJsonKey(key int64) (string, error) {{
+{I}return strconv.FormatInt(key, 10), nil
+}}"""
+        ),
+    ]
+
+    for enumeration in intermediate_uses.enumerations_in_dict_property_keys(
+        symbol_table
+    ):
+        enum_name = golang_naming.enum_name(enumeration.name)
+
+        to_string_name = golang_naming.function_name(
+            Identifier(f"{enumeration.name}_to_string")
+        )
+
+        blocks.append(
+            Stripped(
+                f"""\
+// Serialize the literal `key` of [ourtypes.{enum_name}] as a key of a JSON object,
+// *i.e.*, as its serialized value, or return an error.
+func {_json_key_serializer_of_enumeration(enumeration)}(
+{I}key ourtypes.{enum_name},
+) (result string, err error) {{
+{I}var ok bool
+{I}result, ok = ourstringification.{to_string_name}(key)
+{I}if !ok {{
+{II}err = newSerializationError(
+{III}fmt.Sprintf(
+{IIII}"Got an invalid literal of {enum_name}: %v",
+{IIII}key,
+{III}),
+{II})
+{I}}}
+{I}return
+}}"""
+            )
+        )
+
+    return blocks
+
+
+def _json_key_serializer(
+    keys_type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Stripped:
+    """Determine the function serializing a key of ``keys_type_anno`` as a JSON key."""
+    primitive_type = intermediate.try_primitive_type(keys_type_anno)
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped("stringAsJsonKey")
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped("int64AsJsonKey")
+
+    assert isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_anno.our_type, intermediate.Enumeration
+    ), (
+        f"Unexpected keys of a dictionary: {keys_type_anno}; they should have been "
+        f"refused in intermediate._translate._verify_keys_of_dicts."
+    )
+
+    return Stripped(_json_key_serializer_of_enumeration(keys_type_anno.our_type))
+
+
 def _generate_direct_to_jsonable() -> Stripped:
     """
     Generate the generic function to forward a value as a JSON-able as-is.
@@ -2247,9 +2496,9 @@ def _serialize_container_function_and_arguments(
         # We serialize a set as an array whose items are sorted in the same
         # order in all the SDKs.
         return "serializeArray", [
-            golang_common.sorted_set_items_expr(
+            golang_common.sorted_keys_expr(
                 access_expression,
-                type_anno.items,
+                type_anno,
                 column=indention * golang_common.TAB_WIDTH,
             ),
             _item_or_nested_serializer_function(type_anno.items),
@@ -2261,11 +2510,20 @@ def _serialize_container_function_and_arguments(
         ]
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        # NOTE (mristin):
+        # We serialize a dictionary as a JSON object, and go over its keys in
+        # the same order as the other SDKs. Mind that the order of the keys in
+        # the JSON text is up to the encoder, as the JSON-able object is a map.
+        return "serializeDict", [
+            access_expression,
+            golang_common.sorted_keys_expr(
+                access_expression,
+                type_anno,
+                column=indention * golang_common.TAB_WIDTH,
+            ),
+            _json_key_serializer(type_anno.keys),
+            _item_or_nested_serializer_function(type_anno.values),
+        ]
 
     assert_never(type_anno)
 
@@ -2345,6 +2603,11 @@ def _determine_item_serializer_wrappers(
             ]  # type: Sequence[intermediate.TypeAnnotationUnion]
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             items = type_anno.items
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            # NOTE (mristin):
+            # The keys are serialized by the functions of their own, see
+            # :py:func:`_json_key_serializer`.
+            items = [type_anno.values]
         else:
             continue
 
@@ -3021,6 +3284,10 @@ func mustDeserializationError(err error) *DeserializationError {{
     if intermediate_uses.set_properties(symbol_table):
         blocks.append(_generate_parse_set())
 
+    if intermediate_uses.dict_properties(symbol_table):
+        blocks.append(_generate_parse_dict())
+        blocks.append(_generate_int64_from_json_key())
+
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_parse_tuple_helper(arity))
 
@@ -3173,6 +3440,10 @@ func mustSerializationError(err error) *SerializationError {{
     blocks.append(_generate_bytes_to_jsonable())
     blocks.append(_generate_serialize_array())
 
+    if intermediate_uses.dict_properties(symbol_table):
+        blocks.append(_generate_serialize_dict())
+        blocks.extend(_generate_json_key_serializers(symbol_table=symbol_table))
+
     item_serializer_wrappers = _determine_item_serializer_wrappers(symbol_table)
 
     if item_serializer_wrappers.direct:
@@ -3221,8 +3492,15 @@ func mustSerializationError(err error) *SerializationError {{
     import_lines = [
         f'{I}"fmt"',
         f'{I}"math"',
-        f'{I}b64 "encoding/base64"',
     ]  # type: List[str]
+
+    # NOTE (mristin):
+    # The dictionaries need these to parse and to serialize their keys.
+    for module in ("sort", "strconv", "strings"):
+        if golang_common.names_package(blocks, module):
+            import_lines.append(f'{I}"{module}"')
+
+    import_lines.append(f'{I}b64 "encoding/base64"')
 
     if golang_common.names_package(blocks, "ourcommon"):
         import_lines.append(f"{I}ourcommon {ourcommon_url_literal}")

@@ -994,11 +994,112 @@ def _value_to_type_element_or_type_identifier(
             return _TypeElementOrTypeIdentifier(element=xs_complex_type), None
 
         elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_annotation}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
+            # NOTE (mristin):
+            # We serialize each item of a dictionary as an ``<i>`` element, with
+            # the key in ``<k>`` and the value in ``<v>``, and sort the items by
+            # their keys. A value of a class or of a named union is always wrapped
+            # in ``<v>`` as well, unlike in the lists and the tuples, so that
+            # the readers expect exactly ``<k>`` and ``<v>`` in every item.
+            xs_item_sequence_elements = []  # type: List[ET.Element]
+
+            for tag, part_type_annotation in (
+                ("k", type_annotation.keys),
+                ("v", type_annotation.values),
+            ):
+                part_element = ET.Element("xs:element", {"name": tag})
+
+                if isinstance(
+                    part_type_annotation, intermediate.OurTypeAnnotation
+                ) and isinstance(
+                    part_type_annotation.our_type,
+                    (
+                        intermediate.AbstractClass,
+                        intermediate.ConcreteClass,
+                        intermediate.NamedUnion,
+                    ),
+                ):
+                    xs_part_complex_type = ET.SubElement(part_element, "xs:complexType")
+                    xs_part_sequence = ET.SubElement(
+                        xs_part_complex_type, "xs:sequence"
+                    )
+
+                    if isinstance(
+                        part_type_annotation.our_type, intermediate.NamedUnion
+                    ) or (len(part_type_annotation.our_type.concrete_descendants) > 0):
+                        ET.SubElement(
+                            xs_part_sequence,
+                            "xs:group",
+                            {
+                                "ref": xsd_naming.choice_group_name(
+                                    part_type_annotation.our_type.name
+                                )
+                            },
+                        )
+                    else:
+                        ET.SubElement(
+                            xs_part_sequence,
+                            "xs:element",
+                            {
+                                "name": naming.xml_class_name(
+                                    part_type_annotation.our_type.name
+                                ),
+                                "type": xsd_naming.type_name(
+                                    part_type_annotation.our_type.name
+                                ),
+                            },
+                        )
+                else:
+                    (
+                        part_type_element_or_identifier,
+                        translation_error,
+                    ) = _value_to_type_element_or_type_identifier(
+                        type_annotation=part_type_annotation,
+                        constraints_by_value=constraints_by_value,
+                    )
+
+                    if translation_error is not None:
+                        return None, (
+                            f"Failed to translate the type annotation "
+                            f"{type_annotation} to a type element or "
+                            f"a type identifier: {translation_error}"
+                        )
+
+                    assert part_type_element_or_identifier is not None
+
+                    if part_type_element_or_identifier.tajp is not None:
+                        part_element.attrib[
+                            "type"
+                        ] = part_type_element_or_identifier.tajp
+                    else:
+                        assert part_type_element_or_identifier.element is not None
+                        part_element.append(part_type_element_or_identifier.element)
+
+                xs_item_sequence_elements.append(part_element)
+
+            min_occurs = "0"
+            max_occurs = "unbounded"
+
+            constraints = constraints_by_value.get(type_annotation, None)
+            if constraints is not None and constraints.len_constraint is not None:
+                if constraints.len_constraint.min_value is not None:
+                    min_occurs = str(constraints.len_constraint.min_value)
+
+                if constraints.len_constraint.max_value is not None:
+                    max_occurs = str(constraints.len_constraint.max_value)
+
+            xs_item = ET.Element(
+                "xs:element",
+                {"name": "i", "minOccurs": min_occurs, "maxOccurs": max_occurs},
             )
+            xs_item_complex_type = ET.SubElement(xs_item, "xs:complexType")
+            xs_item_sequence = ET.SubElement(xs_item_complex_type, "xs:sequence")
+            xs_item_sequence.extend(xs_item_sequence_elements)
+
+            xs_complex_type = ET.Element("xs:complexType")
+            xs_sequence = ET.SubElement(xs_complex_type, "xs:sequence")
+            xs_sequence.append(xs_item)
+
+            return _TypeElementOrTypeIdentifier(element=xs_complex_type), None
 
         else:
             # noinspection PyTypeChecker

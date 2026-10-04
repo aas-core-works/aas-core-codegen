@@ -181,6 +181,32 @@ export function mapGetOr<K, V>(
 ]
 
 #: Sort the items of the sets in the properties in the same order as all the SDKs
+DICT_SORTING: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * Give out the entries of `map` sorted by their keys.
+ *
+ * @remarks
+ * We serialize, verify and descend into the items of a dictionary in
+ * the order of its keys, which is the same in all the SDKs, so that the output
+ * and the errors do not depend on the order of insertion.
+ *
+ * @param map - whose entries are sorted
+ * @param compare - compares the keys
+ * @returns entries of `map` sorted by their keys
+ * @typeParam K - type of the keys
+ * @typeParam V - type of the values
+ */
+export function sortedEntries<K, V>(
+{I}map: ReadonlyMap<K, V>,
+{I}compare: (that: K, other: K) => number
+): Array<[K, V]> {{
+{I}return Array.from(map.entries()).sort((that, other) =>
+{II}compare(that[0], other[0])
+{I});
+}}"""
+)
+
 SET_SORTING: Final[Sequence[Stripped]] = [
     Stripped(
         f"""\
@@ -1012,10 +1038,16 @@ export function findStr(text: string, sub: string, start = 0): number {{
 
     # NOTE (mristin):
     # Analogous to the modulo, we add the helpers only if the meta-model has
-    # a set in a property, which we serialize as a sorted array.
-    if intermediate_uses.set_properties(symbol_table):
+    # a set in a property, which we serialize as a sorted array, or
+    # a dictionary in a property, whose items we serialize sorted by their keys.
+    if intermediate_uses.set_properties(
+        symbol_table
+    ) or intermediate_uses.dict_properties(symbol_table):
         for block in SET_SORTING:
             blocks.insert(len(blocks) - 1, block)
+
+    if intermediate_uses.dict_properties(symbol_table):
+        blocks.insert(len(blocks) - 1, DICT_SORTING)
 
     # NOTE (mristin):
     # We need a helper which follows the Python implementation of ``str.lstrip``,

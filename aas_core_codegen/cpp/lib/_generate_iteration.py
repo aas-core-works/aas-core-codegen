@@ -16,6 +16,7 @@ from typing import (
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate
+from aas_core_codegen.intermediate import uses as intermediate_uses
 from aas_core_codegen.common import (
     Error,
     Identifier,
@@ -1273,6 +1274,168 @@ std::unique_ptr<impl::IIterator> Each(
 ]  # type: Final[Sequence[Stripped]]
 
 
+#: Define the iterator over the instances of the values of a dictionary.
+_EACH_VALUE_SORTED = [
+    Stripped(
+        f"""\
+/**
+ * \\brief Iterate over the instances of every value of a dictionary, one value
+ * after another, in the order of the keys.
+ *
+ * We iterate in the order of the serialization, so that the order is the same in
+ * all the SDKs. The iterator over a value is built only once the iteration
+ * reaches the value.
+ */
+template<typename MapT, typename LessT>
+class EachValueSortedIterator : public impl::IIterator {{
+ public:
+{I}typedef typename MapT::key_type K;
+{I}typedef typename MapT::mapped_type V;
+{I}typedef typename MapT::value_type ItemT;
+
+{I}/**
+{I} * Build the iterator over the instances of a value
+{I} */
+{I}typedef std::unique_ptr<impl::IIterator> (*OverValue)(
+{II}const V& value,
+{II}bool recursive
+{I});
+
+{I}/**
+{I} * Render a key as the text of its JSON key for the path
+{I} */
+{I}typedef std::wstring (*KeyToWstring)(const K& key);
+
+{I}EachValueSortedIterator(
+{II}const MapT* map,
+{II}LessT less,
+{II}KeyToWstring key_to_wstring,
+{II}OverValue over_value,
+{II}bool recursive
+{I}) :
+{II}map_(map),
+{II}less_(less),
+{II}key_to_wstring_(key_to_wstring),
+{II}over_value_(over_value),
+{II}recursive_(recursive),
+{II}index_(0) {{
+{II}// Intentionally empty.
+{I}}}
+
+{I}EachValueSortedIterator(const EachValueSortedIterator<MapT, LessT>& other) :
+{II}map_(other.map_),
+{II}less_(other.less_),
+{II}key_to_wstring_(other.key_to_wstring_),
+{II}over_value_(other.over_value_),
+{II}recursive_(other.recursive_),
+{II}sorted_(other.sorted_),
+{II}index_(other.index_),
+{II}value_(other.value_ == nullptr ? nullptr : other.value_->Clone()) {{
+{II}// Intentionally empty.
+{I}}}
+
+{I}void Start() override {{
+{II}if (sorted_ == nullptr) {{
+{III}sorted_ = std::make_shared<std::vector<const ItemT*> >(
+{IIII}common::SortedItemPointers(*map_, less_)
+{III});
+{II}}}
+
+{II}index_ = 0;
+{II}value_ = nullptr;
+{II}SkipDoneValues();
+{I}}}
+
+{I}void Next() override {{
+{II}value_->Next();
+{II}SkipDoneValues();
+{I}}}
+
+{I}bool Done() const override {{
+{II}return index_ >= sorted_->size();
+{I}}}
+
+{I}const std::shared_ptr<types::IClass>& Get() const override {{
+{II}return value_->Get();
+{I}}}
+
+{I}void AppendToPath(Path& path) const override {{
+{II}path.segments.emplace_back(
+{III}common::make_unique<KeySegment>(
+{IIII}key_to_wstring_((*sorted_)[index_]->first)
+{III})
+{II});
+{II}value_->AppendToPath(path);
+{I}}}
+
+{I}std::unique_ptr<impl::IIterator> Clone() const override {{
+{II}return common::make_unique<EachValueSortedIterator<MapT, LessT> >(*this);
+{I}}}
+
+ private:
+{I}const MapT* map_;
+{I}LessT less_;
+{I}KeyToWstring key_to_wstring_;
+{I}OverValue over_value_;
+{I}bool recursive_;
+
+{I}/**
+{I} * Pointers to the items, sorted by their keys once the iteration started,
+{I} * and shared among the clones as they never change
+{I} */
+{I}std::shared_ptr<const std::vector<const ItemT*> > sorted_;
+
+{I}/**
+{I} * Index of the item whose value we currently iterate over, in the sorted order
+{I} */
+{I}std::size_t index_;
+
+{I}/**
+{I} * Iterator over the current value, built once we reached the value
+{I} */
+{I}std::unique_ptr<impl::IIterator> value_;
+
+{I}/**
+{I} * Move on to the next values, and build their iterators, until one is not done.
+{I} */
+{I}void SkipDoneValues() {{
+{II}while (index_ < sorted_->size()) {{
+{III}if (value_ == nullptr) {{
+{IIII}value_ = over_value_((*sorted_)[index_]->second, recursive_);
+{IIII}value_->Start();
+{III}}}
+
+{III}if (!value_->Done()) {{
+{IIII}return;
+{III}}}
+
+{III}value_ = nullptr;
+{III}++index_;
+{II}}}
+{I}}}
+}};  // class EachValueSortedIterator"""
+    ),
+    Stripped(
+        f"""\
+template<typename MapT, typename LessT>
+std::unique_ptr<impl::IIterator> EachValueSorted(
+{I}const MapT& map,
+{I}LessT less,
+{I}std::wstring (*key_to_wstring)(const typename MapT::key_type& key),
+{I}std::unique_ptr<impl::IIterator> (*over_value)(
+{II}const typename MapT::mapped_type& value,
+{II}bool recursive
+{I}),
+{I}bool recursive
+) {{
+{I}return common::make_unique<EachValueSortedIterator<MapT, LessT> >(
+{II}&map, less, key_to_wstring, over_value, recursive
+{I});
+}}"""
+    ),
+]  # type: Final[Sequence[Stripped]]
+
+
 #: Define the iterator over an instance, and then over the instances it references.
 _ONE_THEN_OVER = [
     Stripped(
@@ -1419,11 +1582,9 @@ def _yields(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
         return False
 
     elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_annotation}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        # NOTE (mristin):
+        # The keys are never instances, so only the values can reference them.
+        return _yields(type_annotation.values)
 
     else:
         assert_never(type_annotation)
@@ -1524,11 +1685,12 @@ def _generate_over_expression(
             intermediate.OurTypeAnnotation,
             intermediate.ListTypeAnnotation,
             intermediate.TupleTypeAnnotation,
+            intermediate.DictTypeAnnotation,
         ),
     ):
         # NOTE (mristin):
         # The other types of ours reference no instances, so this must be
-        # a named union here.
+        # a named union here, or a container.
         return cpp_over.generate_call(
             cpp_over.over_function_name(type_annotation), [expr, "recursive"]
         )
@@ -1637,6 +1799,33 @@ def _generate_over_function(
         else:
             body = Stripped(f"return {cpp_over.generate_call('Chain', components)};")
 
+    elif isinstance(type_annotation, intermediate.DictTypeAnnotation):
+        values = type_annotation.values
+
+        value_function: str
+        if isinstance(values, intermediate.OurTypeAnnotation) and isinstance(
+            values.our_type, intermediate.Class
+        ):
+            # NOTE (mristin):
+            # The values of a dictionary of instances are shared pointers, which
+            # we pass on to the hand-written template, as for the lists.
+            interface_name = cpp_naming.interface_name(values.our_type.name)
+            value_function = f"OneThenOver<types::{interface_name}>"
+        else:
+            value_function = cpp_over.over_function_name(values)
+
+        # NOTE (mristin):
+        # We iterate over the values in the order of the serialization, so that
+        # the order is the same in all the SDKs.
+        less = cpp_common.generate_set_item_less(type_annotation.keys)
+        key_to_wstring = cpp_common.dict_key_to_wstring_function(type_annotation.keys)
+
+        call = cpp_over.generate_call(
+            "EachValueSorted",
+            ["value", less, f"&{key_to_wstring}", f"&{value_function}", "recursive"],
+        )
+        body = Stripped(f"return {call};")
+
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation) and isinstance(
         type_annotation.our_type, intermediate.NamedUnion
     ):
@@ -1682,7 +1871,11 @@ switch (value.index()) {{
 
     if isinstance(
         type_annotation,
-        (intermediate.ListTypeAnnotation, intermediate.TupleTypeAnnotation),
+        (
+            intermediate.ListTypeAnnotation,
+            intermediate.TupleTypeAnnotation,
+            intermediate.DictTypeAnnotation,
+        ),
     ):
         alias_name = cpp_over.moniker(type_annotation)
         alias = Stripped(f"using {alias_name} = {value_type};")
@@ -1926,9 +2119,22 @@ def _generate_iteration_over_instances(
         ("InProperty", _IN_PROPERTY),
         ("AtIndex", _AT_INDEX),
         ("Each", _EACH),
+        ("EachValueSorted", _EACH_VALUE_SORTED),
     ):
         if _is_used(function, generated_code):
             combinators.extend(combinator)
+
+    # NOTE (mristin):
+    # The paths render the keys of the dictionaries with these functions.
+    combinators.extend(
+        cpp_common.generate_dict_key_to_wstring_definitions(
+            [
+                function_type.keys
+                for function_type in function_types
+                if isinstance(function_type, intermediate.DictTypeAnnotation)
+            ]
+        )
+    )
 
     if _is_used("OneThenOver", generated_code):
         # NOTE (mristin):
@@ -2173,12 +2379,22 @@ def generate_implementation(
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
+    # NOTE (mristin):
+    # We render the keys of the dictionaries which are enumeration literals in
+    # the paths with ``wstringification::to_wstring``.
+    wstringification_include = (
+        f'\n#include "{include_prefix_path}/wstringification.hpp"'
+        if intermediate_uses.dicts_with_enumeration_keys(symbol_table)
+        and intermediate_uses.dict_properties(symbol_table)
+        else ""
+    )
+
     blocks = [
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/common.hpp"
-#include "{include_prefix_path}/iteration.hpp"'''
+#include "{include_prefix_path}/iteration.hpp"{wstringification_include}"""
         ),
         cpp_common.generate_namespace_opening(namespace),
         Stripped("// region Pathing"),

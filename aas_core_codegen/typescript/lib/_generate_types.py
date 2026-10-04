@@ -40,6 +40,8 @@ from aas_core_codegen.typescript import (
 from aas_core_codegen.typescript.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
+    INDENT4 as IIII,
 )
 
 
@@ -645,6 +647,84 @@ yield * {name}(
     )
 
 
+def _descent_comparator_name(enumeration: intermediate.Enumeration) -> Identifier:
+    """
+    Name the function comparing the literals of ``enumeration`` by their rank.
+
+    The stringification module gives out the same comparison, but it imports
+    the types module, so we can not import it here without a cycle.
+    """
+    return typescript_naming.function_name(
+        Identifier(f"compare_by_rank_of_{enumeration.name}")
+    )
+
+
+def _generate_sorted_dict_entries_for_descent(
+    type_anno: intermediate.DictTypeAnnotation,
+) -> Stripped:
+    """
+    Generate the expression giving the entries of ``that`` sorted by their keys.
+
+    We compare the literals of an enumeration with the comparison of this module,
+    see :py:func:`_generate_descent_comparator`.
+    """
+    if isinstance(type_anno.keys, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.keys.our_type, intermediate.Enumeration
+    ):
+        comparator = _descent_comparator_name(type_anno.keys.our_type)
+        return Stripped(f"OurCommon.sortedEntries(that, {comparator})")
+
+    return typescript_common.generate_sorted_dict_entries(
+        type_anno=type_anno, dict_expression=Stripped("that")
+    )
+
+
+def _generate_descent_comparator(enumeration: intermediate.Enumeration) -> Stripped:
+    """
+    Generate the comparison of the literals of ``enumeration`` by their rank.
+
+    The literals are ranked by the code points of their serialized values, which
+    we sort at the generation time, as in the stringification module.
+    """
+    name = typescript_naming.enum_name(enumeration.name)
+    compare_name = _descent_comparator_name(enumeration)
+
+    cases = []  # type: List[str]
+    for rank, literal in enumerate(
+        sorted(enumeration.literals, key=lambda literal: literal.value)
+    ):
+        literal_name = typescript_naming.enum_literal_name(literal.name)
+        cases.append(
+            f"case {name}.{literal_name}:\n"
+            f"{I}return {rank};  // {typescript_common.string_literal(literal.value)}"
+        )
+
+    cases_joined = "\n".join(cases)
+
+    return Stripped(
+        f"""\
+/**
+ * Compare `that` and `other` by the code points of their serialized values.
+ *
+ * @param that - to be compared
+ * @param other - to be compared against
+ * @returns negative, zero or positive, as `that` is before, equal to or
+ * after `other`
+ */
+function {compare_name}(that: {name}, other: {name}): number {{
+{I}const rank = (literal: {name}): number => {{
+{II}switch (literal) {{
+{III}{indent_but_first_line(cases_joined, III)}
+{III}default:
+{IIII}return {len(enumeration.literals)};
+{II}}}
+{I}}};
+
+{I}return rank(that) - rank(other);
+}}"""
+    )
+
+
 @require(
     lambda type_anno, descendability: (
         type_anno in descendability and descendability[type_anno]
@@ -710,10 +790,25 @@ for (const item of that) {{
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        assert not descendability[type_anno.keys], (
+            f"Expected the keys of a dictionary to hold no instances, as they should "
+            f"have been refused in the intermediate stage otherwise: {type_anno}"
+        )
+
+        value_stmts = _generate_descend_into(
+            expr="value",
+            type_anno=type_anno.values,
+            descendability=descendability,
+        )
+
+        # NOTE (mristin):
+        # We descend into the items in the order of their keys in which they are
+        # serialized, so that the order is the same in all the SDKs.
+        body = Stripped(
+            f"""\
+for (const [, value] of {_generate_sorted_dict_entries_for_descent(type_anno)}) {{
+{I}{indent_but_first_line(value_stmts, I)}
+}}"""
         )
 
     else:
@@ -2728,6 +2823,7 @@ export abstract class Class {{
         return None, errors
 
     observed_monikers = set()  # type: Set[str]
+    observed_descent_comparator_names = set()  # type: Set[str]
 
     for concrete_cls in symbol_table.concrete_classes:
         for prop in concrete_cls.properties:
@@ -2750,6 +2846,16 @@ export abstract class Class {{
                         type_anno=type_anno, descendability=descendability
                     )
                 )
+
+                if (
+                    isinstance(type_anno, intermediate.DictTypeAnnotation)
+                    and isinstance(type_anno.keys, intermediate.OurTypeAnnotation)
+                    and isinstance(type_anno.keys.our_type, intermediate.Enumeration)
+                    and type_anno.keys.our_type.name
+                    not in observed_descent_comparator_names
+                ):
+                    observed_descent_comparator_names.add(type_anno.keys.our_type.name)
+                    blocks.append(_generate_descent_comparator(type_anno.keys.our_type))
 
     # NOTE (mristin):
     # The transpiled methods might use the helpers from the common module, *e.g.*,

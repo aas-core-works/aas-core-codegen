@@ -67,6 +67,32 @@ public final class CommonJsonization {
 
     return Jsonization.Deserialize.deserializeSomething(node);
   } // public static Something loadMinimalSomething
+
+  public static Registry loadMaximalRegistry() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Registry",
+      "maximal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeRegistry(node);
+  } // public static Registry loadMaximalRegistry
+
+  public static Registry loadMinimalRegistry() throws IOException {
+    final Path path = Paths.get(
+      Common.TEST_DATA_DIR,
+      "Json",
+      "Expected",
+      "Registry",
+      "minimal.json");
+
+    final JsonNode node = CommonJson.readFromFile(path);
+
+    return Jsonization.Deserialize.deserializeRegistry(node);
+  } // public static Registry loadMinimalRegistry
 } // class CommonJsonization
 
 // package dummy.tests

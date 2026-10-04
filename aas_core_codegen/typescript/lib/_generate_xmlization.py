@@ -376,6 +376,50 @@ def _element_parser_name(
     )
 
 
+# endregion
+
+# region Serialization
+
+
+def _is_instance_type(type_anno: intermediate.TypeAnnotationUnion) -> bool:
+    """
+    Check whether a value of ``type_anno`` is written as its own, self-describing
+    XML element.
+
+    This is the case for every class and for every named union: the element is
+    picked by the run-time type of the value, which one virtual call answers for
+    all of them at once. The reading needs a dispatcher per interface instead, as
+    it has to decide what to construct before it has read anything.
+    """
+    return isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        type_anno.our_type,
+        (
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+            intermediate.NamedUnion,
+        ),
+    )
+
+
+def _dict_value_parser_name(
+    values_type_anno: intermediate.TypeAnnotationExceptOptional,
+) -> Identifier:
+    """
+    Give out the parser of the content of the element ``<v>`` holding a value of
+    a dictionary.
+
+    An instance is always wrapped in ``<v>``, so it needs a parser of its own,
+    which reads the element of the instance whole. Everything else is parsed
+    as the content of any other element holding it.
+    """
+    if _is_instance_type(values_type_anno):
+        return Identifier(
+            f"parseWrapped_{typescript_common.type_moniker(values_type_anno)}"
+        )
+
+    return _content_parser_name(values_type_anno)
+
+
 class _ParserRegistry:
     """
     Generate the code of the parsers which a meta-model needs to be composed.
@@ -578,6 +622,77 @@ function {name}(
             ),
         )
 
+    def _register_dict_parser(self, type_anno: intermediate.DictTypeAnnotation) -> None:
+        """
+        Register the parser of the content of an element holding a dictionary.
+
+        The value of an item always sits in an element ``<v>``, so an instance is
+        wrapped in it as well, unlike an item of a list, see
+        :py:func:`_dict_value_parser_name`.
+        """
+        self.register_property_parser(type_anno.values)
+
+        value_parser = _dict_value_parser_name(type_anno.values)
+
+        if _is_instance_type(type_anno.values):
+            self._register_element_parser(type_anno.values, tag_suffix="")
+
+            value_type = typescript_common.generate_type(
+                type_anno.values, types_module=Identifier("OurTypes")
+            )
+
+            # NOTE (mristin):
+            # We skip the ignorable tokens after the element of the instance, as
+            # the content of ``<v>`` ends right before its closing tag.
+            self._add(
+                value_parser,
+                Stripped(
+                    f"""\
+function {value_parser}(
+{I}cursor: XmlCursor
+): OurCommon.Either<{value_type}, DeserializationError> {{
+{I}const valueOrError = {_element_parser_name(type_anno.values, tag_suffix="")}(
+{II}cursor
+{I});
+{I}cursor.skipIgnorable();
+{I}return valueOrError;
+}}"""
+                ),
+            )
+
+        name = _content_parser_name(type_anno)
+
+        keys_type = typescript_common.generate_type(
+            type_anno.keys, types_module=Identifier("OurTypes")
+        )
+        values_type = typescript_common.generate_type(
+            type_anno.values, types_module=Identifier("OurTypes")
+        )
+
+        call = Stripped(
+            f"""\
+parseMap<{keys_type}, {values_type}>(
+{I}cursor,
+{I}{_content_parser_name(type_anno.keys)},
+{I}{value_parser}
+)"""
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+function {name}(
+{I}cursor: XmlCursor
+): OurCommon.Either<
+{I}Map<{keys_type}, {values_type}>,
+{I}DeserializationError
+> {{
+{I}return {indent_but_first_line(call, I)};
+}}"""
+            ),
+        )
+
     def register_property_parser(
         self, type_annotation: intermediate.TypeAnnotationUnion
     ) -> None:
@@ -592,6 +707,9 @@ function {name}(
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             self._register_set_parser(type_anno)
+
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            self._register_dict_parser(type_anno)
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_parser(type_anno)
@@ -1038,31 +1156,6 @@ const ROOT_DISPATCH_BY_LOCAL_NAME = new Map<
 >([
 {entries_joined}
 ]);"""
-    )
-
-
-# endregion
-
-# region Serialization
-
-
-def _is_instance_type(type_anno: intermediate.TypeAnnotationUnion) -> bool:
-    """
-    Check whether a value of ``type_anno`` is written as its own, self-describing
-    XML element.
-
-    This is the case for every class and for every named union: the element is
-    picked by the run-time type of the value, which one virtual call answers for
-    all of them at once. The reading needs a dispatcher per interface instead, as
-    it has to decide what to construct before it has read anything.
-    """
-    return isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.our_type,
-        (
-            intermediate.AbstractClass,
-            intermediate.ConcreteClass,
-            intermediate.NamedUnion,
-        ),
     )
 
 
@@ -1529,6 +1622,65 @@ function {name}(
             ),
         )
 
+    def _register_dict_writer(self, type_anno: intermediate.DictTypeAnnotation) -> None:
+        """
+        Register the writer of the content of an element holding a dictionary.
+
+        The items are written sorted by their keys, and a refused item is reported
+        at its JSON key, so that the path is the same in all the SDKs.
+        """
+        self.register_property_writer(type_anno.values)
+
+        name = _content_writer_name(type_anno)
+
+        keys_type = typescript_common.generate_type(
+            type_anno.keys, types_module=Identifier("OurTypes")
+        )
+        values_type = typescript_common.generate_type(
+            type_anno.values, types_module=Identifier("OurTypes")
+        )
+
+        # NOTE (mristin):
+        # An instance writes its own element, which we wrap in ``<v>``.
+        value_writer = (
+            _element_writer_name(type_anno.values, tag_suffix="")
+            if _is_instance_type(type_anno.values)
+            else _content_writer_name(type_anno.values)
+        )
+
+        sorted_entries = typescript_common.generate_sorted_dict_entries(
+            type_anno=type_anno, dict_expression=Stripped("values")
+        )
+
+        json_key = typescript_common.generate_json_key(
+            keys_type_anno=type_anno.keys, key_expression=Stripped("key")
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f"""\
+function {name}(
+{I}parts: Array<string>,
+{I}values: Map<{keys_type}, {values_type}>
+): void {{
+{I}for (const [key, value] of {sorted_entries}) {{
+{II}try {{
+{III}parts.push("<i>");
+{III}writeElement(parts, "k", key, {_content_writer_name(type_anno.keys)});
+{III}writeElement(parts, "v", value, {value_writer});
+{III}parts.push("</i>");
+{II}}} catch (error) {{
+{III}if (error instanceof SerializationError) {{
+{IIII}error.prependKey({json_key});
+{III}}}
+{III}throw error;
+{II}}}
+{I}}}
+}}"""
+            ),
+        )
+
     def register_property_writer(
         self, type_annotation: intermediate.TypeAnnotationUnion
     ) -> None:
@@ -1543,6 +1695,9 @@ function {name}(
 
         elif isinstance(type_anno, intermediate.SetTypeAnnotation):
             self._register_set_writer(type_anno)
+
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            self._register_dict_writer(type_anno)
 
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             self._register_tuple_writer(type_anno)
@@ -1716,6 +1871,7 @@ _XML_COMMON_NAMES = (
     "nextPropertyOpenTag",
     "parseElementContent",
     "parseList",
+    "parseMap",
     "parseNamedElement",
     "parseSet",
     "parseTextContent",

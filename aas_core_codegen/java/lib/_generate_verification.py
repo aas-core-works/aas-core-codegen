@@ -850,6 +850,12 @@ def _verification_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return java_common.set_moniker(_verification_moniker(type_anno.items))
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return java_common.dict_moniker(
+            _verification_moniker(type_anno.keys),
+            _verification_moniker(type_anno.values),
+        )
+
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return java_common.tuple_moniker(
             [_verification_moniker(item) for item in type_anno.items]
@@ -1015,10 +1021,50 @@ Stream.<Reporting.Error>concat(
         body = Stripped(f"return {stream};")
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # We verify the items of a dictionary in the order of their keys in
+        # which they are serialized. Both an invalid key and an invalid value
+        # are reported at the key, given as the member of a JSON object.
+        key_and_value_streams = []  # type: List[Stripped]
+        if _needs_verification(type_anno.keys):
+            key_and_value_streams.append(
+                Stripped(f"Verification.{_verify_method(type_anno.keys)}(key)")
+            )
+
+        if _needs_verification(type_anno.values):
+            key_and_value_streams.append(
+                Stripped(
+                    f"Verification.{_verify_method(type_anno.values)}(that.get(key))"
+                )
+            )
+
+        assert len(key_and_value_streams) > 0, (
+            f"Expected something to verify in the dictionary {type_anno} "
+            f"as guarded by the pre-condition"
+        )
+
+        item_stream = key_and_value_streams[0]
+        if len(key_and_value_streams) == 2:
+            item_stream = Stripped(
+                f"""\
+Stream.<Reporting.Error>concat(
+{I}{key_and_value_streams[0]},
+{I}{key_and_value_streams[1]})"""
+            )
+
+        sorted_keys = java_common.sorted_dict_keys(type_anno.keys, Stripped("that"))
+        key_text = java_common.dict_key_text(type_anno.keys, Stripped("key"))
+
+        body = Stripped(
+            f"""\
+return {sorted_keys}.stream()
+{I}.flatMap(key ->
+{II}{indent_but_first_line(item_stream, II)}
+{III}.map(error -> {{
+{IIII}error.prependSegment(
+{IIIII}new Reporting.KeySegment({key_text}));
+{IIII}return error;
+{III}}}));"""
         )
 
     else:
@@ -1643,11 +1689,36 @@ def generate(
             )
         )
         or any(
-            isinstance(type_anno, intermediate.ListTypeAnnotation)
+            isinstance(nested, intermediate.ListTypeAnnotation)
             for type_anno in own_method_type_annos
+            for nested in intermediate.over_type_annotation_and_nested_type_annotations(
+                type_anno
+            )
         )
     ):
         imports.append(Stripped("import java.util.List;"))
+
+    # NOTE (mristin):
+    # The methods verifying the dictionaries spell out their types, and render
+    # the keys of the enumeration literals as their serialized values.
+    own_method_dicts = [
+        nested
+        for type_anno in own_method_type_annos
+        for nested in intermediate.over_type_annotation_and_nested_type_annotations(
+            type_anno
+        )
+        if isinstance(nested, intermediate.DictTypeAnnotation)
+    ]
+
+    if len(own_method_dicts) > 0 and Stripped("import java.util.Map;") not in imports:
+        imports.append(Stripped("import java.util.Map;"))
+
+    if any(
+        isinstance(dict_type_anno.keys, intermediate.OurTypeAnnotation)
+        and isinstance(dict_type_anno.keys.our_type, intermediate.Enumeration)
+        for dict_type_anno in own_method_dicts
+    ):
+        imports.append(Stripped(f"import {package}.stringification.Stringification;"))
 
     if any(
         isinstance(type_annotation, intermediate.OptionalTypeAnnotation)

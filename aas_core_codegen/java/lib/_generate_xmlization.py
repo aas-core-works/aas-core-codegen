@@ -263,7 +263,12 @@ def _written_leaf_moniker(type_anno: intermediate.AtomicTypeAnnotation) -> str:
 def _item_type_annotations(
     type_anno: intermediate.ContainerTypeAnnotation,
 ) -> Sequence[intermediate.TypeAnnotationExceptOptional]:
-    """Give the items of the list, the set or the tuple ``type_anno``, in order."""
+    """
+    Give the items of the list, the set or the tuple ``type_anno``, in order.
+
+    The items of a dictionary are its values. Its keys are written as text,
+    and handled separately.
+    """
     if isinstance(
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
@@ -273,11 +278,7 @@ def _item_type_annotations(
         return type_anno.items
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        return [type_anno.values]
 
     assert_never(type_anno)
 
@@ -309,10 +310,12 @@ def _written_moniker(type_anno: intermediate.TypeAnnotationExceptOptional) -> st
         )
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys of a dictionary are sorted before they are written, as
+        # the items of a set, so we name the writer after how they are sorted.
+        return java_common.dict_moniker(
+            java_common.set_items_moniker(type_anno.keys),
+            _written_moniker(type_anno.values),
         )
 
     return _written_leaf_moniker(type_anno)
@@ -519,6 +522,7 @@ class _Needed:
         self.enumerations = False
         self.lists = False
         self.sets = False
+        self.dicts = False
         self.nested_elements = False
 
         #: Content readers to emit, keyed and de-duplicated by the moniker
@@ -622,6 +626,18 @@ def _collect_needed(symbol_table: intermediate.SymbolTable) -> _Needed:
             elif isinstance(type_anno, intermediate.SetTypeAnnotation):
                 needed.sets = True
                 register_item(item_type_annos[0], "v")
+            elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+                # NOTE (mristin):
+                # The key and the value are read from and written to ``<k>``
+                # and ``<v>`` directly by the reader and the writer of
+                # the dictionary, so they need only their content functions.
+                # An instance writes its own, self-describing element in
+                # ``<v>``, and needs no content function.
+                needed.dicts = True
+                register_content(type_anno.keys)
+
+                if not _is_instance_type(type_anno.values):
+                    register_content(type_anno.values)
             else:
                 for i, item_type_anno in enumerate(item_type_annos):
                     register_item(item_type_anno, f"v{i + 1}")
@@ -713,6 +729,11 @@ def _collect_dispatching_writers(
             (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation),
         ):
             register(type_anno.items, True)
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            # NOTE (mristin):
+            # A value of a dictionary is always written as its own,
+            # self-describing element in ``<v>``.
+            register(type_anno.values, True)
         elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
             for item_type_anno in type_anno.items:
                 register(item_type_anno, True)
@@ -1275,6 +1296,108 @@ private static <T> Reporting.Result<Set<T>> readSet(
     )
 
 
+def _generate_read_dict() -> Stripped:
+    """Generate the reader of the items of a dictionary."""
+    return Stripped(
+        f"""\
+/**
+ * Read an item of a dictionary from the {{@code <i>}} element which has been
+ * opened, the key with {{@code readKey}} from {{@code <k>}} and the value with
+ * {{@code readValue}} from {{@code <v>}}.
+ */
+private static <K, V> Reporting.Result<Map.Entry<K, V>> readDictItem(
+{I}XMLEventReader reader,
+{I}boolean isEmpty,
+{I}XmlCommon.ContentReader<K> readKey,
+{I}XmlCommon.ContentReader<V> readValue) {{
+{I}if (isEmpty) {{
+{II}return Reporting.Result.failure(new Reporting.Error(
+{III}"Expected a key and a value in an item of the dictionary, " +
+{III}"but encountered a self-closing element"));
+{I}}}
+
+{I}final Reporting.Result<? extends K> keyResult =
+{II}XmlCommon.readNamedElement(reader, "k", readKey);
+{I}if (keyResult.isError()) {{
+{II}keyResult.getError().prependSegment(new Reporting.NameSegment("k"));
+{II}return Reporting.Result.failure(keyResult.getError());
+{I}}}
+
+{I}final Reporting.Result<? extends V> valueResult =
+{II}XmlCommon.readNamedElement(reader, "v", readValue);
+{I}if (valueResult.isError()) {{
+{II}valueResult.getError().prependSegment(new Reporting.NameSegment("v"));
+{II}return Reporting.Result.failure(valueResult.getError());
+{I}}}
+
+{I}return Reporting.Result.success(
+{II}new AbstractMap.SimpleImmutableEntry<>(
+{III}keyResult.getResult(), valueResult.getResult()));
+}}
+
+/**
+ * Read the items of a dictionary, each as an {{@code <i>}} element holding
+ * the key in {{@code <k>}} and the value in {{@code <v>}}.
+ *
+ * <p>Every start element is considered to mark the start of an item. Reading
+ * stops as soon as a non-start element is encountered.
+ *
+ * <p>The items can come in any order, but a duplicate key is an error, so that
+ * no item is silently dropped.
+ */
+private static <K, V> Reporting.Result<Map<K, V>> readDict(
+{I}XMLEventReader reader,
+{I}boolean isEmpty,
+{I}XmlCommon.ContentReader<K> readKey,
+{I}XmlCommon.ContentReader<V> readValue) {{
+{I}final Map<K, V> result = new HashMap<>();
+{I}if (isEmpty) {{
+{II}return Reporting.Result.success(result);
+{I}}}
+
+{I}XmlCommon.skipWhitespaceAndComments(reader);
+{I}int index = 0;
+{I}if (!XmlCommon.currentEvent(reader).isStartElement()) {{
+{II}final Reporting.Error error = new Reporting.Error(
+{III}"Expected a start element opening an item of the dictionary, " +
+{III}"but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
+{II}error.prependSegment(new Reporting.IndexSegment(index));
+{II}return Reporting.Result.failure(error);
+{I}}}
+
+{I}while (XmlCommon.currentEvent(reader).isStartElement()) {{
+{II}final Reporting.Result<? extends Map.Entry<K, V>> itemResult =
+{III}XmlCommon.readNamedElement(
+{IIII}reader,
+{IIII}"i",
+{IIII}(itemReader, isEmptyItem) ->
+{IIIII}readDictItem(itemReader, isEmptyItem, readKey, readValue));
+{II}if (itemResult.isError()) {{
+{III}itemResult.getError()
+{IIII}.prependSegment(
+{IIIII}new Reporting.IndexSegment(index));
+{III}return Reporting.Result.failure(itemResult.getError());
+{II}}}
+
+{II}final Map.Entry<K, V> item = itemResult.getResult();
+{II}if (result.containsKey(item.getKey())) {{
+{III}final Reporting.Error error = new Reporting.Error(
+{IIII}"Expected unique keys in the dictionary, but the key is a duplicate");
+{III}error.prependSegment(new Reporting.NameSegment("k"));
+{III}error.prependSegment(new Reporting.IndexSegment(index));
+{III}return Reporting.Result.failure(error);
+{II}}}
+
+{II}result.put(item.getKey(), item.getValue());
+{II}index++;
+{II}XmlCommon.skipWhitespaceAndComments(reader);
+{I}}}
+
+{I}return Reporting.Result.success(result);
+}}"""
+    )
+
+
 @require(lambda arity: arity > 0)
 def _generate_read_tuple_helper(arity: int) -> Stripped:
     """Generate the reader of the items of a tuple of ``arity`` items."""
@@ -1457,6 +1580,38 @@ return readList(
             f"""\
 return readSet(
 {I}reader, isEmpty, _DeserializeImplementation::{item_reader});"""
+        )
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        key_reader = (
+            f"_DeserializeImplementation::{_content_reader_name(type_anno.keys)}"
+        )
+
+        value_reader: str
+        if _is_instance_type(type_anno.values):
+            assert isinstance(type_anno.values, intermediate.OurTypeAnnotation)
+
+            # NOTE (mristin):
+            # An instance is always wrapped in ``<v>``, and reads its own,
+            # self-describing element within it.
+            value_reader = f"""\
+(valueReader, isEmptyValue) ->
+{I}XmlCommon.readNestedElement(
+{II}valueReader,
+{II}isEmptyValue,
+{II}_DeserializeImplementation::{_from_element_name(type_anno.values.our_type)})"""
+        else:
+            value_reader = (
+                f"_DeserializeImplementation::"
+                f"{_content_reader_name(type_anno.values)}"
+            )
+
+        body = Stripped(
+            f"""\
+return readDict(
+{I}reader,
+{I}isEmpty,
+{I}{key_reader},
+{I}{indent_but_first_line(value_reader, I)});"""
         )
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
         item_readers = ",\n".join(
@@ -2115,6 +2270,9 @@ def _generate_deserialize_impl(
     if needed.sets:
         blocks.append(_generate_read_set())
 
+    if needed.dicts:
+        blocks.append(_generate_read_dict())
+
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_read_tuple_helper(arity=arity))
 
@@ -2586,6 +2744,15 @@ def _container_type(type_anno: intermediate.ContainerTypeAnnotation) -> Stripped
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         return Stripped(f"List<{argument_types[0]}>")
 
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        # NOTE (mristin):
+        # The keys of a dictionary are sorted before they are written, so
+        # the dictionary must keep its keys as precise as the sorting needs
+        # them.
+        return Stripped(
+            f"Map<{java_common.generate_type(type_anno.keys)}, {argument_types[0]}>"
+        )
+
     return java_common.tuple_type(argument_types)
 
 
@@ -2616,7 +2783,55 @@ def _generate_content_writer(
 
     body: Stripped
 
-    if isinstance(
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        keys_type = java_common.generate_type(type_anno.keys)
+        key_writer = _content_writer_reference(type_anno.keys)
+
+        value_writer: Stripped
+        if _is_instance_type(type_anno.values):
+            assert isinstance(type_anno.values, intermediate.OurTypeAnnotation)
+
+            # NOTE (mristin):
+            # An instance is always wrapped in ``<v>``, and writes its own,
+            # self-describing element within it.
+            value_writer = (
+                Stripped(f"{_VISITOR_NAME}::writeUnion")
+                if isinstance(type_anno.values.our_type, intermediate.NamedUnion)
+                else Stripped(f"{_VISITOR_NAME}::writeClass")
+            )
+        else:
+            value_writer = _content_writer_reference(type_anno.values)
+
+        sorted_keys = java_common.sorted_dict_keys(type_anno.keys, Stripped("that"))
+        key_text = java_common.dict_key_text(type_anno.keys, Stripped("key"))
+
+        # NOTE (mristin):
+        # A dictionary is written as a sequence of its items sorted by their
+        # keys in the same order in all the targets. The key is named on
+        # the error path, as the instance is at hand.
+        body = Stripped(
+            f"""\
+for ({keys_type} key : {sorted_keys}) {{
+{I}try {{
+{II}XmlCommon.writeElement(
+{III}"i",
+{III}key,
+{III}writer,
+{III}(itemKey, itemWriter) -> {{
+{IIII}XmlCommon.writeElement(
+{IIIII}"k", itemKey, itemWriter, {key_writer});
+{IIII}XmlCommon.writeElement(
+{IIIII}"v", that.get(itemKey), itemWriter, {value_writer});
+{III}}});
+{I}}} catch (XmlCommon.SerializeFailure failure) {{
+{II}failure.getError().prependSegment(
+{III}new Reporting.KeySegment({key_text}));
+{II}throw failure;
+{I}}}
+}}"""
+        )
+
+    elif isinstance(
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
         item_type = _written_value_type(item_type_annos[0])
@@ -3048,6 +3263,15 @@ def generate(
             [
                 Stripped("import java.util.HashSet;"),
                 Stripped("import java.util.Set;"),
+            ]
+        )
+
+    if intermediate_uses.dict_properties(symbol_table):
+        imports.extend(
+            [
+                Stripped("import java.util.AbstractMap;"),
+                Stripped("import java.util.HashMap;"),
+                Stripped("import java.util.Map;"),
             ]
         )
 

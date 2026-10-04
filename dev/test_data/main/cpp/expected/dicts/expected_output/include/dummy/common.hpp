@@ -12,6 +12,7 @@
 #include <string>
 #include <tuple>
 #include <utility>
+#include <vector>
 #pragma warning(pop)
 
 // NOTE (mristin):
@@ -10184,6 +10185,62 @@ int64_t FindStr(
   const std::wstring& sub,
   int64_t start
 );
+
+/**
+ * \brief Check whether \p that text comes before \p other text,
+ * comparing them code point by code point.
+ *
+ * The comparison of std::wstring compares the code units. Where wchar_t has
+ * 16 bits, as on Windows, the text is encoded in UTF-16, and the code units put
+ * the characters above U+FFFF, encoded as surrogate pairs, before
+ * the characters from U+E000 to U+FFFF. Hence we decode the code points and
+ * compare them instead, in the same way on all the platforms.
+ *
+ * We sort the items of the sets by the code points in the serialization so that
+ * all the SDKs write the same order.
+ *
+ * \param that text to be compared
+ * \param other text to compare against
+ * \return `true` if \p that comes before \p other
+ */
+bool LessByCodePoints(
+  const std::wstring& that,
+  const std::wstring& other
+);
+
+/**
+ * \brief Sort the pointers to the items of \p map by their keys with \p less.
+ *
+ * We sort the pointers instead of the items so that we copy no items.
+ *
+ * \param map whose items are to be sorted
+ * \param less comparing two keys
+ * \return pointers to the items, sorted by their keys
+ */
+template<typename MapT, typename LessT>
+std::vector<const typename MapT::value_type*> SortedItemPointers(
+  const MapT& map,
+  LessT less
+) {
+  typedef typename MapT::value_type ItemT;
+
+  std::vector<const ItemT*> result;
+  result.reserve(map.size());
+
+  for (const ItemT& item : map) {
+    result.push_back(&item);
+  }
+
+  std::sort(
+    result.begin(),
+    result.end(),
+    [&less](const ItemT* that, const ItemT* other) {
+      return less(that->first, other->first);
+    }
+  );
+
+  return result;
+}
 
 /**
  * \brief Look up the value of \p key in \p map, as Python's `get` without

@@ -33,6 +33,28 @@ namespace dummy.Tests
             Assert.AreEqual(1, errors.Count);
             Assert.AreEqual("Invalid Kind: -1", errors[0].Cause);
         }  // void Test_Kind_invalid
+
+        [Test]
+        public void Test_Direction_valid()
+        {
+            var errors = Our.Verification.VerifyDirection(
+                Our.Direction.North).ToList();
+
+            Assert.IsEmpty(errors);
+        }  // void Test_Direction_valid
+
+        [Test]
+        public void Test_Direction_invalid()
+        {
+            int valueAsInt = -1;
+            Our.Direction value = (Our.Direction)valueAsInt;
+
+            var errors = Our.Verification.VerifyDirection(
+                value).ToList();
+
+            Assert.AreEqual(1, errors.Count);
+            Assert.AreEqual("Invalid Direction: -1", errors[0].Cause);
+        }  // void Test_Direction_invalid
     }  // class TestVerificationOfEnums
 }  // namespace dummy.Tests
 

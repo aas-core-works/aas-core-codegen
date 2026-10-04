@@ -216,8 +216,9 @@ def _deep_copied_by_method(type_anno: intermediate.TypeAnnotationUnion) -> bool:
     """
     Check whether ``type_anno`` is deep-copied by its own method in ``Copying``.
 
-    A list or a set of values shared by the deep copy is copied in-line by
-    the copy constructor of the collection.
+    A list or a set of values shared by the deep copy, or a dictionary of such
+    values, is copied in-line by the copy constructor of the collection.
+    The keys of a dictionary are always shared.
     """
     if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
         return False
@@ -226,6 +227,9 @@ def _deep_copied_by_method(type_anno: intermediate.TypeAnnotationUnion) -> bool:
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
         return not _copied_by_sharing(type_anno.items)
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return not _copied_by_sharing(type_anno.values)
 
     return not _copied_by_sharing(type_anno)
 
@@ -344,10 +348,25 @@ return result;"""
         body = Stripped(f"return {tuple_literal};")
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        value_copy_expr = _generate_deep_copy_expr(
+            expr="item.Value", type_anno=type_anno.values
+        )
+
+        set_stmt = f"result[item.Key] = {value_copy_expr};"
+        if "\n" in value_copy_expr:
+            set_stmt = f"""\
+result[item.Key] = (
+{I}{indent_but_first_line(value_copy_expr, I)});"""
+
+        body = Stripped(
+            f"""\
+var result = new {value_type}(that.Count);
+foreach (var item in that)
+{{
+{I}{indent_but_first_line(set_stmt, I)}
+}}
+
+return result;"""
         )
 
     else:

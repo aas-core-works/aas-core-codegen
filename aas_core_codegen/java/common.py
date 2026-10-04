@@ -200,7 +200,7 @@ def set_imports_if_necessary(
     return result
 
 
-def _holds_dict(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+def holds_dict(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
     """Check whether a value of ``type_annotation`` holds a dictionary at any depth."""
     return any(
         isinstance(type_anno, intermediate.DictTypeAnnotation)
@@ -226,24 +226,27 @@ def _body_of(
 def dict_imports_if_necessary(
     functions: Sequence[Union[intermediate.Verification, intermediate.Method]],
     with_bodies: bool,
+    properties: Sequence[intermediate.Property] = (),
 ) -> List[Stripped]:
     """
-    Give the imports of the dictionaries if the ``functions`` use them.
+    Give the imports of the dictionaries if the ``functions`` or the ``properties``
+    use them.
 
-    We need ``Map`` for the dictionary arguments and the dictionary return values.
-    If ``with_bodies`` is set, we also consider the local dictionaries declared
-    in the bodies of the functions, which need ``HashMap`` as well.
+    We need ``Map`` for the dictionary properties, the dictionary arguments and
+    the dictionary return values. If ``with_bodies`` is set, we also consider
+    the local dictionaries declared in the bodies of the functions, which need
+    ``HashMap`` as well.
     """
-    uses_map = False
+    uses_map = any(holds_dict(prop.type_annotation) for prop in properties)
     uses_hash_map = False
 
     for function in functions:
         if any(
-            _holds_dict(argument.type_annotation) for argument in function.arguments
+            holds_dict(argument.type_annotation) for argument in function.arguments
         ):
             uses_map = True
 
-        if function.returns is not None and _holds_dict(function.returns):
+        if function.returns is not None and holds_dict(function.returns):
             uses_map = True
 
         if with_bodies and (
@@ -481,7 +484,8 @@ def leaf_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
 # NOTE (mristin):
 # The three functions which follow are the whole grammar of a compound moniker:
 # a Polish notation over ``_``-separated tokens, where ``ListOf`` and ``SetOf``
-# take exactly one argument and ``TupleOf{N}`` exactly ``N`` of them. They take
+# take exactly one argument, ``DictOf`` exactly two and ``TupleOf{N}`` exactly
+# ``N`` of them. They take
 # the monikers of the items rather than the items themselves, because the two
 # sides of a de/serialization do not agree on what a leaf is: the reading
 # names a leaf by its very type (see :py:func:`leaf_moniker`), whereas
@@ -502,6 +506,11 @@ def list_moniker(item_moniker: str) -> str:
 def set_moniker(item_moniker: str) -> str:
     """Name a set whose item is named ``item_moniker``."""
     return f"SetOf_{item_moniker}"
+
+
+def dict_moniker(keys_moniker: str, values_moniker: str) -> str:
+    """Name a dictionary whose keys and values are named by the given monikers."""
+    return f"DictOf_{keys_moniker}_{values_moniker}"
 
 
 @require(lambda item_monikers: len(item_monikers) > 0)
@@ -526,6 +535,11 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return set_moniker(type_moniker(type_anno.items))
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return dict_moniker(
+            type_moniker(type_anno.keys), type_moniker(type_anno.values)
+        )
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         return tuple_moniker(
@@ -679,6 +693,48 @@ def set_items_moniker(items: intermediate.TypeAnnotationUnion) -> str:
     )
 
     return leaf_moniker(items)
+
+
+def sorted_dict_keys(
+    keys: intermediate.TypeAnnotationUnion, dict_expr: Stripped
+) -> Stripped:
+    """
+    Generate the expression giving the keys of the dictionary ``dict_expr`` sorted.
+
+    The keys are sorted in the same order as the items of a set, see
+    :py:func:`sorted_set_items`, so that the items of a dictionary are
+    serialized, verified and descended into in the same order in all
+    the targets.
+    """
+    return sorted_set_items(keys, Stripped(f"{dict_expr}.keySet()"))
+
+
+def dict_key_text(
+    keys: intermediate.TypeAnnotationUnion, key_expr: Stripped
+) -> Stripped:
+    """
+    Generate the expression giving the key ``key_expr`` as the key of a JSON object.
+
+    The strings are given as they are, the integers as decimal strings, and
+    the enumeration literals as their serialized values. We use the text in
+    the error paths as well, so that the paths are the same in all the targets.
+    """
+    primitive_type = intermediate.try_primitive_type(keys)
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return key_expr
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped(f"Long.toString({key_expr})")
+
+    assert isinstance(keys, intermediate.OurTypeAnnotation) and isinstance(
+        keys.our_type, intermediate.Enumeration
+    ), (
+        f"Expected only strings, integers, constrained primitives of them and "
+        f"enumerations as keys of a dictionary, as the other keys are refused "
+        f"in intermediate._translate._verify_keys_of_dicts, but got: {keys}"
+    )
+
+    return Stripped(f"Stringification.mustToString({key_expr})")
 
 
 def has_set_properties(symbol_table: intermediate.SymbolTable) -> bool:

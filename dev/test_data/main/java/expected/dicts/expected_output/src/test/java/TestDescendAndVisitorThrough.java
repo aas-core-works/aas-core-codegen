@@ -114,6 +114,27 @@ public class TestDescendAndVisitorThrough {
 
       assertDescendAndVisitorThroughSame(instance);
     } // public void testDescendAgainstVisitorThroughForSomething
+
+    @Test
+    public void testDescendOfRegistry() throws IOException {
+      final Registry instance = CommonJsonization.loadMaximalRegistry();
+
+      compareOrRerecordTrace(
+        instance,
+        Paths.get(
+          Common.TEST_DATA_DIR,
+          "Descend",
+          "Registry",
+          "maximal.json.trace"));
+    } // public void testDescendOfRegistry
+
+    @Test
+    public void testDescendAgainstVisitorThroughForRegistry() throws IOException {
+      Registry instance = (
+        CommonJsonization.loadMaximalRegistry());
+
+      assertDescendAndVisitorThroughSame(instance);
+    } // public void testDescendAgainstVisitorThroughForRegistry
 } // class TestDescendAndVisitorThrough
 
 // package dummy.tests

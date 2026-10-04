@@ -5,6 +5,165 @@
       <xs:element name="name" type="xs:string"/>
     </xs:sequence>
   </xs:group>
+  <xs:group name="registry">
+    <xs:sequence>
+      <xs:element name="counts">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k" type="xs:string"/>
+                  <xs:element name="v" type="xs:long"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="countsByNumber">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="0" maxOccurs="5">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k" type="xs:long"/>
+                  <xs:element name="v" type="xs:long"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="weights">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k" type="direction_t"/>
+                  <xs:element name="v" type="xs:long"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="kindsByCode">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                  <xs:element name="v" type="kind_t"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="codesByName">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k" type="xs:string"/>
+                  <xs:element name="v">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="itemsByName">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k" type="xs:string"/>
+                  <xs:element name="v">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="item" type="item_t"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="labels">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k" type="xs:string"/>
+                  <xs:element name="v">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="v" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="v" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                  <xs:sequence>
+                                    <xs:element name="i" minOccurs="0" maxOccurs="unbounded">
+                                      <xs:complexType>
+                                        <xs:sequence>
+                                          <xs:element name="k" type="xs:long"/>
+                                          <xs:element name="v" type="xs:string"/>
+                                        </xs:sequence>
+                                      </xs:complexType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="optionalCounts" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="i" minOccurs="1" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="k" type="xs:string"/>
+                  <xs:element name="v" type="xs:long"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
   <xs:group name="something">
     <xs:sequence>
       <xs:element name="texts">
@@ -57,6 +216,13 @@
       </xs:element>
     </xs:sequence>
   </xs:group>
+  <xs:simpleType name="direction_t">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="up"/>
+      <xs:enumeration value="down"/>
+      <xs:enumeration value="right"/>
+    </xs:restriction>
+  </xs:simpleType>
   <xs:simpleType name="kind_t">
     <xs:restriction base="xs:string">
       <xs:enumeration value="alpha"/>
@@ -67,6 +233,11 @@
   <xs:complexType name="item_t">
     <xs:sequence>
       <xs:group ref="item"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="registry_t">
+    <xs:sequence>
+      <xs:group ref="registry"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="something_t">

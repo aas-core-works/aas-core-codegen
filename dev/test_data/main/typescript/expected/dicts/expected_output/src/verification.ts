@@ -114,22 +114,28 @@ export class IndexSegment {
  * @remarks
  *
  * Unlike a {@link PropertySegment}, which names a property of one of our
- * classes, a key names a member of an open JSON-able object. It is known only
- * at run time, and can be any string at all, so it is always rendered as
- * a subscript.
+ * classes, a key names a member of an open JSON-able object, or an item of
+ * a dictionary. It is known only at run time, and can be any string at all, so
+ * it is always rendered as a subscript. The key of a dictionary is rendered as
+ * its JSON key, so that the path is the same in all the SDKs.
  */
 export class KeySegment {
   /**
-   * Object containing the value at {@link key}
+   * Object or map containing the value at {@link key}
    */
-  readonly object: { readonly [key: string]: unknown };
+  readonly object:
+    | { readonly [key: string]: unknown }
+    | ReadonlyMap<unknown, unknown>;
 
   /**
-   * Key of the value in the {@link object}
+   * Key of the value in the {@link object}, rendered as a JSON key
    */
   readonly key: string;
 
-  constructor(object: { readonly [key: string]: unknown }, key: string) {
+  constructor(
+    object: { readonly [key: string]: unknown } | ReadonlyMap<unknown, unknown>,
+    key: string
+  ) {
     this.object = object;
     this.key = key;
   }
@@ -558,6 +564,63 @@ function *verify_ListOf_class(
 }
 
 /**
+ * Verify the items of `that` recursively.
+ */
+function *verify_DictOf_Code_Kind(
+  that: ReadonlyMap<string, OurTypes.Kind>
+): IterableIterator<VerificationError> {
+  for (const [key] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    for (const error of verifyCode(key)) {
+      error.path.prepend(
+        new KeySegment(
+          that,
+          key
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
+ * Verify the items of `that` recursively.
+ */
+function *verify_DictOf_str_Code(
+  that: ReadonlyMap<string, string>
+): IterableIterator<VerificationError> {
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    for (const error of verifyCode(value)) {
+      error.path.prepend(
+        new KeySegment(
+          that,
+          key
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
+ * Verify the items of `that` recursively.
+ */
+function *verify_DictOf_str_class(
+  that: ReadonlyMap<string, OurTypes.Class>
+): IterableIterator<VerificationError> {
+  for (const [key, value] of OurCommon.sortedEntries(that, OurCommon.compareByCodePoints)) {
+    for (const error of verify(value)) {
+      error.path.prepend(
+        new KeySegment(
+          that,
+          key
+        )
+      );
+      yield error;
+    }
+  }
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -648,6 +711,110 @@ class Verifier
           new PropertySegment(
             that,
             "items"
+          )
+        );
+        yield error;
+      }
+    }
+  }
+
+  *transformRegistryWithContext(
+    that: OurTypes.Registry,
+    context: boolean
+  ): IterableIterator<VerificationError> {
+    if (!that.weightIsAtMost(10)) {
+      yield new VerificationError(
+        "Weights must sum up to at most 10."
+      )
+    }
+
+    if (!(
+      !(that.optionalCounts !== null)
+      || (that.optionalCounts.size > 0)
+    )) {
+      yield new VerificationError(
+        "Optional counts must not be empty, if specified."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.codesByName.keys(),
+          name =>
+            OurCommon.lenStr(OurCommon.mapGetOrThrow(that.codesByName, name)) <= 5
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Codes by name must be at most 5 characters long."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.kindsByCode.keys(),
+          code =>
+            OurCommon.mapGetOrThrow(that.kindsByCode, code) != OurTypes.Kind.Gamma
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Kinds by code must not be gamma."
+      )
+    }
+
+    if (!nestedLabelsAreShort(that.labels)) {
+      yield new VerificationError(
+        "Labels must be short."
+      )
+    }
+
+    if (!itemNamesMatchKeys(that.itemsByName)) {
+      yield new VerificationError(
+        "Items must be named by their keys."
+      )
+    }
+
+    if (!(that.countsByNumber.size <= 5)) {
+      yield new VerificationError(
+        "There must be at most five counts by number."
+      )
+    }
+
+    if (!allCountsAreSmall(that.countsByNumber)) {
+      yield new VerificationError(
+        "Counts by number must be smaller than 3."
+      )
+    }
+
+    if (context === true) {
+      for (const error of verify_DictOf_Code_Kind(that.kindsByCode)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "kindsByCode"
+          )
+        );
+        yield error;
+      }
+
+      for (const error of verify_DictOf_str_Code(that.codesByName)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "codesByName"
+          )
+        );
+        yield error;
+      }
+
+      for (const error of verify_DictOf_str_class(that.itemsByName)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "itemsByName"
           )
         );
         yield error;

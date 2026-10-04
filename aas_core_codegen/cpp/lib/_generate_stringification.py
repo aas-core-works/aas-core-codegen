@@ -1,5 +1,6 @@
 """Generate code for string de/serialization of enumerations."""
 
+import itertools
 import io
 from typing import List
 
@@ -923,6 +924,26 @@ common::expected<
     ]
 
 
+def _ranked_enumerations(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.Enumeration]:
+    """
+    List the enumerations whose literals we sort by their ranks.
+
+    These are the items of the set properties and the keys of the dictionary
+    properties, in the order of their definition in the meta-model.
+    """
+    ids = {
+        id(enum)
+        for enum in itertools.chain(
+            intermediate_uses.enumerations_in_set_properties(symbol_table),
+            intermediate_uses.enumerations_in_dict_property_keys(symbol_table),
+        )
+    }
+
+    return [enum for enum in symbol_table.enumerations if id(enum) in ids]
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -974,7 +995,7 @@ namespace stringification {"""
         blocks.extend(_generate_enum_from_string_definition(enum=enum))
         blocks.append(_generate_enum_to_string_definition(enum=enum))
 
-    for enum in intermediate_uses.enumerations_in_set_properties(symbol_table):
+    for enum in _ranked_enumerations(symbol_table):
         blocks.extend(_generate_rank_and_less_definitions(enum=enum))
 
     blocks.extend(
@@ -1034,7 +1055,7 @@ def generate_implementation(
         blocks.extend(_generate_enum_from_string_implementation(enum=enum))
         blocks.append(_generate_enum_to_string_implementation(enum=enum))
 
-    for enum in intermediate_uses.enumerations_in_set_properties(symbol_table):
+    for enum in _ranked_enumerations(symbol_table):
         blocks.extend(_generate_rank_and_less_implementations(enum=enum))
 
     blocks.extend(

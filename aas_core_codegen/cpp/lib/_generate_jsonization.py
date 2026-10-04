@@ -203,6 +203,34 @@ struct IndexSegment : public ISegment {{
 {I}~IndexSegment() override = default;
 }};  // struct IndexSegment"""
         ),
+        *(
+            [
+                Stripped(
+                    f"""\
+/**
+ * Represent an access to a key of a JSON object on a JSON path.
+ */
+struct KeySegment : public ISegment {{
+{I}/**
+{I} * Key of the value in a JSON object
+{I} */
+{I}std::wstring key;
+
+{I}explicit KeySegment(
+{II}std::wstring a_key
+{I});
+
+{I}std::wstring ToWstring() const override;
+
+{I}std::unique_ptr<ISegment> Clone() const override;
+
+{I}~KeySegment() override = default;
+}};  // struct KeySegment"""
+                )
+            ]
+            if intermediate_uses.dict_properties(symbol_table)
+            else []
+        ),
         Stripped(
             f"""\
 /**
@@ -368,6 +396,37 @@ std::unique_ptr<ISegment> IndexSegment::Clone() const {{
 }}"""
         ),
         Stripped("// endregion IndexSegment"),
+    ]
+
+
+def _generate_key_segment_implementation() -> List[Stripped]:
+    """Generate the implementation of the struct ``KeySegment``."""
+    return [
+        Stripped("// region KeySegment"),
+        Stripped(
+            f"""\
+KeySegment::KeySegment(
+{I}std::wstring a_key
+) :
+{I}key(std::move(a_key)) {{
+{I}// Intentionally empty.
+}}"""
+        ),
+        Stripped(
+            f"""\
+std::wstring KeySegment::ToWstring() const {{
+{I}// NOTE (mristin):
+{I}// We render the key exactly as we do in the paths of the iteration.
+{I}return iteration::KeySegment(key).ToWstring();
+}}"""
+        ),
+        Stripped(
+            f"""\
+std::unique_ptr<ISegment> KeySegment::Clone() const {{
+{I}return common::make_unique<KeySegment>(*this);
+}}"""
+        ),
+        Stripped("// endregion KeySegment"),
     ]
 
 
@@ -1345,6 +1404,305 @@ std::pair<
 {II}common::nullopt
 {I});
 }}"""
+    )
+
+
+def _generate_deserialize_dict() -> Stripped:
+    """Generate a generic dictionary deserialization function."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize a dictionary from the JSON object \\p json.
+ *
+ * The keys can come in any order. A JSON object can not hold duplicate keys
+ * once parsed, so there are no duplicates to refuse.
+ *
+ * \\tparam MapT type of the dictionary, which might come with its own hasher
+ * \\param json value expected to be an object
+ * \\param deserialize_key de-serializes a key from its text
+ * \\param deserialize_value de-serializes a value
+ * \\return the dictionary, or an error, if any
+ */
+template <
+{I}typename MapT,
+{I}typename DeserializeKeyT,
+{I}typename DeserializeValueT
+>
+std::pair<
+{I}common::optional<MapT >,
+{I}common::optional<DeserializationError>
+> DeserializeDict(
+{I}const nlohmann::json& json,
+{I}DeserializeKeyT&& deserialize_key,
+{I}DeserializeValueT&& deserialize_value
+) {{
+{I}typedef typename MapT::key_type K;
+{I}typedef typename MapT::mapped_type V;
+
+{I}if (!json.is_object()) {{
+{II}std::wstring message = common::Concat(
+{III}L"Expected an object, but got: ",
+{III}common::Utf8ToWstring(
+{IIII}json.type_name()
+{III})
+{II});
+
+{II}return std::make_pair<
+{III}common::optional<MapT >,
+{III}common::optional<DeserializationError>
+{II}>(
+{III}common::nullopt,
+{III}common::make_optional<DeserializationError>(
+{IIII}message
+{III})
+{II});
+{I}}}
+
+{I}common::optional<MapT > map(
+{II}common::make_optional<MapT >()
+{I});
+
+{I}map->reserve(json.size());
+
+{I}for (const auto& item : json.items()) {{
+{II}common::optional<K> key;
+{II}common::optional<DeserializationError> error;
+
+{II}std::tie(key, error) = deserialize_key(item.key());
+
+{II}if (!error.has_value()) {{
+{III}common::optional<V> value;
+{III}std::tie(value, error) = deserialize_value(item.value());
+
+{III}if (!error.has_value()) {{
+{IIII}map->emplace(std::move(*key), std::move(*value));
+{III}}}
+{II}}}
+
+{II}if (error.has_value()) {{
+{III}error->path.segments.emplace_front(
+{IIII}common::make_unique<KeySegment>(
+{IIIII}common::Utf8ToWstring(item.key())
+{IIII})
+{III});
+
+{III}return std::make_pair<
+{IIII}common::optional<MapT >,
+{IIII}common::optional<DeserializationError>
+{III}>(
+{IIII}common::nullopt,
+{IIII}std::move(error)
+{III});
+{II}}}
+{I}}}
+
+{I}return std::make_pair(
+{II}std::move(map),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
+def _generate_deserialize_wstring_key() -> Stripped:
+    """Generate the function de-serializing a string key of a dictionary."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize a string key of a dictionary from its \\p text.
+ *
+ * \\param text of the key in a JSON object
+ * \\return the key
+ */
+std::pair<
+{I}common::optional<std::wstring>,
+{I}common::optional<DeserializationError>
+> DeserializeWstringKey(
+{I}const std::string& text
+) {{
+{I}return std::make_pair<
+{II}common::optional<std::wstring>,
+{II}common::optional<DeserializationError>
+{I}>(
+{II}common::Utf8ToWstring(text),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
+def _generate_deserialize_int64_key() -> Stripped:
+    """Generate the function de-serializing an integer key of a dictionary."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize an integer key of a dictionary from its \\p text.
+ *
+ * We accept only the canonical decimal representation, *i.e.*, an optional
+ * minus followed by the digits without leading zeros, and refuse ``-0``, so
+ * that every integer has exactly one key.
+ *
+ * \\param text of the key in a JSON object
+ * \\return the key, or an error, if any
+ */
+std::pair<
+{I}common::optional<int64_t>,
+{I}common::optional<DeserializationError>
+> DeserializeInt64Key(
+{I}const std::string& text
+) {{
+{I}const bool negative = !text.empty() && text[0] == '-';
+{I}const size_t start = negative ? 1 : 0;
+
+{I}bool canonical = text.size() > start;
+{I}for (size_t i = start; canonical && i < text.size(); ++i) {{
+{II}canonical = text[i] >= '0' && text[i] <= '9';
+{I}}}
+
+{I}if (
+{II}canonical
+{II}&& text[start] == '0'
+{II}&& (text.size() > start + 1 || negative)
+{I}) {{
+{II}canonical = false;
+{I}}}
+
+{I}if (!canonical) {{
+{II}return std::make_pair<
+{III}common::optional<int64_t>,
+{III}common::optional<DeserializationError>
+{II}>(
+{III}common::nullopt,
+{III}common::make_optional<DeserializationError>(
+{IIII}common::Concat(
+{IIIII}L"Expected the key to be an integer in its canonical decimal "
+{IIIII}L"representation, but got: ",
+{IIIII}common::Utf8ToWstring(text)
+{IIII})
+{III})
+{II});
+{I}}}
+
+{I}// NOTE (mristin):
+{I}// We accumulate the negative number so that we can represent the smallest
+{I}// 64-bit integer, which has no positive counterpart.
+{I}int64_t result = 0;
+{I}for (size_t i = start; i < text.size(); ++i) {{
+{II}const int64_t digit = static_cast<int64_t>(text[i] - '0');
+
+{II}if (
+{III}result < (std::numeric_limits<int64_t>::min() + digit) / 10
+{II}) {{
+{III}return std::make_pair<
+{IIII}common::optional<int64_t>,
+{IIII}common::optional<DeserializationError>
+{III}>(
+{IIII}common::nullopt,
+{IIII}common::make_optional<DeserializationError>(
+{IIIII}common::Concat(
+{IIIIII}L"Expected the key to be a 64-bit integer, "
+{IIIIII}L"but got an integer which does not fit in that range: ",
+{IIIIII}common::Utf8ToWstring(text)
+{IIIII})
+{IIII})
+{III});
+{II}}}
+
+{II}result = result * 10 - digit;
+{I}}}
+
+{I}if (!negative) {{
+{II}if (result == std::numeric_limits<int64_t>::min()) {{
+{III}return std::make_pair<
+{IIII}common::optional<int64_t>,
+{IIII}common::optional<DeserializationError>
+{III}>(
+{IIII}common::nullopt,
+{IIII}common::make_optional<DeserializationError>(
+{IIIII}common::Concat(
+{IIIIII}L"Expected the key to be a 64-bit integer, "
+{IIIIII}L"but got an integer which does not fit in that range: ",
+{IIIIII}common::Utf8ToWstring(text)
+{IIIII})
+{IIII})
+{III});
+{II}}}
+
+{II}result = -result;
+{I}}}
+
+{I}return std::make_pair<
+{II}common::optional<int64_t>,
+{II}common::optional<DeserializationError>
+{I}>(
+{II}common::make_optional<int64_t>(result),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
+def _generate_deserialize_enumeration_key() -> Stripped:
+    """Generate the function de-serializing a key of a dictionary as a literal."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize a key of a dictionary from its \\p text as a literal
+ * of an enumeration.
+ *
+ * We give the text to \\p deserialize_literal as a JSON string, so that
+ * the key is de-serialized exactly as any other literal.
+ *
+ * \\param text of the key in a JSON object
+ * \\param deserialize_literal de-serializes a literal from a JSON value
+ * \\return the key, or an error, if any
+ */
+template <typename EnumT>
+std::pair<
+{I}common::optional<EnumT>,
+{I}common::optional<DeserializationError>
+> DeserializeEnumerationKey(
+{I}const std::string& text,
+{I}std::pair<
+{II}common::optional<EnumT>,
+{II}common::optional<DeserializationError>
+{I}> (*deserialize_literal)(const nlohmann::json&)
+) {{
+{I}return deserialize_literal(nlohmann::json(text));
+}}"""
+    )
+
+
+def _deserialize_key_expr(keys_type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
+    """Generate the callable de-serializing the key of a dictionary from its text."""
+    primitive_type = intermediate.try_primitive_type(keys_type_anno)
+
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped("DeserializeWstringKey")
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped("DeserializeInt64Key")
+
+    if isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_anno.our_type, intermediate.Enumeration
+    ):
+        enum_name = cpp_naming.enum_name(keys_type_anno.our_type.name)
+        deserialize_literal = cpp_naming.function_name(
+            Identifier(f"deserialize_{keys_type_anno.our_type.name}")
+        )
+        return Stripped(
+            f"""\
+[](const std::string& a_text) {{
+{I}return DeserializeEnumerationKey<types::{enum_name}>(
+{II}a_text,
+{II}{deserialize_literal}
+{I});
+}}"""
+        )
+
+    raise AssertionError(
+        f"Unexpected keys of a dictionary: {keys_type_anno}; they should have "
+        f"been refused in intermediate._translate._verify_keys_of_dicts."
     )
 
 
@@ -2587,10 +2945,30 @@ DeserializeSet<
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        dict_type = cpp_common.generate_type(
+            type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
+        )
+
+        deserialize_key = _deserialize_key_expr(type_anno.keys)
+
+        deserialize_value: Stripped
+        if isinstance(type_anno.values, intermediate.ContainerTypeAnnotationAsTuple):
+            deserialize_value = _deserialize_nested_item_expr(type_anno.values)
+        else:
+            assert isinstance(
+                type_anno.values, intermediate.AtomicTypeAnnotationAsTuple
+            )
+            deserialize_value = _deserialize_expr_for_atomic_item(type_anno.values)
+
+        return Stripped(
+            f"""\
+DeserializeDict<
+{I}{indent_but_first_line(dict_type, I)}
+>(
+{I}{json_expr},
+{I}{indent_but_first_line(deserialize_key, I)},
+{I}{indent_but_first_line(deserialize_value, I)}
+)"""
         )
 
     else:
@@ -4109,6 +4487,186 @@ nlohmann::json SerializeSetWithInfallible(
     )
 
 
+def _generate_serialize_dict_with_fallible_value_serialization() -> Stripped:
+    """Generate a function to serialize a dictionary with fallible value serialization."""
+    return Stripped(
+        f"""\
+/**
+ * Serialize the given dictionary to a JSON object, with the keys sorted by
+ * \\p less, where value serialization might fail.
+ *
+ * The path of an error refers to the key of the value.
+ */
+template<
+{I}typename MapT,
+{I}typename LessT,
+{I}typename SerializeKeyT,
+{I}typename FallibleSerializeValueT
+>
+std::pair<
+{I}common::optional<nlohmann::json>,
+{I}common::optional<SerializationError>
+> SerializeDictWithFallible(
+{I}const MapT& map,
+{I}LessT less,
+{I}SerializeKeyT&& serialize_key,
+{I}FallibleSerializeValueT&& fallible_serialize_value
+) {{
+{I}typedef typename MapT::value_type ItemT;
+
+{I}const std::vector<const ItemT*> sorted(
+{II}common::SortedItemPointers(map, less)
+{I});
+
+{I}nlohmann::json serialized = nlohmann::json::object();
+
+{I}for (const ItemT* item : sorted) {{
+{II}const std::string key(serialize_key(item->first));
+
+{II}common::optional<nlohmann::json> json_value;
+{II}common::optional<SerializationError> error;
+
+{II}std::tie(
+{III}json_value,
+{III}error
+{II}) = fallible_serialize_value(Deref(item->second));
+
+{II}if (error.has_value()) {{
+{III}error->path.segments.emplace_front(
+{IIII}common::make_unique<iteration::KeySegment>(
+{IIIII}common::Utf8ToWstring(key)
+{IIII})
+{III});
+
+{III}return std::make_pair<
+{IIII}common::optional<nlohmann::json>,
+{IIII}common::optional<SerializationError>
+{III}>(
+{IIII}common::nullopt,
+{IIII}std::move(error)
+{III});
+{II}}}
+
+{II}serialized[key] = std::move(*json_value);
+{I}}}
+
+{I}return std::make_pair(
+{II}std::move(serialized),
+{II}common::nullopt
+{I});
+}}"""
+    )
+
+
+def _generate_serialize_dict_with_infallible_value_serialization() -> Stripped:
+    """Generate a function to serialize a dictionary with infallible value serialization."""
+    return Stripped(
+        f"""\
+/**
+ * Serialize the given dictionary to a JSON object, with the keys sorted by
+ * \\p less, where value serialization can not fail.
+ */
+template<
+{I}typename MapT,
+{I}typename LessT,
+{I}typename SerializeKeyT,
+{I}typename InfallibleSerializeValueT
+>
+nlohmann::json SerializeDictWithInfallible(
+{I}const MapT& map,
+{I}LessT less,
+{I}SerializeKeyT&& serialize_key,
+{I}InfallibleSerializeValueT&& infallible_serialize_value
+) {{
+{I}typedef typename MapT::value_type ItemT;
+
+{I}const std::vector<const ItemT*> sorted(
+{II}common::SortedItemPointers(map, less)
+{I});
+
+{I}nlohmann::json serialized = nlohmann::json::object();
+
+{I}for (const ItemT* item : sorted) {{
+{II}serialized[serialize_key(item->first)] = infallible_serialize_value(
+{III}Deref(item->second)
+{II});
+{I}}}
+
+{I}return serialized;
+}}"""
+    )
+
+
+def _generate_serialize_wstring_key() -> Stripped:
+    """Generate the function serializing a string key of a dictionary."""
+    return Stripped(
+        f"""\
+/**
+ * Serialize the string key \\p that of a dictionary to the text of the key.
+ */
+std::string SerializeWstringKey(
+{I}const std::wstring& that
+) {{
+{I}return common::WstringToUtf8(that);
+}}"""
+    )
+
+
+def _generate_serialize_int64_key() -> Stripped:
+    """Generate the function serializing an integer key of a dictionary."""
+    return Stripped(
+        f"""\
+/**
+ * Serialize the integer key \\p that of a dictionary to the text of the key,
+ * in its canonical decimal representation.
+ */
+std::string SerializeInt64Key(
+{I}const int64_t& that
+) {{
+{I}return std::to_string(that);
+}}"""
+    )
+
+
+def _generate_serialize_enumeration_key() -> Stripped:
+    """Generate the function serializing a key of a dictionary which is a literal."""
+    return Stripped(
+        f"""\
+/**
+ * Serialize the key \\p that of a dictionary, a literal of an enumeration,
+ * to the text of the key.
+ */
+template <typename EnumT>
+std::string SerializeEnumerationKey(
+{I}const EnumT& that
+) {{
+{I}return stringification::to_string(that);
+}}"""
+    )
+
+
+def _serialize_key_expr(keys_type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
+    """Generate the callable serializing a key of a dictionary to its text."""
+    primitive_type = intermediate.try_primitive_type(keys_type_anno)
+
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped("SerializeWstringKey")
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped("SerializeInt64Key")
+
+    if isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_anno.our_type, intermediate.Enumeration
+    ):
+        enum_name = cpp_naming.enum_name(keys_type_anno.our_type.name)
+        return Stripped(f"SerializeEnumerationKey<types::{enum_name}>")
+
+    raise AssertionError(
+        f"Unexpected keys of a dictionary: {keys_type_anno}; they should have "
+        f"been refused in intermediate._translate._verify_keys_of_dicts."
+    )
+
+
 def _generate_serialize_tuple_function(arity: int) -> Stripped:
     """
     Generate a generic function to serialize a tuple of the given ``arity``.
@@ -4334,6 +4892,12 @@ def _serialization_is_fallible(
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
         return _serialization_is_fallible(type_anno.items, ids_of_fallible_types)
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        # NOTE (mristin):
+        # The keys are written as texts, also the integers, so only the values
+        # can fail.
+        return _serialization_is_fallible(type_anno.values, ids_of_fallible_types)
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         # NOTE (mristin):
@@ -4733,10 +5297,33 @@ Serialize{union_name}(
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        serialize_dict = (
+            "SerializeDictWithFallible"
+            if _serialization_is_fallible(type_anno.values, ids_of_fallible_types)
+            else "SerializeDictWithInfallible"
+        )
+
+        less = cpp_common.generate_set_item_less(type_anno.keys)
+
+        serialize_key = _serialize_key_expr(type_anno.keys)
+
+        serialize_value: Stripped
+        if isinstance(type_anno.values, intermediate.ContainerTypeAnnotationAsTuple):
+            serialize_value = Stripped(_serialize_nested_name(type_anno.values))
+        else:
+            assert isinstance(
+                type_anno.values, intermediate.AtomicTypeAnnotationAsTuple
+            )
+            serialize_value = _serialize_item_expr(type_anno.values)
+
+        return Stripped(
+            f"""\
+{serialize_dict}(
+{I}{indent_but_first_line(value_expr, I)},
+{I}{less},
+{I}{indent_but_first_line(serialize_key, I)},
+{I}{indent_but_first_line(serialize_value, I)}
+)"""
         )
 
     else:
@@ -5566,6 +6153,21 @@ def _type_annotation_contains_list_of_instances(
     )
 
 
+def _dicts_in_properties(
+    symbol_table: intermediate.SymbolTable,
+) -> List[intermediate.DictTypeAnnotation]:
+    """List the dictionaries at any depth of the properties of the concrete classes."""
+    return [
+        type_anno
+        for cls in symbol_table.concrete_classes
+        for prop in cls.properties
+        for type_anno in intermediate.over_type_annotation_and_nested_type_annotations(
+            prop.type_annotation
+        )
+        if isinstance(type_anno, intermediate.DictTypeAnnotation)
+    ]
+
+
 def _type_annotation_contains_list(
     type_annotation: intermediate.TypeAnnotationUnion,
 ) -> bool:
@@ -5594,6 +6196,27 @@ def generate_implementation(
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
+    dicts_in_properties = _dicts_in_properties(symbol_table)
+    has_dict_properties = len(dicts_in_properties) > 0
+
+    dict_keys_primitive_types = {
+        intermediate.try_primitive_type(dict_type_anno.keys)
+        for dict_type_anno in dicts_in_properties
+    }
+    has_dict_enumeration_keys = any(
+        isinstance(dict_type_anno.keys, intermediate.OurTypeAnnotation)
+        and isinstance(dict_type_anno.keys.our_type, intermediate.Enumeration)
+        for dict_type_anno in dicts_in_properties
+    )
+
+    # NOTE (mristin):
+    # ``DeserializeInt64Key`` needs ``std::numeric_limits``.
+    limits_include = (
+        "\n#include <limits>"
+        if intermediate.PrimitiveType.INT in dict_keys_primitive_types
+        else ""
+    )
+
     blocks = [
         cpp_common.WARNING,
         Stripped(
@@ -5603,7 +6226,7 @@ def generate_implementation(
 #include "{include_prefix_path}/wstringification.hpp"
 
 #pragma warning(push, 0)
-#include <cmath>
+#include <cmath>{limits_include}
 #include <set>
 #include <sstream>
 #include <unordered_map>
@@ -5612,6 +6235,7 @@ def generate_implementation(
         cpp_common.generate_namespace_opening(namespace),
         *_generate_property_segment_implementation(),
         *_generate_index_segment_implementation(),
+        *(_generate_key_segment_implementation() if has_dict_properties else []),
         *_generate_path_implementation(),
         Stripped("// region De-serialization"),
         *_generate_deserialization_error_implementation(),
@@ -5655,6 +6279,18 @@ def generate_implementation(
 
     if has_set_properties:
         blocks.append(_generate_deserialize_set())
+
+    if has_dict_properties:
+        blocks.append(_generate_deserialize_dict())
+
+        if intermediate.PrimitiveType.STR in dict_keys_primitive_types:
+            blocks.append(_generate_deserialize_wstring_key())
+
+        if intermediate.PrimitiveType.INT in dict_keys_primitive_types:
+            blocks.append(_generate_deserialize_int64_key())
+
+        if has_dict_enumeration_keys:
+            blocks.append(_generate_deserialize_enumeration_key())
 
     for arity in intermediate.tuple_arities(symbol_table):
         blocks.append(_generate_deserialize_tuple_function(arity))
@@ -5812,9 +6448,25 @@ struct SerializationError {{
         blocks.append(_generate_as_fallible())
         blocks.append(_generate_as_fallible_identity())
 
-    if has_tuple:
+    if has_tuple or has_dict_properties:
         blocks.append(_generate_deref())
         blocks.append(_generate_deref_identity())
+
+    # NOTE (mristin):
+    # The serialization of a dictionary dereferences its values, so it comes after
+    # ``Deref``.
+    if has_dict_properties:
+        blocks.append(_generate_serialize_dict_with_fallible_value_serialization())
+        blocks.append(_generate_serialize_dict_with_infallible_value_serialization())
+
+        if intermediate.PrimitiveType.STR in dict_keys_primitive_types:
+            blocks.append(_generate_serialize_wstring_key())
+
+        if intermediate.PrimitiveType.INT in dict_keys_primitive_types:
+            blocks.append(_generate_serialize_int64_key())
+
+        if has_dict_enumeration_keys:
+            blocks.append(_generate_serialize_enumeration_key())
 
     if intermediate_uses.json_types(symbol_table):
         blocks.extend(

@@ -27,6 +27,10 @@ public interface IVisitorWithContext<ContextT>
     ISomething that,
     ContextT context
   );
+  void visitRegistry(
+    IRegistry that,
+    ContextT context
+  );
 }
 
 /*

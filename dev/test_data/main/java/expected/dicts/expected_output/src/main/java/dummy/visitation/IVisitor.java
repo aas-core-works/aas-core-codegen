@@ -23,6 +23,9 @@ public interface IVisitor
   void visitSomething(
     ISomething that
   );
+  void visitRegistry(
+    IRegistry that
+  );
 }
 
 /*

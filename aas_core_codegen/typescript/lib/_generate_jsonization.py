@@ -150,6 +150,111 @@ function parseSet<T>(
     )
 
 
+def _generate_parse_map() -> Stripped:
+    """
+    Generate the generic helper to parse a JSON object member-by-member into a map.
+
+    We accept the members in any order. A JSON object can not hold a duplicate
+    key once it has been parsed, so we have nothing to check for the duplicates.
+    """
+    return Stripped(
+        f"""\
+/**
+ * Parse `jsonable` as a JSON object into a map, every key with `parseKey` and
+ * every value with `parseValue`.
+ *
+ * @param jsonable - to be parsed member-by-member
+ * @param parseKey - to parse a single key of `jsonable`
+ * @param parseValue - to parse a single value of `jsonable`
+ * @returns parsed map, or an error
+ * @typeParam K - type of a single parsed key
+ * @typeParam V - type of a single parsed value
+ */
+function parseMap<K, V>(
+{I}jsonable: JsonValue,
+{I}parseKey: (
+{II}jsonKey: string
+{I}) => OurCommon.Either<K, DeserializationError>,
+{I}parseValue: (
+{II}jsonableValue: JsonValue
+{I}) => OurCommon.Either<V, DeserializationError>
+): OurCommon.Either<Map<K, V>, DeserializationError> {{
+{I}const objectError = checkIsJsonObject(jsonable);
+{I}if (objectError !== null) {{
+{II}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{III}null,
+{III}objectError
+{II});
+{I}}}
+
+{I}const jsonObject = <JsonObject>jsonable;
+
+{I}const result = new Map<K, V>();
+{I}for (const jsonKey of Object.keys(jsonObject)) {{
+{II}const keyOrError = parseKey(jsonKey);
+{II}if (keyOrError.error !== null) {{
+{III}keyOrError.error.path.prepend(new KeySegment(jsonObject, jsonKey));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}keyOrError.error
+{III});
+{II}}}
+
+{II}const valueOrError = parseValue(jsonObject[jsonKey]);
+{II}if (valueOrError.error !== null) {{
+{III}valueOrError.error.path.prepend(new KeySegment(jsonObject, jsonKey));
+{III}return new OurCommon.Either<Map<K, V>, DeserializationError>(
+{IIII}null,
+{IIII}valueOrError.error
+{III});
+{II}}}
+
+{II}result.set(keyOrError.mustValue(), valueOrError.mustValue());
+{I}}}
+{I}return new OurCommon.Either<Map<K, V>, DeserializationError>(result, null);
+}}"""
+    )
+
+
+def _generate_integer_from_json_key() -> Stripped:
+    """
+    Generate the function to decode an integer key of a dictionary from a JSON key.
+
+    The integer keys are written as canonical decimal strings, which we check
+    strictly, so that the same text always gives the same key in all the SDKs.
+    """
+    return Stripped(
+        f"""\
+/**
+ * Parse `jsonKey` as a canonical decimal integer, the key of a dictionary.
+ *
+ * @param jsonKey - to be parsed
+ * @returns parsed integer value, or an error
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function integerFromJsonKey(
+{I}jsonKey: string
+): OurCommon.Either<number, DeserializationError> {{
+{I}if (!/^(0|-?[1-9][0-9]*)$/.test(jsonKey)) {{
+{II}return newDeserializationError<number>(
+{III}"Expected a canonical decimal integer as the key, " +
+{IIII}`but got: ${{JSON.stringify(jsonKey)}}`
+{II});
+{I}}}
+
+{I}const value = Number(jsonKey);
+{I}if (!Number.isSafeInteger(value)) {{
+{II}return newDeserializationError<number>(
+{III}"Expected the integer key to be a safe integer, " +
+{IIII}`but got: ${{jsonKey}}`
+{II});
+{I}}}
+
+{I}return new OurCommon.Either<number, DeserializationError>(value, null);
+}}"""
+    )
+
+
 def _generate_extract_model_type() -> Stripped:
     """
     Generate the generic helper to read the ``modelType`` property of an object.
@@ -1016,6 +1121,33 @@ def _parse_function_reference(
     return _parse_function_for_atomic_value(type_anno)
 
 
+def _parse_key_function(keys_type_anno: intermediate.TypeAnnotationUnion) -> Stripped:
+    """
+    Reference the function parsing a key of a dictionary from a JSON key.
+
+    A string and a literal of an enumeration are parsed from the JSON key as from
+    any other JSON value, while an integer is written as a canonical decimal
+    string, see ``integerFromJsonKey``.
+    """
+    primitive_type = intermediate.try_primitive_type(keys_type_anno)
+
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped("stringFromJsonable")
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped("integerFromJsonKey")
+
+    assert isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+        keys_type_anno.our_type, intermediate.Enumeration
+    ), (
+        f"Expected strings, integers, constrained primitives or enumeration "
+        f"literals as the keys of a dictionary, as the others should have been "
+        f"refused in the intermediate stage, but got: {keys_type_anno}"
+    )
+
+    return _parse_function_for_atomic_value(keys_type_anno)
+
+
 def _generate_parse_call(
     type_anno: intermediate.TypeAnnotationExceptOptional, value_expression: Stripped
 ) -> Stripped:
@@ -1067,10 +1199,13 @@ parseTuple{len(type_anno.items)}<{item_types_joined}>(
         )
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        return Stripped(
+            f"""\
+parseMap(
+{I}{value_expression},
+{I}{_parse_key_function(type_anno.keys)},
+{I}{_parse_function_reference(type_anno.values)}
+)"""
         )
 
     assert_never(type_anno)
@@ -1186,18 +1321,13 @@ def _collect_nested_containers(
         if not isinstance(type_anno, intermediate.ContainerTypeAnnotationAsTuple):
             return
 
-        if isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
-
-        items = (
-            type_anno.items
-            if isinstance(type_anno, intermediate.TupleTypeAnnotation)
-            else [type_anno.items]
-        )
+        items: Sequence[intermediate.TypeAnnotationExceptOptional]
+        if isinstance(type_anno, intermediate.TupleTypeAnnotation):
+            items = type_anno.items
+        elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+            items = [type_anno.keys, type_anno.values]
+        else:
+            items = [type_anno.items]
         for item in items:
             visit(item, True)
 
@@ -2031,11 +2161,7 @@ def _jsonable_type(type_anno: intermediate.TypeAnnotationExceptOptional) -> Stri
         return Stripped("Array<JsonValue>")
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        return Stripped("JsonObject")
 
     return _jsonable_type_of_atomic(type_anno)
 
@@ -2228,6 +2354,82 @@ function {function_name}(
 {I}that: ReadonlySet<{item_type}>
 ): Array<{jsonable_item_type}> {{
 {I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
+def _generate_serialize_dict(type_anno: intermediate.DictTypeAnnotation) -> Stripped:
+    """
+    Generate the function serializing the dictionary ``type_anno`` as a JSON object.
+
+    We write the members sorted by their keys, so that the output is the same in
+    all the SDKs, and report a refused member at its JSON key.
+    """
+    function_name = _composed_serialize_function_name(type_anno)
+
+    keys_type = typescript_common.generate_type(
+        type_anno.keys, types_module=Identifier("OurTypes")
+    )
+    values_type = typescript_common.generate_type(
+        type_anno.values, types_module=Identifier("OurTypes")
+    )
+
+    sorted_entries = typescript_common.generate_sorted_dict_entries(
+        type_anno=type_anno, dict_expression=Stripped("that")
+    )
+
+    keys_type_anno = type_anno.keys
+    assert isinstance(keys_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+        f"Expected the keys of a dictionary to be atomic, as the others should have "
+        f"been refused in the intermediate stage: {type_anno}"
+    )
+
+    serialize_key: Stripped
+    primitive_type = intermediate.try_primitive_type(keys_type_anno)
+    if primitive_type is intermediate.PrimitiveType.STR:
+        serialize_key = Stripped("key")
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        serialize_key = Stripped(
+            f"{_generate_serialize_call(Stripped('key'), keys_type_anno)}.toString()"
+        )
+    else:
+        assert isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and (
+            isinstance(keys_type_anno.our_type, intermediate.Enumeration)
+        ), f"Unexpected keys of a dictionary: {type_anno}"
+
+        serialize_key = _generate_serialize_call(Stripped("key"), keys_type_anno)
+
+    serialize_value = _generate_serialize_value(
+        access_expression=Stripped("value"), type_anno=type_anno.values
+    )
+
+    json_key = typescript_common.generate_json_key(
+        keys_type_anno=type_anno.keys, key_expression=Stripped("key")
+    )
+
+    return Stripped(
+        f"""\
+/**
+ * Serialize `that` to a JSON object with the members sorted by their keys.
+ *
+ * @param that - dictionary to be serialized
+ * @returns JSON object
+ */
+function {function_name}(
+{I}that: ReadonlyMap<{keys_type}, {values_type}>
+): JsonObject {{
+{I}const result: JsonObject = {{}};
+{I}for (const [key, value] of {sorted_entries}) {{
+{II}try {{
+{III}result[{serialize_key}] = {serialize_value};
+{II}}} catch (error) {{
+{III}if (error instanceof SerializationError) {{
+{IIII}error.prependKey({json_key});
+{III}}}
+{III}throw error;
+{II}}}
+{I}}}
+{I}return result;
 }}"""
     )
 
@@ -2960,6 +3162,11 @@ function newDeserializationError<T>(
             if intermediate_uses.set_properties(symbol_table)
             else []
         ),
+        *(
+            [_generate_parse_map(), _generate_integer_from_json_key()]
+            if intermediate_uses.dict_properties(symbol_table)
+            else []
+        ),
         _generate_bool_from_jsonable(),
         _generate_int_from_jsonable(),
         _generate_float_from_jsonable(),
@@ -3030,11 +3237,7 @@ function newDeserializationError<T>(
         elif isinstance(composed_type_anno, intermediate.TupleTypeAnnotation):
             blocks.append(_generate_serialize_tuple(type_anno=composed_type_anno))
         elif isinstance(composed_type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {composed_type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            blocks.append(_generate_serialize_dict(type_anno=composed_type_anno))
 
         else:
             assert_never(composed_type_anno)

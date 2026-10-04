@@ -567,10 +567,21 @@ for item in that:
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys are never instances, so we descend only into the values. We
+        # visit the keys in the sorted order so that the order of the descent is
+        # the same in all the targets.
+        value_code = _generate_descend_into(
+            expr="value", type_anno=type_anno.values, descendability=descendability
+        )
+
+        sorted_keys = python_common.generate_sorted_keys(type_anno.keys, "that")
+
+        body = Stripped(
+            f"""\
+for key in {sorted_keys}:
+{I}value = that[key]
+{I}{indent_but_first_line(value_code, I)}"""
         )
 
     else:
@@ -1977,11 +1988,17 @@ def generate(
 
     typing_imports.extend(set_imports)
 
-    typing_imports.extend(
-        name
-        for name in python_common.typing_imports_for_dicts(specified_methods)
-        if name not in typing_imports
-    )
+    dict_imports = python_common.typing_imports_for_dicts(specified_methods)
+
+    # NOTE (mristin):
+    # The dictionary properties and the corresponding arguments of
+    # the constructors are always mutable, so they are annotated as ``Dict``.
+    if Identifier("Dict") not in dict_imports and intermediate_uses.dict_properties(
+        symbol_table
+    ):
+        dict_imports.insert(0, Identifier("Dict"))
+
+    typing_imports.extend(name for name in dict_imports if name not in typing_imports)
 
     # NOTE (mristin):
     # We spell out the final local lists as ``Final[Sequence[...]]``, and the lists

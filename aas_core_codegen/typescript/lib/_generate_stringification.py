@@ -1,6 +1,7 @@
 """Generate code for string de/serialization of enumerations."""
 
 import io
+import itertools
 from typing import Tuple, Optional, List
 
 from icontract import ensure
@@ -428,8 +429,20 @@ def generate(
         blocks.append(_generate_enum_from_string(enumeration=enum))
         blocks.append(_generate_enum_to_string(enumeration=enum))
 
-    for enum in intermediate_uses.enumerations_in_set_properties(symbol_table):
-        blocks.append(_generate_rank_and_compare(enumeration=enum))
+    # NOTE (mristin):
+    # We rank the literals held in the set properties and those used as the keys
+    # of the dictionary properties, as we sort them both on serialization.
+    ranked_enumeration_id_set = {
+        intermediate.runtime_id(enumeration)
+        for enumeration in itertools.chain(
+            intermediate_uses.enumerations_in_set_properties(symbol_table),
+            intermediate_uses.enumerations_in_dict_property_keys(symbol_table),
+        )
+    }
+
+    for enum in symbol_table.enumerations:
+        if intermediate.runtime_id(enum) in ranked_enumeration_id_set:
+            blocks.append(_generate_rank_and_compare(enumeration=enum))
 
     blocks.append(typescript_common.WARNING)
 

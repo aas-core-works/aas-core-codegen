@@ -454,6 +454,178 @@ private static <T> Reporting.Result<Set<T>> parseSet(
     )
 
 
+def _generate_prepend_key() -> Stripped:
+    """Generate the helper marking an error as coming from a keyed value."""
+    return Stripped(
+        f"""\
+/**
+ * Mark the error of {{@code result}} as coming from the member {{@code key}}
+ * of a JSON object.
+ */
+private static <T> Reporting.Result<T> prependKey(
+{I}Reporting.Result<?> result, String key) {{
+{I}final Reporting.Error error = result.getError();
+{I}error.prependSegment(new Reporting.KeySegment(key));
+{I}return Reporting.Result.failure(error);
+}}"""
+    )
+
+
+def _generate_parse_dict_helper() -> Stripped:
+    """Generate the generic helper to parse a JSON object as a dictionary."""
+    return Stripped(
+        f"""\
+/**
+ * Parse {{@code node}} as a JSON object, every of its keys with
+ * {{@code parseKey}}, and every of its values with {{@code parseValue}},
+ * into a dictionary.
+ *
+ * <p>The keys can come in any order. A duplicate key can not be detected, since
+ * the JSON object has already been parsed.
+ *
+ * @param node JSON node to be parsed
+ * @param parseKey to parse a single key of the object
+ * @param parseValue to parse a single value of the object
+ */
+private static <K, V> Reporting.Result<Map<K, V>> parseDict(
+{I}JsonNode node,
+{I}Function<String, Reporting.Result<? extends K>> parseKey,
+{I}Function<JsonNode, Reporting.Result<? extends V>> parseValue) {{
+{I}if (!node.isObject()) {{
+{II}return notAJsonObject(node);
+{I}}}
+
+{I}final Map<K, V> result = new HashMap<>();
+
+{I}final Iterator<Map.Entry<String, JsonNode>> iterator = node.fields();
+{I}while (iterator.hasNext()) {{
+{II}final Map.Entry<String, JsonNode> member = iterator.next();
+
+{II}final Reporting.Result<? extends K> parsedKey = parseKey.apply(member.getKey());
+{II}if (parsedKey.isError()) {{
+{III}return prependKey(parsedKey, member.getKey());
+{II}}}
+
+{II}final Reporting.Result<? extends V> parsedValue =
+{III}parseValue.apply(member.getValue());
+{II}if (parsedValue.isError()) {{
+{III}return prependKey(parsedValue, member.getKey());
+{II}}}
+
+{II}result.put(parsedKey.getResult(), parsedValue.getResult());
+{I}}}
+
+{I}return Reporting.Result.success(result);
+}}"""
+    )
+
+
+def _generate_parse_string_key() -> Stripped:
+    """Generate the parser of a string key of a JSON object."""
+    return Stripped(
+        """\
+/**
+ * Parse {@code key} of a JSON object as a string, which it already is.
+ */
+private static Reporting.Result<String> parseStringKey(String key) {
+  return Reporting.Result.success(key);
+}"""
+    )
+
+
+def _generate_parse_long_key() -> Stripped:
+    """Generate the parser of an integer key of a JSON object."""
+    return Stripped(
+        f"""\
+/**
+ * Match the canonical decimal strings of the integer keys of a JSON object.
+ */
+private static final Pattern CANONICAL_INTEGER_KEY_PATTERN =
+{I}Pattern.compile("^(0|-?[1-9][0-9]*)$");
+
+/**
+ * Parse {{@code key}} of a JSON object as a 64-bit integer.
+ *
+ * <p>We accept only the canonical decimal strings, so that the same key can
+ * not be written in two ways, and so that all the targets agree on the keys.
+ */
+private static Reporting.Result<Long> parseLongKey(String key) {{
+{I}if (!CANONICAL_INTEGER_KEY_PATTERN.matcher(key).matches()) {{
+{II}return Reporting.Result.failure(
+{III}new Reporting.Error(
+{IIII}"Expected the key to be an integer written as a canonical " +
+{IIII}"decimal string, but got: " + key));
+{I}}}
+
+{I}try {{
+{II}return Reporting.Result.success(Long.parseLong(key));
+{I}}} catch (NumberFormatException exception) {{
+{II}return Reporting.Result.failure(
+{III}new Reporting.Error(
+{IIII}"Expected the key to be an integer within the 64-bit range, " +
+{IIII}"but got: " + key));
+{I}}}
+}}"""
+    )
+
+
+def _generate_try_enum_from_key_helper() -> Stripped:
+    """Generate the generic helper parsing a key of a JSON object as a literal."""
+    return Stripped(
+        f"""\
+/**
+ * Parse {{@code key}} of a JSON object as a literal of the enumeration
+ * {{@code enumType}}, converted from its text by {{@code fromString}}.
+ *
+ * @param key key of the JSON object to be parsed
+ * @param fromString to convert the text into a literal
+ * @param enumType enumeration whose literal is expected
+ */
+private static <T> Reporting.Result<T> tryEnumFromKey(
+{I}String key,
+{I}Function<String, Optional<T>> fromString,
+{I}Class<T> enumType) {{
+{I}final Optional<T> parsed = fromString.apply(key);
+{I}if (!parsed.isPresent()) {{
+{II}return Reporting.Result.failure(
+{III}new Reporting.Error(
+{IIII}"Not a valid JSON representation of " + enumType.getSimpleName()));
+{I}}}
+
+{I}return Reporting.Result.success(parsed.get());
+}}"""
+    )
+
+
+def _key_parser_reference(keys: intermediate.TypeAnnotationUnion) -> Stripped:
+    """Reference the parser of a single key of a JSON object as ``keys``."""
+    primitive_type = intermediate.try_primitive_type(keys)
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped(f"{_DESERIALIZE_IMPL_NAME}::parseStringKey")
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped(f"{_DESERIALIZE_IMPL_NAME}::parseLongKey")
+
+    assert isinstance(keys, intermediate.OurTypeAnnotation) and isinstance(
+        keys.our_type, intermediate.Enumeration
+    ), (
+        f"Expected only strings, integers, constrained primitives of them and "
+        f"enumerations as keys of a dictionary, as the other keys are refused "
+        f"in intermediate._translate._verify_keys_of_dicts, but got: {keys}"
+    )
+
+    enum_name = java_naming.enum_name(keys.our_type.name)
+    from_string_name = java_naming.method_name(
+        Identifier(f"{keys.our_type.name}_from_string")
+    )
+
+    return Stripped(
+        f"""\
+key -> tryEnumFromKey(
+{I}key, Stringification::{from_string_name}, {enum_name}.class)"""
+    )
+
+
 def _generate_parse_tuple_helper(arity: int) -> Stripped:
     """Generate the generic helper to parse a JSON array as a tuple."""
     type_params = [f"T{i + 1}" for i in range(arity)]
@@ -610,6 +782,20 @@ return parseSet(
 {I}{item_parser});"""
             )
 
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        key_parser = _key_parser_reference(type_anno.keys)
+        value_parser = _item_parser_reference(type_anno.values)
+
+        description = "a dictionary"
+
+        body = Stripped(
+            f"""\
+return parseDict(
+{I}node,
+{I}{indent_but_first_line(key_parser, I)},
+{I}{value_parser});"""
+        )
+
     elif isinstance(type_anno, intermediate.TupleTypeAnnotation):
         item_parsers_joined = ",\n".join(
             _item_parser_reference(item_type_anno) for item_type_anno in type_anno.items
@@ -626,7 +812,8 @@ return parseTuple{len(type_anno.items)}(
 
     else:
         raise AssertionError(
-            f"Expected a list, a set or a tuple type annotation, but got: {type_anno}"
+            f"Expected a list, a set, a dictionary or a tuple type annotation, "
+            f"but got: {type_anno}"
         )
 
     # NOTE (mristin):
@@ -1603,6 +1790,32 @@ def _generate_deserialize_impl(
         for type_anno in composed_type_annotations
     )
 
+    dict_type_annotations = [
+        type_anno
+        for type_anno in composed_type_annotations
+        if isinstance(type_anno, intermediate.DictTypeAnnotation)
+    ]
+
+    needs_parse_dict = len(dict_type_annotations) > 0
+
+    needs_parse_string_key = any(
+        intermediate.try_primitive_type(type_anno.keys)
+        is intermediate.PrimitiveType.STR
+        for type_anno in dict_type_annotations
+    )
+
+    needs_parse_long_key = any(
+        intermediate.try_primitive_type(type_anno.keys)
+        is intermediate.PrimitiveType.INT
+        for type_anno in dict_type_annotations
+    )
+
+    needs_try_enum_from_key = any(
+        isinstance(type_anno.keys, intermediate.OurTypeAnnotation)
+        and isinstance(type_anno.keys.our_type, intermediate.Enumeration)
+        for type_anno in dict_type_annotations
+    )
+
     tuple_arities = intermediate.tuple_arities(symbol_table)
 
     #: The array, the set and the tuple helpers all report a non-array and mark
@@ -1616,7 +1829,10 @@ def _generate_deserialize_impl(
     needs_try_model_type_from = needs_check_model_type or len(interfaces) > 0
 
     needs_not_a_json_object = (
-        len(parsed_classes) > 0 or len(interfaces) > 0 or len(named_unions) > 0
+        len(parsed_classes) > 0
+        or len(interfaces) > 0
+        or len(named_unions) > 0
+        or needs_parse_dict
     )
 
     needs_prepend_name = (
@@ -1673,6 +1889,19 @@ def _generate_deserialize_impl(
 
     if needs_parse_set:
         blocks.append(_generate_parse_set_helper())
+
+    if needs_parse_dict:
+        blocks.append(_generate_prepend_key())
+        blocks.append(_generate_parse_dict_helper())
+
+    if needs_parse_string_key:
+        blocks.append(_generate_parse_string_key())
+
+    if needs_parse_long_key:
+        blocks.append(_generate_parse_long_key())
+
+    if needs_try_enum_from_key:
+        blocks.append(_generate_try_enum_from_key_helper())
 
     for arity in tuple_arities:
         blocks.append(_generate_parse_tuple_helper(arity=arity))
@@ -2055,7 +2284,12 @@ def _serialized_value_type(type_anno: intermediate.TypeAnnotationUnion) -> Strip
 def _item_type_annotations(
     type_anno: intermediate.ContainerTypeAnnotation,
 ) -> Sequence[intermediate.TypeAnnotationExceptOptional]:
-    """Give the items of the list, the set or the tuple ``type_anno``, in order."""
+    """
+    Give the items of the list, the set or the tuple ``type_anno``, in order.
+
+    The items of a dictionary are its values. Its keys are written as the names
+    of the members of a JSON object, and not converted by a function of their own.
+    """
     if isinstance(
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
@@ -2065,11 +2299,7 @@ def _item_type_annotations(
         return type_anno.items
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        return [type_anno.values]
 
     assert_never(type_anno)
 
@@ -2101,10 +2331,13 @@ def _serialized_moniker(type_anno: intermediate.TypeAnnotationExceptOptional) ->
         )
 
     if isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys of a dictionary are sorted before they are serialized, as
+        # the items of a set, so we name the serializer after how they are
+        # sorted.
+        return java_common.dict_moniker(
+            java_common.set_items_moniker(type_anno.keys),
+            _serialized_moniker(type_anno.values),
         )
 
     return _serialized_leaf_moniker(type_anno)
@@ -2150,6 +2383,15 @@ def _container_type(type_anno: intermediate.ContainerTypeAnnotation) -> Stripped
 
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
         return Stripped(f"List<{argument_types[0]}>")
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        # NOTE (mristin):
+        # The keys of a dictionary are sorted before they are serialized, so
+        # the dictionary must keep its keys as precise as the sorting needs
+        # them.
+        return Stripped(
+            f"Map<{java_common.generate_type(type_anno.keys)}, {argument_types[0]}>"
+        )
 
     return java_common.tuple_type(argument_types)
 
@@ -2219,10 +2461,47 @@ def _generate_composed_serializer(
     body_indentation = _FUNCTION_BODY_INDENTATION
 
     stmts = [
-        Stripped("final ArrayNode result = JsonNodeFactory.instance.arrayNode();")
+        (
+            Stripped("final ObjectNode result = JsonNodeFactory.instance.objectNode();")
+            if isinstance(type_anno, intermediate.DictTypeAnnotation)
+            else Stripped(
+                "final ArrayNode result = JsonNodeFactory.instance.arrayNode();"
+            )
+        )
     ]  # type: List[Stripped]
 
-    if isinstance(
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        keys_type = java_common.generate_type(type_anno.keys)
+
+        conversion = _serialize_call(
+            type_anno=item_type_annos[0],
+            source_expr=Stripped("that.get(key)"),
+            # The conversion sits inside ``result.set(text, `` in the loop
+            # body, two levels deeper than the body of the function.
+            indentation=body_indentation + 2 * len(I) + len("result.set(text, "),
+        )
+
+        # NOTE (mristin):
+        # A dictionary is serialized as a JSON object whose keys are sorted in
+        # the same order in all the targets. The key is named on the error path
+        # as the name of the member of the JSON object.
+        stmts.append(
+            Stripped(
+                f"""\
+for ({keys_type} key : {java_common.sorted_dict_keys(type_anno.keys, Stripped("that"))}) {{
+{I}final String text = {java_common.dict_key_text(type_anno.keys, Stripped("key"))};
+{I}try {{
+{II}result.set(text, {indent_but_first_line(conversion, II)});
+{I}}} catch (_SerializeFailure failure) {{
+{II}failure.getError().prependSegment(
+{III}new Reporting.KeySegment(text));
+{II}throw failure;
+{I}}}
+}}"""
+            )
+        )
+
+    elif isinstance(
         type_anno, (intermediate.ListTypeAnnotation, intermediate.SetTypeAnnotation)
     ):
         item_type = _serialized_value_type(item_type_annos[0])
@@ -2291,21 +2570,34 @@ try {{
     stmts.append(Stripped("return result;"))
 
     if isinstance(type_anno, intermediate.ListTypeAnnotation):
-        description = "every item of {@code that}"
+        description = "every item of {@code that} into a JSON array"
     elif isinstance(type_anno, intermediate.SetTypeAnnotation):
-        description = "every item of {@code that}, in the sorted order,"
+        description = (
+            "every item of {@code that}, in the sorted order, into a JSON array"
+        )
+    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
+        description = "every item of {@code that}, in the sorted order of the keys, into a JSON object"
     else:
-        description = f"each of the {len(item_type_annos)} items of {{@code that}}"
+        description = (
+            f"each of the {len(item_type_annos)} items of {{@code that}} "
+            f"into a JSON array"
+        )
+
+    result_type = (
+        "ObjectNode"
+        if isinstance(type_anno, intermediate.DictTypeAnnotation)
+        else "ArrayNode"
+    )
 
     writer = io.StringIO()
     writer.write(
         f"""\
 /**
- * Serialize {description} into a JSON array.
+ * Serialize {description}.
  *
  * @param that to be serialized
  */
-private static ArrayNode {name}(
+private static {result_type} {name}(
 {I}{indent_but_first_line(value_type, I)} that) {{
 """
     )
@@ -3048,6 +3340,10 @@ def generate(
 
     if needs_function:
         imports.append(Stripped("import java.util.function.Function;"))
+
+    if intermediate_uses.dict_properties(symbol_table):
+        imports.append(Stripped("import java.util.HashMap;"))
+        imports.append(Stripped("import java.util.regex.Pattern;"))
 
     deserialize_impl_block, deserialize_impl_errors = _generate_deserialize_impl(
         symbol_table=symbol_table

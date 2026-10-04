@@ -46,6 +46,22 @@ std::shared_ptr<
   dummy::types::ISomething
 > LoadMaxSomething();
 
+/**
+ * Load a minimal example of IRegistry by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IRegistry
+> LoadMinRegistry();
+
+/**
+ * Load a maximal example of IRegistry by
+ * de-serializing it from an XML file.
+ */
+std::shared_ptr<
+  dummy::types::IRegistry
+> LoadMaxRegistry();
+
 }  // namespace examples
 }  // namespace common
 }  // namespace test

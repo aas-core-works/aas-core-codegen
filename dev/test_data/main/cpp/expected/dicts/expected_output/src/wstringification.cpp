@@ -21,6 +21,10 @@ const std::unordered_map<
   {
     L"Something",
     types::ModelType::kSomething
+  },
+  {
+    L"Registry",
+    types::ModelType::kRegistry
   }
 };
 
@@ -63,6 +67,8 @@ std::wstring to_wstring(
     return L"Item";
     case types::ModelType::kSomething:
     return L"Something";
+    case types::ModelType::kRegistry:
+    return L"Registry";
     default:
       throw std::invalid_argument(
         common::Concat(
@@ -138,6 +144,77 @@ std::wstring to_wstring(
       throw std::invalid_argument(
         common::Concat(
           "Unexpected Kind literal: ",
+          std::to_string(
+            static_cast<std::uint32_t>(literal)
+          )
+        )
+      );
+  }
+}
+
+const std::unordered_map<
+  std::wstring,
+  types::Direction
+> kDirectionFromWstringMap = {
+  {
+    L"up",
+    types::Direction::kNorth
+  },
+  {
+    L"down",
+    types::Direction::kSouth
+  },
+  {
+    L"right",
+    types::Direction::kEast
+  }
+};
+
+common::optional<types::Direction> DirectionFromWstring(
+  const std::wstring& text
+) {
+  const auto it = kDirectionFromWstringMap.find(
+    text
+  );
+  if (it == kDirectionFromWstringMap.end()) {
+    return {};
+  }
+  return it->second;
+}
+
+types::Direction MustDirectionFromWstring(
+  const std::wstring& text
+) {
+  const auto it = kDirectionFromWstringMap.find(
+    text
+  );
+  if (it == kDirectionFromWstringMap.end()) {
+    throw std::invalid_argument(
+      common::WstringToUtf8(
+        common::Concat(
+          L"Unexpected Direction literal: ",
+          text
+        )
+      )
+    );
+  }
+  return it->second;
+}
+
+std::wstring to_wstring(
+  types::Direction literal
+) {
+  switch (literal) {
+    case types::Direction::kNorth:
+      return L"up";
+    case types::Direction::kSouth:
+      return L"down";
+    case types::Direction::kEast:
+      return L"right";
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected Direction literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )

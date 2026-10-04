@@ -114,19 +114,33 @@ def _parser_name(type_annotation: intermediate.TypeAnnotationUnion) -> Identifie
             intermediate.ListTypeAnnotation,
             intermediate.TupleTypeAnnotation,
             intermediate.SetTypeAnnotation,
+            intermediate.DictTypeAnnotation,
         ),
     ):
         return Identifier(f"_{python_common.type_moniker(type_anno)}_from_jsonable")
 
-    elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
-
     else:
         assert_never(type_anno)
+
+
+def _key_parser_name(
+    keys_type_annotation: intermediate.TypeAnnotationUnion,
+) -> Identifier:
+    """
+    Give out the name of the function parsing a key of a JSON object as the key of
+    a dictionary.
+
+    The integer keys are written as canonical decimal strings, so they need a parser
+    of their own. All the other keys are strings in JSON as well, so they are parsed
+    by the parser of their type.
+    """
+    if (
+        intermediate.try_primitive_type(keys_type_annotation)
+        is intermediate.PrimitiveType.INT
+    ):
+        return Identifier("_int_key_from_jsonable")
+
+    return _parser_name(keys_type_annotation)
 
 
 class _ParserRegistry:
@@ -254,6 +268,51 @@ def {name}(
             ),
         )
 
+    def _register_dict_parser(
+        self, type_annotation: intermediate.DictTypeAnnotation
+    ) -> None:
+        """Register the parser of a dictionary of the ``type_annotation``."""
+        self.note_needed_helper("_dict_from_jsonable")
+
+        parse_key = _key_parser_name(type_annotation.keys)
+        if parse_key == "_int_key_from_jsonable":
+            self.note_needed_helper(parse_key)
+        else:
+            self.register_parser(type_annotation.keys)
+
+        self.register_parser(type_annotation.values)
+
+        name = _parser_name(type_annotation)
+
+        dict_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("our_types")
+        )
+
+        parse_value = _parser_name(type_annotation.values)
+
+        self._add(
+            name,
+            Stripped(
+                f'''\
+def {name}(
+{I}jsonable: Jsonable
+) -> {dict_type}:
+{I}"""
+{I}Parse :paramref:`jsonable` as
+{I}{python_common.describe_value_type(type_annotation)}.
+
+{I}:param jsonable: JSON-able structure to be parsed
+{I}:return: parsed dictionary
+{I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+{I}"""
+{I}return _dict_from_jsonable(
+{II}jsonable,
+{II}{parse_key},
+{II}{parse_value}
+{I})'''
+            ),
+        )
+
     def _register_tuple_parser(
         self, type_annotation: intermediate.TupleTypeAnnotation
     ) -> None:
@@ -352,11 +411,7 @@ def {name}(
             self._register_set_parser(type_anno)
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            self._register_dict_parser(type_anno)
 
         else:
             assert_never(type_anno)
@@ -374,6 +429,8 @@ _HELPER_DEPENDENCIES = {
     "_bytes_from_jsonable": [],
     "_list_from_jsonable": [],
     "_set_from_jsonable": [],
+    "_dict_from_jsonable": [],
+    "_int_key_from_jsonable": [],
     "_json_value_from_jsonable": [],
     "_json_array_from_jsonable": ["_json_value_from_jsonable"],
     "_json_object_from_jsonable": ["_json_value_from_jsonable"],
@@ -681,6 +738,88 @@ def _set_from_jsonable(
 {II}result.add(item)
 
 {I}return result'''
+        ),
+        "_dict_from_jsonable": Stripped(
+            f'''\
+def _dict_from_jsonable(
+{I}jsonable: Jsonable,
+{I}parse_key: Callable[[str], _KeyT],
+{I}parse_value: _Parser[_ValueT]
+) -> Dict[_KeyT, _ValueT]:
+{I}"""
+{I}Parse :paramref:`jsonable` as a dictionary, applying :paramref:`parse_key`
+{I}on every key and :paramref:`parse_value` on every value.
+
+{I}We accept the keys in any order. The duplicate keys can not be detected as
+{I}the JSON object has been already parsed into a mapping.
+
+{I}:param jsonable: JSON-able structure to be parsed
+{I}:param parse_key: to parse a single key of the object
+{I}:param parse_value: to parse a single value of the object
+{I}:return: parsed dictionary
+{I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+{I}"""
+{I}if not isinstance(jsonable, (dict, collections.abc.Mapping)):
+{II}raise DeserializationException(
+{III}f"Expected a mapping, but got: {{type(jsonable)}}"
+{II})
+
+{I}result = dict()  # type: Dict[_KeyT, _ValueT]
+{I}for key, jsonable_value in jsonable.items():
+{II}if not isinstance(key, str):
+{III}raise DeserializationException(
+{IIII}f"Expected only string keys in the mapping, but got "
+{IIII}f"a key of type: {{type(key)}}"
+{III})
+
+{II}try:
+{III}parsed_key = parse_key(key)
+{III}value = parse_value(jsonable_value)
+{II}except DeserializationException as exception:
+{III}exception.path._prepend(KeySegment(jsonable, key))
+{III}raise
+
+{II}result[parsed_key] = value
+
+{I}return result'''
+        ),
+        "_int_key_from_jsonable": Stripped(
+            f'''\
+def _int_key_from_jsonable(
+{I}key: str
+) -> int:
+{I}"""
+{I}Parse :paramref:`key` of a JSON object as an integer key of a dictionary.
+
+{I}The integer keys are written as canonical decimal strings, *i.e.*, with no
+{I}leading zeros, no plus sign, no white space and no negative zero, within
+{I}the range of 64-bit integers.
+
+{I}:param key: to be parsed
+{I}:return: parsed integer
+{I}:raise: :py:class:`DeserializationException` if unexpected :paramref:`key`
+{I}"""
+{I}# NOTE (mristin):
+{I}# ``int`` accepts more than the canonical decimal strings, *e.g.*, ``"01"``,
+{I}# ``" 1"`` or ``"1_0"``, so we check that the integer is written back as
+{I}# the very same string.
+{I}try:
+{II}value = int(key)
+{I}except ValueError:
+{II}value = None
+
+{I}if value is None or str(value) != key:
+{II}raise DeserializationException(
+{III}f"Expected the key to be an integer written as a canonical decimal "
+{III}f"string, but got: {{key!r}}"
+{II})
+
+{I}if not (-9223372036854775808 <= value <= 9223372036854775807):
+{II}raise DeserializationException(
+{III}f"Expected the key to be a 64-bit integer, but got: {{key!r}}"
+{II})
+
+{I}return value'''
         ),
         "_json_value_from_jsonable": Stripped(
             f'''\
@@ -1663,9 +1802,10 @@ def _container_serializer_name(
         intermediate.ListTypeAnnotation,
         intermediate.TupleTypeAnnotation,
         intermediate.SetTypeAnnotation,
+        intermediate.DictTypeAnnotation,
     ],
 ) -> Identifier:
-    """Give out the name of the serializer of a list, a tuple or a set."""
+    """Give out the name of the serializer of a list, a tuple, a set or a dictionary."""
     return Identifier(f"_{python_common.type_moniker(type_annotation)}_to_jsonable")
 
 
@@ -1909,11 +2049,11 @@ def _generate_serialization(
             serializer_name = _container_serializer_name(type_anno)
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
-        )
+        # NOTE (mristin):
+        # A dictionary always needs a serializer of its own, as its keys are
+        # sorted, and the integer keys and the enumeration literals need to be
+        # converted to strings.
+        serializer_name = _container_serializer_name(type_anno)
 
     else:
         assert_never(type_anno)
@@ -2187,6 +2327,80 @@ def {name}(
             ),
         )
 
+    def _register_dict_serializer(
+        self, type_annotation: intermediate.DictTypeAnnotation
+    ) -> None:
+        """Register the serializer of a dictionary of the ``type_annotation``."""
+        keys_type_anno = type_annotation.keys
+        values_type_anno = type_annotation.values
+
+        assert isinstance(keys_type_anno, intermediate.AtomicTypeAnnotationAsTuple), (
+            f"Expected the keys of a dictionary to be atomic, as the other keys "
+            f"are refused in intermediate._translate._verify_keys_of_dicts, "
+            f"but got: {type_annotation}"
+        )
+
+        self.register_serializer(values_type_anno)
+
+        name = _container_serializer_name(type_annotation)
+
+        dict_type = python_common.generate_type(
+            type_annotation, types_module=Identifier("our_types")
+        )
+
+        sorted_keys = python_common.generate_sorted_keys(keys_type_anno, "that")
+
+        jsonable_key: Stripped
+        if (
+            intermediate.try_primitive_type(keys_type_anno)
+            is intermediate.PrimitiveType.INT
+        ):
+            jsonable_key = Stripped("str(key)")
+        elif isinstance(keys_type_anno, intermediate.OurTypeAnnotation) and isinstance(
+            keys_type_anno.our_type, intermediate.Enumeration
+        ):
+            jsonable_key = Stripped("key.value")
+        else:
+            jsonable_key = Stripped("key")
+
+        value_serialization = _generate_serialization(
+            Stripped("that[key]"), values_type_anno
+        )
+
+        # NOTE (mristin):
+        # We sort the keys so that the output is the same in all the targets, see
+        # :py:func:`python_common.generate_sorted_keys`.
+        body = Stripped(
+            f"""\
+jsonable = dict()  # type: Dict[str, MutableJsonable]
+for key in {sorted_keys}:
+{I}jsonable_key = {jsonable_key}
+{I}try:
+{II}jsonable[jsonable_key] = {indent_but_first_line(value_serialization, II)}
+{I}except SerializationException as exception:
+{II}exception._prepend_key(jsonable_key)
+{II}raise
+return jsonable"""
+        )
+
+        self._add(
+            name,
+            Stripped(
+                f'''\
+def {name}(
+{I}that: {dict_type}
+) -> Dict[str, MutableJsonable]:
+{I}"""
+{I}Serialize :paramref:`that` as a JSON object of
+{I}{python_common.describe_value_type(values_type_anno)} with the keys sorted.
+
+{I}:param that: dictionary to be serialized
+{I}:return: JSON-able representation of :paramref:`that`
+{I}"""
+{I}{indent_but_first_line(body, I)}'''
+            ),
+        )
+
     def register_serializer(
         self, type_annotation: intermediate.TypeAnnotationUnion
     ) -> None:
@@ -2245,11 +2459,7 @@ def {name}(
             self._register_set_serializer(type_anno)
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            self._register_dict_serializer(type_anno)
 
         else:
             assert_never(type_anno)
@@ -2580,6 +2790,13 @@ def generate(
     # only then so that the import is never unused.
     set_import = f"{I}Set,\n" if "_set_from_jsonable" in needed_helpers else ""
 
+    # NOTE (mristin):
+    # We define the type of the keys only for the dictionaries so that the type
+    # variable is never unused.
+    key_type_var = (
+        '_KeyT = TypeVar("_KeyT")\n' if "_dict_from_jsonable" in needed_helpers else ""
+    )
+
     # endregion
 
     blocks = [
@@ -2799,7 +3016,7 @@ MutableJsonable = Union[
         Stripped(
             f"""\
 _ValueT = TypeVar("_ValueT")
-
+{key_type_var}
 #: Parse a JSON-able value into a value of the meta-model
 _Parser = Callable[
 {I}[Jsonable],

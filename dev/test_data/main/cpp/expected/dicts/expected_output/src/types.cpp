@@ -182,6 +182,212 @@ bool Something::CountsAreAtLeast(
 
 // endregion Something
 
+// region Registry
+
+Registry::Registry(
+  std::unordered_map<std::wstring, int64_t> counts,
+  std::unordered_map<int64_t, int64_t> counts_by_number,
+  std::unordered_map<Direction, int64_t, common::EnumHash> weights,
+  std::unordered_map<std::wstring, Kind> kinds_by_code,
+  std::unordered_map<std::wstring, std::wstring> codes_by_name,
+  std::unordered_map<
+    std::wstring,
+    std::shared_ptr<IItem>
+  > items_by_name,
+  std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  > labels,
+  common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  > optional_counts
+) {
+  counts_ = std::move(counts);
+
+  counts_by_number_ = std::move(counts_by_number);
+
+  weights_ = std::move(weights);
+
+  kinds_by_code_ = std::move(kinds_by_code);
+
+  codes_by_name_ = std::move(codes_by_name);
+
+  items_by_name_ = std::move(items_by_name);
+
+  labels_ = std::move(labels);
+
+  optional_counts_ = std::move(optional_counts);
+}
+
+ModelType Registry::model_type() const {
+  return ModelType::kRegistry;
+}
+
+const std::unordered_map<std::wstring, int64_t>& Registry::counts() const {
+  return counts_;
+}
+
+std::unordered_map<std::wstring, int64_t>& Registry::mutable_counts() {
+  return counts_;
+}
+
+void Registry::set_counts(
+  std::unordered_map<std::wstring, int64_t> value
+) {
+  counts_ = value;
+}
+
+const std::unordered_map<int64_t, int64_t>& Registry::counts_by_number() const {
+  return counts_by_number_;
+}
+
+std::unordered_map<int64_t, int64_t>& Registry::mutable_counts_by_number() {
+  return counts_by_number_;
+}
+
+void Registry::set_counts_by_number(
+  std::unordered_map<int64_t, int64_t> value
+) {
+  counts_by_number_ = value;
+}
+
+const std::unordered_map<Direction, int64_t, common::EnumHash>& Registry::weights() const {
+  return weights_;
+}
+
+std::unordered_map<Direction, int64_t, common::EnumHash>& Registry::mutable_weights() {
+  return weights_;
+}
+
+void Registry::set_weights(
+  std::unordered_map<Direction, int64_t, common::EnumHash> value
+) {
+  weights_ = value;
+}
+
+const std::unordered_map<std::wstring, Kind>& Registry::kinds_by_code() const {
+  return kinds_by_code_;
+}
+
+std::unordered_map<std::wstring, Kind>& Registry::mutable_kinds_by_code() {
+  return kinds_by_code_;
+}
+
+void Registry::set_kinds_by_code(
+  std::unordered_map<std::wstring, Kind> value
+) {
+  kinds_by_code_ = value;
+}
+
+const std::unordered_map<std::wstring, std::wstring>& Registry::codes_by_name() const {
+  return codes_by_name_;
+}
+
+std::unordered_map<std::wstring, std::wstring>& Registry::mutable_codes_by_name() {
+  return codes_by_name_;
+}
+
+void Registry::set_codes_by_name(
+  std::unordered_map<std::wstring, std::wstring> value
+) {
+  codes_by_name_ = value;
+}
+
+const std::unordered_map<
+  std::wstring,
+  std::shared_ptr<IItem>
+>& Registry::items_by_name() const {
+  return items_by_name_;
+}
+
+std::unordered_map<
+  std::wstring,
+  std::shared_ptr<IItem>
+>& Registry::mutable_items_by_name() {
+  return items_by_name_;
+}
+
+void Registry::set_items_by_name(
+  std::unordered_map<
+    std::wstring,
+    std::shared_ptr<IItem>
+  > value
+) {
+  items_by_name_ = value;
+}
+
+const std::unordered_map<
+  std::wstring,
+  std::vector<
+    std::vector<
+      std::unordered_map<int64_t, std::wstring>
+    >
+  >
+>& Registry::labels() const {
+  return labels_;
+}
+
+std::unordered_map<
+  std::wstring,
+  std::vector<
+    std::vector<
+      std::unordered_map<int64_t, std::wstring>
+    >
+  >
+>& Registry::mutable_labels() {
+  return labels_;
+}
+
+void Registry::set_labels(
+  std::unordered_map<
+    std::wstring,
+    std::vector<
+      std::vector<
+        std::unordered_map<int64_t, std::wstring>
+      >
+    >
+  > value
+) {
+  labels_ = value;
+}
+
+const common::optional<
+  std::unordered_map<std::wstring, int64_t>
+>& Registry::optional_counts() const {
+  return optional_counts_;
+}
+
+common::optional<
+  std::unordered_map<std::wstring, int64_t>
+>& Registry::mutable_optional_counts() {
+  return optional_counts_;
+}
+
+void Registry::set_optional_counts(
+  common::optional<
+    std::unordered_map<std::wstring, int64_t>
+  > value
+) {
+  optional_counts_ = value;
+}
+
+bool Registry::WeightIsAtMost(
+  int64_t maximum
+) const {
+  int64_t total = 0;
+  for (const auto& direction_and_weight : this->weights()) {
+    const int64_t weight = direction_and_weight.second;
+    total = total + weight;
+  }
+  return total <= maximum;
+}
+
+// endregion Registry
+
 // region Is-a functions
 
 bool IsItem(
@@ -191,6 +397,8 @@ bool IsItem(
     case ModelType::kItem:
       return true;
     case ModelType::kSomething:
+      return false;
+    case ModelType::kRegistry:
       return false;
     default:
       throw std::invalid_argument(
@@ -211,6 +419,30 @@ bool IsSomething(
     case ModelType::kItem:
       return false;
     case ModelType::kSomething:
+      return true;
+    case ModelType::kRegistry:
+      return false;
+    default:
+      throw std::invalid_argument(
+        common::Concat(
+          "Unexpected model type: ",
+          std::to_string(
+            static_cast<std::uint32_t>(that.model_type())
+          )
+        )
+      );
+  }
+}
+
+bool IsRegistry(
+  const IClass& that
+) {
+  switch (that.model_type()) {
+    case ModelType::kItem:
+      return false;
+    case ModelType::kSomething:
+      return false;
+    case ModelType::kRegistry:
       return true;
     default:
       throw std::invalid_argument(

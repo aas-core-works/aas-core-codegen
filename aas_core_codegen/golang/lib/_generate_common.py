@@ -161,27 +161,29 @@ func SetDifference[K comparable](
     ),
 ]
 
-#: Sort the items of a set in the order of their serialization
+#: Sort the items of a set, or the keys of a dictionary, in the order of their
+#: serialization
 SORTED_KEYS: Final[Sequence[Stripped]] = [
     Stripped(
         f"""\
-// Collect the items of the set into a slice, sorted by `less`.
+// Collect the keys of the map `m` into a slice, sorted by `less`.
 //
-// The set is represented as a map to empty structs. A nil set gives
-// a nil slice, so that an absent optional set stays absent.
+// A set is represented as a map to empty structs, so this gives its items.
+// A nil map gives a nil slice, so that an absent optional set stays absent.
 //
-// We serialize the sets as arrays whose items are sorted in the same order
-// in all the SDKs, see [LessBool] and [LessOrdered].
-func SortedKeys[K comparable](
-{I}set map[K]struct{{}},
+// We serialize the sets as arrays whose items are sorted, and the dictionaries
+// with their keys sorted, in the same order in all the SDKs, see [LessBool]
+// and [LessOrdered].
+func SortedKeys[K comparable, V any](
+{I}m map[K]V,
 {I}less func(that K, other K) bool,
 ) []K {{
-{I}if set == nil {{
+{I}if m == nil {{
 {II}return nil
 {I}}}
 
-{I}result := make([]K, 0, len(set))
-{I}for k := range set {{
+{I}result := make([]K, 0, len(m))
+{I}for k := range m {{
 {II}result = append(result, k)
 {I}}}
 
@@ -372,7 +374,9 @@ def generate(symbol_table: intermediate.SymbolTable) -> str:
     if intermediate_uses.int_call(symbol_table):
         import_lines.append(f'{I}"fmt"')
 
-    if intermediate_uses.set_properties(symbol_table):
+    if intermediate_uses.set_properties(
+        symbol_table
+    ) or intermediate_uses.dict_properties(symbol_table):
         import_lines.append(f'{I}"sort"')
 
     import_lines.append(f'{I}"strings"')
@@ -646,7 +650,9 @@ func FindStr(text string, sub string, start int64) int64 {{
     if intermediate_uses.set_operations(symbol_table):
         blocks.extend(SET_OPERATIONS)
 
-    if intermediate_uses.set_properties(symbol_table):
+    if intermediate_uses.set_properties(
+        symbol_table
+    ) or intermediate_uses.dict_properties(symbol_table):
         blocks.extend(SORTED_KEYS)
 
     blocks.append(golang_common.WARNING)

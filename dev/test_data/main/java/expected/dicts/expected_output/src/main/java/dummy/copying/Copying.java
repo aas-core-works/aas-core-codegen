@@ -13,6 +13,8 @@ import dummy.visitation.AbstractTransformer;
 import dummy.types.enums.*;
 import dummy.types.impl.*;
 import dummy.types.model.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Allow for making shallow and deep copies of model instances.
@@ -60,6 +62,58 @@ public class Copying
     }
 
     /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static Map<String, IItem> deepDictOf_string_IItem(
+        Map<String, IItem> that) {
+        Map<String, IItem> result = new HashMap<>(that.size());
+        for (Map.Entry<String, IItem> item : that.entrySet()) {
+            result.put(
+                item.getKey(),
+                deep(item.getValue()));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static Map<String, List<List<Map<Long, String>>>> deepDictOf_string_ListOf_ListOf_DictOf_long_string(
+        Map<String, List<List<Map<Long, String>>>> that) {
+        Map<String, List<List<Map<Long, String>>>> result = new HashMap<>(that.size());
+        for (Map.Entry<String, List<List<Map<Long, String>>>> item : that.entrySet()) {
+            result.put(
+                item.getKey(),
+                deepListOf_ListOf_DictOf_long_string(item.getValue()));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<List<Map<Long, String>>> deepListOf_ListOf_DictOf_long_string(
+        List<List<Map<Long, String>>> that) {
+        List<List<Map<Long, String>>> result = new ArrayList<>(that.size());
+        for (List<Map<Long, String>> item : that) {
+            result.add(deepListOf_DictOf_long_string(item));
+        }
+        return result;
+    }
+
+    /**
+     * Make a deep copy of {@code that}, copying its items recursively.
+     */
+    private static List<Map<Long, String>> deepListOf_DictOf_long_string(
+        List<Map<Long, String>> that) {
+        List<Map<Long, String>> result = new ArrayList<>(that.size());
+        for (Map<Long, String> item : that) {
+            result.add(new HashMap<>(item));
+        }
+        return result;
+    }
+
+    /**
      * Dispatch the making of shallow copies.
      */
     private static class _ShallowCopier extends AbstractTransformer<IClass> {
@@ -81,6 +135,21 @@ public class Copying
                 that.getCodes(),
                 that.getItems(),
                 that.getOptionalTexts().orElse(null));
+        }
+
+        @Override
+        public IClass transformRegistry(
+            IRegistry that
+        ) {
+            return new Registry(
+                that.getCounts(),
+                that.getCountsByNumber(),
+                that.getWeights(),
+                that.getKindsByCode(),
+                that.getCodesByName(),
+                that.getItemsByName(),
+                that.getLabels(),
+                that.getOptionalCounts().orElse(null));
         }
     }
 
@@ -107,6 +176,24 @@ public class Copying
                 deepListOf_IItem(that.getItems()),
                 that.getOptionalTexts().isPresent()
                     ? new ArrayList<>(that.getOptionalTexts().get())
+                    : null
+            );
+        }
+
+        @Override
+        public IClass transformRegistry (
+            IRegistry that
+        ) {
+            return new Registry(
+                new HashMap<>(that.getCounts()),
+                new HashMap<>(that.getCountsByNumber()),
+                new HashMap<>(that.getWeights()),
+                new HashMap<>(that.getKindsByCode()),
+                new HashMap<>(that.getCodesByName()),
+                deepDictOf_string_IItem(that.getItemsByName()),
+                deepDictOf_string_ListOf_ListOf_DictOf_long_string(that.getLabels()),
+                that.getOptionalCounts().isPresent()
+                    ? new HashMap<>(that.getOptionalCounts().get())
                     : null
             );
         }

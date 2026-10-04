@@ -990,6 +990,46 @@ std::vector<const typename SetT::value_type*> SortedPointers(
 )
 
 
+#: Define the sorting of the items of a dictionary by their keys, which we need to
+#: serialize and verify the dictionary properties in the same order in all the SDKs
+_SORTED_ITEM_POINTERS_DEFINITION: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * \\brief Sort the pointers to the items of \\p map by their keys with \\p less.
+ *
+ * We sort the pointers instead of the items so that we copy no items.
+ *
+ * \\param map whose items are to be sorted
+ * \\param less comparing two keys
+ * \\return pointers to the items, sorted by their keys
+ */
+template<typename MapT, typename LessT>
+std::vector<const typename MapT::value_type*> SortedItemPointers(
+{I}const MapT& map,
+{I}LessT less
+) {{
+{I}typedef typename MapT::value_type ItemT;
+
+{I}std::vector<const ItemT*> result;
+{I}result.reserve(map.size());
+
+{I}for (const ItemT& item : map) {{
+{II}result.push_back(&item);
+{I}}}
+
+{I}std::sort(
+{II}result.begin(),
+{II}result.end(),
+{II}[&less](const ItemT* that, const ItemT* other) {{
+{III}return less(that->first, other->first);
+{II}}}
+{I});
+
+{I}return result;
+}}"""
+)
+
+
 # fmt: off
 @ensure(
     lambda result:
@@ -1048,8 +1088,11 @@ std::unique_ptr<T> make_unique(
     make_uniques_joined = "\n\n".join(make_uniques)
 
     has_set_properties = intermediate_uses.set_properties(symbol_table)
+    has_dict_properties = intermediate_uses.dict_properties(symbol_table)
 
-    vector_include = "#include <vector>\n" if has_set_properties else ""
+    vector_include = (
+        "#include <vector>\n" if has_set_properties or has_dict_properties else ""
+    )
 
     blocks = [
         Stripped(
@@ -1437,9 +1480,11 @@ size_t LenTuple(const std::tuple<T...>&) {
             *(
                 [_LESS_BY_CODE_POINTS_DECLARATION]
                 if intermediate_uses.sets_of_strings_in_properties(symbol_table)
+                or intermediate_uses.dicts_with_string_keys_in_properties(symbol_table)
                 else []
             ),
             *([_SORTED_POINTERS_DEFINITION] if has_set_properties else []),
+            *([_SORTED_ITEM_POINTERS_DEFINITION] if has_dict_properties else []),
             *(
                 _DICT_HELPERS_DEFINITIONS
                 if intermediate_uses.dicts(symbol_table)
@@ -1497,7 +1542,9 @@ def generate_implementation(
 
     # NOTE (mristin):
     # ``LessByCodePoints`` needs ``std::uint32_t``.
-    if intermediate_uses.sets_of_strings_in_properties(symbol_table):
+    if intermediate_uses.sets_of_strings_in_properties(
+        symbol_table
+    ) or intermediate_uses.dicts_with_string_keys_in_properties(symbol_table):
         std_includes.append("#include <cstdint>")
 
     std_includes_joined = "\n".join(std_includes)
@@ -1729,6 +1776,7 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
         *(
             [_LESS_BY_CODE_POINTS_DEFINITION]
             if intermediate_uses.sets_of_strings_in_properties(symbol_table)
+            or intermediate_uses.dicts_with_string_keys_in_properties(symbol_table)
             else []
         ),
         cpp_common.generate_namespace_closing(namespace),

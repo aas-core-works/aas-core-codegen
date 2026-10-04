@@ -142,6 +142,31 @@ namespace dummy.Tests
             AssertDescendAndVisitorThroughSame(
                 instance);
         }  // public void Test_Descend_against_VisitorThrough_for_Something
+
+        [Test]
+        public void Test_Descend_of_Registry()
+        {
+            Our.Registry instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRegistry());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Our.Tests.Common.TestDataDir,
+                    "Descend",
+                    "Registry",
+                    "maximal.json.trace"));
+        }  // public void Test_Descend_of_Registry
+
+        [Test]
+        public void Test_Descend_against_VisitorThrough_for_Registry()
+        {
+            Our.Registry instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRegistry());
+
+            AssertDescendAndVisitorThroughSame(
+                instance);
+        }  // public void Test_Descend_against_VisitorThrough_for_Registry
     }  // class TestDescendAndVisitorThrough
 }  // namespace dummy.Tests
 

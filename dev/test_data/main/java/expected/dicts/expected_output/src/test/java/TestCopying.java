@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import java.util.Map;
 
 public class TestCopying {
   private static class _DeepEqualiser extends AbstractTransformerWithContext<IClass, Boolean> {
@@ -50,6 +51,25 @@ public class TestCopying {
         && that.getOptionalTexts().equals(casted.getOptionalTexts()));
     }
 
+    @Override
+    public Boolean transformRegistry(IRegistry that, IClass other) {
+      if (!(other instanceof Registry)) {
+        return false;
+      }
+
+      Registry casted = (Registry) other;
+
+      return (
+        that.getCounts().equals(casted.getCounts())
+        && that.getCountsByNumber().equals(casted.getCountsByNumber())
+        && that.getWeights().equals(casted.getWeights())
+        && that.getKindsByCode().equals(casted.getKindsByCode())
+        && that.getCodesByName().equals(casted.getCodesByName())
+        && deepEqualsDictOf_string_IItem(that.getItemsByName(), casted.getItemsByName())
+        && that.getLabels().equals(casted.getLabels())
+        && that.getOptionalCounts().equals(casted.getOptionalCounts()));
+    }
+
     private Boolean deepEqualsListOf_IItem(
       List<IItem> that,
       List<IItem> other) {
@@ -59,6 +79,26 @@ public class TestCopying {
 
       for (int i = 0; i < that.size(); i++) {
         if (!transform(that.get(i), other.get(i))) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private Boolean deepEqualsDictOf_string_IItem(
+      Map<String, IItem> that,
+      Map<String, IItem> other) {
+      if (that.size() != other.size()) {
+        return false;
+      }
+
+      for (Map.Entry<String, IItem> item : that.entrySet()) {
+        if (!other.containsKey(item.getKey())) {
+          return false;
+        }
+
+        if (!transform(item.getValue(), other.get(item.getKey()))) {
           return false;
         }
       }
@@ -87,11 +127,29 @@ public class TestCopying {
       && that.getOptionalTexts().equals(other.getOptionalTexts()));
   }
 
+  private static Boolean RegistryShallowEquals(
+    Registry that,
+    Registry other) {
+    return (
+      that.getCounts().equals(other.getCounts())
+      && that.getCountsByNumber().equals(other.getCountsByNumber())
+      && that.getWeights().equals(other.getWeights())
+      && that.getKindsByCode().equals(other.getKindsByCode())
+      && that.getCodesByName().equals(other.getCodesByName())
+      && that.getItemsByName().equals(other.getItemsByName())
+      && that.getLabels().equals(other.getLabels())
+      && that.getOptionalCounts().equals(other.getOptionalCounts()));
+  }
+
   private static Boolean ItemDeepEquals(Item that, Item other) {
     return DeepEqualiserInstance.transform(that, other);
   }
 
   private static Boolean SomethingDeepEquals(Something that, Something other) {
+    return DeepEqualiserInstance.transform(that, other);
+  }
+
+  private static Boolean RegistryDeepEquals(Registry that, Registry other) {
     return DeepEqualiserInstance.transform(that, other);
   }
 
@@ -134,6 +192,26 @@ public class TestCopying {
       SomethingDeepEquals(instance, instanceCopy),
       "Something");
   } // public void testSomethingDeepCopy
+
+  @Test
+  public void testRegistryShallowCopy() throws IOException {
+    final Registry instance = CommonJsonization.loadMaximalRegistry();
+    final Registry instanceCopy = Copying.shallow(instance);
+
+    assertTrue(
+      RegistryShallowEquals(instance, instanceCopy),
+      "Registry");
+  } // public void testRegistryShallowCopy
+
+  @Test
+  public void testRegistryDeepCopy() throws IOException {
+    final Registry instance = CommonJsonization.loadMaximalRegistry();
+    final Registry instanceCopy = Copying.deep(instance);
+
+    assertTrue(
+      RegistryDeepEquals(instance, instanceCopy),
+      "Registry");
+  } // public void testRegistryDeepCopy
 } // class TestCopying
 
 // package dummy.tests

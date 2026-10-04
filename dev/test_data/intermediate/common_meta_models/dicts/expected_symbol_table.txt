@@ -24,6 +24,30 @@ SymbolTable(
       literal_id_set=...,
       literal_value_set=...,
       parsed=...),
+    Enumeration(
+      name='Direction',
+      literals=[
+        EnumerationLiteral(
+          name='North',
+          value='up',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='South',
+          value='down',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='East',
+          value='right',
+          description=None,
+          parsed=...)],
+      description=None,
+      literals_by_name=...,
+      literals_by_value=...,
+      literal_id_set=...,
+      literal_value_set=...,
+      parsed=...),
     ConstrainedPrimitive(
       name='Code',
       inheritances=[],
@@ -612,21 +636,664 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Registry',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='counts',
+          type_annotation=DictTypeAnnotation(
+            keys=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            values=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='counts',
+          xml_name='counts',
+          parsed=...),
+        Property(
+          name='counts_by_number',
+          type_annotation=DictTypeAnnotation(
+            keys=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            values=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='countsByNumber',
+          xml_name='countsByNumber',
+          parsed=...),
+        Property(
+          name='weights',
+          type_annotation=DictTypeAnnotation(
+            keys=OurTypeAnnotation(
+              our_type='Reference to our type Direction',
+              parsed=...),
+            values=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='weights',
+          xml_name='weights',
+          parsed=...),
+        Property(
+          name='kinds_by_code',
+          type_annotation=DictTypeAnnotation(
+            keys=OurTypeAnnotation(
+              our_type='Reference to our type Code',
+              parsed=...),
+            values=OurTypeAnnotation(
+              our_type='Reference to our type Kind',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='kindsByCode',
+          xml_name='kindsByCode',
+          parsed=...),
+        Property(
+          name='codes_by_name',
+          type_annotation=DictTypeAnnotation(
+            keys=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            values=OurTypeAnnotation(
+              our_type='Reference to our type Code',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='codesByName',
+          xml_name='codesByName',
+          parsed=...),
+        Property(
+          name='items_by_name',
+          type_annotation=DictTypeAnnotation(
+            keys=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            values=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='itemsByName',
+          xml_name='itemsByName',
+          parsed=...),
+        Property(
+          name='labels',
+          type_annotation=DictTypeAnnotation(
+            keys=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            values=ListTypeAnnotation(
+              items=ListTypeAnnotation(
+                items=DictTypeAnnotation(
+                  keys=PrimitiveTypeAnnotation(
+                    a_type='INT',
+                    parsed=...),
+                  values=PrimitiveTypeAnnotation(
+                    a_type='STR',
+                    parsed=...),
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='labels',
+          xml_name='labels',
+          parsed=...),
+        Property(
+          name='optional_counts',
+          type_annotation=OptionalTypeAnnotation(
+            value=DictTypeAnnotation(
+              keys=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              values=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Registry',
+          json_name='optionalCounts',
+          xml_name='optionalCounts',
+          parsed=...)],
+      methods=[
+        UnderstoodMethod(
+          name='weight_is_at_most',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='maximum',
+              type_annotation=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='BOOL',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Check the iteration over the items of a dictionary property.</paragraph>',
+            remarks=[],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to ConcreteClass Registry',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Assignment(
+                target=Name(
+                  identifier='total',
+                  original_node=...),
+                value=Constant(
+                  value=0,
+                  original_node=...),
+                annotation=None,
+                original_node=...)"""),
+            textwrap.dedent("""\
+              For(
+                generator=ForEachItem(
+                  key=Name(
+                    identifier='direction',
+                    original_node=...),
+                  value=Name(
+                    identifier='weight',
+                    original_node=...),
+                  mapping=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='weights',
+                    original_node=...),
+                  original_node=...),
+                body=[
+                  Assignment(
+                    target=Name(
+                      identifier='total',
+                      original_node=...),
+                    value=Add(
+                      left=Name(
+                        identifier='total',
+                        original_node=...),
+                      right=Name(
+                        identifier='weight',
+                        original_node=...),
+                      original_node=...),
+                    annotation=None,
+                    original_node=...)],
+                original_node=...)"""),
+            textwrap.dedent("""\
+              Return(
+                value=Comparison(
+                  left=Name(
+                    identifier='total',
+                    original_node=...),
+                  op='LE',
+                  right=Name(
+                    identifier='maximum',
+                    original_node=...),
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...)],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='counts',
+            type_annotation=DictTypeAnnotation(
+              keys=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              values=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='counts_by_number',
+            type_annotation=DictTypeAnnotation(
+              keys=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              values=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='weights',
+            type_annotation=DictTypeAnnotation(
+              keys=OurTypeAnnotation(
+                our_type='Reference to our type Direction',
+                parsed=...),
+              values=PrimitiveTypeAnnotation(
+                a_type='INT',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='kinds_by_code',
+            type_annotation=DictTypeAnnotation(
+              keys=OurTypeAnnotation(
+                our_type='Reference to our type Code',
+                parsed=...),
+              values=OurTypeAnnotation(
+                our_type='Reference to our type Kind',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='codes_by_name',
+            type_annotation=DictTypeAnnotation(
+              keys=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              values=OurTypeAnnotation(
+                our_type='Reference to our type Code',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='items_by_name',
+            type_annotation=DictTypeAnnotation(
+              keys=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              values=OurTypeAnnotation(
+                our_type='Reference to our type Item',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='labels',
+            type_annotation=DictTypeAnnotation(
+              keys=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              values=ListTypeAnnotation(
+                items=ListTypeAnnotation(
+                  items=DictTypeAnnotation(
+                    keys=PrimitiveTypeAnnotation(
+                      a_type='INT',
+                      parsed=...),
+                    values=PrimitiveTypeAnnotation(
+                      a_type='STR',
+                      parsed=...),
+                    parsed=...),
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='optional_counts',
+            type_annotation=OptionalTypeAnnotation(
+              value=DictTypeAnnotation(
+                keys=PrimitiveTypeAnnotation(
+                  a_type='STR',
+                  parsed=...),
+                values=PrimitiveTypeAnnotation(
+                  a_type='INT',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=True,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='counts',
+              argument='counts',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='counts_by_number',
+              argument='counts_by_number',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='weights',
+              argument='weights',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='kinds_by_code',
+              argument='kinds_by_code',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='codes_by_name',
+              argument='codes_by_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='items_by_name',
+              argument='items_by_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='labels',
+              argument='labels',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_counts',
+              argument='optional_counts',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='counts',
+              argument='counts',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='counts_by_number',
+              argument='counts_by_number',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='weights',
+              argument='weights',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='kinds_by_code',
+              argument='kinds_by_code',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='codes_by_name',
+              argument='codes_by_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='items_by_name',
+              argument='items_by_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='labels',
+              argument='labels',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='optional_counts',
+              argument='optional_counts',
+              default=None)""")]),
+      invariants=[
+        Invariant(
+          description='Weights must sum up to at most 10.',
+          body=textwrap.dedent("""\
+            MethodCall(
+              member=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='weight_is_at_most',
+                original_node=...),
+              args=[
+                Constant(
+                  value=10,
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...),
+        Invariant(
+          description='Optional counts must not be empty, if specified.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='optional_counts',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='optional_counts',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...),
+        Invariant(
+          description='Codes by name must be at most 5 characters long.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='name',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='codes_by_name',
+                  original_node=...),
+                original_node=...),
+              condition=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Index(
+                      collection=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='codes_by_name',
+                        original_node=...),
+                      index=Name(
+                        identifier='name',
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                op='LE',
+                right=Constant(
+                  value=5,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...),
+        Invariant(
+          description='Kinds by code must not be gamma.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='code',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='kinds_by_code',
+                  original_node=...),
+                original_node=...),
+              condition=Comparison(
+                left=Index(
+                  collection=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='kinds_by_code',
+                    original_node=...),
+                  index=Name(
+                    identifier='code',
+                    original_node=...),
+                  original_node=...),
+                op='NE',
+                right=Member(
+                  instance=Name(
+                    identifier='Kind',
+                    original_node=...),
+                  name='Gamma',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...),
+        Invariant(
+          description='Labels must be short.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='nested_labels_are_short',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='labels',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...),
+        Invariant(
+          description='Items must be named by their keys.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='item_names_match_keys',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='items_by_name',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...),
+        Invariant(
+          description='There must be at most five counts by number.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='counts_by_number',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=5,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...),
+        Invariant(
+          description='Counts by number must be smaller than 3.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='all_counts_are_small',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='counts_by_number',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Registry',
+          parsed=...)],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
     'Reference to our type Code',
     'Reference to our type Item',
+    'Reference to our type Registry',
     'Reference to our type Something'],
   enumerations=[
-    'Reference to our type Kind'],
+    'Reference to our type Kind',
+    'Reference to our type Direction'],
   constrained_primitives=[
     'Reference to our type Code'],
   classes=[
     'Reference to our type Item',
-    'Reference to our type Something'],
+    'Reference to our type Something',
+    'Reference to our type Registry'],
   concrete_classes=[
     'Reference to our type Item',
-    'Reference to our type Something'],
+    'Reference to our type Something',
+    'Reference to our type Registry'],
   named_unions=[],
   constants=[],
   constants_by_name=...,
@@ -1225,11 +1892,17 @@ SymbolTable(
           <paragraph>The order of the iteration over a dictionary differs among the targets, so
           the results must not depend on it.</paragraph>"""),
         textwrap.dedent("""\
-          <paragraph>The invariants call the verification functions with the dictionaries built from
-          the properties, so that the live tests run them. The dictionaries of instances and
-          the nested lists of dictionaries can not be built in the invariants, as
-          the instances are read-only there and we can not create a list. The verification
-          functions over them are only compiled.</paragraph>""")],
+          <paragraph>The invariants of <literal>Something</literal> call the verification functions with
+          the dictionaries built from its list properties.</paragraph>"""),
+        textwrap.dedent("""\
+          <paragraph>The class <literal>Registry</literal> holds the dictionaries in its properties, which the targets
+          serialize with the keys sorted. We pick the keys so that a wrong order shows: the
+          strings outside the Basic Multilingual Plane sort differently by UTF-16 code
+          units than by code points, the integers differently as text than numerically, and
+          the literals of <literal>Direction</literal> differently by their names or by their
+          declaration than by their values. We
+          also nest the dictionaries in the lists, hold the instances and the constrained
+          primitives as keys and as values, and check them in the invariants.</paragraph>""")],
       constraints_by_identifier=[],
       parsed=...),
     version='dummy',

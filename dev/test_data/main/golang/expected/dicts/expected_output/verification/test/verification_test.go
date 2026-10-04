@@ -230,6 +230,68 @@ func TestKindRuntimeRange(t *testing.T) {
 	}
 }
 
+func TestDirectionRuntimeRange(t *testing.T) {
+	var gotErr *ourverification.VerificationError
+
+	// No error is expected on the first literal.
+	ourverification.VerifyDirection(
+		ourtypes.Direction(0),
+		func (err *ourverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// No error is expected on the last literal.
+	ourverification.VerifyDirection(
+		ourtypes.Direction(2),
+		func (err *ourverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr != nil {
+		t.Fatalf("Expected no error, but got: %s", gotErr.Message)
+		return
+	}
+
+	// An error is expected before the first literal.
+	gotErr = nil
+	ourverification.VerifyDirection(
+		ourtypes.Direction(0 - 1),
+		func (err *ourverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+
+	// An error is expected after the last literal.
+	gotErr = nil
+	ourverification.VerifyDirection(
+		ourtypes.Direction(2 + 1),
+		func (err *ourverification.VerificationError) bool {
+			gotErr = err
+			return false
+		},
+	)
+
+	if gotErr == nil {
+		t.Fatal("Expected an error, but got none.")
+		return
+	}
+}
+
 func TestItemOK(t *testing.T) {
 	pths := ourtesting.FindFilesBySuffixRecursively(
 		filepath.Join(
@@ -458,6 +520,136 @@ func TestSomethingFail(t *testing.T) {
 			)
 
 			deserialized, deseriaErr := ourjsonization.SomethingFromJsonable(
+				jsonable,
+			)
+			if deseriaErr != nil {
+				t.Fatalf(
+					"Unexpected deserialization error from %s: %s",
+					pth, deseriaErr.Error(),
+				)
+				return
+			}
+
+			var errors []*ourverification.VerificationError
+			ourverification.Verify(
+				deserialized,
+				func(err *ourverification.VerificationError) (abort bool) {
+					errors = append(errors, err)
+					return
+				},
+			)
+
+			ok := assertEqualsExpectedOrRerecordVerificationErrors(
+				t,
+				errors,
+				pth,
+				expectedPth,
+			)
+			if !ok {
+				return
+			}
+		}
+	}
+}
+
+func TestRegistryOK(t *testing.T) {
+	pths := ourtesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			ourtesting.TestDataDir,
+			"Json",
+			"Expected",
+			"Registry",
+		),
+		".json",
+	)
+	sort.Strings(pths)
+
+	for _, pth := range pths {
+		jsonable := ourtesting.MustReadJsonable(
+			pth,
+		)
+
+		deserialized, deseriaErr := ourjsonization.RegistryFromJsonable(
+			jsonable,
+		)
+		if deseriaErr != nil {
+			t.Fatalf(
+				"Unexpected deserialization error from %s: %s",
+				pth, deseriaErr.Error(),
+			)
+			return
+		}
+
+		var errors []*ourverification.VerificationError
+		ourverification.Verify(
+			deserialized,
+			func(veriErr *ourverification.VerificationError) (abort bool) {
+				errors = append(errors, veriErr)
+				return
+			},
+		)
+
+		ok := assertNoVerificationErrors(
+			t,
+			deserialized,
+			pth,
+		)
+		if !ok {
+			return
+		}
+	}
+}
+
+func TestRegistryFail(t *testing.T) {
+	pattern := filepath.Join(
+		ourtesting.TestDataDir,
+		"Json",
+		"Unexpected",
+		"Invalid",
+		"*",  // This asterisk represents the cause.
+		"Registry",
+	)
+
+	causeDirs, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(
+			fmt.Sprintf(
+				"Failed to find cause directories matching %s: %s",
+				pattern, err.Error(),
+			),
+		)
+	}
+
+	for _, causeDir := range causeDirs {
+		pths := ourtesting.FindFilesBySuffixRecursively(
+			causeDir,
+			".json",
+		)
+		sort.Strings(pths)
+
+		for _, pth := range pths {
+			jsonable := ourtesting.MustReadJsonable(
+				pth,
+			)
+
+			relPth, err := filepath.Rel(ourtesting.TestDataDir, pth)
+			if err != nil {
+				panic(
+					fmt.Sprintf(
+						"Failed to compute the relative path of %s to %s: %s",
+						ourtesting.TestDataDir, pth, err.Error(),
+					),
+				)
+			}
+
+			expectedPth := filepath.Join(
+				ourtesting.TestDataDir,
+				"VerificationError",
+				filepath.Dir(relPth),
+				filepath.Base(relPth)+".errors",
+			)
+
+			deserialized, deseriaErr := ourjsonization.RegistryFromJsonable(
 				jsonable,
 			)
 			if deseriaErr != nil {

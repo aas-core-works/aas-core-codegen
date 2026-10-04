@@ -59,6 +59,66 @@ namespace dummy
             return result;
         }
 
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static Dictionary<string, IItem> Deep_DictOf_string_IItem(
+            Dictionary<string, IItem> that)
+        {
+            var result = new Dictionary<string, IItem>(that.Count);
+            foreach (var item in that)
+            {
+                result[item.Key] = Deep(item.Value);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static Dictionary<string, List<List<Dictionary<long, string>>>> Deep_DictOf_string_ListOf_ListOf_DictOf_long_string(
+            Dictionary<string, List<List<Dictionary<long, string>>>> that)
+        {
+            var result = new Dictionary<string, List<List<Dictionary<long, string>>>>(that.Count);
+            foreach (var item in that)
+            {
+                result[item.Key] = Deep_ListOf_ListOf_DictOf_long_string(item.Value);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<List<Dictionary<long, string>>> Deep_ListOf_ListOf_DictOf_long_string(
+            List<List<Dictionary<long, string>>> that)
+        {
+            var result = new List<List<Dictionary<long, string>>>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(Deep_ListOf_DictOf_long_string(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make a deep copy of <paramref name="that" />.
+        /// </summary>
+        private static List<Dictionary<long, string>> Deep_ListOf_DictOf_long_string(
+            List<Dictionary<long, string>> that)
+        {
+            var result = new List<Dictionary<long, string>>(that.Count);
+            foreach (var item in that)
+            {
+                result.Add(new Dictionary<long, string>(item));
+            }
+
+            return result;
+        }
+
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Our.IClass>
         {
@@ -80,6 +140,21 @@ namespace dummy
                     that.Codes,
                     that.Items,
                     that.OptionalTexts);
+            }
+
+            public override Our.IClass TransformRegistry(
+                Our.IRegistry that
+            )
+            {
+                return new Our.Registry(
+                    that.Counts,
+                    that.CountsByNumber,
+                    that.Weights,
+                    that.KindsByCode,
+                    that.CodesByName,
+                    that.ItemsByName,
+                    that.Labels,
+                    that.OptionalCounts);
             }
         }  // internal class ShallowCopier
 
@@ -106,6 +181,24 @@ namespace dummy
                     Deep_ListOf_IItem(that.Items),
                     (that.OptionalTexts != null)
                         ? new List<string>(that.OptionalTexts)
+                        : null
+                );
+            }
+
+            public override Our.IClass TransformRegistry(
+                Our.IRegistry that
+            )
+            {
+                return new Our.Registry(
+                    new Dictionary<string, long>(that.Counts),
+                    new Dictionary<long, long>(that.CountsByNumber),
+                    new Dictionary<Direction, long>(that.Weights),
+                    new Dictionary<string, Kind>(that.KindsByCode),
+                    new Dictionary<string, string>(that.CodesByName),
+                    Deep_DictOf_string_IItem(that.ItemsByName),
+                    Deep_DictOf_string_ListOf_ListOf_DictOf_long_string(that.Labels),
+                    (that.OptionalCounts != null)
+                        ? new Dictionary<string, long>(that.OptionalCounts)
                         : null
                 );
             }

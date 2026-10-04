@@ -88,6 +88,68 @@ std::string to_string(
 );
 
 /**
+ * Try to parse the \p text as a literal of
+ * types::Direction.
+ *
+ * \param text to be parsed
+ * \return literal, or nothing, if \p text invalid
+ */
+common::optional<types::Direction> DirectionFromString(
+  const std::string& text
+);
+
+/**
+ * Parse the \p text as a literal of
+ * types::Direction.
+ *
+ * \param text to be parsed
+ * \return literal
+ * \throw std::invalid_argument if \p text invalid
+ */
+types::Direction MustDirectionFromString(
+  const std::string& text
+);
+
+/**
+ * Translate the enumeration literal \p literal
+ * of types::Direction to text.
+ *
+ * \param literal to be converted into text
+ * \return text representation of \p literal
+ * \throw std::invalid_argument if \p literal invalid
+ */
+std::string to_string(
+  types::Direction literal
+);
+
+/**
+ * \brief Determine the rank of \p literal of types::Direction among
+ * the literals sorted by their text, code point by code point.
+ *
+ * We sort the literals in a set by their rank in the serialization so that
+ * all the SDKs write the same order.
+ *
+ * \param literal to be ranked
+ * \return the rank, or the number of the literals if \p literal is invalid
+ */
+std::uint32_t RankOfDirection(
+  types::Direction literal
+);
+
+/**
+ * \brief Check whether \p that literal of types::Direction comes before
+ * \p other literal, compared by their ranks.
+ *
+ * \param that literal to be compared
+ * \param other literal to compare against
+ * \return `true` if \p that comes before \p other
+ */
+bool LessByRankOfDirection(
+  types::Direction that,
+  types::Direction other
+);
+
+/**
  * Encode the \p bytes with base64 to a std::string.
  *
  * \param bytes to be encoded

@@ -411,6 +411,91 @@ class _Transformer(
             )
             yield error
 
+    # noinspection PyMethodMayBeStatic
+    def transform_registry(
+            self,
+            that: our_types.Registry
+    ) -> Iterator[Error]:
+        if not that.weight_is_at_most(10):
+            yield Error(
+                'Weights must sum up to at most 10.'
+            )
+
+        if not (
+            not (that.optional_counts is not None)
+            or (len(that.optional_counts) > 0)
+        ):
+            yield Error(
+                'Optional counts must not be empty, if specified.'
+            )
+
+        if not (
+            all(
+                len(that.codes_by_name[name]) <= 5
+                for name in that.codes_by_name
+            )
+        ):
+            yield Error(
+                'Codes by name must be at most 5 characters long.'
+            )
+
+        if not (
+            all(
+                that.kinds_by_code[code] != our_types.Kind.GAMMA
+                for code in that.kinds_by_code
+            )
+        ):
+            yield Error(
+                'Kinds by code must not be gamma.'
+            )
+
+        if not nested_labels_are_short(that.labels):
+            yield Error(
+                'Labels must be short.'
+            )
+
+        if not item_names_match_keys(that.items_by_name):
+            yield Error(
+                'Items must be named by their keys.'
+            )
+
+        if not (len(that.counts_by_number) <= 5):
+            yield Error(
+                'There must be at most five counts by number.'
+            )
+
+        if not all_counts_are_small(that.counts_by_number):
+            yield Error(
+                'Counts by number must be smaller than 3.'
+            )
+
+        for error in _verify_dict_of__code__kind(that.kinds_by_code):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'kinds_by_code'
+                )
+            )
+            yield error
+
+        for error in _verify_dict_of__str__code(that.codes_by_name):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'codes_by_name'
+                )
+            )
+            yield error
+
+        for error in _verify_dict_of__str__class(that.items_by_name):
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'items_by_name'
+                )
+            )
+            yield error
+
 
 _TRANSFORMER = _Transformer()
 
@@ -452,6 +537,51 @@ def _verify_list_of__class(
                 IndexSegment(
                     that,
                     i
+                )
+            )
+            yield error
+
+
+def _verify_dict_of__code__kind(
+        that: Mapping[str, our_types.Kind]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for key in sorted(that):
+        for error in verify_code(key):
+            error.path._prepend(
+                KeySegment(
+                    that,
+                    key
+                )
+            )
+            yield error
+
+
+def _verify_dict_of__str__code(
+        that: Mapping[str, str]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for key in sorted(that):
+        for error in verify_code(that[key]):
+            error.path._prepend(
+                KeySegment(
+                    that,
+                    key
+                )
+            )
+            yield error
+
+
+def _verify_dict_of__str__class(
+        that: Mapping[str, our_types.Class]
+) -> Iterator[Error]:
+    """Verify the items of :paramref:`that` recursively."""
+    for key in sorted(that):
+        for error in verify(that[key]):
+            error.path._prepend(
+                KeySegment(
+                    that,
+                    key
                 )
             )
             yield error

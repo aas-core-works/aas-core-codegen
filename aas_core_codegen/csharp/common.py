@@ -326,13 +326,14 @@ def compare_by_rank_of_enumeration_name(
     return Identifier(f"CompareByRankOf{csharp_naming.enum_name(enumeration.name)}")
 
 
-def set_items_comparison(items: intermediate.TypeAnnotationUnion) -> Stripped:
+def sorting_comparison(items: intermediate.TypeAnnotationUnion) -> Stripped:
     """
-    Generate the ``System.Comparison`` which sorts the ``items`` of a set.
+    Generate the ``System.Comparison`` which sorts the ``items`` of a set, or
+    the keys of a dictionary.
 
-    The sets are serialized sorted, in the same order in all the SDKs: ``false``
-    before ``true``, the integers numerically, and the strings and the serialized
-    values of the enumeration literals by their code points.
+    The sets and the dictionaries are serialized sorted, in the same order in all
+    the SDKs: ``false`` before ``true``, the integers numerically, and the strings
+    and the serialized values of the enumeration literals by their code points.
     """
     if isinstance(items, intermediate.OurTypeAnnotation) and isinstance(
         items.our_type, intermediate.Enumeration
@@ -342,8 +343,9 @@ def set_items_comparison(items: intermediate.TypeAnnotationUnion) -> Stripped:
 
     primitive_type = intermediate.try_primitive_type(items)
     assert primitive_type is not None, (
-        f"Expected the items of a set to be primitives, constrained primitives "
-        f"or enumeration literals, but got: {items}"
+        f"Expected the items of a set or the keys of a dictionary to be "
+        f"primitives, constrained primitives or enumeration literals, "
+        f"but got: {items}"
     )
 
     if primitive_type is intermediate.PrimitiveType.BOOL:
@@ -369,6 +371,39 @@ def set_items_comparison(items: intermediate.TypeAnnotationUnion) -> Stripped:
 
     else:
         assert_never(primitive_type)
+
+
+def dict_key_text_expr(
+    keys: intermediate.TypeAnnotationUnion, key_expr: str
+) -> Stripped:
+    """
+    Generate the expression rendering the key at ``key_expr`` as its JSON key.
+
+    The paths of the errors name a value of a dictionary by its key as it is
+    written in JSON, in all the SDKs: the strings as they are, the integers as
+    canonical decimal strings, and the enumeration literals as their serialized
+    values. An invalid enumeration literal has no serialized value, so we fall
+    back to its C# representation.
+    """
+    if isinstance(keys, intermediate.OurTypeAnnotation) and isinstance(
+        keys.our_type, intermediate.Enumeration
+    ):
+        return Stripped(f'Stringification.ToString({key_expr}) ?? $"{{{key_expr}}}"')
+
+    primitive_type = intermediate.try_primitive_type(keys)
+
+    if primitive_type is intermediate.PrimitiveType.STR:
+        return Stripped(key_expr)
+
+    if primitive_type is intermediate.PrimitiveType.INT:
+        return Stripped(
+            f"{key_expr}.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+        )
+
+    raise AssertionError(
+        f"Expected the keys of a dictionary to be strings, integers, constrained "
+        f"primitives of them or enumeration literals, but got: {keys}"
+    )
 
 
 WARNING: Final[Stripped] = Stripped(
@@ -471,8 +506,9 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
     Name the type in a way usable as a part of a C# identifier.
 
     The monikers are a Polish notation over ``_``-separated tokens: ``ListOf``
-    and ``SetOf`` take exactly one argument, ``TupleOf{N}`` exactly ``N`` of them, and
-    everything else is a leaf. A leaf token never contains an underscore
+    and ``SetOf`` take exactly one argument, ``DictOf`` exactly two (the keys and
+    the values), ``TupleOf{N}`` exactly ``N`` of them, and everything else is
+    a leaf. A leaf token never contains an underscore
     (see :py:func:`leaf_moniker`), so the encoding is injective -- two
     different types can not be given the same moniker, and hence neither can
     two different de/serializers be given the same name, nor can two different
@@ -484,6 +520,9 @@ def type_moniker(type_anno: intermediate.TypeAnnotationUnion) -> str:
 
     if isinstance(type_anno, intermediate.SetTypeAnnotation):
         return f"SetOf_{type_moniker(type_anno.items)}"
+
+    if isinstance(type_anno, intermediate.DictTypeAnnotation):
+        return f"DictOf_{type_moniker(type_anno.keys)}_{type_moniker(type_anno.values)}"
 
     if isinstance(type_anno, intermediate.TupleTypeAnnotation):
         joined = "_".join(type_moniker(item) for item in type_anno.items)

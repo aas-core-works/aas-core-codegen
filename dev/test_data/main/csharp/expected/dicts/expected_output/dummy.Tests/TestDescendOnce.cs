@@ -86,6 +86,21 @@ namespace dummy.Tests
                     "Something",
                     "maximal.json.trace"));
         }  // public void Test_Something
+
+        [Test]
+        public void Test_Registry()
+        {
+            Our.Registry instance = (
+                Our.Tests.CommonJsonization.LoadMaximalRegistry());
+
+            CompareOrRerecordTrace(
+                instance,
+                Path.Combine(
+                    Our.Tests.Common.TestDataDir,
+                    "DescendOnce",
+                    "Registry",
+                    "maximal.json.trace"));
+        }  // public void Test_Registry
     }  // class TestDescendOnce
 }  // namespace dummy.Tests
 

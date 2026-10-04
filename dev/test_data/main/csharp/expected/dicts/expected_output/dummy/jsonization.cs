@@ -324,6 +324,102 @@ namespace dummy
                     };
             }
 
+            /// <summary>
+            /// De-serialize every member of a JSON object into a dictionary, its key with
+            /// <paramref name="deserializeKey" /> and its value with
+            /// <paramref name="deserializeValue" />.
+            /// </summary>
+            /// <remarks>
+            /// The key is handed over to <paramref name="deserializeKey" /> as a JSON
+            /// string, so that the strings and the enumeration literals de-serialize
+            /// from it exactly as their values do. The members can come in any order.
+            /// </remarks>
+            /// <typeparam name="TKey">Type of a key</typeparam>
+            /// <typeparam name="TValue">Type of a value</typeparam>
+            private static Deserializer<Dictionary<TKey, TValue>> AsDictOf<TKey, TValue>(
+                Deserializer<TKey> deserializeKey,
+                Deserializer<TValue> deserializeValue) where TKey : notnull
+            {
+                return (
+                    Nodes.JsonNode? node,
+                    out Reporting.Error? error) =>
+                    {
+                        error = null;
+
+                        Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                        if (obj == null)
+                        {
+                            error = new Reporting.Error(
+                                $"Expected a JsonObject, but got {Describe(node)}");
+                            return default!;
+                        }
+
+                        var result = new Dictionary<TKey, TValue>(obj.Count);
+
+                        foreach (var member in obj)
+                        {
+                            TKey key = deserializeKey(
+                                Nodes.JsonValue.Create(member.Key),
+                                out error);
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.KeySegment(member.Key));
+                                return default!;
+                            }
+
+                            TValue value = deserializeValue(member.Value, out error);
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.KeySegment(member.Key));
+                                return default!;
+                            }
+
+                            result[key] = value;
+                        }
+
+                        return result;
+                    };
+            }
+
+            /// <summary>
+            /// De-serialize an integer key of a dictionary from its canonical decimal
+            /// string in <paramref name="node" />.
+            /// </summary>
+            /// <remarks>
+            /// We accept only the canonical form, so that each integer has exactly one
+            /// key: no leading zeros, no plus sign, no white space and no <c>-0</c>.
+            /// </remarks>
+            private static long LongKeyFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                string text = node!.GetValue<string>();
+
+                if (
+                    LongKeyRe.IsMatch(text)
+                    && long.TryParse(
+                        text,
+                        System.Globalization.NumberStyles.AllowLeadingSign,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out long value))
+                {
+                    return value;
+                }
+
+                error = new Reporting.Error(
+                    "Expected the key to be an integer in the canonical decimal form, " +
+                    $"but got: {text}");
+                return default;
+            }
+
+            private static readonly System.Text.RegularExpressions.Regex LongKeyRe = (
+                new System.Text.RegularExpressions.Regex(
+                    @"^(0|-?[1-9][0-9]*)$"));
+
             private static readonly Deserializer<List<string>> Parse_ListOf_string = (
                 AsArrayOf<string>(
                     StringFrom));
@@ -339,6 +435,72 @@ namespace dummy
             private static readonly Deserializer<List<IItem>> Parse_ListOf_IItem = (
                 AsArrayOf<IItem>(
                     ItemFrom));
+
+            private static readonly Deserializer<
+                Dictionary<string, long>
+            > Parse_DictOf_string_long = (
+                AsDictOf<string, long>(
+                    StringFrom,
+                    LongFrom));
+
+            private static readonly Deserializer<Dictionary<long, long>> Parse_DictOf_long_long = (
+                AsDictOf<long, long>(
+                    LongKeyFrom,
+                    LongFrom));
+
+            private static readonly Deserializer<
+                Dictionary<Direction, long>
+            > Parse_DictOf_Direction_long = (
+                AsDictOf<Direction, long>(
+                    DirectionFrom,
+                    LongFrom));
+
+            private static readonly Deserializer<
+                Dictionary<string, Kind>
+            > Parse_DictOf_string_Kind = (
+                AsDictOf<string, Kind>(
+                    StringFrom,
+                    KindFrom));
+
+            private static readonly Deserializer<
+                Dictionary<string, string>
+            > Parse_DictOf_string_string = (
+                AsDictOf<string, string>(
+                    StringFrom,
+                    StringFrom));
+
+            private static readonly Deserializer<
+                Dictionary<string, IItem>
+            > Parse_DictOf_string_IItem = (
+                AsDictOf<string, IItem>(
+                    StringFrom,
+                    ItemFrom));
+
+            private static readonly Deserializer<
+                Dictionary<long, string>
+            > Parse_DictOf_long_string = (
+                AsDictOf<long, string>(
+                    LongKeyFrom,
+                    StringFrom));
+
+            private static readonly Deserializer<
+                List<Dictionary<long, string>>
+            > Parse_ListOf_DictOf_long_string = (
+                AsArrayOf<Dictionary<long, string>>(
+                    Parse_DictOf_long_string));
+
+            private static readonly Deserializer<
+                List<List<Dictionary<long, string>>>
+            > Parse_ListOf_ListOf_DictOf_long_string = (
+                AsArrayOf<List<Dictionary<long, string>>>(
+                    Parse_ListOf_DictOf_long_string));
+
+            private static readonly Deserializer<
+                Dictionary<string, List<List<Dictionary<long, string>>>>
+            > Parse_DictOf_string_ListOf_ListOf_DictOf_long_string = (
+                AsDictOf<string, List<List<Dictionary<long, string>>>>(
+                    StringFrom,
+                    Parse_ListOf_ListOf_DictOf_long_string));
 
             /// <summary>
             /// Deserialize the enumeration Kind from the <paramref name="node" />.
@@ -365,6 +527,32 @@ namespace dummy
 
                 return result.Value;
             }  // internal static KindFrom
+
+            /// <summary>
+            /// Deserialize the enumeration Direction from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Our.Direction DirectionFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                string text = StringFrom(node, out error);
+                if (error != null)
+                {
+                    return default!;
+                }
+
+                Our.Direction? result = Stringification.DirectionFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of Direction");
+                    return default!;
+                }
+
+                return result.Value;
+            }  // internal static DirectionFrom
 
             /// <summary>
             /// Deserialize an instance of Item from <paramref name="node" />.
@@ -545,6 +733,159 @@ namespace dummy
                             "Unexpected null, had to be handled before"),
                     theOptionalTexts);
             }  // internal static SomethingFrom
+
+            /// <summary>
+            /// Deserialize an instance of Registry from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Our.Registry RegistryFrom(
+                Nodes.JsonNode? node,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
+                if (obj == null)
+                {
+                    error = new Reporting.Error(
+                        $"Expected a JsonObject representing Registry, but got {Describe(node)}");
+                    return default!;
+                }
+
+                Dictionary<string, long>? theCounts = null;
+                Dictionary<long, long>? theCountsByNumber = null;
+                Dictionary<Direction, long>? theWeights = null;
+                Dictionary<string, Kind>? theKindsByCode = null;
+                Dictionary<string, string>? theCodesByName = null;
+                Dictionary<string, IItem>? theItemsByName = null;
+                Dictionary<string, List<List<Dictionary<long, string>>>>? theLabels = null;
+                Dictionary<string, long>? theOptionalCounts = null;
+
+                foreach (var keyValue in obj)
+                {
+                    switch (keyValue.Key)
+                    {
+                        case "counts":
+                            theCounts = Parse_DictOf_string_long(
+                                keyValue.Value, out error);
+                            break;
+                        case "countsByNumber":
+                            theCountsByNumber = Parse_DictOf_long_long(
+                                keyValue.Value, out error);
+                            break;
+                        case "weights":
+                            theWeights = Parse_DictOf_Direction_long(
+                                keyValue.Value, out error);
+                            break;
+                        case "kindsByCode":
+                            theKindsByCode = Parse_DictOf_string_Kind(
+                                keyValue.Value, out error);
+                            break;
+                        case "codesByName":
+                            theCodesByName = Parse_DictOf_string_string(
+                                keyValue.Value, out error);
+                            break;
+                        case "itemsByName":
+                            theItemsByName = Parse_DictOf_string_IItem(
+                                keyValue.Value, out error);
+                            break;
+                        case "labels":
+                            theLabels = Parse_DictOf_string_ListOf_ListOf_DictOf_long_string(
+                                keyValue.Value, out error);
+                            break;
+                        case "optionalCounts":
+                            theOptionalCounts = Parse_DictOf_string_long(
+                                keyValue.Value, out error);
+                            break;
+                        default:
+                            error = new Reporting.Error(
+                                $"Unexpected property: {keyValue.Key}");
+                            return default!;
+                    }
+
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                keyValue.Key));
+                        return default!;
+                    }
+                }
+
+                if (theCounts == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"counts\" is missing");
+                    return default!;
+                }
+
+                if (theCountsByNumber == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"countsByNumber\" is missing");
+                    return default!;
+                }
+
+                if (theWeights == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"weights\" is missing");
+                    return default!;
+                }
+
+                if (theKindsByCode == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"kindsByCode\" is missing");
+                    return default!;
+                }
+
+                if (theCodesByName == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"codesByName\" is missing");
+                    return default!;
+                }
+
+                if (theItemsByName == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"itemsByName\" is missing");
+                    return default!;
+                }
+
+                if (theLabels == null)
+                {
+                    error = new Reporting.Error(
+                        "Required property \"labels\" is missing");
+                    return default!;
+                }
+
+                return new Our.Registry(
+                    theCounts
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theCountsByNumber
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theWeights
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theKindsByCode
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theCodesByName
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theItemsByName
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theLabels
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theOptionalCounts);
+            }  // internal static RegistryFrom
         }  // public static class DeserializeImplementation
 
         /// <summary>
@@ -636,6 +977,29 @@ namespace dummy
             }
 
             /// <summary>
+            /// Deserialize an instance of Direction from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Direction.
+            /// </exception>
+            public static Our.Direction DirectionFrom(
+                Nodes.JsonNode node)
+            {
+                Our.Direction result = DeserializeImplementation.DirectionFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
             /// Deserialize an instance of Item from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -671,6 +1035,29 @@ namespace dummy
                 Nodes.JsonNode node)
             {
                 Our.Something result = DeserializeImplementation.SomethingFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result;
+            }
+
+            /// <summary>
+            /// Deserialize an instance of Registry from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of Registry.
+            /// </exception>
+            public static Our.Registry RegistryFrom(
+                Nodes.JsonNode node)
+            {
+                Our.Registry result = DeserializeImplementation.RegistryFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -820,6 +1207,59 @@ namespace dummy
                 };
             }
 
+            /// <summary>
+            /// Compose the serializer of a dictionary whose keys are serialized with
+            /// <paramref name="serializeKey" /> and values with
+            /// <paramref name="serializeValue" />, in the order of the keys given by
+            /// <paramref name="comparison" />.
+            /// </summary>
+            /// <remarks>
+            /// <paramref name="serializeKey" /> needs to give a JSON string. We serialize
+            /// the members sorted by their keys, so that all the SDKs serialize
+            /// a dictionary in the same order.
+            /// </remarks>
+            /// <typeparam name="TKey">Type of a key</typeparam>
+            /// <typeparam name="TValue">Type of a value</typeparam>
+            private static Serializer<Dictionary<TKey, TValue>> SerializeDict<TKey, TValue>(
+                Serializer<TKey> serializeKey,
+                Serializer<TValue> serializeValue,
+                System.Comparison<TKey> comparison) where TKey : notnull
+            {
+                return (that) =>
+                {
+                    var result = new Nodes.JsonObject();
+                    foreach (TKey key in Common.SetHelpers.Sorted(that.Keys, comparison))
+                    {
+                        string? keyText = null;
+                        try
+                        {
+                            keyText = serializeKey(key)!.GetValue<string>();
+                            result[keyText] = serializeValue(that[key]);
+                        }
+                        catch (SerializationFailure failure)
+                        {
+                            failure.Error.PrependSegment(
+                                new Reporting.KeySegment(keyText ?? $"{key}"));
+                            throw;
+                        }
+                    }
+                    return result;
+                };
+            }
+
+            /// <summary>
+            /// Serialize an integer key of a dictionary as its canonical decimal string.
+            /// </summary>
+            /// <remarks>
+            /// <c>Nodes.JsonValue.Create</c> returns null only for a null string, which
+            /// a formatted integer never is.
+            /// </remarks>
+            private static Nodes.JsonNode LongKeyToJsonValue(long that)
+            {
+                return Nodes.JsonValue.Create(
+                    that.ToString(System.Globalization.CultureInfo.InvariantCulture))!;
+            }
+
             private static readonly Serializer<List<string>> Serialize_ListOf_string = (
                 SerializeList<string>(
                     ToJsonValue));
@@ -835,6 +1275,82 @@ namespace dummy
             private static readonly Serializer<List<IItem>> Serialize_ListOf_IItem = (
                 SerializeList<IItem>(
                     TransformIClass));
+
+            private static readonly Serializer<
+                Dictionary<string, long>
+            > Serialize_DictOf_string_long = (
+                SerializeDict<string, long>(
+                    ToJsonValue,
+                    ToJsonValue,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly Serializer<
+                Dictionary<long, long>
+            > Serialize_DictOf_long_long = (
+                SerializeDict<long, long>(
+                    LongKeyToJsonValue,
+                    ToJsonValue,
+                    System.Collections.Generic.Comparer<long>.Default.Compare));
+
+            private static readonly Serializer<
+                Dictionary<Direction, long>
+            > Serialize_DictOf_Direction_long = (
+                SerializeDict<Direction, long>(
+                    Serialize.DirectionToJsonValue,
+                    ToJsonValue,
+                    Common.SetHelpers.CompareByRankOfDirection));
+
+            private static readonly Serializer<
+                Dictionary<string, Kind>
+            > Serialize_DictOf_string_Kind = (
+                SerializeDict<string, Kind>(
+                    ToJsonValue,
+                    Serialize.KindToJsonValue,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly Serializer<
+                Dictionary<string, string>
+            > Serialize_DictOf_string_string = (
+                SerializeDict<string, string>(
+                    ToJsonValue,
+                    ToJsonValue,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly Serializer<
+                Dictionary<string, IItem>
+            > Serialize_DictOf_string_IItem = (
+                SerializeDict<string, IItem>(
+                    ToJsonValue,
+                    TransformIClass,
+                    Common.SetHelpers.CompareByCodePoints));
+
+            private static readonly Serializer<
+                Dictionary<long, string>
+            > Serialize_DictOf_long_string = (
+                SerializeDict<long, string>(
+                    LongKeyToJsonValue,
+                    ToJsonValue,
+                    System.Collections.Generic.Comparer<long>.Default.Compare));
+
+            private static readonly Serializer<
+                List<Dictionary<long, string>>
+            > Serialize_ListOf_DictOf_long_string = (
+                SerializeList<Dictionary<long, string>>(
+                    Serialize_DictOf_long_string));
+
+            private static readonly Serializer<
+                List<List<Dictionary<long, string>>>
+            > Serialize_ListOf_ListOf_DictOf_long_string = (
+                SerializeList<List<Dictionary<long, string>>>(
+                    Serialize_ListOf_DictOf_long_string));
+
+            private static readonly Serializer<
+                Dictionary<string, List<List<Dictionary<long, string>>>>
+            > Serialize_DictOf_string_ListOf_ListOf_DictOf_long_string = (
+                SerializeDict<string, List<List<Dictionary<long, string>>>>(
+                    ToJsonValue,
+                    Serialize_ListOf_ListOf_DictOf_long_string,
+                    Common.SetHelpers.CompareByCodePoints));
 
             private static readonly Serializer<string> Serialize_string = ToJsonValue;
 
@@ -908,6 +1424,69 @@ namespace dummy
 
                 return result;
             }
+
+            public override Nodes.JsonObject TransformRegistry(
+                Our.IRegistry that
+            )
+            {
+                var result = new Nodes.JsonObject();
+
+                SetProperty(result, "counts", "Counts", that.Counts, Serialize_DictOf_string_long);
+
+                SetProperty(
+                    result,
+                    "countsByNumber",
+                    "CountsByNumber",
+                    that.CountsByNumber,
+                    Serialize_DictOf_long_long);
+
+                SetProperty(
+                    result,
+                    "weights",
+                    "Weights",
+                    that.Weights,
+                    Serialize_DictOf_Direction_long);
+
+                SetProperty(
+                    result,
+                    "kindsByCode",
+                    "KindsByCode",
+                    that.KindsByCode,
+                    Serialize_DictOf_string_Kind);
+
+                SetProperty(
+                    result,
+                    "codesByName",
+                    "CodesByName",
+                    that.CodesByName,
+                    Serialize_DictOf_string_string);
+
+                SetProperty(
+                    result,
+                    "itemsByName",
+                    "ItemsByName",
+                    that.ItemsByName,
+                    Serialize_DictOf_string_IItem);
+
+                SetProperty(
+                    result,
+                    "labels",
+                    "Labels",
+                    that.Labels,
+                    Serialize_DictOf_string_ListOf_ListOf_DictOf_long_string);
+
+                if (that.OptionalCounts != null)
+                {
+                    SetProperty(
+                        result,
+                        "optionalCounts",
+                        "OptionalCounts",
+                        that.OptionalCounts,
+                        Serialize_DictOf_string_long);
+                }
+
+                return result;
+            }
         }  // internal class Transformer
 
         /// <summary>
@@ -962,6 +1541,23 @@ namespace dummy
                     ?? throw new SerializationFailure(
                         new Reporting.Error(
                             $"Invalid Kind: {that}"));
+            }
+
+            /// <summary>
+            /// Serialize a literal of Direction into a JSON string.
+            /// </summary>
+            /// <exception cref="SerializationFailure">
+            /// Thrown when <paramref name="that" /> is no literal of Direction at all.
+            /// <see cref="ToJsonObject" /> converts it, so a caller which serializes
+            /// a whole instance catches <see cref="SerializationException" /> instead.
+            /// </exception>
+            public static Nodes.JsonValue DirectionToJsonValue(Our.Direction that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new SerializationFailure(
+                        new Reporting.Error(
+                            $"Invalid Direction: {that}"));
             }
         }  // public static class Serialize
     }  // public static class Jsonization

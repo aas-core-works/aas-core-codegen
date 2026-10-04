@@ -31,6 +31,25 @@ namespace dummy.Tests
                 "\"alpha\"",
                 serialized.ToJsonString());
         }  // void Test_round_trip_Kind
+
+        [Test]
+        public void Test_round_trip_Direction()
+        {
+            var node = Nodes.JsonValue.Create(
+                "up")
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected null node");
+
+            var parsed = Our.Jsonization.Deserialize.DirectionFrom(
+                node);
+
+            var serialized = Our.Jsonization.Serialize.DirectionToJsonValue(
+                parsed);
+
+            Assert.AreEqual(
+                "\"up\"",
+                serialized.ToJsonString());
+        }  // void Test_round_trip_Direction
     }  // class TestJsonizationOfEnums
 }  // namespace dummy.Tests
 

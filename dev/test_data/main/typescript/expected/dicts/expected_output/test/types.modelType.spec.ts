@@ -67,6 +67,35 @@ test("model type to string of Something", () => {
   );
 });
 
+test("model type of Registry", () => {
+  const instance = TestCommonJsonization.loadMinimalRegistry();
+
+  expect(instance.modelType()).toStrictEqual(
+    OurTypes.ModelType.Registry
+  );
+});
+
+test("model type from string of Registry", () => {
+  const text = "Registry";
+  const literal = OurStringification.modelTypeFromString(
+    text
+  );
+
+  expect(literal).toStrictEqual(
+    OurTypes.ModelType.Registry
+  );
+});
+
+test("model type to string of Registry", () => {
+  const text = OurStringification.mustModelTypeToString(
+    OurTypes.ModelType.Registry
+  );
+
+  expect(text).toStrictEqual(
+    "Registry"
+  );
+});
+
 test("model type from invalid string", () => {
   const text = "This is definitely not a valid model type.";
   const literal = OurStringification.modelTypeFromString(

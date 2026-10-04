@@ -36,6 +36,20 @@ TEST_CASE("Test ModelType round-trip") {
     )
     == L"Something"
   );
+
+  REQUIRE(
+    our::types::ModelType::kRegistry
+    == our::wstringification::MustModelTypeFromWstring(
+      L"Registry"
+    )
+  );
+
+  REQUIRE(
+    our::wstringification::to_wstring(
+      our::types::ModelType::kRegistry
+    )
+    == L"Registry"
+  );
 }
 
 TEST_CASE("Test failure on ModelType") {
@@ -109,6 +123,65 @@ TEST_CASE("Test failure on Kind") {
       L"Totally utterly invalid"
     ),
     "Unexpected Kind literal: Totally utterly invalid"
+  );
+}
+
+TEST_CASE("Test Direction round-trip") {
+  REQUIRE(
+    our::types::Direction::kNorth
+    == our::wstringification::MustDirectionFromWstring(
+      L"up"
+    )
+  );
+
+  REQUIRE(
+    our::wstringification::to_wstring(
+      our::types::Direction::kNorth
+    )
+    == L"up"
+  );
+
+  REQUIRE(
+    our::types::Direction::kSouth
+    == our::wstringification::MustDirectionFromWstring(
+      L"down"
+    )
+  );
+
+  REQUIRE(
+    our::wstringification::to_wstring(
+      our::types::Direction::kSouth
+    )
+    == L"down"
+  );
+
+  REQUIRE(
+    our::types::Direction::kEast
+    == our::wstringification::MustDirectionFromWstring(
+      L"right"
+    )
+  );
+
+  REQUIRE(
+    our::wstringification::to_wstring(
+      our::types::Direction::kEast
+    )
+    == L"right"
+  );
+}
+
+TEST_CASE("Test failure on Direction") {
+  CHECK(
+    !our::wstringification::DirectionFromWstring(
+      L"Totally utterly invalid"
+    ).has_value()
+  );
+
+  REQUIRE_THROWS_WITH(
+    our::wstringification::MustDirectionFromWstring(
+      L"Totally utterly invalid"
+    ),
+    "Unexpected Direction literal: Totally utterly invalid"
   );
 }
 

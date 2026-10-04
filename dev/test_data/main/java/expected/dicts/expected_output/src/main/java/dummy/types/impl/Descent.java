@@ -9,6 +9,7 @@ import dummy.common.*;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -39,6 +40,24 @@ final class Descent {
     return that.stream().flatMap(item ->
       Stream.concat(Stream.<IClass>of(item),
         StreamSupport.stream(item.descend().spliterator(), false)));
+  }
+
+  /**
+   * Iterate over the class instances held by {@code that}.
+   *
+   * <p>If {@code recurse} is set, descend recursively into the instances
+   * as well.
+   */
+  static Stream<IClass> descendDictOf_string_IItem(
+    Map<String, IItem> that,
+    boolean recurse) {
+    if (!recurse) {
+      return SetHelpers.sortedByCodePoints(that.keySet()).stream().<IClass>map(key -> that.get(key));
+    }
+
+    return SetHelpers.sortedByCodePoints(that.keySet()).stream().flatMap(key ->
+      Stream.concat(Stream.<IClass>of(that.get(key)),
+        StreamSupport.stream(that.get(key).descend().spliterator(), false)));
   }
 }
 

@@ -1,0 +1,13 @@
+{
+  "counts": {},
+  "countsByNumber": {},
+  "weights": {},
+  "kindsByCode": {},
+  "codesByName": {},
+  "itemsByName": {
+    "x": {
+      "name": "y"
+    }
+  },
+  "labels": {}
+}

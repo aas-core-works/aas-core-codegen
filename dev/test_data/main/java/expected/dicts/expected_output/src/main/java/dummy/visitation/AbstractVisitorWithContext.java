@@ -29,6 +29,10 @@ public abstract class AbstractVisitorWithContext<ContextT>
     ISomething that,
     ContextT context
   );
+  public abstract void visitRegistry(
+    IRegistry that,
+    ContextT context
+  );
 }
 
 /*

@@ -512,11 +512,38 @@ Stream.concat(
                 )
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            # NOTE (mristin):
+            # We descend into the values of a dictionary in the order of their
+            # keys in which they are serialized, so that the order is the same
+            # in all the targets. The keys never hold any instances.
+            sorted_keys = java_common.sorted_dict_keys(type_anno.keys, Stripped("that"))
+
+            if not recurse and isinstance(
+                type_anno.values, intermediate.OurTypeAnnotation
+            ):
+                instance_expr = (
+                    "that.get(key).getUnderlying()"
+                    if isinstance(type_anno.values.our_type, intermediate.NamedUnion)
+                    else "that.get(key)"
+                )
+
+                stream = Stripped(
+                    f"{sorted_keys}.stream().<IClass>map(key -> {instance_expr})"
+                )
+            else:
+                value_stream = _generate_descend_into(
+                    expr="that.get(key)",
+                    type_anno=type_anno.values,
+                    recurse=recurse,
+                    recurse_expr="recurse",
+                    descendability=descendability,
+                )
+
+                stream = Stripped(
+                    f"""\
+{sorted_keys}.stream().flatMap(key ->
+{I}{indent_but_first_line(value_stream, I)})"""
+                )
 
         else:
             assert_never(type_anno)
@@ -731,7 +758,11 @@ def _generate_imports_for_interface(
     imports.extend(java_common.set_imports_if_necessary(cls, with_bodies=False))
 
     imports.extend(
-        java_common.dict_imports_if_necessary(cls.methods, with_bodies=False)
+        java_common.dict_imports_if_necessary(
+            cls.methods,
+            with_bodies=False,
+            properties=cls.properties,
+        )
     )
 
     if len(cls.inheritances) == 0:
@@ -788,7 +819,11 @@ def _generate_imports_for_class(
 
     imports.extend(java_common.set_imports_if_necessary(cls, with_bodies=True))
 
-    imports.extend(java_common.dict_imports_if_necessary(cls.methods, with_bodies=True))
+    imports.extend(
+        java_common.dict_imports_if_necessary(
+            cls.methods, with_bodies=True, properties=cls.properties
+        )
+    )
 
     if _has_descendable_properties(cls):
         imports.extend(
@@ -2593,14 +2628,21 @@ def generate(
 
                 # NOTE (mristin):
                 # The method spells out the type of the container, so we need to
-                # import the sets nested in it as well.
-                if any(
-                    isinstance(nested, intermediate.SetTypeAnnotation)
-                    for nested in intermediate.over_type_annotation_and_nested_type_annotations(
-                        type_anno
-                    )
+                # import the sets, the lists and the dictionaries nested in it as
+                # well.
+                for (
+                    nested
+                ) in intermediate.over_type_annotation_and_nested_type_annotations(
+                    type_anno
                 ):
-                    descent_imports.add(Stripped("java.util.Set"))
+                    if isinstance(nested, intermediate.SetTypeAnnotation):
+                        descent_imports.add(Stripped("java.util.Set"))
+                    elif isinstance(nested, intermediate.ListTypeAnnotation):
+                        descent_imports.add(Stripped("java.util.List"))
+                    elif isinstance(nested, intermediate.DictTypeAnnotation):
+                        descent_imports.add(Stripped("java.util.Map"))
+                    else:
+                        pass
 
                 descent_methods.append(
                     _generate_descend_into_container(

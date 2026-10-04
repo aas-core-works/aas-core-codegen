@@ -374,6 +374,14 @@ namespace dummy
                 (int)Our.Kind.Beta,
                 (int)Our.Kind.Gamma
             };
+
+            internal static readonly HashSet<int> ForDirection = new HashSet<int>
+            {
+
+                (int)Our.Direction.North,
+                (int)Our.Direction.South,
+                (int)Our.Direction.East
+            };
         }  // internal static class EnumValueSet
 
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -484,6 +492,111 @@ namespace dummy
                     yield return error;
                 }
             }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> TransformRegistry(
+                Our.IRegistry that
+            )
+            {
+                if (!that.WeightIsAtMost(10))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Weights must sum up to at most 10.");
+                }
+
+                if (!(
+                    !(that.OptionalCounts != null)
+                    || (that.OptionalCounts.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Optional counts must not be empty, if specified.");
+                }
+
+                if (!(
+                    that.CodesByName.Keys.All(
+                        name => Common.StringHelpers.Len(that.CodesByName[name]) <= 5)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Codes by name must be at most 5 characters long.");
+                }
+
+                if (!(
+                    that.KindsByCode.Keys.All(
+                        code => that.KindsByCode[code] != Kind.Gamma)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Kinds by code must not be gamma.");
+                }
+
+                if (!Verification.NestedLabelsAreShort(that.Labels))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Labels must be short.");
+                }
+
+                if (!Verification.ItemNamesMatchKeys(that.ItemsByName))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Items must be named by their keys.");
+                }
+
+                if (!(that.CountsByNumber.Count <= 5))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "There must be at most five counts by number.");
+                }
+
+                if (!(
+                    Verification.AllCountsAreSmall(that.CountsByNumber)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Counts by number must be smaller than 3.");
+                }
+
+                foreach (
+                    var error in Verification.Verify_DictOf_Direction_long(
+                        that.Weights))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment("weights"));
+                    yield return error;
+                }
+
+                foreach (
+                    var error in Verification.Verify_DictOf_Code_Kind(
+                        that.KindsByCode))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment("kindsByCode"));
+                    yield return error;
+                }
+
+                foreach (
+                    var error in Verification.Verify_DictOf_string_Code(
+                        that.CodesByName))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment("codesByName"));
+                    yield return error;
+                }
+
+                foreach (
+                    var error in Verification.Verify_DictOf_string_IItem(
+                        that.ItemsByName))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment("itemsByName"));
+                    yield return error;
+                }
+            }
         }  // private class Transformer
 
         /// <summary>
@@ -511,6 +624,20 @@ namespace dummy
             {
                 yield return new Reporting.Error(
                     $"Invalid Kind: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDirection(
+            Our.Direction that)
+        {
+            if (!EnumValueSet.ForDirection.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid Direction: {that}");
             }
         }
 
@@ -582,6 +709,101 @@ namespace dummy
                     yield return error;
                 }
                 index++;
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_DictOf_Direction_long(
+            Dictionary<Our.Direction, long> that)
+        {
+            foreach (
+                var key in Common.SetHelpers.Sorted(
+                    that.Keys,
+                    Common.SetHelpers.CompareByRankOfDirection))
+            {
+                string keyText = Stringification.ToString(key) ?? $"{key}";
+
+                foreach (var error in Verification.VerifyDirection(key))
+                {
+                    error.PrependSegment(
+                        new Reporting.KeySegment(keyText));
+                    yield return error;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_DictOf_Code_Kind(
+            Dictionary<string, Our.Kind> that)
+        {
+            foreach (
+                var key in Common.SetHelpers.Sorted(
+                    that.Keys,
+                    Common.SetHelpers.CompareByCodePoints))
+            {
+                string keyText = key;
+
+                foreach (var error in Verification.VerifyCode(key))
+                {
+                    error.PrependSegment(
+                        new Reporting.KeySegment(keyText));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.VerifyKind(that[key]))
+                {
+                    error.PrependSegment(
+                        new Reporting.KeySegment(keyText));
+                    yield return error;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_DictOf_string_Code(
+            Dictionary<string, string> that)
+        {
+            foreach (
+                var key in Common.SetHelpers.Sorted(
+                    that.Keys,
+                    Common.SetHelpers.CompareByCodePoints))
+            {
+                string keyText = key;
+
+                foreach (var error in Verification.VerifyCode(that[key]))
+                {
+                    error.PrependSegment(
+                        new Reporting.KeySegment(keyText));
+                    yield return error;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verify the items of <paramref name="that" /> recursively.
+        /// </summary>
+        private static IEnumerable<Reporting.Error> Verify_DictOf_string_IItem(
+            Dictionary<string, Our.IItem> that)
+        {
+            foreach (
+                var key in Common.SetHelpers.Sorted(
+                    that.Keys,
+                    Common.SetHelpers.CompareByCodePoints))
+            {
+                string keyText = key;
+
+                foreach (var error in Verification.Verify(that[key]))
+                {
+                    error.PrependSegment(
+                        new Reporting.KeySegment(keyText));
+                    yield return error;
+                }
             }
         }
     }  // public static class Verification

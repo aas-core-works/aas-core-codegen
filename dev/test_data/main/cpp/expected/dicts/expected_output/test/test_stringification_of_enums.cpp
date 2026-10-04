@@ -36,6 +36,20 @@ TEST_CASE("Test ModelType round-trip") {
     )
     == "Something"
   );
+
+  REQUIRE(
+    our::types::ModelType::kRegistry
+    == our::stringification::MustModelTypeFromString(
+      "Registry"
+    )
+  );
+
+  REQUIRE(
+    our::stringification::to_string(
+      our::types::ModelType::kRegistry
+    )
+    == "Registry"
+  );
 }
 
 TEST_CASE("Test failure on ModelType") {
@@ -109,6 +123,65 @@ TEST_CASE("Test failure on Kind") {
       "Totally utterly invalid"
     ),
     "Unexpected Kind literal: Totally utterly invalid"
+  );
+}
+
+TEST_CASE("Test Direction round-trip") {
+  REQUIRE(
+    our::types::Direction::kNorth
+    == our::stringification::MustDirectionFromString(
+      "up"
+    )
+  );
+
+  REQUIRE(
+    our::stringification::to_string(
+      our::types::Direction::kNorth
+    )
+    == "up"
+  );
+
+  REQUIRE(
+    our::types::Direction::kSouth
+    == our::stringification::MustDirectionFromString(
+      "down"
+    )
+  );
+
+  REQUIRE(
+    our::stringification::to_string(
+      our::types::Direction::kSouth
+    )
+    == "down"
+  );
+
+  REQUIRE(
+    our::types::Direction::kEast
+    == our::stringification::MustDirectionFromString(
+      "right"
+    )
+  );
+
+  REQUIRE(
+    our::stringification::to_string(
+      our::types::Direction::kEast
+    )
+    == "right"
+  );
+}
+
+TEST_CASE("Test failure on Direction") {
+  CHECK(
+    !our::stringification::DirectionFromString(
+      "Totally utterly invalid"
+    ).has_value()
+  );
+
+  REQUIRE_THROWS_WITH(
+    our::stringification::MustDirectionFromString(
+      "Totally utterly invalid"
+    ),
+    "Unexpected Direction literal: Totally utterly invalid"
   );
 }
 

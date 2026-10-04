@@ -230,6 +230,7 @@ MutableJsonable = Union[
 
 
 _ValueT = TypeVar("_ValueT")
+_KeyT = TypeVar("_KeyT")
 
 #: Parse a JSON-able value into a value of the meta-model
 _Parser = Callable[
@@ -338,6 +339,247 @@ def _list_from_jsonable(
     return result
 
 
+def _dict_from_jsonable(
+    jsonable: Jsonable,
+    parse_key: Callable[[str], _KeyT],
+    parse_value: _Parser[_ValueT]
+) -> Dict[_KeyT, _ValueT]:
+    """
+    Parse :paramref:`jsonable` as a dictionary, applying :paramref:`parse_key`
+    on every key and :paramref:`parse_value` on every value.
+
+    We accept the keys in any order. The duplicate keys can not be detected as
+    the JSON object has been already parsed into a mapping.
+
+    :param jsonable: JSON-able structure to be parsed
+    :param parse_key: to parse a single key of the object
+    :param parse_value: to parse a single value of the object
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    if not isinstance(jsonable, (dict, collections.abc.Mapping)):
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
+
+    result = dict()  # type: Dict[_KeyT, _ValueT]
+    for key, jsonable_value in jsonable.items():
+        if not isinstance(key, str):
+            raise DeserializationException(
+                f"Expected only string keys in the mapping, but got "
+                f"a key of type: {type(key)}"
+            )
+
+        try:
+            parsed_key = parse_key(key)
+            value = parse_value(jsonable_value)
+        except DeserializationException as exception:
+            exception.path._prepend(KeySegment(jsonable, key))
+            raise
+
+        result[parsed_key] = value
+
+    return result
+
+
+def _int_key_from_jsonable(
+    key: str
+) -> int:
+    """
+    Parse :paramref:`key` of a JSON object as an integer key of a dictionary.
+
+    The integer keys are written as canonical decimal strings, *i.e.*, with no
+    leading zeros, no plus sign, no white space and no negative zero, within
+    the range of 64-bit integers.
+
+    :param key: to be parsed
+    :return: parsed integer
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`key`
+    """
+    # NOTE (mristin):
+    # ``int`` accepts more than the canonical decimal strings, *e.g.*, ``"01"``,
+    # ``" 1"`` or ``"1_0"``, so we check that the integer is written back as
+    # the very same string.
+    try:
+        value = int(key)
+    except ValueError:
+        value = None
+
+    if value is None or str(value) != key:
+        raise DeserializationException(
+            f"Expected the key to be an integer written as a canonical decimal "
+            f"string, but got: {key!r}"
+        )
+
+    if not (-9223372036854775808 <= value <= 9223372036854775807):
+        raise DeserializationException(
+            f"Expected the key to be a 64-bit integer, but got: {key!r}"
+        )
+
+    return value
+
+
+def _dict_of__direction__int_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[our_types.Direction, int]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of :py:class:`.types.Direction` to ``int``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        direction_from_jsonable,
+        _int_from_jsonable
+    )
+
+
+def _dict_of__int__int_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[int, int]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of ``int`` to ``int``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        _int_key_from_jsonable,
+        _int_from_jsonable
+    )
+
+
+def _dict_of__int__str_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[int, str]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of ``int`` to ``str``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        _int_key_from_jsonable,
+        _str_from_jsonable
+    )
+
+
+def _dict_of__str__int_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[str, int]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of ``str`` to ``int``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        _str_from_jsonable,
+        _int_from_jsonable
+    )
+
+
+def _dict_of__str__item_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[str, our_types.Item]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of ``str`` to :py:class:`.types.Item`.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        _str_from_jsonable,
+        item_from_jsonable
+    )
+
+
+def _dict_of__str__kind_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[str, our_types.Kind]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of :py:class:`.types.Code` to :py:class:`.types.Kind`.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        _str_from_jsonable,
+        kind_from_jsonable
+    )
+
+
+def _dict_of__str__list_of__list_of__dict_of__int__str_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[str, List[List[Dict[int, str]]]]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of ``str`` to lists of lists of dictionaries of ``int`` to ``str``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        _str_from_jsonable,
+        _list_of__list_of__dict_of__int__str_from_jsonable
+    )
+
+
+def _dict_of__str__str_from_jsonable(
+    jsonable: Jsonable
+) -> Dict[str, str]:
+    """
+    Parse :paramref:`jsonable` as
+    a dictionary of ``str`` to :py:class:`.types.Code`.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed dictionary
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _dict_from_jsonable(
+        jsonable,
+        _str_from_jsonable,
+        _str_from_jsonable
+    )
+
+
+def _list_of__dict_of__int__str_from_jsonable(
+    jsonable: Jsonable
+) -> List[Dict[int, str]]:
+    """
+    Parse :paramref:`jsonable` as a list of
+    dictionaries of ``int`` to ``str``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed list
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _list_from_jsonable(
+        jsonable,
+        _dict_of__int__str_from_jsonable
+    )
+
+
 def _list_of__int_from_jsonable(
     jsonable: Jsonable
 ) -> List[int]:
@@ -389,6 +631,23 @@ def _list_of__kind_from_jsonable(
     )
 
 
+def _list_of__list_of__dict_of__int__str_from_jsonable(
+    jsonable: Jsonable
+) -> List[List[Dict[int, str]]]:
+    """
+    Parse :paramref:`jsonable` as a list of
+    lists of dictionaries of ``int`` to ``str``.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed list
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    return _list_from_jsonable(
+        jsonable,
+        _list_of__dict_of__int__str_from_jsonable
+    )
+
+
 def _list_of__str_from_jsonable(
     jsonable: Jsonable
 ) -> List[str]:
@@ -427,6 +686,32 @@ def kind_from_jsonable(
         raise DeserializationException(
             f"Not a valid string representation of "
             f"a literal of Kind: {jsonable}"
+        )
+
+    return literal
+
+
+def direction_from_jsonable(
+    jsonable: Jsonable
+) -> our_types.Direction:
+    """
+    Convert the JSON-able structure :paramref:`jsonable` to a literal of
+    :py:class:`.types.Direction`.
+
+    :param jsonable: JSON-able structure to be parsed
+    :return: parsed literal
+    :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    if not isinstance(jsonable, str):
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
+
+    literal = our_stringification.direction_from_str(jsonable)
+    if literal is None:
+        raise DeserializationException(
+            f"Not a valid string representation of "
+            f"a literal of Direction: {jsonable}"
         )
 
     return literal
@@ -556,6 +841,108 @@ def something_from_jsonable(
     )
 
 
+def registry_from_jsonable(
+        jsonable: Jsonable
+) -> our_types.Registry:
+    """
+    Parse an instance of :py:class:`.types.Registry` from the JSON-able
+    structure :paramref:`jsonable`.
+
+    :param jsonable: structure to be parsed
+    :return: Parsed instance of :py:class:`.types.Registry`
+    :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
+    """
+    mapping = _as_mapping(jsonable)
+
+    the_counts: Optional[Dict[str, int]] = None
+    the_counts_by_number: Optional[Dict[int, int]] = None
+    the_weights: Optional[Dict[our_types.Direction, int]] = None
+    the_kinds_by_code: Optional[Dict[str, our_types.Kind]] = None
+    the_codes_by_name: Optional[Dict[str, str]] = None
+    the_items_by_name: Optional[Dict[str, our_types.Item]] = None
+    the_labels: Optional[Dict[str, List[List[Dict[int, str]]]]] = None
+    the_optional_counts: Optional[Dict[str, int]] = None
+
+    try:
+        for key, jsonable_value in mapping.items():
+            if key == 'modelType':
+                # The model type is redundant for this class, and we simply accept it.
+                pass
+            elif key == 'counts':
+                the_counts = _dict_of__str__int_from_jsonable(jsonable_value)
+            elif key == 'countsByNumber':
+                the_counts_by_number = _dict_of__int__int_from_jsonable(jsonable_value)
+            elif key == 'weights':
+                the_weights = _dict_of__direction__int_from_jsonable(jsonable_value)
+            elif key == 'kindsByCode':
+                the_kinds_by_code = _dict_of__str__kind_from_jsonable(jsonable_value)
+            elif key == 'codesByName':
+                the_codes_by_name = _dict_of__str__str_from_jsonable(jsonable_value)
+            elif key == 'itemsByName':
+                the_items_by_name = _dict_of__str__item_from_jsonable(jsonable_value)
+            elif key == 'labels':
+                the_labels = (
+                    _dict_of__str__list_of__list_of__dict_of__int__str_from_jsonable(jsonable_value)
+                )
+            elif key == 'optionalCounts':
+                the_optional_counts = _dict_of__str__int_from_jsonable(jsonable_value)
+            else:
+                raise DeserializationException(
+                    f"Unexpected property: {key}"
+                )
+    except DeserializationException as exception:
+        exception.path._prepend(
+            PropertySegment(mapping, key)
+        )
+        raise
+
+    if the_counts is None:
+        raise DeserializationException(
+            "The required property 'counts' is missing"
+        )
+
+    if the_counts_by_number is None:
+        raise DeserializationException(
+            "The required property 'countsByNumber' is missing"
+        )
+
+    if the_weights is None:
+        raise DeserializationException(
+            "The required property 'weights' is missing"
+        )
+
+    if the_kinds_by_code is None:
+        raise DeserializationException(
+            "The required property 'kindsByCode' is missing"
+        )
+
+    if the_codes_by_name is None:
+        raise DeserializationException(
+            "The required property 'codesByName' is missing"
+        )
+
+    if the_items_by_name is None:
+        raise DeserializationException(
+            "The required property 'itemsByName' is missing"
+        )
+
+    if the_labels is None:
+        raise DeserializationException(
+            "The required property 'labels' is missing"
+        )
+
+    return our_types.Registry(
+        the_counts,
+        the_counts_by_number,
+        the_weights,
+        the_kinds_by_code,
+        the_codes_by_name,
+        the_items_by_name,
+        the_labels,
+        the_optional_counts
+    )
+
+
 # endregion
 
 
@@ -636,6 +1023,208 @@ def _int_to_jsonable(
     return that
 
 
+def _dict_of__direction__int_to_jsonable(
+    that: Dict[our_types.Direction, int]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    ``int`` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that, key=lambda literal: literal.value):
+        jsonable_key = key.value
+        try:
+            jsonable[jsonable_key] = _int_to_jsonable(
+                that[key]
+            )
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _dict_of__int__int_to_jsonable(
+    that: Dict[int, int]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    ``int`` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that):
+        jsonable_key = str(key)
+        try:
+            jsonable[jsonable_key] = _int_to_jsonable(
+                that[key]
+            )
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _dict_of__int__str_to_jsonable(
+    that: Dict[int, str]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    ``str`` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that):
+        jsonable_key = str(key)
+        try:
+            jsonable[jsonable_key] = that[key]
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _dict_of__str__int_to_jsonable(
+    that: Dict[str, int]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    ``int`` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that):
+        jsonable_key = key
+        try:
+            jsonable[jsonable_key] = _int_to_jsonable(
+                that[key]
+            )
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _dict_of__str__item_to_jsonable(
+    that: Dict[str, our_types.Item]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    :py:class:`.types.Item` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that):
+        jsonable_key = key
+        try:
+            jsonable[jsonable_key] = _item_to_jsonable(
+                that[key]
+            )
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _dict_of__str__kind_to_jsonable(
+    that: Dict[str, our_types.Kind]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    :py:class:`.types.Kind` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that):
+        jsonable_key = key
+        try:
+            jsonable[jsonable_key] = that[key].value
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _dict_of__str__list_of__list_of__dict_of__int__str_to_jsonable(
+    that: Dict[str, List[List[Dict[int, str]]]]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    a list of lists of dictionaries of ``int`` to ``str`` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that):
+        jsonable_key = key
+        try:
+            jsonable[jsonable_key] = _list_of__list_of__dict_of__int__str_to_jsonable(
+                that[key]
+            )
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _dict_of__str__str_to_jsonable(
+    that: Dict[str, str]
+) -> Dict[str, MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a JSON object of
+    :py:class:`.types.Code` with the keys sorted.
+
+    :param that: dictionary to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = dict()  # type: Dict[str, MutableJsonable]
+    for key in sorted(that):
+        jsonable_key = key
+        try:
+            jsonable[jsonable_key] = that[key]
+        except SerializationException as exception:
+            exception._prepend_key(jsonable_key)
+            raise
+    return jsonable
+
+
+def _list_of__dict_of__int__str_to_jsonable(
+    that: List[Dict[int, str]]
+) -> List[MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a list of
+    dictionaries of ``int`` to ``str``.
+
+    :param that: list to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = []  # type: List[MutableJsonable]
+    for i, item in enumerate(that):
+        try:
+            jsonable.append(
+                _dict_of__int__str_to_jsonable(
+                    item
+                )
+            )
+        except SerializationException as exception:
+            exception._prepend_index(i)
+            raise
+    return jsonable
+
+
 def _list_of__int_to_jsonable(
     that: List[int]
 ) -> List[MutableJsonable]:
@@ -699,6 +1288,30 @@ def _list_of__kind_to_jsonable(
         try:
             jsonable.append(
                 item.value
+            )
+        except SerializationException as exception:
+            exception._prepend_index(i)
+            raise
+    return jsonable
+
+
+def _list_of__list_of__dict_of__int__str_to_jsonable(
+    that: List[List[Dict[int, str]]]
+) -> List[MutableJsonable]:
+    """
+    Serialize :paramref:`that` as a list of
+    lists of dictionaries of ``int`` to ``str``.
+
+    :param that: list to be serialized
+    :return: JSON-able representation of :paramref:`that`
+    """
+    jsonable = []  # type: List[MutableJsonable]
+    for i, item in enumerate(that):
+        try:
+            jsonable.append(
+                _list_of__dict_of__int__str_to_jsonable(
+                    item
+                )
             )
         except SerializationException as exception:
             exception._prepend_index(i)
@@ -770,6 +1383,71 @@ def _something_to_jsonable(
     return jsonable
 
 
+def _registry_to_jsonable(
+    that: our_types.Registry
+) -> MutableMapping[str, MutableJsonable]:
+    """Serialize :paramref:`that` to a JSON-able representation."""
+    jsonable: MutableMapping[str, MutableJsonable] = dict()
+    try:
+        jsonable['counts'] = _dict_of__str__int_to_jsonable(
+            that.counts
+        )
+    except SerializationException as exception:
+        exception._prepend_property('counts')
+        raise
+    try:
+        jsonable['countsByNumber'] = _dict_of__int__int_to_jsonable(
+            that.counts_by_number
+        )
+    except SerializationException as exception:
+        exception._prepend_property('counts_by_number')
+        raise
+    try:
+        jsonable['weights'] = _dict_of__direction__int_to_jsonable(
+            that.weights
+        )
+    except SerializationException as exception:
+        exception._prepend_property('weights')
+        raise
+    try:
+        jsonable['kindsByCode'] = _dict_of__str__kind_to_jsonable(
+            that.kinds_by_code
+        )
+    except SerializationException as exception:
+        exception._prepend_property('kinds_by_code')
+        raise
+    try:
+        jsonable['codesByName'] = _dict_of__str__str_to_jsonable(
+            that.codes_by_name
+        )
+    except SerializationException as exception:
+        exception._prepend_property('codes_by_name')
+        raise
+    try:
+        jsonable['itemsByName'] = _dict_of__str__item_to_jsonable(
+            that.items_by_name
+        )
+    except SerializationException as exception:
+        exception._prepend_property('items_by_name')
+        raise
+    try:
+        jsonable['labels'] = _dict_of__str__list_of__list_of__dict_of__int__str_to_jsonable(
+            that.labels
+        )
+    except SerializationException as exception:
+        exception._prepend_property('labels')
+        raise
+    if that.optional_counts is not None:
+        try:
+            jsonable['optionalCounts'] = _dict_of__str__int_to_jsonable(
+                that.optional_counts
+            )
+        except SerializationException as exception:
+            exception._prepend_property('optional_counts')
+            raise
+    return jsonable
+
+
 class _Serializer(
         our_types.AbstractTransformer[MutableJsonable]
 ):
@@ -787,6 +1465,9 @@ class _Serializer(
     )
     transform_something = staticmethod(
         _something_to_jsonable
+    )
+    transform_registry = staticmethod(
+        _registry_to_jsonable
     )
 
 

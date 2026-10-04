@@ -31,6 +31,7 @@ class NeededCombinators:
         polymorphic: bool,
         lists: bool,
         sets: bool,
+        dicts: bool,
         v_elements: bool,
         json_shapes: bool,
     ) -> None:
@@ -40,6 +41,7 @@ class NeededCombinators:
         self.polymorphic = polymorphic
         self.lists = lists
         self.sets = sets
+        self.dicts = dicts
         self.v_elements = v_elements
         self.json_shapes = json_shapes
 
@@ -82,6 +84,7 @@ def needed_combinators(
     polymorphic = False
     lists = False
     sets = False
+    dicts = False
     v_elements = False
     json_shapes = False
 
@@ -95,7 +98,8 @@ def needed_combinators(
         de/serialize their own, self-describing element and hence need no
         dispatching combinator.
         """
-        nonlocal enumerations, polymorphic, lists, sets, v_elements, json_shapes
+        nonlocal enumerations, polymorphic, lists, sets, dicts, v_elements
+        nonlocal json_shapes
 
         if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
             primitive_types.add(type_anno.a_type)
@@ -163,11 +167,29 @@ def needed_combinators(
             register(type_anno.items, nested=True)
 
         elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-            raise AssertionError(
-                f"Unexpected dictionary in a property: {type_anno}; "
-                f"the dictionaries in the properties are refused in "
-                f"parse._translate._verify_symbol_table."
-            )
+            dicts = True
+
+            # NOTE (mristin):
+            # The keys and the values are always wrapped in ``<k>`` and ``<v>``,
+            # respectively, also when the value is an instance of a class or of
+            # a named union, which is then read as a self-describing element in
+            # ``<v>``.
+            v_elements = True
+
+            if isinstance(type_anno.values, intermediate.OurTypeAnnotation) and (
+                isinstance(
+                    type_anno.values.our_type,
+                    (
+                        intermediate.AbstractClass,
+                        intermediate.ConcreteClass,
+                        intermediate.NamedUnion,
+                    ),
+                )
+            ):
+                polymorphic = True
+
+            register(type_anno.keys, nested=True)
+            register(type_anno.values, nested=True)
 
         else:
             assert_never(type_anno)
@@ -182,6 +204,7 @@ def needed_combinators(
         polymorphic=polymorphic,
         lists=lists,
         sets=sets,
+        dicts=dicts,
         v_elements=v_elements,
         json_shapes=json_shapes,
     )

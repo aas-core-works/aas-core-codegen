@@ -216,10 +216,29 @@ return true"""
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        # NOTE (mristin):
+        # The keys are primitives and enumeration literals, which Go compares
+        # with ``==`` as the keys of a map.
+        value_check = _generate_return_false_if(
+            _generate_unequal_condition("thatValue", "otherValue", type_anno.values)
+        )
+
+        body = Stripped(
+            f"""\
+if len(that) != len(other) {{
+{I}return false
+}}
+
+for k, thatValue := range that {{
+{I}otherValue, ok := other[k]
+{I}if !ok {{
+{II}return false
+{I}}}
+
+{I}{indent_but_first_line(value_check, I)}
+}}
+
+return true"""
         )
 
     else:

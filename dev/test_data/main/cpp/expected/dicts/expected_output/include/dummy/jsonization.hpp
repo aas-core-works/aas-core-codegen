@@ -80,6 +80,26 @@ struct IndexSegment : public ISegment {
 };  // struct IndexSegment
 
 /**
+ * Represent an access to a key of a JSON object on a JSON path.
+ */
+struct KeySegment : public ISegment {
+  /**
+   * Key of the value in a JSON object
+   */
+  std::wstring key;
+
+  explicit KeySegment(
+    std::wstring a_key
+  );
+
+  std::wstring ToWstring() const override;
+
+  std::unique_ptr<ISegment> Clone() const override;
+
+  ~KeySegment() override = default;
+};  // struct KeySegment
+
+/**
  * Represent a JSON path to some value.
  */
 struct Path {
@@ -144,6 +164,23 @@ common::expected<
   std::shared_ptr<types::ISomething>,
   DeserializationError
 > SomethingFrom(
+  const nlohmann::json& json,
+  bool additional_properties = false
+);
+
+/**
+ * \brief Deserialize \p json value to an instance
+ * of types::IRegistry.
+ *
+ * \param json value to be de-serialized
+ * \param additional_properties if not set, check that \p json contains
+ * no additional properties
+ * \return The deserialized instance, or a de-serialization error, if any.
+ */
+common::expected<
+  std::shared_ptr<types::IRegistry>,
+  DeserializationError
+> RegistryFrom(
   const nlohmann::json& json,
   bool additional_properties = false
 );

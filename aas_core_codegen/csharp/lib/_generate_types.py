@@ -815,10 +815,26 @@ foreach (var item in that)
         )
 
     elif isinstance(type_anno, intermediate.DictTypeAnnotation):
-        raise AssertionError(
-            f"Unexpected dictionary in a property: {type_anno}; "
-            f"the dictionaries in the properties are refused in "
-            f"parse._translate._verify_symbol_table."
+        value_stmts = _generate_descend_into(
+            expr="that[key]",
+            type_anno=type_anno.values,
+            recurse=recurse,
+            descendability=descendability,
+        )
+
+        # NOTE (mristin):
+        # We descend in the order of the sorted keys, the same order in which we
+        # serialize the dictionary, so that the descent is deterministic.
+        comparison = csharp_common.sorting_comparison(type_anno.keys)
+
+        body = Stripped(
+            f"""\
+foreach (
+{I}var key in {csharp_common.COMMON_CLASS}.SetHelpers.Sorted(
+{II}that.Keys, {comparison}))
+{{
+{I}{indent_but_first_line(value_stmts, I)}
+}}"""
         )
 
     else:
