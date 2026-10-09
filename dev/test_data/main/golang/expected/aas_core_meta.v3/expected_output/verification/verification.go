@@ -584,7 +584,7 @@ func QualifierTypesAreUnique[Q ourtypes.IQualifier](
 }
 
 func constructMatchesXMLSerializableString() *regexp.Regexp {
-	pattern := "^[\t\n\r -\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$"
+	pattern := "^[\\t\\n\\r -\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$"
 
 	return regexp.MustCompile(
 		pattern,
@@ -1853,7 +1853,7 @@ func MatchesXsNegativeInteger(text string) bool {
 }
 
 func constructMatchesXsString() *regexp.Regexp {
-	pattern := "^[\t\n\r -\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$"
+	pattern := "^[\\t\\n\\r -\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$"
 
 	return regexp.MustCompile(
 		pattern,

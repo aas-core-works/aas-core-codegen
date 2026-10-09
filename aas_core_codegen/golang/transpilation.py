@@ -1133,6 +1133,56 @@ ourcommon.{function_name}(
                 for arg_node, arg in zip(node.args, args)
             ]
 
+            for i, (arg_node, argument) in enumerate(
+                zip(node.args, func_type.func.arguments)
+            ):
+                source_type = intermediate_type_inference.beneath_optional(
+                    self.type_map[arg_node]
+                )
+                target_type = intermediate.beneath_optional(argument.type_annotation)
+                if not (
+                    isinstance(func_type.func, intermediate.TranspilableVerification)
+                    and not argument.mutable
+                    and isinstance(
+                        source_type, intermediate_type_inference.ListTypeAnnotation
+                    )
+                    and isinstance(target_type, intermediate.ListTypeAnnotation)
+                    and isinstance(
+                        source_type.items, intermediate_type_inference.OurTypeAnnotation
+                    )
+                    and isinstance(target_type.items, intermediate.OurTypeAnnotation)
+                    and isinstance(source_type.items.our_type, intermediate.Class)
+                    and isinstance(target_type.items.our_type, intermediate.Class)
+                    and source_type.items.our_type is not target_type.items.our_type
+                    and source_type.items.our_type.is_subclass_of(
+                        target_type.items.our_type
+                    )
+                ):
+                    continue
+
+                # NOTE (mristin):
+                # Go slices are invariant even when their item interfaces inherit.
+                # We convert only mismatching read-only arguments, preserving nil.
+                source_slice = self._our_type_name(
+                    golang_naming.interface_name(source_type.items.our_type.name)
+                )
+                target_slice = self._our_type_name(
+                    golang_naming.interface_name(target_type.items.our_type.name)
+                )
+                args[i] = Stripped(
+                    f"""\
+func(items []{source_slice}) []{target_slice} {{
+{I}if items == nil {{
+{II}return nil
+{I}}}
+{I}result := make([]{target_slice}, len(items))
+{I}for i, item := range items {{
+{II}result[i] = item
+{I}}}
+{I}return result
+}}({args[i]})"""
+                )
+
             args_joined = ", ".join(args)
 
             # Apply heuristic for breaking the lines

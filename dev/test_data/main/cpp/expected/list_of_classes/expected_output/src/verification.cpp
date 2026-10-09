@@ -37,6 +37,68 @@ Error::Error(
 
 // endregion struct Error
 
+// region Verification functions
+
+bool ItemsAreSome(
+  const std::vector<
+    std::shared_ptr<types::IAbstractItem>
+  >& items
+) {
+  return (
+    common::All(
+      [&](const std::shared_ptr<types::IAbstractItem>& item) -> bool {
+        return types::IsSomeItem(*item);
+      },
+      items
+    )
+  );
+}
+
+bool SomeItemsAreSome(
+  const std::vector<
+    std::shared_ptr<types::ISomeItem>
+  >& items
+) {
+  return (
+    ItemsAreSome(
+      items
+    )
+  );
+}
+
+bool OptionalSomeItemsAreSome(
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::ISomeItem>
+    >
+  >& items
+) {
+  return (
+    OptionalItemsAreSome(
+      items
+    )
+  );
+}
+
+bool OptionalItemsAreSome(
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IAbstractItem>
+    >
+  >& items
+) {
+  return (
+    (
+      (!(items.has_value()))
+      || ItemsAreSome(
+        (*items)
+      )
+    )
+  );
+}
+
+// endregion Verification functions
+
 namespace {
 
 /**

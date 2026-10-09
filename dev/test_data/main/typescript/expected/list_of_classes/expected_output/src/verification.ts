@@ -190,6 +190,51 @@ export class VerificationError {
 }
 
 /**
+ * Check a read-only list of base-class instances.
+ */
+export function itemsAreSome(
+  items: Array<OurTypes.IAbstractItem>
+): boolean {
+  return OurCommon.every(
+    OurCommon.map(
+      items,
+      item =>
+        OurTypes.isSomeItem(item)
+    )
+  );
+}
+
+/**
+ * Pass a list of descendants to a base-class list parameter.
+ */
+export function someItemsAreSome(
+  items: Array<OurTypes.SomeItem>
+): boolean {
+  return itemsAreSome(items);
+}
+
+/**
+ * Preserve an optional descendant list passed to an optional parameter.
+ */
+export function optionalSomeItemsAreSome(
+  items: Array<OurTypes.SomeItem> | null
+): boolean {
+  return optionalItemsAreSome(items);
+}
+
+/**
+ * Check a possibly missing read-only list of base-class instances.
+ */
+export function optionalItemsAreSome(
+  items: Array<OurTypes.IAbstractItem> | null
+): boolean {
+  return (
+    (items === null)
+    || itemsAreSome(items)
+  );
+}
+
+/**
  * Verify the items of `that` recursively.
  */
 function *verify_ListOf_class(

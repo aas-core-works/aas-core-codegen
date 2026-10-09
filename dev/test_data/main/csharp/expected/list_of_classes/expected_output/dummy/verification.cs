@@ -32,6 +32,48 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
+        /// Check a read-only list of base-class instances.
+        /// </summary>
+        public static bool ItemsAreSome(
+            List<IAbstractItem> items
+        )
+        {
+            return items.All(
+                item => item is Our.ISomeItem);
+        }  // public static bool ItemsAreSome
+
+        /// <summary>
+        /// Pass a list of descendants to a base-class list parameter.
+        /// </summary>
+        public static bool SomeItemsAreSome(
+            List<ISomeItem> items
+        )
+        {
+            return Verification.ItemsAreSome(items);
+        }  // public static bool SomeItemsAreSome
+
+        /// <summary>
+        /// Preserve an optional descendant list passed to an optional parameter.
+        /// </summary>
+        public static bool OptionalSomeItemsAreSome(
+            List<ISomeItem>? items
+        )
+        {
+            return Verification.OptionalItemsAreSome(items);
+        }  // public static bool OptionalSomeItemsAreSome
+
+        /// <summary>
+        /// Check a possibly missing read-only list of base-class instances.
+        /// </summary>
+        public static bool OptionalItemsAreSome(
+            List<IAbstractItem>? items
+        )
+        {
+            return (items == null)
+            || Verification.ItemsAreSome(items);
+        }  // public static bool OptionalItemsAreSome
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet

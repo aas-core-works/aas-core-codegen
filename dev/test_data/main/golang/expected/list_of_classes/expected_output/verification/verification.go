@@ -12,6 +12,7 @@ package verification
 
 import (
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
@@ -42,6 +43,62 @@ func (ve *VerificationError) Error() string {
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
+}
+
+// Check a read-only list of base-class instances.
+func ItemsAreSome(
+	items []ourtypes.IAbstractItem,
+) bool {
+	return ourcommon.All(
+			func(item ourtypes.IAbstractItem) bool {
+				return ourtypes.IsSomeItem(item)
+			},
+			items,
+		)
+}
+
+// Pass a list of descendants to a base-class list parameter.
+func SomeItemsAreSome(
+	items []ourtypes.ISomeItem,
+) bool {
+	return ItemsAreSome(
+			func(items []ourtypes.ISomeItem) []ourtypes.IAbstractItem {
+				if items == nil {
+					return nil
+				}
+				result := make([]ourtypes.IAbstractItem, len(items))
+				for i, item := range items {
+					result[i] = item
+				}
+				return result
+			}(items),
+		)
+}
+
+// Preserve an optional descendant list passed to an optional parameter.
+func OptionalSomeItemsAreSome(
+	items []ourtypes.ISomeItem,
+) bool {
+	return OptionalItemsAreSome(
+			func(items []ourtypes.ISomeItem) []ourtypes.IAbstractItem {
+				if items == nil {
+					return nil
+				}
+				result := make([]ourtypes.IAbstractItem, len(items))
+				for i, item := range items {
+					result[i] = item
+				}
+				return result
+			}(items),
+		)
+}
+
+// Check a possibly missing read-only list of base-class instances.
+func OptionalItemsAreSome(
+	items []ourtypes.IAbstractItem,
+) bool {
+	return (items == nil) ||
+		ItemsAreSome(items)
 }
 
 // Verify `that` instance of [ourtypes.ISomeItem].
