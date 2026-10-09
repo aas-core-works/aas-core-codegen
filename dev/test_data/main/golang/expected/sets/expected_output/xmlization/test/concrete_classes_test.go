@@ -68,7 +68,7 @@ func TestSomethingRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -194,7 +194,7 @@ func TestCollectionRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)

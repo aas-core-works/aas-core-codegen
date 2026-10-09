@@ -68,7 +68,7 @@ func TestQueryConditionRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)

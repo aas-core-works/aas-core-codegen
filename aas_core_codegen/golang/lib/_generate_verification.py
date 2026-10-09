@@ -116,16 +116,7 @@ class RegexRenderer(parse_retree.Renderer):
     def char_to_str_and_escape_or_encode_if_necessary(
         self, node: parse_retree.Char, escaping: Mapping[str, str]
     ) -> List[Union[str, parse_tree.FormattedValue]]:
-        if not node.explicitly_encoded:
-            escaped = escaping.get(node.character, None)
-            if escaped is not None:
-                result: List[Union[str, parse_tree.FormattedValue]] = [escaped]
-            else:
-                result = [node.character]
-
-            return result
-
-        return [node.character]
+        return [escaping.get(node.character, node.character)]
 
 
 _REGEX_RENDERER = RegexRenderer()

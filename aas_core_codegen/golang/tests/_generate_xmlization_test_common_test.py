@@ -35,13 +35,14 @@ package xmlization_test"""
         Stripped(
             f"""\
 import (
+{I}"encoding/xml"
 {I}"fmt"
 {I}"os"
 {I}"path/filepath"
-{I}"regexp"
 {I}"strings"
 {I}"testing"
 {I}ourtesting "{repo_url}/ourtesting"
+{I}ourtypes "{repo_url}/types"
 {I}ourxmlization "{repo_url}/xmlization"
 )"""
         ),
@@ -89,163 +90,26 @@ func assertNoSerializationError(
 }}"""
         ),
         Stripped(
-            """\
-// NOTE (mristin):
-// Currently, Go does not support self-closing tags,
-// see: https://github.com/golang/go/issues/21399.
-// We apply the following hack to make the tags self-closing even if they are not.
-// This is unsafe in general, but works OK for the limited set of test data that we are
-// here dealing with.
-//
-// The code has been taken from: https://github.com/golang/go/issues/21399#issuecomment-1342730174"""
-        ),
-        Stripped(
-            """\
-// NOTE (mristin):
-// The opening tag, tag name plus an optional attribute list (*e.g.*,
-// ``xmlns="..."`` on a root element), is captured in the first (and only)
-// submatch group so that we do not lose any attributes when we force
-// the tag to be self-closing below. The attribute list must not end with
-// a slash, as we would otherwise match an already self-closing tag followed
-// by the closing tag of its parent, *e.g.*, ``<someBytes /></something>``.
-var emptyTagRe = regexp.MustCompile(`<(\\w+(?:\\s[^>]*[^/>])?)></\\w+>`)"""
-        ),
-        Stripped(
             f"""\
-func forceSelfClosingTags(text string) string {{
-{I}b := []byte(text)
-{I}emptyTagIdxs := emptyTagRe.FindAllSubmatchIndex(b, -1)
-
-{I}if len(emptyTagIdxs) == 0 {{
-{II}return text
-{I}}}
-
-{I}// NOTE (mristin):
-{I}// The matches are walked in order, and the pieces of `b` between them are
-{I}// copied over as they are. Mind that `nb` starts out empty and that `b` is
-{I}// only ever *read*: an earlier version appended into `b[0:idx[0]]`, which
-{I}// writes into `b`'s own backing array, so a document with more than one
-{I}// empty tag came out garbled -- every turn of the loop then indexed into
-{I}// a `b` which the previous turn had already overwritten.
-{I}var nb []byte
-{I}previous := 0
-
-{I}for _, idx := range emptyTagIdxs {{
-{II}// Copy everything since the previous match, then the tag itself --
-{II}// its name and its attributes -- as a self-closing one.
-{II}nb = append(nb, b[previous:idx[0]]...)
-{II}nb = append(nb, fmt.Sprintf("<%s/>", b[idx[2]:idx[3]])...)
-
-{II}previous = idx[1]
-{I}}}
-
-{I}// Finally, copy everything after the last match.
-{I}nb = append(nb, b[previous:]...)
-
-{I}return string(nb)
-}}"""
-        ),
-        Stripped(
-            """\
-var whitespaceBetweenTagsRe = regexp.MustCompile(`>\\s+<`)"""
-        ),
-        Stripped(
-            f"""\
-// Remove all whitespace (including newlines, tabs, and spaces) between XML tags
-// without parsing the XML.
-func removeWhitespaceBetweenTags(text string) string {{
-{I}return whitespaceBetweenTagsRe.ReplaceAllString(text, "><")
-}}"""
-        ),
-        Stripped(
-            """\
-var whitespaceBeforeAngleBracketsRe = regexp.MustCompile(`\\s+>`)
-var whitespaceBeforeSelfClosingRe = regexp.MustCompile(`\\s+/>`)
-var whitespaceAfterAngleBracketsRe = regexp.MustCompile(`<\\s+`)"""
-        ),
-        Stripped(
-            f"""\
-// Remove any whitespace before `>` and `/>` or after `<`
-func removeWhitespaceWithinTags(text string) string {{
-{I}result := text
-{I}result = whitespaceBeforeAngleBracketsRe.ReplaceAllString(result, ">")
-{I}result = whitespaceBeforeSelfClosingRe.ReplaceAllString(result, "/>")
-{I}result = whitespaceAfterAngleBracketsRe.ReplaceAllString(result, "<")
-{I}return result
-}}"""
-        ),
-        Stripped(
-            f"""\
-// Assert that the serialization `other`, as XML document, equals the original
-//
-//	XML document `that` read from the `source`.
+// Assert that serializing and de-serializing preserves the original instance.
 func assertSerializationEqualsDeserialization(
 {I}t *testing.T,
-{I}that string,
+{I}that ourtypes.IClass,
 {I}other string,
 {I}source string,
 ) (ok bool) {{
-{I}ok = true
-
-{I}// Remove carriers to avoid problems between Windows, Posix and MacOS
-{I}canonicalThat := strings.ReplaceAll(that, "\\r", "")
-{I}canonicalOther := strings.ReplaceAll(other, "\\r", "")
-
-{I}canonicalThat = strings.TrimSpace(canonicalThat)
-{I}canonicalOther = strings.TrimSpace(canonicalOther)
-
-{I}canonicalThat = forceSelfClosingTags(canonicalThat)
-{I}canonicalOther = forceSelfClosingTags(canonicalOther)
-
-{I}// NOTE (mristin):
-{I}// The following hack is SUPER ugly and unsafe! However, it works. Given Go's
-{I}// limited support for XML, we gave up on a safer approach :(. We tested
-{I}// the following approaches before applying this hack:
-{I}//  * A round-trip over `encoding/xml`. Failed due to
-{I}//    https://github.com/golang/go/issues/13400.
-{I}//  * Using `aqwari.net/xml/xmltree`. Failed as the special characters in the
-{I}//    element content still has not been de-escaped or consistently escaped in
-{I}//    a round trip.
-
-{I}canonicalThat = strings.ReplaceAll(canonicalThat, "'", "&#39;")
-{I}canonicalOther = strings.ReplaceAll(canonicalOther, "'", "&#39;")
-
-{I}canonicalThat = removeWhitespaceBetweenTags(canonicalThat)
-{I}canonicalOther = removeWhitespaceBetweenTags(canonicalOther)
-
-{I}canonicalThat = removeWhitespaceWithinTags(canonicalThat)
-{I}canonicalOther = removeWhitespaceWithinTags(canonicalOther)
-
-{I}thatLines := strings.Split(canonicalThat, "\\n")
-{I}otherLines := strings.Split(canonicalOther, "\\n")
-
-{I}if canonicalThat != canonicalOther {{
-{II}b := new(strings.Builder)
-{II}minLines := len(thatLines)
-{II}if minLines > len(otherLines) {{
-{III}minLines = len(otherLines)
-{II}}}
-{II}for i := 0; i < minLines; i++ {{
-{III}if thatLines[i] == otherLines[i] {{
-{IIII}b.WriteString(fmt.Sprintf("           %s\\n", thatLines[i]))
-{III}}} else {{
-{IIII}b.WriteString(fmt.Sprintf("ORIGINAL   %s\\n", thatLines[i]))
-{IIII}b.WriteString(fmt.Sprintf("SERIALIZED %s\\n", otherLines[i]))
-{IIII}break
-{III}}}
-{II}}}
-
-{II}ok = false
-{II}t.Fatalf(
-{III}"The canonicalized XML serialization of the de-serialized instance "+
-{IIII}"from %s does not equal the canonicalized original XML document:\\n"+
-{IIII}"%s",
-{III}source, b.String(),
-{II})
-{II}return
+{I}decoder := xml.NewDecoder(strings.NewReader(other))
+{I}roundTripped, err := ourxmlization.Unmarshal(decoder)
+{I}if !assertNoDeserializationError(t, err, source) {{
+{II}return false
 {I}}}
 
-{I}return
+{I}if !ourtesting.DeepEqual(that, roundTripped) {{
+{II}t.Fatalf("XML round-trip changed the instance from %s", source)
+{II}return false
+{I}}}
+
+{I}return true
 }}"""
         ),
         Stripped(

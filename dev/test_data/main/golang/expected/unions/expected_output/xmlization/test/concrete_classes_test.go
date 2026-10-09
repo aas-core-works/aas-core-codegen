@@ -68,7 +68,7 @@ func TestStructuralFirstRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -194,7 +194,7 @@ func TestStructuralSecondRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -320,7 +320,7 @@ func TestMixedAbstractDescendantOneRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -446,7 +446,7 @@ func TestMixedAbstractDescendantTwoRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -572,7 +572,7 @@ func TestMixedConcreteWithDescendantsRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -698,7 +698,7 @@ func TestMixedConcreteWithDescendantsChildRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -824,7 +824,7 @@ func TestMixedConcreteLeafRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -950,7 +950,7 @@ func TestModelTypedFirstRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -1076,7 +1076,7 @@ func TestModelTypedSecondRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)
@@ -1202,7 +1202,7 @@ func TestSomethingRoundTripOK(t *testing.T) {
 
 		ok = assertSerializationEqualsDeserialization(
 			t,
-			text,
+			deserialized,
 			roundTrip,
 			pth,
 		)

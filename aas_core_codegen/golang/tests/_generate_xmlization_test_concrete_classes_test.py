@@ -90,7 +90,7 @@ func {test_name}(t *testing.T) {{
 
 {II}ok = assertSerializationEqualsDeserialization(
 {III}t,
-{III}text,
+{III}deserialized,
 {III}roundTrip,
 {III}pth,
 {II})

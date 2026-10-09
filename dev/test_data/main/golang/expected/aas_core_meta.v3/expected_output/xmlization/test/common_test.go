@@ -4,13 +4,14 @@ package xmlization_test
 // Do NOT edit or append.
 
 import (
+	"encoding/xml"
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"testing"
 	ourtesting "github.com/aas-core-works/aas-core3.0-golang/ourtesting"
+	ourtypes "github.com/aas-core-works/aas-core3.0-golang/types"
 	ourxmlization "github.com/aas-core-works/aas-core3.0-golang/xmlization"
 )
 
@@ -53,148 +54,25 @@ func assertNoSerializationError(
 	return
 }
 
-// NOTE (mristin):
-// Currently, Go does not support self-closing tags,
-// see: https://github.com/golang/go/issues/21399.
-// We apply the following hack to make the tags self-closing even if they are not.
-// This is unsafe in general, but works OK for the limited set of test data that we are
-// here dealing with.
-//
-// The code has been taken from: https://github.com/golang/go/issues/21399#issuecomment-1342730174
-
-// NOTE (mristin):
-// The opening tag, tag name plus an optional attribute list (*e.g.*,
-// ``xmlns="..."`` on a root element), is captured in the first (and only)
-// submatch group so that we do not lose any attributes when we force
-// the tag to be self-closing below. The attribute list must not end with
-// a slash, as we would otherwise match an already self-closing tag followed
-// by the closing tag of its parent, *e.g.*, ``<someBytes /></something>``.
-var emptyTagRe = regexp.MustCompile(`<(\w+(?:\s[^>]*[^/>])?)></\w+>`)
-
-func forceSelfClosingTags(text string) string {
-	b := []byte(text)
-	emptyTagIdxs := emptyTagRe.FindAllSubmatchIndex(b, -1)
-
-	if len(emptyTagIdxs) == 0 {
-		return text
-	}
-
-	// NOTE (mristin):
-	// The matches are walked in order, and the pieces of `b` between them are
-	// copied over as they are. Mind that `nb` starts out empty and that `b` is
-	// only ever *read*: an earlier version appended into `b[0:idx[0]]`, which
-	// writes into `b`'s own backing array, so a document with more than one
-	// empty tag came out garbled -- every turn of the loop then indexed into
-	// a `b` which the previous turn had already overwritten.
-	var nb []byte
-	previous := 0
-
-	for _, idx := range emptyTagIdxs {
-		// Copy everything since the previous match, then the tag itself --
-		// its name and its attributes -- as a self-closing one.
-		nb = append(nb, b[previous:idx[0]]...)
-		nb = append(nb, fmt.Sprintf("<%s/>", b[idx[2]:idx[3]])...)
-
-		previous = idx[1]
-	}
-
-	// Finally, copy everything after the last match.
-	nb = append(nb, b[previous:]...)
-
-	return string(nb)
-}
-
-var whitespaceBetweenTagsRe = regexp.MustCompile(`>\s+<`)
-
-// Remove all whitespace (including newlines, tabs, and spaces) between XML tags
-// without parsing the XML.
-func removeWhitespaceBetweenTags(text string) string {
-	return whitespaceBetweenTagsRe.ReplaceAllString(text, "><")
-}
-
-var whitespaceBeforeAngleBracketsRe = regexp.MustCompile(`\s+>`)
-var whitespaceBeforeSelfClosingRe = regexp.MustCompile(`\s+/>`)
-var whitespaceAfterAngleBracketsRe = regexp.MustCompile(`<\s+`)
-
-// Remove any whitespace before `>` and `/>` or after `<`
-func removeWhitespaceWithinTags(text string) string {
-	result := text
-	result = whitespaceBeforeAngleBracketsRe.ReplaceAllString(result, ">")
-	result = whitespaceBeforeSelfClosingRe.ReplaceAllString(result, "/>")
-	result = whitespaceAfterAngleBracketsRe.ReplaceAllString(result, "<")
-	return result
-}
-
-// Assert that the serialization `other`, as XML document, equals the original
-//
-//	XML document `that` read from the `source`.
+// Assert that serializing and de-serializing preserves the original instance.
 func assertSerializationEqualsDeserialization(
 	t *testing.T,
-	that string,
+	that ourtypes.IClass,
 	other string,
 	source string,
 ) (ok bool) {
-	ok = true
-
-	// Remove carriers to avoid problems between Windows, Posix and MacOS
-	canonicalThat := strings.ReplaceAll(that, "\r", "")
-	canonicalOther := strings.ReplaceAll(other, "\r", "")
-
-	canonicalThat = strings.TrimSpace(canonicalThat)
-	canonicalOther = strings.TrimSpace(canonicalOther)
-
-	canonicalThat = forceSelfClosingTags(canonicalThat)
-	canonicalOther = forceSelfClosingTags(canonicalOther)
-
-	// NOTE (mristin):
-	// The following hack is SUPER ugly and unsafe! However, it works. Given Go's
-	// limited support for XML, we gave up on a safer approach :(. We tested
-	// the following approaches before applying this hack:
-	//  * A round-trip over `encoding/xml`. Failed due to
-	//    https://github.com/golang/go/issues/13400.
-	//  * Using `aqwari.net/xml/xmltree`. Failed as the special characters in the
-	//    element content still has not been de-escaped or consistently escaped in
-	//    a round trip.
-
-	canonicalThat = strings.ReplaceAll(canonicalThat, "'", "&#39;")
-	canonicalOther = strings.ReplaceAll(canonicalOther, "'", "&#39;")
-
-	canonicalThat = removeWhitespaceBetweenTags(canonicalThat)
-	canonicalOther = removeWhitespaceBetweenTags(canonicalOther)
-
-	canonicalThat = removeWhitespaceWithinTags(canonicalThat)
-	canonicalOther = removeWhitespaceWithinTags(canonicalOther)
-
-	thatLines := strings.Split(canonicalThat, "\n")
-	otherLines := strings.Split(canonicalOther, "\n")
-
-	if canonicalThat != canonicalOther {
-		b := new(strings.Builder)
-		minLines := len(thatLines)
-		if minLines > len(otherLines) {
-			minLines = len(otherLines)
-		}
-		for i := 0; i < minLines; i++ {
-			if thatLines[i] == otherLines[i] {
-				b.WriteString(fmt.Sprintf("           %s\n", thatLines[i]))
-			} else {
-				b.WriteString(fmt.Sprintf("ORIGINAL   %s\n", thatLines[i]))
-				b.WriteString(fmt.Sprintf("SERIALIZED %s\n", otherLines[i]))
-				break
-			}
-		}
-
-		ok = false
-		t.Fatalf(
-			"The canonicalized XML serialization of the de-serialized instance "+
-				"from %s does not equal the canonicalized original XML document:\n"+
-				"%s",
-			source, b.String(),
-		)
-		return
+	decoder := xml.NewDecoder(strings.NewReader(other))
+	roundTripped, err := ourxmlization.Unmarshal(decoder)
+	if !assertNoDeserializationError(t, err, source) {
+		return false
 	}
 
-	return
+	if !ourtesting.DeepEqual(that, roundTripped) {
+		t.Fatalf("XML round-trip changed the instance from %s", source)
+		return false
+	}
+
+	return true
 }
 
 // Assert that there is a de-serialization error.
