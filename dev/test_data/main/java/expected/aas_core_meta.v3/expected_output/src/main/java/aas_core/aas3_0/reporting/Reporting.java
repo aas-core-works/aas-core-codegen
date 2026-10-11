@@ -115,18 +115,45 @@ public class Reporting
     /**
      * Escape the characters which a JSON string may not hold as they are.
      *
-     * <p>Mind the order: the backslash has to go first, or the backslash which
-     * the replacements below introduce would be escaped a second time.
+     * <p>The control characters without a short escape are written as Unicode
+     * escapes, as {@code JSON.stringify} does.
      */
     private static String escapeForJsonString(String text) {
-        return text
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\b", "\\b")
-            .replace("\f", "\\f")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\t", "\\t");
+        StringBuilder builder = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i++) {
+            char character = text.charAt(i);
+            switch (character) {
+                case '\\':
+                    builder.append("\\\\");
+                    break;
+                case '"':
+                    builder.append("\\\"");
+                    break;
+                case '\b':
+                    builder.append("\\b");
+                    break;
+                case '\f':
+                    builder.append("\\f");
+                    break;
+                case '\n':
+                    builder.append("\\n");
+                    break;
+                case '\r':
+                    builder.append("\\r");
+                    break;
+                case '\t':
+                    builder.append("\\t");
+                    break;
+                default:
+                    if (character < 0x20) {
+                        builder.append(String.format("\\u%04x", (int) character));
+                    } else {
+                        builder.append(character);
+                    }
+                    break;
+            }
+        }
+        return builder.toString();
     }
 
     /**

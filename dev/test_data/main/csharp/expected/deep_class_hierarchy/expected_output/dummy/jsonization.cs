@@ -257,7 +257,17 @@ namespace dummy
                     return default!;
                 }
 
-                return StringFrom(modelTypeNode, out error);
+                string modelType = StringFrom(modelTypeNode, out error);
+                if (error != null)
+                {
+                    // NOTE (mristin):
+                    // A model type of a wrong type is reported at the property, as the type
+                    // errors of all the other properties are, and as in the other SDKs.
+                    error.PrependSegment(
+                        new Reporting.NameSegment("modelType"));
+                    return default!;
+                }
+                return modelType;
             }
 
             /// <summary>
@@ -387,9 +397,14 @@ namespace dummy
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Branch")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Branch', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -523,9 +538,14 @@ namespace dummy
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Leaf")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Leaf', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -634,9 +654,14 @@ namespace dummy
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Blossom")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Blossom', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -771,9 +796,14 @@ namespace dummy
                                 keyValue.Value, out error);
                             if (error == null && modelType != "PlainMarker")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'PlainMarker', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:

@@ -13,6 +13,8 @@ properties do not have fixed order, and hence we can not read
 
 import base64
 import collections.abc
+import json
+import re
 import sys
 from typing import (
     Any,
@@ -139,6 +141,11 @@ class KeySegment:
 Segment = Union[PropertySegment, IndexSegment, KeySegment]
 
 
+#: Match the property names which a path writes after a dot; the other names
+#: are written in brackets as JSON strings, *e.g.*, ``["$eq"]``.
+_VARIABLE_NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z_0-9]*$")
+
+
 class Path:
     """Represent the relative path to the erroneous value."""
 
@@ -164,21 +171,27 @@ class Path:
         iterator = iter(self._segments)
         first = next(iterator)
         if isinstance(first, PropertySegment):
-            parts.append(f"{first.name}")
+            if _VARIABLE_NAME_RE.match(first.name):
+                parts.append(first.name)
+            else:
+                parts.append(f"[{json.dumps(first.name, ensure_ascii=False)}]")
         elif isinstance(first, IndexSegment):
             parts.append(f"[{first.index}]")
         elif isinstance(first, KeySegment):
-            parts.append(f"[{first.key!r}]")
+            parts.append(f"[{json.dumps(first.key, ensure_ascii=False)}]")
         else:
             our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
-                parts.append(f".{segment.name}")
+                if _VARIABLE_NAME_RE.match(segment.name):
+                    parts.append(f".{segment.name}")
+                else:
+                    parts.append(f"[{json.dumps(segment.name, ensure_ascii=False)}]")
             elif isinstance(segment, IndexSegment):
                 parts.append(f"[{segment.index}]")
             elif isinstance(segment, KeySegment):
-                parts.append(f"[{segment.key!r}]")
+                parts.append(f"[{json.dumps(segment.key, ensure_ascii=False)}]")
             else:
                 our_common.assert_never(segment)
 
@@ -293,10 +306,15 @@ def _dispatch_from_jsonable(
         )
 
     if not isinstance(model_type, str):
-        raise DeserializationException(
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
             f"Expected the property modelType to be a str, "
             f"but got: {type(model_type)}"
         )
+        exception.path._prepend(PropertySegment(mapping, "modelType"))
+        raise exception
 
     parse = dispatch.get(model_type, None)
     if parse is None:
@@ -737,12 +755,11 @@ def extension_from_jsonable(
     the_value: Optional[str] = None
     the_refers_to: Optional[List[our_types.Reference]] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'semanticId':
+            if key == 'semanticId':
                 the_semantic_id = reference_from_jsonable(jsonable_value)
             elif key == 'supplementalSemanticIds':
                 the_supplemental_semantic_ids = (
@@ -757,14 +774,18 @@ def extension_from_jsonable(
             elif key == 'refersTo':
                 the_refers_to = _list_of__reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_name is None:
         raise DeserializationException(
@@ -916,12 +937,11 @@ def administrative_information_from_jsonable(
     the_creator: Optional[our_types.Reference] = None
     the_template_id: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'embeddedDataSpecifications':
+            if key == 'embeddedDataSpecifications':
                 the_embedded_data_specifications = (
                     _list_of__embedded_data_specification_from_jsonable(jsonable_value)
                 )
@@ -934,14 +954,18 @@ def administrative_information_from_jsonable(
             elif key == 'templateId':
                 the_template_id = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     return our_types.AdministrativeInformation(
         the_embedded_data_specifications,
@@ -1017,12 +1041,11 @@ def qualifier_from_jsonable(
     the_value: Optional[str] = None
     the_value_id: Optional[our_types.Reference] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'semanticId':
+            if key == 'semanticId':
                 the_semantic_id = reference_from_jsonable(jsonable_value)
             elif key == 'supplementalSemanticIds':
                 the_supplemental_semantic_ids = (
@@ -1039,14 +1062,18 @@ def qualifier_from_jsonable(
             elif key == 'valueId':
                 the_value_id = reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_type is None:
         raise DeserializationException(
@@ -1083,6 +1110,17 @@ def asset_administration_shell_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'AssetAdministrationShell':
         raise DeserializationException(
             f"Expected modelType to be 'AssetAdministrationShell', "
@@ -1100,6 +1138,8 @@ def asset_administration_shell_from_jsonable(
     the_derived_from: Optional[our_types.Reference] = None
     the_asset_information: Optional[our_types.AssetInformation] = None
     the_submodels: Optional[List[our_types.Reference]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1137,14 +1177,18 @@ def asset_administration_shell_from_jsonable(
             elif key == 'submodels':
                 the_submodels = _list_of__reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_id is None:
         raise DeserializationException(
@@ -1190,12 +1234,11 @@ def asset_information_from_jsonable(
     the_asset_type: Optional[str] = None
     the_default_thumbnail: Optional[our_types.Resource] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'assetKind':
+            if key == 'assetKind':
                 the_asset_kind = asset_kind_from_jsonable(jsonable_value)
             elif key == 'globalAssetId':
                 the_global_asset_id = _str_from_jsonable(jsonable_value)
@@ -1208,14 +1251,18 @@ def asset_information_from_jsonable(
             elif key == 'defaultThumbnail':
                 the_default_thumbnail = resource_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_asset_kind is None:
         raise DeserializationException(
@@ -1247,24 +1294,27 @@ def resource_from_jsonable(
     the_path: Optional[str] = None
     the_content_type: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'path':
+            if key == 'path':
                 the_path = _str_from_jsonable(jsonable_value)
             elif key == 'contentType':
                 the_content_type = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_path is None:
         raise DeserializationException(
@@ -1322,12 +1372,11 @@ def specific_asset_id_from_jsonable(
     the_value: Optional[str] = None
     the_external_subject_id: Optional[our_types.Reference] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'semanticId':
+            if key == 'semanticId':
                 the_semantic_id = reference_from_jsonable(jsonable_value)
             elif key == 'supplementalSemanticIds':
                 the_supplemental_semantic_ids = (
@@ -1340,14 +1389,18 @@ def specific_asset_id_from_jsonable(
             elif key == 'externalSubjectId':
                 the_external_subject_id = reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_name is None:
         raise DeserializationException(
@@ -1382,6 +1435,17 @@ def submodel_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'Submodel':
         raise DeserializationException(
             f"Expected modelType to be 'Submodel', "
@@ -1401,6 +1465,8 @@ def submodel_from_jsonable(
     the_qualifiers: Optional[List[our_types.Qualifier]] = None
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_submodel_elements: Optional[List[our_types.SubmodelElement]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1446,14 +1512,18 @@ def submodel_from_jsonable(
                     _list_of__submodel_element_from_jsonable(jsonable_value)
                 )
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_id is None:
         raise DeserializationException(
@@ -1545,6 +1615,8 @@ def _relationship_element_from_jsonable_without_dispatch(
     the_first: Optional[our_types.Reference] = None
     the_second: Optional[our_types.Reference] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
             if key == 'modelType':
@@ -1581,14 +1653,18 @@ def _relationship_element_from_jsonable_without_dispatch(
             elif key == 'second':
                 the_second = reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_first is None:
         raise DeserializationException(
@@ -1655,6 +1731,17 @@ def submodel_element_list_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'SubmodelElementList':
         raise DeserializationException(
             f"Expected modelType to be 'SubmodelElementList', "
@@ -1675,6 +1762,8 @@ def submodel_element_list_from_jsonable(
     the_type_value_list_element: Optional[our_types.AASSubmodelElements] = None
     the_value_type_list_element: Optional[our_types.DataTypeDefXSD] = None
     the_value: Optional[List[our_types.SubmodelElement]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1722,14 +1811,18 @@ def submodel_element_list_from_jsonable(
             elif key == 'value':
                 the_value = _list_of__submodel_element_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_type_value_list_element is None:
         raise DeserializationException(
@@ -1768,6 +1861,17 @@ def submodel_element_collection_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'SubmodelElementCollection':
         raise DeserializationException(
             f"Expected modelType to be 'SubmodelElementCollection', "
@@ -1784,6 +1888,8 @@ def submodel_element_collection_from_jsonable(
     the_qualifiers: Optional[List[our_types.Qualifier]] = None
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_value: Optional[List[our_types.SubmodelElement]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1819,14 +1925,18 @@ def submodel_element_collection_from_jsonable(
             elif key == 'value':
                 the_value = _list_of__submodel_element_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     return our_types.SubmodelElementCollection(
         the_extensions,
@@ -1874,6 +1984,17 @@ def property_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'Property':
         raise DeserializationException(
             f"Expected modelType to be 'Property', "
@@ -1892,6 +2013,8 @@ def property_from_jsonable(
     the_value_type: Optional[our_types.DataTypeDefXSD] = None
     the_value: Optional[str] = None
     the_value_id: Optional[our_types.Reference] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -1931,14 +2054,18 @@ def property_from_jsonable(
             elif key == 'valueId':
                 the_value_id = reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_value_type is None:
         raise DeserializationException(
@@ -1975,6 +2102,17 @@ def multi_language_property_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'MultiLanguageProperty':
         raise DeserializationException(
             f"Expected modelType to be 'MultiLanguageProperty', "
@@ -1992,6 +2130,8 @@ def multi_language_property_from_jsonable(
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_value: Optional[List[our_types.LangStringTextType]] = None
     the_value_id: Optional[our_types.Reference] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2029,14 +2169,18 @@ def multi_language_property_from_jsonable(
             elif key == 'valueId':
                 the_value_id = reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     return our_types.MultiLanguageProperty(
         the_extensions,
@@ -2067,6 +2211,17 @@ def range_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'Range':
         raise DeserializationException(
             f"Expected modelType to be 'Range', "
@@ -2085,6 +2240,8 @@ def range_from_jsonable(
     the_value_type: Optional[our_types.DataTypeDefXSD] = None
     the_min: Optional[str] = None
     the_max: Optional[str] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2124,14 +2281,18 @@ def range_from_jsonable(
             elif key == 'max':
                 the_max = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_value_type is None:
         raise DeserializationException(
@@ -2168,6 +2329,17 @@ def reference_element_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'ReferenceElement':
         raise DeserializationException(
             f"Expected modelType to be 'ReferenceElement', "
@@ -2184,6 +2356,8 @@ def reference_element_from_jsonable(
     the_qualifiers: Optional[List[our_types.Qualifier]] = None
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_value: Optional[our_types.Reference] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2219,14 +2393,18 @@ def reference_element_from_jsonable(
             elif key == 'value':
                 the_value = reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     return our_types.ReferenceElement(
         the_extensions,
@@ -2256,6 +2434,17 @@ def blob_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'Blob':
         raise DeserializationException(
             f"Expected modelType to be 'Blob', "
@@ -2273,6 +2462,8 @@ def blob_from_jsonable(
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_value: Optional[bytes] = None
     the_content_type: Optional[str] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2310,14 +2501,18 @@ def blob_from_jsonable(
             elif key == 'contentType':
                 the_content_type = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_content_type is None:
         raise DeserializationException(
@@ -2353,6 +2548,17 @@ def file_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'File':
         raise DeserializationException(
             f"Expected modelType to be 'File', "
@@ -2370,6 +2576,8 @@ def file_from_jsonable(
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_value: Optional[str] = None
     the_content_type: Optional[str] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2407,14 +2615,18 @@ def file_from_jsonable(
             elif key == 'contentType':
                 the_content_type = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_content_type is None:
         raise DeserializationException(
@@ -2450,6 +2662,17 @@ def annotated_relationship_element_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'AnnotatedRelationshipElement':
         raise DeserializationException(
             f"Expected modelType to be 'AnnotatedRelationshipElement', "
@@ -2468,6 +2691,8 @@ def annotated_relationship_element_from_jsonable(
     the_first: Optional[our_types.Reference] = None
     the_second: Optional[our_types.Reference] = None
     the_annotations: Optional[List[our_types.DataElement]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2507,14 +2732,18 @@ def annotated_relationship_element_from_jsonable(
             elif key == 'annotations':
                 the_annotations = _list_of__data_element_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_first is None:
         raise DeserializationException(
@@ -2556,6 +2785,17 @@ def entity_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'Entity':
         raise DeserializationException(
             f"Expected modelType to be 'Entity', "
@@ -2575,6 +2815,8 @@ def entity_from_jsonable(
     the_entity_type: Optional[our_types.EntityType] = None
     the_global_asset_id: Optional[str] = None
     the_specific_asset_ids: Optional[List[our_types.SpecificAssetID]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2618,14 +2860,18 @@ def entity_from_jsonable(
                     _list_of__specific_asset_id_from_jsonable(jsonable_value)
                 )
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_entity_type is None:
         raise DeserializationException(
@@ -2749,12 +2995,11 @@ def event_payload_from_jsonable(
     the_time_stamp: Optional[str] = None
     the_payload: Optional[bytes] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'source':
+            if key == 'source':
                 the_source = reference_from_jsonable(jsonable_value)
             elif key == 'sourceSemanticId':
                 the_source_semantic_id = reference_from_jsonable(jsonable_value)
@@ -2771,14 +3016,18 @@ def event_payload_from_jsonable(
             elif key == 'payload':
                 the_payload = _bytes_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_source is None:
         raise DeserializationException(
@@ -2839,6 +3088,17 @@ def basic_event_element_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'BasicEventElement':
         raise DeserializationException(
             f"Expected modelType to be 'BasicEventElement', "
@@ -2862,6 +3122,8 @@ def basic_event_element_from_jsonable(
     the_last_update: Optional[str] = None
     the_min_interval: Optional[str] = None
     the_max_interval: Optional[str] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -2911,14 +3173,18 @@ def basic_event_element_from_jsonable(
             elif key == 'maxInterval':
                 the_max_interval = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_observed is None:
         raise DeserializationException(
@@ -2970,6 +3236,17 @@ def operation_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'Operation':
         raise DeserializationException(
             f"Expected modelType to be 'Operation', "
@@ -2988,6 +3265,8 @@ def operation_from_jsonable(
     the_input_variables: Optional[List[our_types.OperationVariable]] = None
     the_output_variables: Optional[List[our_types.OperationVariable]] = None
     the_inoutput_variables: Optional[List[our_types.OperationVariable]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3033,14 +3312,18 @@ def operation_from_jsonable(
                     _list_of__operation_variable_from_jsonable(jsonable_value)
                 )
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     return our_types.Operation(
         the_extensions,
@@ -3073,22 +3356,25 @@ def operation_variable_from_jsonable(
 
     the_value: Optional[our_types.SubmodelElement] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'value':
+            if key == 'value':
                 the_value = submodel_element_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_value is None:
         raise DeserializationException(
@@ -3114,6 +3400,17 @@ def capability_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'Capability':
         raise DeserializationException(
             f"Expected modelType to be 'Capability', "
@@ -3129,6 +3426,8 @@ def capability_from_jsonable(
     the_supplemental_semantic_ids: Optional[List[our_types.Reference]] = None
     the_qualifiers: Optional[List[our_types.Qualifier]] = None
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3162,14 +3461,18 @@ def capability_from_jsonable(
                     _list_of__embedded_data_specification_from_jsonable(jsonable_value)
                 )
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     return our_types.Capability(
         the_extensions,
@@ -3198,6 +3501,17 @@ def concept_description_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'ConceptDescription':
         raise DeserializationException(
             f"Expected modelType to be 'ConceptDescription', "
@@ -3213,6 +3527,8 @@ def concept_description_from_jsonable(
     the_id: Optional[str] = None
     the_embedded_data_specifications: Optional[List[our_types.EmbeddedDataSpecification]] = None
     the_is_case_of: Optional[List[our_types.Reference]] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -3246,14 +3562,18 @@ def concept_description_from_jsonable(
             elif key == 'isCaseOf':
                 the_is_case_of = _list_of__reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_id is None:
         raise DeserializationException(
@@ -3316,26 +3636,29 @@ def reference_from_jsonable(
     the_referred_semantic_id: Optional[our_types.Reference] = None
     the_keys: Optional[List[our_types.Key]] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'type':
+            if key == 'type':
                 the_type = reference_types_from_jsonable(jsonable_value)
             elif key == 'referredSemanticId':
                 the_referred_semantic_id = reference_from_jsonable(jsonable_value)
             elif key == 'keys':
                 the_keys = _list_of__key_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_type is None:
         raise DeserializationException(
@@ -3370,24 +3693,27 @@ def key_from_jsonable(
     the_type: Optional[our_types.KeyTypes] = None
     the_value: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'type':
+            if key == 'type':
                 the_type = key_types_from_jsonable(jsonable_value)
             elif key == 'value':
                 the_value = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_type is None:
         raise DeserializationException(
@@ -3491,24 +3817,27 @@ def lang_string_name_type_from_jsonable(
     the_language: Optional[str] = None
     the_text: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'language':
+            if key == 'language':
                 the_language = _str_from_jsonable(jsonable_value)
             elif key == 'text':
                 the_text = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_language is None:
         raise DeserializationException(
@@ -3542,24 +3871,27 @@ def lang_string_text_type_from_jsonable(
     the_language: Optional[str] = None
     the_text: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'language':
+            if key == 'language':
                 the_language = _str_from_jsonable(jsonable_value)
             elif key == 'text':
                 the_text = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_language is None:
         raise DeserializationException(
@@ -3594,12 +3926,11 @@ def environment_from_jsonable(
     the_submodels: Optional[List[our_types.Submodel]] = None
     the_concept_descriptions: Optional[List[our_types.ConceptDescription]] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'assetAdministrationShells':
+            if key == 'assetAdministrationShells':
                 the_asset_administration_shells = (
                     _list_of__asset_administration_shell_from_jsonable(jsonable_value)
                 )
@@ -3610,14 +3941,18 @@ def environment_from_jsonable(
                     _list_of__concept_description_from_jsonable(jsonable_value)
                 )
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     return our_types.Environment(
         the_asset_administration_shells,
@@ -3660,26 +3995,29 @@ def embedded_data_specification_from_jsonable(
     the_data_specification: Optional[our_types.Reference] = None
     the_data_specification_content: Optional[our_types.DataSpecificationContent] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'dataSpecification':
+            if key == 'dataSpecification':
                 the_data_specification = reference_from_jsonable(jsonable_value)
             elif key == 'dataSpecificationContent':
                 the_data_specification_content = (
                     data_specification_content_from_jsonable(jsonable_value)
                 )
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_data_specification is None:
         raise DeserializationException(
@@ -3741,12 +4079,11 @@ def level_type_from_jsonable(
     the_typ: Optional[bool] = None
     the_max: Optional[bool] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'min':
+            if key == 'min':
                 the_min = _bool_from_jsonable(jsonable_value)
             elif key == 'nom':
                 the_nom = _bool_from_jsonable(jsonable_value)
@@ -3755,14 +4092,18 @@ def level_type_from_jsonable(
             elif key == 'max':
                 the_max = _bool_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_min is None:
         raise DeserializationException(
@@ -3808,24 +4149,27 @@ def value_reference_pair_from_jsonable(
     the_value: Optional[str] = None
     the_value_id: Optional[our_types.Reference] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'value':
+            if key == 'value':
                 the_value = _str_from_jsonable(jsonable_value)
             elif key == 'valueId':
                 the_value_id = reference_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_value is None:
         raise DeserializationException(
@@ -3858,24 +4202,27 @@ def value_list_from_jsonable(
 
     the_value_reference_pairs: Optional[List[our_types.ValueReferencePair]] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'valueReferencePairs':
+            if key == 'valueReferencePairs':
                 the_value_reference_pairs = (
                     _list_of__value_reference_pair_from_jsonable(jsonable_value)
                 )
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_value_reference_pairs is None:
         raise DeserializationException(
@@ -3903,24 +4250,27 @@ def lang_string_preferred_name_type_iec_61360_from_jsonable(
     the_language: Optional[str] = None
     the_text: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'language':
+            if key == 'language':
                 the_language = _str_from_jsonable(jsonable_value)
             elif key == 'text':
                 the_text = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_language is None:
         raise DeserializationException(
@@ -3954,24 +4304,27 @@ def lang_string_short_name_type_iec_61360_from_jsonable(
     the_language: Optional[str] = None
     the_text: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'language':
+            if key == 'language':
                 the_language = _str_from_jsonable(jsonable_value)
             elif key == 'text':
                 the_text = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_language is None:
         raise DeserializationException(
@@ -4005,24 +4358,27 @@ def lang_string_definition_type_iec_61360_from_jsonable(
     the_language: Optional[str] = None
     the_text: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'language':
+            if key == 'language':
                 the_language = _str_from_jsonable(jsonable_value)
             elif key == 'text':
                 the_text = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_language is None:
         raise DeserializationException(
@@ -4054,6 +4410,17 @@ def data_specification_iec_61360_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'DataSpecificationIec61360':
         raise DeserializationException(
             f"Expected modelType to be 'DataSpecificationIec61360', "
@@ -4072,6 +4439,8 @@ def data_specification_iec_61360_from_jsonable(
     the_value_list: Optional[our_types.ValueList] = None
     the_value: Optional[str] = None
     the_level_type: Optional[our_types.LevelType] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -4109,14 +4478,18 @@ def data_specification_iec_61360_from_jsonable(
             elif key == 'levelType':
                 the_level_type = level_type_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_preferred_name is None:
         raise DeserializationException(
@@ -4422,7 +4795,7 @@ class SerializationException(Exception):
         object is known only at run time and can be any string at all, so it is
         always rendered as a subscript.
         """
-        self._segments.insert(0, f'[{key!r}]')
+        self._segments.insert(0, f'[{json.dumps(key, ensure_ascii=False)}]')
 
     def __str__(self) -> str:
         if len(self._segments) == 0:

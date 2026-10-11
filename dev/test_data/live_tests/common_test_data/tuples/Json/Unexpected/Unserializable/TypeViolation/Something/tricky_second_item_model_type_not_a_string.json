@@ -1,0 +1,33 @@
+{
+  "pair": [
+    "hello",
+    3
+  ],
+  "items": [
+    {
+      "modelType": "SomeItem",
+      "name": "something"
+    },
+    {
+      "modelType": "AnotherItem",
+      "serialNumber": 42
+    }
+  ],
+  "tricky": [
+    7,
+    {
+      "modelType": 42,
+      "name": "something"
+    },
+    {
+      "modelType": "AnotherItem",
+      "serialNumber": 99
+    },
+    {
+      "modelType": "SomeItem",
+      "name": "second"
+    },
+    5,
+    "ok"
+  ]
+}

@@ -80,6 +80,27 @@ struct IndexSegment : public ISegment {
 };  // struct IndexSegment
 
 /**
+ * Represent an access to a member of a JSON object whose key is known only at
+ * run time, such as a member of a JSON-able object, on a JSON path.
+ */
+struct KeySegment : public ISegment {
+  /**
+   * Key of the member in a JSON object
+   */
+  std::wstring key;
+
+  explicit KeySegment(
+    std::wstring a_key
+  );
+
+  std::wstring ToWstring() const override;
+
+  std::unique_ptr<ISegment> Clone() const override;
+
+  ~KeySegment() override = default;
+};  // struct KeySegment
+
+/**
  * Represent a JSON path to some value.
  */
 struct Path {

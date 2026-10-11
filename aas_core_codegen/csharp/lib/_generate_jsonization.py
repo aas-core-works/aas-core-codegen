@@ -336,7 +336,17 @@ private static string ModelTypeFrom(
 {II}return default!;
 {I}}}
 
-{I}return StringFrom(modelTypeNode, out error);
+{I}string modelType = StringFrom(modelTypeNode, out error);
+{I}if (error != null)
+{I}{{
+{II}// NOTE (mristin):
+{II}// A model type of a wrong type is reported at the property, as the type
+{II}// errors of all the other properties are, and as in the other SDKs.
+{II}error.PrependSegment(
+{III}new Reporting.NameSegment("modelType"));
+{II}return default!;
+{I}}}
+{I}return modelType;
 }}"""
     )
 
@@ -683,6 +693,8 @@ if (modelTypeNode != null)
 {I}string modelType = StringFrom(modelTypeNode, out error);
 {I}if (error != null)
 {I}{{
+{II}error.PrependSegment(
+{III}new Reporting.NameSegment("modelType"));
 {II}return default!;
 {I}}}
 
@@ -1033,9 +1045,14 @@ case "modelType":
 {II}keyValue.Value, out error);
 {I}if (error == null && modelType != "{model_type}")
 {I}{{
+{II}// NOTE (mristin):
+{II}// A wrong model type is reported at the instance, as an unknown one is,
+{II}// and as in the other SDKs, so we return before the property is
+{II}// prepended to the path.
 {II}error = new Reporting.Error(
 {III}"Expected the model type '{model_type}', " +
 {III}$"but got {{modelType}}");
+{II}return default!;
 {I}}}
 {I}break;"""
             )

@@ -246,7 +246,9 @@ public class Jsonization {
           final Reporting.Error error = new Reporting.Error(
             "Expected the model type '" + expected + "', " +
             "but got '" + modelType + "'");
-          error.prependSegment(new Reporting.NameSegment("modelType"));
+          // NOTE (mristin):
+          // A wrong model type is reported at the instance, as an unknown one is,
+          // and as in the other SDKs.
           return error;
         }
 

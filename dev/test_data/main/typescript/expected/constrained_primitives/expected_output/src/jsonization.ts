@@ -124,6 +124,12 @@ export class KeySegment {
 export type Segment = PropertySegment | IndexSegment | KeySegment;
 
 /**
+ * Match the property names which a path writes after a dot; the other names
+ * are written in brackets as JSON strings, *e.g.*, `["$eq"]`.
+ */
+const VARIABLE_NAME_RE = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
+
+/**
  * Represent the relative path to the erroneous value.
  */
 export class Path {
@@ -155,7 +161,11 @@ export class Path {
     let segment = this._segments[0];
 
     if (segment instanceof PropertySegment) {
-      parts.push(segment.name);
+      parts.push(
+        VARIABLE_NAME_RE.test(segment.name)
+          ? segment.name
+          : `[${JSON.stringify(segment.name)}]`
+      );
     } else if (segment instanceof IndexSegment) {
       parts.push(`[${segment.index}]`);
     } else if (segment instanceof KeySegment) {
@@ -167,7 +177,11 @@ export class Path {
     for (let i = 1; i < this._segments.length; i++) {
       segment = this._segments[i];
       if (segment instanceof PropertySegment) {
-        parts.push(`.${segment.name}`);
+        parts.push(
+          VARIABLE_NAME_RE.test(segment.name)
+            ? `.${segment.name}`
+            : `[${JSON.stringify(segment.name)}]`
+        );
       } else if (segment instanceof IndexSegment) {
         parts.push(`[${segment.index}]`);
       } else if (segment instanceof KeySegment) {
@@ -261,10 +275,15 @@ function extractModelType(
     );
   }
   if (typeof modelType !== "string") {
-    return newDeserializationError<string>(
+    // NOTE (mristin):
+    // A model type of a wrong type is reported at the property, as the type
+    // errors of all the other properties are, and as in the other SDKs.
+    const error = new DeserializationError(
       `Expected the property modelType to be a string, ` +
       `but got: ${typeof modelType}`
     );
+    error.path.prepend(new PropertySegment(jsonObject, "modelType"));
+    return new OurCommon.Either<string, DeserializationError>(null, error);
   }
 
   return new OurCommon.Either<string, DeserializationError>(modelType, null);

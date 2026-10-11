@@ -341,7 +341,17 @@ namespace AasCore.Aas3_0
                     return default!;
                 }
 
-                return StringFrom(modelTypeNode, out error);
+                string modelType = StringFrom(modelTypeNode, out error);
+                if (error != null)
+                {
+                    // NOTE (mristin):
+                    // A model type of a wrong type is reported at the property, as the type
+                    // errors of all the other properties are, and as in the other SDKs.
+                    error.PrependSegment(
+                        new Reporting.NameSegment("modelType"));
+                    return default!;
+                }
+                return modelType;
             }
 
             private static readonly Deserializer<List<IReference>> Parse_ListOf_IReference = (
@@ -1344,9 +1354,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "AssetAdministrationShell")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'AssetAdministrationShell', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -1759,9 +1774,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Submodel")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Submodel', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -2013,9 +2033,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "RelationshipElement")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'RelationshipElement', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -2199,9 +2224,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "SubmodelElementList")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'SubmodelElementList', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -2333,9 +2363,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "SubmodelElementCollection")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'SubmodelElementCollection', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -2516,9 +2551,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Property")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Property', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -2653,9 +2693,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "MultiLanguageProperty")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'MultiLanguageProperty', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -2785,9 +2830,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Range")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Range', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -2917,9 +2967,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "ReferenceElement")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'ReferenceElement', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -3043,9 +3098,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Blob")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Blob', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -3179,9 +3239,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "File")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'File', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -3320,9 +3385,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "AnnotatedRelationshipElement")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'AnnotatedRelationshipElement', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -3476,9 +3546,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Entity")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Entity', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -3876,9 +3951,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "BasicEventElement")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'BasicEventElement', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -4041,9 +4121,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Operation")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Operation', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -4216,9 +4301,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Capability")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Capability', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -4331,9 +4421,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "ConceptDescription")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'ConceptDescription', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -5533,9 +5628,14 @@ namespace AasCore.Aas3_0
                                 keyValue.Value, out error);
                             if (error == null && modelType != "DataSpecificationIec61360")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'DataSpecificationIec61360', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:

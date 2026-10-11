@@ -15,6 +15,7 @@ from aas_core_codegen.csharp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
+    INDENT5 as IIIII,
 )
 
 
@@ -132,18 +133,45 @@ public static String generateJsonPath(Collection<Segment> segments) {{
 /**
  * Escape the characters which a JSON string may not hold as they are.
  *
- * <p>Mind the order: the backslash has to go first, or the backslash which
- * the replacements below introduce would be escaped a second time.
+ * <p>The control characters without a short escape are written as Unicode
+ * escapes, as {{@code JSON.stringify}} does.
  */
 private static String escapeForJsonString(String text) {{
-{I}return text
-{II}.replace("\\\\", "\\\\\\\\")
-{II}.replace("\\"", "\\\\\\"")
-{II}.replace("\\b", "\\\\b")
-{II}.replace("\\f", "\\\\f")
-{II}.replace("\\n", "\\\\n")
-{II}.replace("\\r", "\\\\r")
-{II}.replace("\\t", "\\\\t");
+{I}StringBuilder builder = new StringBuilder(text.length());
+{I}for (int i = 0; i < text.length(); i++) {{
+{II}char character = text.charAt(i);
+{II}switch (character) {{
+{III}case '\\\\':
+{IIII}builder.append("\\\\\\\\");
+{IIII}break;
+{III}case '"':
+{IIII}builder.append("\\\\\\"");
+{IIII}break;
+{III}case '\\b':
+{IIII}builder.append("\\\\b");
+{IIII}break;
+{III}case '\\f':
+{IIII}builder.append("\\\\f");
+{IIII}break;
+{III}case '\\n':
+{IIII}builder.append("\\\\n");
+{IIII}break;
+{III}case '\\r':
+{IIII}builder.append("\\\\r");
+{IIII}break;
+{III}case '\\t':
+{IIII}builder.append("\\\\t");
+{IIII}break;
+{III}default:
+{IIII}if (character < 0x20) {{
+{IIIII}builder.append(String.format("\\\\u%04x", (int) character));
+{IIII}}} else {{
+{IIIII}builder.append(character);
+{IIII}}}
+{IIII}break;
+{II}}}
+{I}}}
+{I}return builder.toString();
 }}"""
         ),
         Stripped(

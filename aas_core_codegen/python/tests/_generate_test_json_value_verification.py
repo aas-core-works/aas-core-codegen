@@ -74,8 +74,8 @@ class TestJsonValue(unittest.TestCase):
 
 {I}def test_the_walk_is_depth_first(self) -> None:
 {II}# NOTE (mristin):
-{II}# A breadth-first walk would report the shallow ``['z']`` before
-{II}# the deeper ``['a']['deep']``, although the latter comes first in
+{II}# A breadth-first walk would report the shallow ``["z"]`` before
+{II}# the deeper ``["a"]["deep"]``, although the latter comes first in
 {II}# the value.
 {II}value = {{
 {III}"a": {{"deep": math.nan}},
@@ -83,7 +83,7 @@ class TestJsonValue(unittest.TestCase):
 {II}}}
 
 {II}self.assertListEqual(
-{III}["['a']['deep']", "['z']"],
+{III}['["a"]["deep"]', '["z"]'],
 {III}[
 {IIII}path
 {IIII}for path, _ in _paths_and_causes(
@@ -101,7 +101,7 @@ class TestJsonValue(unittest.TestCase):
 
 {II}self.assertEqual(1, len(paths_and_causes))
 {II}self.assertEqual(
-{III}"['a b'][1][\\"c'd\\"]",
+{III}'["a b"][1]["c\\'d"]',
 {III}paths_and_causes[0][0]
 {II})
 
@@ -113,7 +113,7 @@ class TestJsonValue(unittest.TestCase):
 {II})
 
 {II}self.assertEqual(1, len(paths_and_causes))
-{II}self.assertEqual("['a']", paths_and_causes[0][0])
+{II}self.assertEqual('["a"]', paths_and_causes[0][0])
 {II}self.assertIn("but got a key of type", paths_and_causes[0][1])
 
 {I}def test_the_segments_carry_their_container(self) -> None:
@@ -184,7 +184,7 @@ class TestJsonValue(unittest.TestCase):
 {II})
 
 {II}self.assertEqual(1, len(paths_and_causes))
-{II}self.assertEqual("['a']", paths_and_causes[0][0])
+{II}self.assertEqual('["a"]', paths_and_causes[0][0])
 {II}self.assertIn("but got: ", paths_and_causes[0][1])"""
         ),
         Stripped(
@@ -231,7 +231,7 @@ class TestJsonArrayAndJsonObject(unittest.TestCase):
 {II})
 
 {II}self.assertEqual(1, len(paths_and_causes))
-{II}self.assertEqual("['a'][0]['b']", paths_and_causes[0][0])"""
+{II}self.assertEqual('["a"][0]["b"]', paths_and_causes[0][0])"""
         ),
         Stripped(
             f"""\
