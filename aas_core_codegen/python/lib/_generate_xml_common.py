@@ -286,7 +286,7 @@ class IndexSegment:
 {I}#: Erroneous element
 {I}element: Final[Element]
 
-{I}#: Index of the element in the sequence
+{I}#: Index of the element in the sequence, starting at zero
 {I}index: Final[int]
 
 {I}def __init__(
@@ -299,8 +299,12 @@ class IndexSegment:
 {II}self.index = index
 
 {I}def __str__(self) -> str:
-{II}\"\"\"Render the segment as an element wildcard with the index.\"\"\"
-{II}return f'*[{{self.index}}]'"""
+{II}\"\"\"
+{II}Render the segment as an element wildcard with the index.
+
+{II}XPath counts the elements starting at one, so we add one to :py:attr:`index`.
+{II}\"\"\"
+{II}return f'*[{{self.index + 1}}]'"""
         ),
         Stripped(
             f"""\

@@ -142,7 +142,7 @@ class TestReading(unittest.TestCase):
             our_xmlrpc.read_value_content(element, iterator)
 
         self.assertEqual(
-            'struct/member[name="nested"]/value/array/data/*[1]/string',
+            'struct/member[name="nested"]/value/array/data/*[2]/string',
             str(context.exception.path)
         )
 
@@ -161,7 +161,7 @@ class TestReading(unittest.TestCase):
         ) as context:
             our_xmlrpc.read_array_body(element, iterator)
 
-        self.assertEqual('data/*[0]/boolean', str(context.exception.path))
+        self.assertEqual('data/*[1]/boolean', str(context.exception.path))
 
     def test_the_struct_body_entered_without_its_wrapper(self) -> None:
         # NOTE (mristin):

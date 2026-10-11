@@ -615,6 +615,47 @@ func nextProperty(
     )
 
 
+def _generate_naming_element() -> Stripped:
+    """Generate the wrapper which reports the errors at the element read by local name."""
+    return Stripped(
+        f"""\
+// Wrap `readByLocal` so that its errors are reported at the element it reads.
+//
+// We use it where an instance of a class is its own element, at the root or
+// nested in a property, so that the path names the element of the instance,
+// *e.g.*, `someRoot/property/someClass/someProperty`, as in the other SDKs.
+// The items of a list and of a tuple are not wrapped, as their index already
+// selects the element of the instance.
+func namingElement[T any](
+{I}readByLocal func(
+{II}aDecoder *xml.Decoder,
+{II}aCurrent xml.Token,
+{II}aLocal string,
+{I}) (value T, aNext xml.Token, anErr error),
+) func(
+{I}decoder *xml.Decoder,
+{I}current xml.Token,
+{I}local string,
+) (value T, next xml.Token, err error) {{
+{I}return func(
+{II}decoder *xml.Decoder,
+{II}current xml.Token,
+{II}local string,
+{I}) (value T, next xml.Token, err error) {{
+{II}value, next, err = readByLocal(decoder, current, local)
+{II}if err != nil {{
+{III}if deseriaErr, ok := err.(*DeserializationError); ok {{
+{IIII}deseriaErr.Path.PrependName(
+{IIIII}&ourreporting.NameSegment{{Name: local}},
+{IIII})
+{III}}}
+{II}}}
+{II}return
+{I}}}
+}}"""
+    )
+
+
 def _generate_conclude_property() -> Stripped:
     """Generate the function to conclude the reading of a single property."""
     return Stripped(
@@ -624,30 +665,30 @@ def _generate_conclude_property() -> Stripped:
 //
 // If `valueErr` is set, report it in the context of that property. Otherwise,
 // consume the end element, so that the resulting `next` token points to the first
-// token just after it.
+// token just after it. An unexpected content in place of the end element, such as
+// a text or an excess element, is reported in the context of the property as well.
 func concludeProperty(
 {I}decoder *xml.Decoder,
 {I}current xml.Token,
 {I}local string,
 {I}valueErr error,
 ) (next xml.Token, err error) {{
-{I}if valueErr != nil {{
-{II}if deseriaErr, ok := valueErr.(*DeserializationError); ok {{
+{I}err = valueErr
+
+{I}if err == nil {{
+{II}current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+{I}}}
+
+{I}if err == nil {{
+{II}err = xmlcommon.CheckEndElement(current, local)
+{I}}}
+
+{I}if err != nil {{
+{II}if deseriaErr, ok := err.(*DeserializationError); ok {{
 {III}deseriaErr.Path.PrependName(
 {IIII}&ourreporting.NameSegment{{Name: local}},
 {III})
 {II}}}
-{II}err = valueErr
-{II}return
-{I}}}
-
-{I}current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
-{I}if err != nil {{
-{II}return
-{I}}}
-
-{I}err = xmlcommon.CheckEndElement(current, local)
-{I}if err != nil {{
 {II}return
 {I}}}
 
@@ -679,6 +720,22 @@ def _generate_read_tuple_helper(arity: int) -> Stripped:
         item_blocks.append(
             Stripped(
                 f"""\
+current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+if err != nil {{
+{I}return
+}}
+
+// NOTE (mristin):
+// A missing item is reported at the tuple itself, and not at the position of
+// the item, as there is no item element to point to.
+if _, ok := current.(xml.StartElement); !ok {{
+{I}err = xmlcommon.NewDeserializationError(
+{II}"Expected the item {i + 1} of the tuple of {arity} item(s), " +
+{III}"but got no start element",
+{I})
+{I}return
+}}
+
 var item{i + 1} {type_params[i]}
 item{i + 1}, current, err = xmlcommon.ReadElementDispatched(
 {I}decoder, current, readItem{i + 1},
@@ -1141,7 +1198,7 @@ def _generate_snippet_to_switch_on_property_deserialization(
                     case_body = Stripped(
                         f"""\
 {prop_var}, current, valueErr = xmlcommon.ReadElementDispatched(
-{I}decoder, current, {read_dispatched},
+{I}decoder, current, namingElement({read_dispatched}),
 )"""
                     )
                 else:
@@ -1660,8 +1717,27 @@ func Unmarshal(
 {II}return
 {I}}}
 
+{I}// NOTE (mristin):
+{I}// We skip the prolog before the root element, *i.e.*, the XML declaration,
+{I}// the processing instructions, the comments and the whitespace.
+{I}for {{
+{II}current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+{II}if err != nil {{
+{III}return
+{II}}}
+
+{II}if _, ok := current.(xml.ProcInst); !ok {{
+{III}break
+{II}}}
+
+{II}current, err = xmlcommon.ReadNext(decoder, current)
+{II}if err != nil {{
+{III}return
+{II}}}
+{I}}}
+
 {I}instance, _, err = xmlcommon.ReadElementDispatched(
-{II}decoder, current, readClassDispatched,
+{II}decoder, current, namingElement(readClassDispatched),
 {I})
 {I}return
 }}"""
@@ -2701,6 +2777,7 @@ type DeserializationError = xmlcommon.DeserializationError"""
             _generate_read_optional(),
             _generate_next_property(),
             _generate_conclude_property(),
+            _generate_naming_element(),
         ]
     )
 

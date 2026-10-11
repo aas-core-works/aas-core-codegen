@@ -179,8 +179,10 @@ public static String generateRelativeXPath(Collection<Segment> segments) {{
 {III}part = escapeForXPath(name);
 {II}}} else if (segment instanceof IndexSegment) {{
 {III}final IndexSegment indexSegment = ((IndexSegment) segment);
+{III}// NOTE (mristin):
+{III}// XPath counts the elements starting at one, while our indices start at zero.
 {III}final int index = indexSegment.getIndex();
-{III}part = "*[" + index + "]";
+{III}part = "*[" + (index + 1) + "]";
 {II}}} else if (segment instanceof KeySegment) {{
 {III}// A JSON-able object is written as an XML-RPC <struct>, which holds
 {III}// the key of a member in a <name> child element, and not in

@@ -277,6 +277,20 @@ public final class XmlRpc {
                 "but the element was empty"));
         }
 
+        // NOTE (mristin):
+        // Only an entered <data> element is a step of the path. Another element in
+        // its place is refused on the property itself.
+        final Reporting.Result<String> tryElementName =
+            XmlCommon.peekElementNameInNoNamespace(reader);
+        if (tryElementName.isError()) {
+            return Reporting.Result.failure(tryElementName.getError());
+        }
+        if (!"data".equals(tryElementName.getResult())) {
+            return Reporting.Result.failure(new Reporting.Error(
+                "Expected an XML element data, but got an XML element " +
+                tryElementName.getResult()));
+        }
+
         final Reporting.Result<? extends ArrayNode> result = XmlCommon.readNamedElementInNoNamespace(
             reader, "data", XmlRpc::readXmlRpcData);
         if (result.isError()) {

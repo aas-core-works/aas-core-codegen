@@ -251,7 +251,7 @@ namespace dummy.Tests
             // The item gets an index and no step of its own, as every item of
             // a ``<data>`` element is a ``<value>`` element.
             Assert.AreEqual(
-                "array/data/*[1]",
+                "array/data/*[2]",
                 Our.Reporting.GenerateRelativeXPath(error!.PathSegments));
         }
 

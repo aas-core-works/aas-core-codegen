@@ -184,6 +184,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.ExtensionFrom(
                     xmlReader);
@@ -231,6 +232,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -285,6 +287,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.ExtensionFrom(
                         xmlReader);
@@ -313,6 +316,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.AdministrativeInformationFrom(
                     xmlReader);
@@ -360,6 +364,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -414,6 +419,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.AdministrativeInformationFrom(
                         xmlReader);
@@ -442,6 +448,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.QualifierFrom(
                     xmlReader);
@@ -489,6 +496,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -543,6 +551,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.QualifierFrom(
                         xmlReader);
@@ -571,6 +580,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.AssetAdministrationShellFrom(
                     xmlReader);
@@ -618,6 +628,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -672,6 +683,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.AssetAdministrationShellFrom(
                         xmlReader);
@@ -700,6 +712,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.AssetInformationFrom(
                     xmlReader);
@@ -747,6 +760,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -801,6 +815,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.AssetInformationFrom(
                         xmlReader);
@@ -829,6 +844,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.ResourceFrom(
                     xmlReader);
@@ -876,6 +892,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -930,6 +947,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.ResourceFrom(
                         xmlReader);
@@ -958,6 +976,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.SpecificAssetIdFrom(
                     xmlReader);
@@ -1005,6 +1024,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1059,6 +1079,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.SpecificAssetIdFrom(
                         xmlReader);
@@ -1087,6 +1108,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.SubmodelFrom(
                     xmlReader);
@@ -1134,6 +1156,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1188,6 +1211,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.SubmodelFrom(
                         xmlReader);
@@ -1216,6 +1240,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.RelationshipElementFrom(
                     xmlReader);
@@ -1263,6 +1288,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1317,6 +1343,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.RelationshipElementFrom(
                         xmlReader);
@@ -1345,6 +1372,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.SubmodelElementListFrom(
                     xmlReader);
@@ -1392,6 +1420,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1446,6 +1475,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.SubmodelElementListFrom(
                         xmlReader);
@@ -1474,6 +1504,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.SubmodelElementCollectionFrom(
                     xmlReader);
@@ -1521,6 +1552,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1575,6 +1607,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.SubmodelElementCollectionFrom(
                         xmlReader);
@@ -1603,6 +1636,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.PropertyFrom(
                     xmlReader);
@@ -1650,6 +1684,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1704,6 +1739,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.PropertyFrom(
                         xmlReader);
@@ -1732,6 +1768,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.MultiLanguagePropertyFrom(
                     xmlReader);
@@ -1779,6 +1816,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1833,6 +1871,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.MultiLanguagePropertyFrom(
                         xmlReader);
@@ -1861,6 +1900,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.RangeFrom(
                     xmlReader);
@@ -1908,6 +1948,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -1962,6 +2003,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.RangeFrom(
                         xmlReader);
@@ -1990,6 +2032,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.ReferenceElementFrom(
                     xmlReader);
@@ -2037,6 +2080,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2091,6 +2135,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.ReferenceElementFrom(
                         xmlReader);
@@ -2119,6 +2164,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.BlobFrom(
                     xmlReader);
@@ -2166,6 +2212,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2220,6 +2267,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.BlobFrom(
                         xmlReader);
@@ -2248,6 +2296,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.FileFrom(
                     xmlReader);
@@ -2295,6 +2344,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2349,6 +2399,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.FileFrom(
                         xmlReader);
@@ -2377,6 +2428,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.AnnotatedRelationshipElementFrom(
                     xmlReader);
@@ -2424,6 +2476,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2478,6 +2531,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.AnnotatedRelationshipElementFrom(
                         xmlReader);
@@ -2506,6 +2560,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.EntityFrom(
                     xmlReader);
@@ -2553,6 +2608,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2607,6 +2663,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.EntityFrom(
                         xmlReader);
@@ -2635,6 +2692,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.EventPayloadFrom(
                     xmlReader);
@@ -2682,6 +2740,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2736,6 +2795,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.EventPayloadFrom(
                         xmlReader);
@@ -2764,6 +2824,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.BasicEventElementFrom(
                     xmlReader);
@@ -2811,6 +2872,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2865,6 +2927,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.BasicEventElementFrom(
                         xmlReader);
@@ -2893,6 +2956,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.OperationFrom(
                     xmlReader);
@@ -2940,6 +3004,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -2994,6 +3059,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.OperationFrom(
                         xmlReader);
@@ -3022,6 +3088,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.OperationVariableFrom(
                     xmlReader);
@@ -3069,6 +3136,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -3123,6 +3191,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.OperationVariableFrom(
                         xmlReader);
@@ -3151,6 +3220,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.CapabilityFrom(
                     xmlReader);
@@ -3198,6 +3268,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -3252,6 +3323,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.CapabilityFrom(
                         xmlReader);
@@ -3280,6 +3352,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.ConceptDescriptionFrom(
                     xmlReader);
@@ -3327,6 +3400,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -3381,6 +3455,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.ConceptDescriptionFrom(
                         xmlReader);
@@ -3409,6 +3484,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.ReferenceFrom(
                     xmlReader);
@@ -3456,6 +3532,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -3510,6 +3587,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.ReferenceFrom(
                         xmlReader);
@@ -3538,6 +3616,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.KeyFrom(
                     xmlReader);
@@ -3585,6 +3664,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -3639,6 +3719,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.KeyFrom(
                         xmlReader);
@@ -3667,6 +3748,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.LangStringNameTypeFrom(
                     xmlReader);
@@ -3714,6 +3796,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -3768,6 +3851,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.LangStringNameTypeFrom(
                         xmlReader);
@@ -3796,6 +3880,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.LangStringTextTypeFrom(
                     xmlReader);
@@ -3843,6 +3928,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -3897,6 +3983,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.LangStringTextTypeFrom(
                         xmlReader);
@@ -3925,6 +4012,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.EnvironmentFrom(
                     xmlReader);
@@ -3972,6 +4060,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4026,6 +4115,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.EnvironmentFrom(
                         xmlReader);
@@ -4054,6 +4144,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.EmbeddedDataSpecificationFrom(
                     xmlReader);
@@ -4101,6 +4192,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4155,6 +4247,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.EmbeddedDataSpecificationFrom(
                         xmlReader);
@@ -4183,6 +4276,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.LevelTypeFrom(
                     xmlReader);
@@ -4230,6 +4324,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4284,6 +4379,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.LevelTypeFrom(
                         xmlReader);
@@ -4312,6 +4408,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.ValueReferencePairFrom(
                     xmlReader);
@@ -4359,6 +4456,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4413,6 +4511,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.ValueReferencePairFrom(
                         xmlReader);
@@ -4441,6 +4540,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.ValueListFrom(
                     xmlReader);
@@ -4488,6 +4588,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4542,6 +4643,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.ValueListFrom(
                         xmlReader);
@@ -4570,6 +4672,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.LangStringPreferredNameTypeIec61360From(
                     xmlReader);
@@ -4617,6 +4720,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4671,6 +4775,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.LangStringPreferredNameTypeIec61360From(
                         xmlReader);
@@ -4699,6 +4804,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.LangStringShortNameTypeIec61360From(
                     xmlReader);
@@ -4746,6 +4852,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4800,6 +4907,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.LangStringShortNameTypeIec61360From(
                         xmlReader);
@@ -4828,6 +4936,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.LangStringDefinitionTypeIec61360From(
                     xmlReader);
@@ -4875,6 +4984,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -4929,6 +5039,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.LangStringDefinitionTypeIec61360From(
                         xmlReader);
@@ -4957,6 +5068,7 @@ namespace AasCore.Aas3_0.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.DataSpecificationIec61360From(
                     xmlReader);
@@ -5004,6 +5116,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -5058,6 +5171,7 @@ namespace AasCore.Aas3_0.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.DataSpecificationIec61360From(
                         xmlReader);

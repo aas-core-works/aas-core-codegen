@@ -157,7 +157,7 @@ test("the path into a nested value", () => {{
 
 {I}expect(parsed.error).not.toBeNull();
 {I}expect(mustError(parsed).path.toString()).toStrictEqual(
-{II}'struct/member[name="nested"]/value/array/data/*[1]/string'
+{II}'struct/member[name="nested"]/value/array/data/*[2]/string'
 {I});
 }});"""
         ),
@@ -176,7 +176,7 @@ test("the array body is entered without its wrapper", () => {{
 {I}const parsed = OurXmlRpc.parseArrayBody(cursor);
 
 {I}expect(parsed.error).not.toBeNull();
-{I}expect(mustError(parsed).path.toString()).toStrictEqual("data/*[0]/boolean");
+{I}expect(mustError(parsed).path.toString()).toStrictEqual("data/*[1]/boolean");
 }});"""
         ),
         Stripped(

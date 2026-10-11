@@ -158,8 +158,10 @@ public class Reporting
                 part = escapeForXPath(name);
             } else if (segment instanceof IndexSegment) {
                 final IndexSegment indexSegment = ((IndexSegment) segment);
+                // NOTE (mristin):
+                // XPath counts the elements starting at one, while our indices start at zero.
                 final int index = indexSegment.getIndex();
-                part = "*[" + index + "]";
+                part = "*[" + (index + 1) + "]";
             } else if (segment instanceof KeySegment) {
                 // A JSON-able object is written as an XML-RPC <struct>, which holds
                 // the key of a member in a <name> child element, and not in

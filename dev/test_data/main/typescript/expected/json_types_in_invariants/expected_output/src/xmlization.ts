@@ -404,20 +404,29 @@ export function fromXmlString(
   const rootOpenTag = rootOpenTagOrError.mustValue();
   const rootLocalName = localNameOfTag(rootOpenTag.tag);
 
+  // NOTE (mristin):
+  // The errors within the root element are reported at it, as in the other SDKs.
   const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(rootLocalName);
   if (dispatch === undefined) {
-    return newDeserializationError<OurTypes.Class>(
+    const error = new DeserializationError(
       `Unexpected root XML element: ${rootLocalName}`
+    );
+    error.path.prepend(new ElementSegment(rootLocalName));
+    return new OurCommon.Either<OurTypes.Class, DeserializationError>(
+      null,
+      error
     );
   }
 
   const instanceOrError = dispatch(cursor);
   if (instanceOrError.error !== null) {
+    instanceOrError.error.path.prepend(new ElementSegment(rootLocalName));
     return instanceOrError;
   }
 
   const closeError = consumeCloseTag(cursor, rootLocalName);
   if (closeError !== null) {
+    closeError.path.prepend(new ElementSegment(rootLocalName));
     return new OurCommon.Either<OurTypes.Class, DeserializationError>(
       null,
       closeError

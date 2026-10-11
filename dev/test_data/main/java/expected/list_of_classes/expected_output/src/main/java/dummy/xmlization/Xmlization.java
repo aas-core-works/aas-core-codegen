@@ -147,7 +147,6 @@ public class Xmlization {
         final Reporting.Error error = new Reporting.Error(
           "Expected a start element opening an item of the list, " +
           "but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
-        error.prependSegment(new Reporting.IndexSegment(index));
         return Reporting.Result.failure(error);
       }
 
@@ -319,6 +318,12 @@ public class Xmlization {
 
           final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
           if (endResult.isError()) {
+            // NOTE (mristin):
+            // Whatever unexpected node precedes the end element still lies within
+            // the property.
+            endResult.getError().prependSegment(
+              new Reporting.NameSegment(
+                elementName));
             return Reporting.Result.failure(endResult.getError());
           }
         }
@@ -396,6 +401,12 @@ public class Xmlization {
 
           final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
           if (endResult.isError()) {
+            // NOTE (mristin):
+            // Whatever unexpected node precedes the end element still lies within
+            // the property.
+            endResult.getError().prependSegment(
+              new Reporting.NameSegment(
+                elementName));
             return Reporting.Result.failure(endResult.getError());
           }
         }
@@ -473,6 +484,12 @@ public class Xmlization {
 
           final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
           if (endResult.isError()) {
+            // NOTE (mristin):
+            // Whatever unexpected node precedes the end element still lies within
+            // the property.
+            endResult.getError().prependSegment(
+              new Reporting.NameSegment(
+                elementName));
             return Reporting.Result.failure(endResult.getError());
           }
         }
@@ -582,6 +599,12 @@ public class Xmlization {
 
           final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
           if (endResult.isError()) {
+            // NOTE (mristin):
+            // Whatever unexpected node precedes the end element still lies within
+            // the property.
+            endResult.getError().prependSegment(
+              new Reporting.NameSegment(
+                elementName));
             return Reporting.Result.failure(endResult.getError());
           }
         }
@@ -652,12 +675,22 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       XmlCommon.skipWhitespaceAndComments(reader);
 
+      // NOTE (mristin):
+      // The path starts at the root element as it is in the document, which
+      // might well be another element than the expected one.
+      final String rootElementName = (
+        XmlCommon.currentEvent(reader).isStartElement()
+          ? XmlCommon.currentEvent(reader).asStartElement().getName().getLocalPart()
+          : null);
+
       Reporting.Result<? extends IAbstractItem> result =
         _DeserializeImplementation.readIAbstractItemFromElement(
           reader);
 
       return result.onError(error -> {
-        error.prependSegment(new Reporting.NameSegment("iabstractitem"));
+        if (rootElementName != null) {
+          error.prependSegment(new Reporting.NameSegment(rootElementName));
+        }
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());
@@ -675,12 +708,22 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       XmlCommon.skipWhitespaceAndComments(reader);
 
+      // NOTE (mristin):
+      // The path starts at the root element as it is in the document, which
+      // might well be another element than the expected one.
+      final String rootElementName = (
+        XmlCommon.currentEvent(reader).isStartElement()
+          ? XmlCommon.currentEvent(reader).asStartElement().getName().getLocalPart()
+          : null);
+
       Reporting.Result<? extends SomeItem> result =
         _DeserializeImplementation.readSomeItemFromElement(
           reader);
 
       return result.onError(error -> {
-        error.prependSegment(new Reporting.NameSegment("someitem"));
+        if (rootElementName != null) {
+          error.prependSegment(new Reporting.NameSegment(rootElementName));
+        }
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());
@@ -698,12 +741,22 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       XmlCommon.skipWhitespaceAndComments(reader);
 
+      // NOTE (mristin):
+      // The path starts at the root element as it is in the document, which
+      // might well be another element than the expected one.
+      final String rootElementName = (
+        XmlCommon.currentEvent(reader).isStartElement()
+          ? XmlCommon.currentEvent(reader).asStartElement().getName().getLocalPart()
+          : null);
+
       Reporting.Result<? extends AnotherItem> result =
         _DeserializeImplementation.readAnotherItemFromElement(
           reader);
 
       return result.onError(error -> {
-        error.prependSegment(new Reporting.NameSegment("anotheritem"));
+        if (rootElementName != null) {
+          error.prependSegment(new Reporting.NameSegment(rootElementName));
+        }
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());
@@ -721,12 +774,22 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       XmlCommon.skipWhitespaceAndComments(reader);
 
+      // NOTE (mristin):
+      // The path starts at the root element as it is in the document, which
+      // might well be another element than the expected one.
+      final String rootElementName = (
+        XmlCommon.currentEvent(reader).isStartElement()
+          ? XmlCommon.currentEvent(reader).asStartElement().getName().getLocalPart()
+          : null);
+
       Reporting.Result<? extends Simple> result =
         _DeserializeImplementation.readSimpleFromElement(
           reader);
 
       return result.onError(error -> {
-        error.prependSegment(new Reporting.NameSegment("simple"));
+        if (rootElementName != null) {
+          error.prependSegment(new Reporting.NameSegment(rootElementName));
+        }
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());
@@ -744,12 +807,22 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       XmlCommon.skipWhitespaceAndComments(reader);
 
+      // NOTE (mristin):
+      // The path starts at the root element as it is in the document, which
+      // might well be another element than the expected one.
+      final String rootElementName = (
+        XmlCommon.currentEvent(reader).isStartElement()
+          ? XmlCommon.currentEvent(reader).asStartElement().getName().getLocalPart()
+          : null);
+
       Reporting.Result<? extends Something> result =
         _DeserializeImplementation.readSomethingFromElement(
           reader);
 
       return result.onError(error -> {
-        error.prependSegment(new Reporting.NameSegment("something"));
+        if (rootElementName != null) {
+          error.prependSegment(new Reporting.NameSegment(rootElementName));
+        }
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());

@@ -158,7 +158,7 @@ IndexSegment::IndexSegment(
 std::wstring IndexSegment::ToWstring() const {
   return common::Concat(
     L"*[",
-    std::to_wstring(index),
+    std::to_wstring(index + 1),
     L"]"
   );
 }

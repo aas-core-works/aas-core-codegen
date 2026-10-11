@@ -184,6 +184,7 @@ namespace dummy.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.FirstFrom(
                     xmlReader);
@@ -231,6 +232,7 @@ namespace dummy.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -285,6 +287,7 @@ namespace dummy.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.FirstFrom(
                         xmlReader);
@@ -313,6 +316,7 @@ namespace dummy.Tests
             foreach (var path in paths)
             {
                 using var xmlReader = System.Xml.XmlReader.Create(path);
+                xmlReader.MoveToContent();
 
                 var instance = Our.Xmlization.Deserialize.SecondFrom(
                     xmlReader);
@@ -360,6 +364,7 @@ namespace dummy.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     Our.Xmlization.Exception? exception = null;
 
@@ -414,6 +419,7 @@ namespace dummy.Tests
                 foreach (var path in paths)
                 {
                     using var xmlReader = System.Xml.XmlReader.Create(path);
+                    xmlReader.MoveToContent();
 
                     var instance = Our.Xmlization.Deserialize.SecondFrom(
                         xmlReader);

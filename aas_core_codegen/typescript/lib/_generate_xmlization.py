@@ -624,6 +624,18 @@ def _generate_parse_tuple_function(arity: int) -> Stripped:
     for i in range(arity):
         item_blocks.append(
             f"""\
+// NOTE (mristin):
+// A missing item is reported at the tuple itself, and not at the position of
+// the item, as there is no item element to point to.
+cursor.skipIgnorable();
+const maybeItem{i} = cursor.current();
+if (maybeItem{i} === null || maybeItem{i}.kind === "close-tag") {{
+{I}return newDeserializationError<{tuple_type}>(
+{II}"Expected the item {i + 1} of the tuple of {arity} item(s), " +
+{III}"but got no start element"
+{I});
+}}
+
 const item{i}OrError = parseItem{i}(cursor);
 if (item{i}OrError.error !== null) {{
 {I}item{i}OrError.error.path.prepend(new IndexSegment({i}));
@@ -674,7 +686,15 @@ def _generate_parse_case_for_property(
     # NOTE (mristin):
     # A case sits two levels below the ``switch``, which the class's parser indents by
     # three, so the body of a case lands on the fourth level.
-    content_parser = _content_parser_name(prop.type_annotation)
+    content_parser = Stripped(_content_parser_name(prop.type_annotation))
+
+    # NOTE (mristin):
+    # A dispatched instance nests an element of its own in the element of
+    # the property, which we name in the path, see ``namingElement``.
+    if typescript_common.is_dispatched(
+        intermediate.beneath_optional(prop.type_annotation)
+    ):
+        content_parser = Stripped(f"namingElement({content_parser})")
 
     call = Stripped(
         f"""\
@@ -999,7 +1019,7 @@ export function {function_name}(
 
 {I}const cursor = new XmlCursor(tokensOrError.mustValue());
 
-{I}const instanceOrError = {dispatch_function_name}(cursor);
+{I}const instanceOrError = namingElement({dispatch_function_name})(cursor);
 {I}if (instanceOrError.error !== null) {{
 {II}return instanceOrError;
 {I}}}
@@ -1875,6 +1895,52 @@ function dispatchParseElement<T>(
             )
         )
 
+    # NOTE (mristin):
+    # We generate the wrapper only if it is used, as an unused function would make
+    # ESLint unhappy.
+    if any(cls.interface is not None for cls in symbol_table.classes) or any(
+        typescript_common.is_dispatched(
+            intermediate.beneath_optional(prop.type_annotation)
+        )
+        for cls in symbol_table.concrete_classes
+        for prop in cls.properties
+    ):
+        blocks.append(
+            Stripped(
+                f"""\
+/**
+ * Wrap `parseElement` so that its errors are reported at the element it parses.
+ *
+ * We use it where an instance is its own element, at the root or nested in
+ * a property, so that the path names the element of the instance, *e.g.*,
+ * `someRoot/property/someClass/someProperty`, as in the other SDKs. The items of
+ * a list and of a tuple are not wrapped, as their index already selects
+ * the element of the instance.
+ *
+ * @param parseElement - to parse the element whole, the tags included
+ * @returns the wrapped parser
+ * @typeParam T - type of the parsed instance
+ */
+function namingElement<T>(
+{I}parseElement: ContentParser<T>
+): ContentParser<T> {{
+{I}return (cursor: XmlCursor) => {{
+{II}const startTagOrError = readNextOpenTag(cursor);
+{II}const localName =
+{III}startTagOrError.error === null
+{IIII}? localNameOfTag(startTagOrError.mustValue().tag)
+{IIII}: null;
+
+{II}const valueOrError = parseElement(cursor);
+{II}if (valueOrError.error !== null && localName !== null) {{
+{III}valueOrError.error.path.prepend(new ElementSegment(localName));
+{II}}}
+{II}return valueOrError;
+{I}}};
+}}"""
+            )
+        )
+
     if len(symbol_table.enumerations) > 0:
         blocks.append(
             Stripped(
@@ -2098,20 +2164,29 @@ export function fromXmlString(
 {I}const rootOpenTag = rootOpenTagOrError.mustValue();
 {I}const rootLocalName = localNameOfTag(rootOpenTag.tag);
 
+{I}// NOTE (mristin):
+{I}// The errors within the root element are reported at it, as in the other SDKs.
 {I}const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(rootLocalName);
 {I}if (dispatch === undefined) {{
-{II}return newDeserializationError<OurTypes.Class>(
+{II}const error = new DeserializationError(
 {III}`Unexpected root XML element: ${{rootLocalName}}`
+{II});
+{II}error.path.prepend(new ElementSegment(rootLocalName));
+{II}return new OurCommon.Either<OurTypes.Class, DeserializationError>(
+{III}null,
+{III}error
 {II});
 {I}}}
 
 {I}const instanceOrError = dispatch(cursor);
 {I}if (instanceOrError.error !== null) {{
+{II}instanceOrError.error.path.prepend(new ElementSegment(rootLocalName));
 {II}return instanceOrError;
 {I}}}
 
 {I}const closeError = consumeCloseTag(cursor, rootLocalName);
 {I}if (closeError !== null) {{
+{II}closeError.path.prepend(new ElementSegment(rootLocalName));
 {II}return new OurCommon.Either<OurTypes.Class, DeserializationError>(
 {III}null,
 {III}closeError

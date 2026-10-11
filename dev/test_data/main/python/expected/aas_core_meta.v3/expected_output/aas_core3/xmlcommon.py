@@ -161,7 +161,7 @@ class IndexSegment:
     #: Erroneous element
     element: Final[Element]
 
-    #: Index of the element in the sequence
+    #: Index of the element in the sequence, starting at zero
     index: Final[int]
 
     def __init__(
@@ -174,8 +174,12 @@ class IndexSegment:
         self.index = index
 
     def __str__(self) -> str:
-        """Render the segment as an element wildcard with the index."""
-        return f'*[{self.index}]'
+        """
+        Render the segment as an element wildcard with the index.
+
+        XPath counts the elements starting at one, so we add one to :py:attr:`index`.
+        """
+        return f'*[{self.index + 1}]'
 
 
 class KeySegment:

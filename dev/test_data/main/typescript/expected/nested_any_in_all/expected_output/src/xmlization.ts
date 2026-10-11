@@ -100,6 +100,37 @@ function dispatchParseElement<T>(
 }
 
 /**
+ * Wrap `parseElement` so that its errors are reported at the element it parses.
+ *
+ * We use it where an instance is its own element, at the root or nested in
+ * a property, so that the path names the element of the instance, *e.g.*,
+ * `someRoot/property/someClass/someProperty`, as in the other SDKs. The items of
+ * a list and of a tuple are not wrapped, as their index already selects
+ * the element of the instance.
+ *
+ * @param parseElement - to parse the element whole, the tags included
+ * @returns the wrapped parser
+ * @typeParam T - type of the parsed instance
+ */
+function namingElement<T>(
+  parseElement: ContentParser<T>
+): ContentParser<T> {
+  return (cursor: XmlCursor) => {
+    const startTagOrError = readNextOpenTag(cursor);
+    const localName =
+      startTagOrError.error === null
+        ? localNameOfTag(startTagOrError.mustValue().tag)
+        : null;
+
+    const valueOrError = parseElement(cursor);
+    if (valueOrError.error !== null && localName !== null) {
+      valueOrError.error.path.prepend(new ElementSegment(localName));
+    }
+    return valueOrError;
+  };
+}
+
+/**
  * Report that the property `localName` occurred more than once.
  *
  * The check itself sits in the property loop, right in front of the parse, since
@@ -682,7 +713,7 @@ function parseSpecificationFromSequence(
         const parsed = parseElementContent(
           cursor,
           propertyLocalName,
-          dispatchParseContentElement
+          namingElement(dispatchParseContentElement)
         );
         propertyError = parsed.error;
         theContent = parsed.value;
@@ -1023,7 +1054,7 @@ export function contentFromXmlString(
 
   const cursor = new XmlCursor(tokensOrError.mustValue());
 
-  const instanceOrError = dispatchParseContentElement(cursor);
+  const instanceOrError = namingElement(dispatchParseContentElement)(cursor);
   if (instanceOrError.error !== null) {
     return instanceOrError;
   }
@@ -1087,20 +1118,29 @@ export function fromXmlString(
   const rootOpenTag = rootOpenTagOrError.mustValue();
   const rootLocalName = localNameOfTag(rootOpenTag.tag);
 
+  // NOTE (mristin):
+  // The errors within the root element are reported at it, as in the other SDKs.
   const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(rootLocalName);
   if (dispatch === undefined) {
-    return newDeserializationError<OurTypes.Class>(
+    const error = new DeserializationError(
       `Unexpected root XML element: ${rootLocalName}`
+    );
+    error.path.prepend(new ElementSegment(rootLocalName));
+    return new OurCommon.Either<OurTypes.Class, DeserializationError>(
+      null,
+      error
     );
   }
 
   const instanceOrError = dispatch(cursor);
   if (instanceOrError.error !== null) {
+    instanceOrError.error.path.prepend(new ElementSegment(rootLocalName));
     return instanceOrError;
   }
 
   const closeError = consumeCloseTag(cursor, rootLocalName);
   if (closeError !== null) {
+    closeError.path.prepend(new ElementSegment(rootLocalName));
     return new OurCommon.Either<OurTypes.Class, DeserializationError>(
       null,
       closeError

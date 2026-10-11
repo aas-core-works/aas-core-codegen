@@ -13,7 +13,7 @@ test("xmlization path renders as a relative XPath", () => {
   path.prepend(new OurXmlization.IndexSegment(3));
   path.prepend(new OurXmlization.ElementSegment("something"));
 
-  expect(path.toString()).toStrictEqual("something/*[3]");
+  expect(path.toString()).toStrictEqual("something/*[4]");
 });
 
 test("xmlization key segment renders as a predicate on the name", () => {

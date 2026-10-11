@@ -398,6 +398,7 @@ public void Test_{cls_name_csharp}_ok()
 {I}foreach (var path in paths)
 {I}{{
 {II}using var xmlReader = System.Xml.XmlReader.Create(path);
+{II}xmlReader.MoveToContent();
 
 {II}var instance = Our.Xmlization.Deserialize.{cls_name_csharp}From(
 {III}xmlReader);
@@ -450,6 +451,7 @@ public void Test_{cls_name_csharp}_deserialization_fail()
 {II}foreach (var path in paths)
 {II}{{
 {III}using var xmlReader = System.Xml.XmlReader.Create(path);
+{III}xmlReader.MoveToContent();
 
 {III}Our.Xmlization.Exception? exception = null;
 
@@ -509,6 +511,7 @@ public void Test_{cls_name_csharp}_verification_fail()
 {II}foreach (var path in paths)
 {II}{{
 {III}using var xmlReader = System.Xml.XmlReader.Create(path);
+{III}xmlReader.MoveToContent();
 
 {III}var instance = Our.Xmlization.Deserialize.{cls_name_csharp}From(
 {IIII}xmlReader);

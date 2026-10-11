@@ -229,35 +229,70 @@ func nextProperty(
 //
 // If `valueErr` is set, report it in the context of that property. Otherwise,
 // consume the end element, so that the resulting `next` token points to the first
-// token just after it.
+// token just after it. An unexpected content in place of the end element, such as
+// a text or an excess element, is reported in the context of the property as well.
 func concludeProperty(
 	decoder *xml.Decoder,
 	current xml.Token,
 	local string,
 	valueErr error,
 ) (next xml.Token, err error) {
-	if valueErr != nil {
-		if deseriaErr, ok := valueErr.(*DeserializationError); ok {
+	err = valueErr
+
+	if err == nil {
+		current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+	}
+
+	if err == nil {
+		err = xmlcommon.CheckEndElement(current, local)
+	}
+
+	if err != nil {
+		if deseriaErr, ok := err.(*DeserializationError); ok {
 			deseriaErr.Path.PrependName(
 				&ourreporting.NameSegment{Name: local},
 			)
 		}
-		err = valueErr
-		return
-	}
-
-	current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
-	if err != nil {
-		return
-	}
-
-	err = xmlcommon.CheckEndElement(current, local)
-	if err != nil {
 		return
 	}
 
 	next, err = xmlcommon.ReadNext(decoder, current)
 	return
+}
+
+// Wrap `readByLocal` so that its errors are reported at the element it reads.
+//
+// We use it where an instance of a class is its own element, at the root or
+// nested in a property, so that the path names the element of the instance,
+// *e.g.*, `someRoot/property/someClass/someProperty`, as in the other SDKs.
+// The items of a list and of a tuple are not wrapped, as their index already
+// selects the element of the instance.
+func namingElement[T any](
+	readByLocal func(
+		aDecoder *xml.Decoder,
+		aCurrent xml.Token,
+		aLocal string,
+	) (value T, aNext xml.Token, anErr error),
+) func(
+	decoder *xml.Decoder,
+	current xml.Token,
+	local string,
+) (value T, next xml.Token, err error) {
+	return func(
+		decoder *xml.Decoder,
+		current xml.Token,
+		local string,
+	) (value T, next xml.Token, err error) {
+		value, next, err = readByLocal(decoder, current, local)
+		if err != nil {
+			if deseriaErr, ok := err.(*DeserializationError); ok {
+				deseriaErr.Path.PrependName(
+					&ourreporting.NameSegment{Name: local},
+				)
+			}
+		}
+		return
+	}
 }
 
 // Read a scalar item expected in the element `v`.
@@ -531,8 +566,27 @@ func Unmarshal(
 		return
 	}
 
+	// NOTE (mristin):
+	// We skip the prolog before the root element, *i.e.*, the XML declaration,
+	// the processing instructions, the comments and the whitespace.
+	for {
+		current, err = xmlcommon.SkipEmptyTextWhitespaceAndComments(decoder, current)
+		if err != nil {
+			return
+		}
+
+		if _, ok := current.(xml.ProcInst); !ok {
+			break
+		}
+
+		current, err = xmlcommon.ReadNext(decoder, current)
+		if err != nil {
+			return
+		}
+	}
+
 	instance, _, err = xmlcommon.ReadElementDispatched(
-		decoder, current, readClassDispatched,
+		decoder, current, namingElement(readClassDispatched),
 	)
 	return
 }

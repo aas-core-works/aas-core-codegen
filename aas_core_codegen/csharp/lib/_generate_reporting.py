@@ -236,7 +236,9 @@ public static string GenerateRelativeXPath(
 {IIII}part = EscapeForXPath(nameSegment.Name);
 {IIII}break;
 {III}case IndexSegment indexSegment:
-{IIII}part = $"*[{{indexSegment.Index}}]";
+{IIII}// XPath counts the elements starting at one, while our indices
+{IIII}// start at zero.
+{IIII}part = $"*[{{indexSegment.Index + 1}}]";
 {IIII}break;
 {III}case KeySegment keySegment:
 {IIII}// A JSON-able object is written as an XML-RPC <struct>, which

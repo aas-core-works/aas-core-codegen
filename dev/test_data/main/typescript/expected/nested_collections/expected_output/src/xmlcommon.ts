@@ -31,6 +31,7 @@ import {
   CommentToken,
   EndToken,
   OpenTagToken,
+  ProcessingInstructionToken,
   TextToken,
   XmlAnyToken,
   XmlSaxParser
@@ -135,10 +136,10 @@ export class IndexSegment {
   }
 
   /**
-   * Render the segment as an element wildcard with the index.
+   * Render the segment as an element wildcard with the 1-based index of XPath.
    */
   toString(): string {
-    return `*[${this.index}]`;
+    return `*[${this.index + 1}]`;
   }
 }
 
@@ -653,6 +654,16 @@ export function parseList<T>(
       break;
     }
 
+    // NOTE (mristin):
+    // Anything but an element, *e.g.*, a text, is reported at the list itself
+    // and not at an item, as there is no item element to point to.
+    if (!(maybeClose instanceof OpenTagToken)) {
+      return newDeserializationError<Array<T>>(
+        "Expected only item elements and whitespace text, " +
+          `but got token kind: ${maybeClose.kind}`
+      );
+    }
+
     const itemOrError = parseItem(cursor);
     if (itemOrError.error !== null) {
       itemOrError.error.path.prepend(new IndexSegment(itemIndex));
@@ -749,7 +760,14 @@ export function tokenizeXml(
 export function readRequiredRootOpenTag(
   cursor: XmlCursor
 ): OurCommon.Either<OpenTagToken, DeserializationError> {
+  // NOTE (mristin):
+  // We skip the prolog before the root element, *i.e.*, the XML declaration,
+  // the processing instructions, the comments and the whitespace.
   cursor.skipIgnorable();
+  while (cursor.current() instanceof ProcessingInstructionToken) {
+    cursor.advance();
+    cursor.skipIgnorable();
+  }
 
   const token = cursor.current();
   if (token === null) {
@@ -1056,6 +1074,16 @@ export function parseSet<T>(
 
     if (maybeClose instanceof CloseTagToken) {
       break;
+    }
+
+    // NOTE (mristin):
+    // Anything but an element, *e.g.*, a text, is reported at the set itself
+    // and not at an item, as there is no item element to point to.
+    if (!(maybeClose instanceof OpenTagToken)) {
+      return newDeserializationError<Set<T>>(
+        "Expected only item elements and whitespace text, " +
+          `but got token kind: ${maybeClose.kind}`
+      );
     }
 
     const itemOrError = parseItem(cursor);

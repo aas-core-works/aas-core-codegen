@@ -190,11 +190,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);

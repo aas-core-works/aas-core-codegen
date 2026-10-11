@@ -1088,6 +1088,11 @@ def _generate_deserialize_from_element_generic() -> Stripped:
     into a ``shared_ptr``-wrapped interface, but the framing around the value is
     the very same, and every error factory it calls is already generic in
     the value type.
+
+    The function does not prepend the name of the element to the path of
+    an error, as the other SDKs do not either. An item of a list is selected by its
+    index, while a value nested in an element, such as the root or an instance in
+    a property, is read with ``DeserializeNestedElement``, which prepends the name.
     """
     model_type_from_element_name = cpp_naming.function_name(
         Identifier("model_type_from_element_name")
@@ -1160,18 +1165,7 @@ std::pair<
 {I}reader.Read();
 
 {I}if (reader.node().kind() == xml_common::NodeKind::Error) {{
-{II}auto no_instance_and_error = NoInstanceAndDeserializationErrorFromReader<
-{III}ValueT
-{II}>(
-{III}reader
-{II});
-
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*(no_instance_and_error.second)
-{II});
-
-{II}return no_instance_and_error;
+{II}return NoInstanceAndDeserializationErrorFromReader<ValueT>(reader);
 {I}}}
 
 {I}common::optional<ValueT> instance;
@@ -1181,21 +1175,11 @@ std::pair<
 {I}) = dispatch(reader, *model_type, name);
 
 {I}if (error.has_value()) {{
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
 {II}return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
 {I}}}
 
 {I}error = SkipWhitespace(reader);
 {I}if (error.has_value()) {{
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
 {II}return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
 {I}}}
 
@@ -1211,11 +1195,6 @@ std::pair<
 {III})
 {II});
 
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
 {II}return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
 {I}}}
 
@@ -1224,12 +1203,6 @@ std::pair<
 {I}reader.Read();
 {I}if (reader.node().kind() == xml_common::NodeKind::Error) {{
 {II}error = DeserializationErrorFromReader(reader);
-
-{II}PrependElementSegmentToDeserializationError(
-{III}name,
-{III}*error
-{II});
-
 {II}return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
 {I}}}
 
@@ -1295,6 +1268,70 @@ std::pair<
 {III}return from_sequence(a_reader);
 {II}}}
 {I});
+}}"""
+    )
+
+
+def _generate_deserialize_nested_element() -> Stripped:
+    """
+    Generate the function to de-serialize a value from an element nested in another.
+
+    This is the counterpart of ``_read_nested_element`` in the Python SDK.
+    """
+    return Stripped(
+        f"""\
+/**
+ * \\brief De-serialize a value from the element nested in another element, such
+ * as the instance in a property, or from the root element.
+ *
+ * We prepend the name of the nested element to the path of an error, so that
+ * the path reads, *e.g.*, <code>value/property/idShort</code>.
+ *
+ * This looks redundant next to reading an item of a list, and it is not.
+ * An item is not nested in an element of its own -- the item element *is*
+ * the indexed child -- so its readers prepend only the index, and the path
+ * reads, *e.g.*, <code>annotations/&#42;[1]/idShort</code>.
+ *
+ * \\param reader to read from
+ * \\param deserialize_element de-serializes the nested element
+ * \\return the value, or an error, if any
+ */
+template <typename T, typename DeserializeT>
+std::pair<
+{I}common::optional<T>,
+{I}common::optional<DeserializationError>
+> DeserializeNestedElement(
+{I}xml_common::ReaderMergingText& reader,
+{I}const DeserializeT& deserialize_element
+) {{
+{I}common::optional<DeserializationError> error = SkipWhitespace(reader);
+{I}if (error.has_value()) {{
+{II}return NoInstanceAndDeserializationError<T>(std::move(*error));
+{I}}}
+
+{I}if (reader.node().kind() != xml_common::NodeKind::Start) {{
+{II}return deserialize_element(reader);
+{I}}}
+
+{I}const std::string name(
+{II}static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+{III}const xml_common::StartNode&
+{II}>(reader.node()).name
+{I});
+
+{I}std::pair<
+{II}common::optional<T>,
+{II}common::optional<DeserializationError>
+{I}> result = deserialize_element(reader);
+
+{I}if (result.second.has_value()) {{
+{II}PrependElementSegmentToDeserializationError(
+{III}name,
+{III}*(result.second)
+{II});
+{I}}}
+
+{I}return result;
 }}"""
     )
 
@@ -2107,12 +2144,6 @@ std::pair<
 {I}) = deserialize_content(reader);
 
 {I}if (error.has_value()) {{
-{II}error->path.segments.emplace_front(
-{III}common::make_unique<xml_path::ElementSegment>(
-{IIII}common::Utf8ToWstring(expected_name)
-{III})
-{II});
-
 {II}return NoInstanceAndDeserializationError<T>(
 {III}std::move(*error)
 {II});
@@ -2218,6 +2249,19 @@ std::pair<
 {I}size_t i = 0;
 
 {I}while (true) {{
+{II}// NOTE (mristin):
+{II}// Anything but an item element is an error of the set, not of an item,
+{II}// so we do not prepend any index to its path.
+{II}if (reader.node().kind() != xml_common::NodeKind::Start) {{
+{III}error = DeserializationError(
+{IIII}common::Concat(
+{IIIII}L"Expected only item elements and whitespace text, but got ",
+{IIIII}xml_common::NodeToHumanReadableWstring(reader.node())
+{IIII})
+{III});
+{III}break;
+{II}}}
+
 {II}common::optional<T> item;
 
 {II}std::tie(
@@ -2319,6 +2363,19 @@ std::pair<
 {II}size_t i = 0;
 
 {II}while (true) {{
+{III}// NOTE (mristin):
+{III}// Anything but an item element is an error of the list, not of an item,
+{III}// so we do not prepend any index to its path.
+{III}if (reader.node().kind() != xml_common::NodeKind::Start) {{
+{IIII}error = DeserializationError(
+{IIIII}common::Concat(
+{IIIIII}L"Expected only item elements and whitespace text, but got ",
+{IIIIII}xml_common::NodeToHumanReadableWstring(reader.node())
+{IIIII})
+{IIII});
+{IIII}break;
+{III}}}
+
 {III}common::optional<T> item;
 
 {III}std::tie(
@@ -2410,6 +2467,23 @@ def _generate_deserialize_tuple_function(arity: int) -> Stripped:
         item_blocks.append(
             Stripped(
                 f"""\
+// NOTE (mristin):
+// A missing item is an error of the tuple, not of the item, so we do not
+// prepend any index to its path.
+if (reader.node().kind() != xml_common::NodeKind::Start) {{
+{I}return NoInstanceAndDeserializationErrorWithCause<
+{II}std::tuple<
+{III}{indent_but_first_line(item_types_joined, III)}
+{II}>
+{I}>(
+{II}common::Concat(
+{III}L"Expected a start element corresponding to the item {i} "
+{III}L"of the tuple, but got ",
+{III}xml_common::NodeToHumanReadableWstring(reader.node())
+{II})
+{I});
+}}
+
 std::tie(
 {I}item{i},
 {I}error
@@ -3334,7 +3408,17 @@ def _generate_deserialize_property_expr(
                         Identifier(f"{type_anno.our_type.name}_from_element")
                     )
 
-                    return Stripped(f"{from_element_name}(reader)")
+                    interface_name = cpp_naming.interface_name(type_anno.our_type.name)
+
+                    return Stripped(
+                        f"""\
+DeserializeNestedElement<
+{I}std::shared_ptr<types::{interface_name}>
+>(
+{I}reader,
+{I}{from_element_name}
+)"""
+                    )
 
             elif isinstance(type_anno.our_type, intermediate.NamedUnion):
                 # NOTE (mristin):
@@ -3345,7 +3429,17 @@ def _generate_deserialize_property_expr(
                     Identifier(f"{type_anno.our_type.name}_from_element")
                 )
 
-                return Stripped(f"{from_element_name}(reader)")
+                union_name = cpp_naming.union_name(type_anno.our_type.name)
+
+                return Stripped(
+                    f"""\
+DeserializeNestedElement<
+{I}types::{union_name}
+>(
+{I}reader,
+{I}{from_element_name}
+)"""
+                )
 
             else:
                 # noinspection PyTypeChecker
@@ -3653,13 +3747,19 @@ common::expected<
 {II});
 {I}}}
 
+{I}common::optional<DeserializationError> error = SkipBof(reader);
+{I}if (error.has_value()) {{
+{II}return common::make_unexpected(
+{III}std::move(*error)
+{II});
+{I}}}
+
 {I}common::optional<ValueT> instance;
-{I}common::optional<DeserializationError> error;
 
 {I}std::tie(
 {II}instance,
 {II}error
-{I}) = from_element(reader);
+{I}) = DeserializeNestedElement<ValueT>(reader, from_element);
 
 {I}if (error.has_value()) {{
 {II}return common::make_unexpected(
@@ -5536,6 +5636,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         _generate_read_properties(),
         _generate_deserialize_from_element_generic(),
         _generate_deserialize_sole_from_element(),
+        _generate_deserialize_nested_element(),
         _generate_class_from_element(
             interface_name=Identifier("IClass"),
             function_name=cpp_naming.function_name(Identifier("class_from_element")),
