@@ -402,6 +402,19 @@ private static ContentReader<T> AsText<T>(
 {III}return default!;
 {II}}}
 
+{II}// NOTE (mristin):
+{II}// XmlReader.ReadContentAs* throws an InvalidOperationException if it
+{II}// starts at an element, so we have to report a nested element before
+{II}// the conversion. A nested element after a text is not our concern
+{II}// here, as the caller expects the end element afterwards.
+{II}if (reader.NodeType == Xml.XmlNodeType.Element)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}$"Expected an XML content representing {{typeof(T).Name}}, " +
+{IIII}$"but got a nested element {{reader.Name}}");
+{III}return default!;
+{II}}}
+
 {II}try
 {II}{{
 {III}return readContent(reader);

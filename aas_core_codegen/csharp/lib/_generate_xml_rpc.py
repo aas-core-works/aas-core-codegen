@@ -78,6 +78,17 @@ private static bool? DeserializeBooleanTextFrom(
 {{
 {I}error = null;
 
+{I}// NOTE (mristin):
+{I}// XmlReader.ReadContentAsString throws an InvalidOperationException if
+{I}// it starts at an element, so we report a nested element beforehand.
+{I}if (reader.NodeType == Xml.XmlNodeType.Element)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected \\"0\\" or \\"1\\" as the text of a <boolean> element, " +
+{III}$"but got a nested element {{reader.Name}}");
+{II}return null;
+{I}}}
+
 {I}string text;
 {I}try
 {I}{{
@@ -126,6 +137,17 @@ private static double? DeserializeDoubleTextFrom(
 {{
 {I}error = null;
 
+{I}// NOTE (mristin):
+{I}// XmlReader.ReadContentAsString throws an InvalidOperationException if
+{I}// it starts at an element, so we report a nested element beforehand.
+{I}if (reader.NodeType == Xml.XmlNodeType.Element)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected a number as the text of a <double> element, " +
+{III}$"but got a nested element {{reader.Name}}");
+{II}return null;
+{I}}}
+
 {I}double result;
 {I}try
 {I}{{
@@ -171,6 +193,17 @@ private static string? DeserializeStringTextFrom(
 {I}out Reporting.Error? error)
 {{
 {I}error = null;
+
+{I}// NOTE (mristin):
+{I}// XmlReader.ReadContentAsString throws an InvalidOperationException if
+{I}// it starts at an element, so we report a nested element beforehand.
+{I}if (reader.NodeType == Xml.XmlNodeType.Element)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected text as the content of a <string> element, " +
+{III}$"but got a nested element {{reader.Name}}");
+{II}return null;
+{I}}}
 
 {I}try
 {I}{{
@@ -506,13 +539,15 @@ private static Nodes.JsonNode? DeserializeMemberFrom(
 {I}}}
 {I}else
 {I}{{
-{II}key = DeserializeStringTextFrom(reader, out error)
-{III}?? throw new System.InvalidOperationException(
-{IIII}"Unexpected key null when error null");
+{II}string? maybeKey = DeserializeStringTextFrom(reader, out error);
 {II}if (error != null)
 {II}{{
 {III}return null;
 {II}}}
+
+{II}key = maybeKey
+{III}?? throw new System.InvalidOperationException(
+{IIII}"Unexpected key null when error null");
 
 {II}XmlCommon.ConsumeEndElementInNoNamespace(
 {III}reader, "name", false, out error);

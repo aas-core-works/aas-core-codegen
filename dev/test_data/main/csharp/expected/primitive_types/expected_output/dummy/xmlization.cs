@@ -145,6 +145,19 @@ namespace dummy
                         return default!;
                     }
 
+                    // NOTE (mristin):
+                    // XmlReader.ReadContentAs* throws an InvalidOperationException if it
+                    // starts at an element, so we have to report a nested element before
+                    // the conversion. A nested element after a text is not our concern
+                    // here, as the caller expects the end element afterwards.
+                    if (reader.NodeType == Xml.XmlNodeType.Element)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML content representing {typeof(T).Name}, " +
+                            $"but got a nested element {reader.Name}");
+                        return default!;
+                    }
+
                     try
                     {
                         return readContent(reader);

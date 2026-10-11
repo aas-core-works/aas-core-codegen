@@ -286,6 +286,33 @@ namespace dummy.Tests
         }
 
         [Test]
+        public void Test_deserialize_rejects_a_nested_element_in_a_text()
+        {
+            string[] texts =
+            {
+                "<value><boolean><nested/></boolean></value>",
+                "<value><double><nested/></double></value>",
+                "<value><string><nested/></string></value>",
+                "<value><struct><member>"
+                    + "<name><nested/></name>"
+                    + "<value><string>something</string></value>"
+                + "</member></struct></value>"
+            };
+
+            foreach (string text in texts)
+            {
+                Nodes.JsonNode? result = DeserializeFromString(
+                    text, out Our.Reporting.Error? error);
+
+                Assert.IsNull(result, text);
+                Assert.IsNotNull(error, text);
+                Assert.IsTrue(
+                    error!.Cause.Contains("but got a nested element nested"),
+                    $"Unexpected cause for {text}: {error.Cause}");
+            }
+        }
+
+        [Test]
         public void Test_deserialize_rejects_repeated_member_key()
         {
             string text = (

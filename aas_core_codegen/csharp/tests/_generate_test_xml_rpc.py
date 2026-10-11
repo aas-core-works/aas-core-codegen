@@ -339,6 +339,35 @@ public void Test_deserialize_rejects_non_strict_boolean_lexical_form()
         Stripped(
             f"""\
 [Test]
+public void Test_deserialize_rejects_a_nested_element_in_a_text()
+{{
+{I}string[] texts =
+{I}{{
+{II}"<value><boolean><nested/></boolean></value>",
+{II}"<value><double><nested/></double></value>",
+{II}"<value><string><nested/></string></value>",
+{II}"<value><struct><member>"
+{III}+ "<name><nested/></name>"
+{III}+ "<value><string>something</string></value>"
+{II}+ "</member></struct></value>"
+{I}}};
+
+{I}foreach (string text in texts)
+{I}{{
+{II}Nodes.JsonNode? result = DeserializeFromString(
+{III}text, out Our.Reporting.Error? error);
+
+{II}Assert.IsNull(result, text);
+{II}Assert.IsNotNull(error, text);
+{II}Assert.IsTrue(
+{III}error!.Cause.Contains("but got a nested element nested"),
+{III}$"Unexpected cause for {{text}}: {{error.Cause}}");
+{I}}}
+}}"""
+        ),
+        Stripped(
+            f"""\
+[Test]
 public void Test_deserialize_rejects_repeated_member_key()
 {{
 {I}string text = (
