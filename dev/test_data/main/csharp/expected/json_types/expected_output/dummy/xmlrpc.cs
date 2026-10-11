@@ -38,6 +38,17 @@ namespace dummy
         {
             error = null;
 
+            // NOTE (mristin):
+            // XmlReader.ReadContentAsString throws an InvalidOperationException if
+            // it starts at an element, so we report a nested element beforehand.
+            if (reader.NodeType == Xml.XmlNodeType.Element)
+            {
+                error = new Reporting.Error(
+                    "Expected \"0\" or \"1\" as the text of a <boolean> element, " +
+                    $"but got a nested element {reader.Name}");
+                return null;
+            }
+
             string text;
             try
             {
@@ -84,6 +95,17 @@ namespace dummy
         {
             error = null;
 
+            // NOTE (mristin):
+            // XmlReader.ReadContentAsString throws an InvalidOperationException if
+            // it starts at an element, so we report a nested element beforehand.
+            if (reader.NodeType == Xml.XmlNodeType.Element)
+            {
+                error = new Reporting.Error(
+                    "Expected a number as the text of a <double> element, " +
+                    $"but got a nested element {reader.Name}");
+                return null;
+            }
+
             double result;
             try
             {
@@ -127,6 +149,17 @@ namespace dummy
             out Reporting.Error? error)
         {
             error = null;
+
+            // NOTE (mristin):
+            // XmlReader.ReadContentAsString throws an InvalidOperationException if
+            // it starts at an element, so we report a nested element beforehand.
+            if (reader.NodeType == Xml.XmlNodeType.Element)
+            {
+                error = new Reporting.Error(
+                    "Expected text as the content of a <string> element, " +
+                    $"but got a nested element {reader.Name}");
+                return null;
+            }
 
             try
             {
@@ -454,13 +487,15 @@ namespace dummy
             }
             else
             {
-                key = DeserializeStringTextFrom(reader, out error)
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected key null when error null");
+                string? maybeKey = DeserializeStringTextFrom(reader, out error);
                 if (error != null)
                 {
                     return null;
                 }
+
+                key = maybeKey
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected key null when error null");
 
                 XmlCommon.ConsumeEndElementInNoNamespace(
                     reader, "name", false, out error);
