@@ -230,6 +230,9 @@ func escapeForXPath(
 // Leave out the leading slash (`/`). This is helpful if we
 // want to embed the error report in a larger document with a prefix
 // *etc.*
+//
+// The indices of the segments are 0-based, while the indices of XPath are
+// 1-based, so we render the index `i` as `*[i + 1]`.
 func ToRelativeXPath(
 {I}p *Path,
 ) string {{
@@ -244,7 +247,7 @@ func ToRelativeXPath(
 {III}case *NameSegment:
 {IIII}b.WriteString(escapeForXPath(v.Name))
 {III}case *IndexSegment:
-{IIII}b.WriteString(fmt.Sprintf("*[%d]", v.Index))
+{IIII}b.WriteString(fmt.Sprintf("*[%d]", v.Index+1))
 {III}case *KeySegment:
 {IIII}// NOTE (mristin):
 {IIII}// A JSON-able object is written as an XML-RPC `<struct>`, which holds

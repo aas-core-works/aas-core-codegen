@@ -113,7 +113,9 @@ struct MemberSegment : public ISegment {{
  */
 struct IndexSegment : public ISegment {{
 {I}/**
-{I} * Index of the element in the sequence
+{I} * Zero-based index of the element in the sequence
+{I} *
+{I} * \\note XPath counts from one, so we render the index plus one.
 {I} */
 {I}size_t index;
 
@@ -326,7 +328,7 @@ IndexSegment::IndexSegment(
 std::wstring IndexSegment::ToWstring() const {{
 {I}return common::Concat(
 {II}L"*[",
-{II}std::to_wstring(index),
+{II}std::to_wstring(index + 1),
 {II}L"]"
 {I});
 }}"""

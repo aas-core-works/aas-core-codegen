@@ -1491,8 +1491,8 @@ def _read_nested_element(
     wraps its instance in an element of its own, so the discriminator's name has to
     be prepended to the error path, which then reads ``value/property/idShort``.
     A list item is not wrapped -- the item element *is* the indexed child -- so the
-    same prepend would give ``annotations/*[0]/property/idShort``, which walks one
-    level past the element that ``*[0]`` already selects, and resolves to nothing.
+    same prepend would give ``annotations/*[1]/property/idShort``, which walks one
+    level past the element that ``*[1]`` already selects, and resolves to nothing.
 
     The end element corresponding to :paramref:`element` will be read as well.
 

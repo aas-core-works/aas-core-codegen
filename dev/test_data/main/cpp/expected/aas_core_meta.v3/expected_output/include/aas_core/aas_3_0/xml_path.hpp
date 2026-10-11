@@ -94,7 +94,9 @@ struct MemberSegment : public ISegment {
  */
 struct IndexSegment : public ISegment {
   /**
-   * Index of the element in the sequence
+   * Zero-based index of the element in the sequence
+   *
+   * \note XPath counts from one, so we render the index plus one.
    */
   size_t index;
 

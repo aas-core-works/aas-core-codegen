@@ -297,7 +297,7 @@ TEST_CASE("Deserialize reports the XPath to a nested invalid value") {{
 {I});
 {I}REQUIRE(
 {II}result.error().path.ToWstring()
-{II}== L"struct/member[name=\\"nested\\"]/value/array/data/*[1]"
+{II}== L"struct/member[name=\\"nested\\"]/value/array/data/*[2]"
 {I});
 }}"""
         ),
@@ -324,7 +324,7 @@ TEST_CASE("Deserialize reports no <array> wrapper for an array body") {{
 {I}std::tie(value, error) = xml_rpc::DeserializeArrayBodyFrom(reader);
 
 {I}REQUIRE(error.has_value());
-{I}REQUIRE(error->path.ToWstring() == L"data/*[0]");
+{I}REQUIRE(error->path.ToWstring() == L"data/*[1]");
 }}"""
         ),
         Stripped(

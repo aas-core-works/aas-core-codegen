@@ -142,6 +142,16 @@ export function parseSet<T>(
 {III}break;
 {II}}}
 
+{II}// NOTE (mristin):
+{II}// Anything but an element, *e.g.*, a text, is reported at the set itself
+{II}// and not at an item, as there is no item element to point to.
+{II}if (!(maybeClose instanceof OpenTagToken)) {{
+{III}return newDeserializationError<Set<T>>(
+{IIII}"Expected only item elements and whitespace text, " +
+{IIIII}`but got token kind: ${{maybeClose.kind}}`
+{III});
+{II}}}
+
 {II}const itemOrError = parseItem(cursor);
 {II}if (itemOrError.error !== null) {{
 {III}itemOrError.error.path.prepend(new IndexSegment(itemIndex));
@@ -212,6 +222,7 @@ import {
   CommentToken,
   EndToken,
   OpenTagToken,
+  ProcessingInstructionToken,
   TextToken,
   XmlAnyToken,
   XmlSaxParser
@@ -294,10 +305,10 @@ export class IndexSegment {{
 {I}}}
 
 {I}/**
-{I} * Render the segment as an element wildcard with the index.
+{I} * Render the segment as an element wildcard with the 1-based index of XPath.
 {I} */
 {I}toString(): string {{
-{II}return `*[${{this.index}}]`;
+{II}return `*[${{this.index + 1}}]`;
 {I}}}
 }}"""
         ),
@@ -824,6 +835,16 @@ export function parseList<T>(
 {III}break;
 {II}}}
 
+{II}// NOTE (mristin):
+{II}// Anything but an element, *e.g.*, a text, is reported at the list itself
+{II}// and not at an item, as there is no item element to point to.
+{II}if (!(maybeClose instanceof OpenTagToken)) {{
+{III}return newDeserializationError<Array<T>>(
+{IIII}"Expected only item elements and whitespace text, " +
+{IIIII}`but got token kind: ${{maybeClose.kind}}`
+{III});
+{II}}}
+
 {II}const itemOrError = parseItem(cursor);
 {II}if (itemOrError.error !== null) {{
 {III}itemOrError.error.path.prepend(new IndexSegment(itemIndex));
@@ -920,7 +941,14 @@ export function tokenizeXml(
 export function readRequiredRootOpenTag(
 {I}cursor: XmlCursor
 ): OurCommon.Either<OpenTagToken, DeserializationError> {{
+{I}// NOTE (mristin):
+{I}// We skip the prolog before the root element, *i.e.*, the XML declaration,
+{I}// the processing instructions, the comments and the whitespace.
 {I}cursor.skipIgnorable();
+{I}while (cursor.current() instanceof ProcessingInstructionToken) {{
+{II}cursor.advance();
+{II}cursor.skipIgnorable();
+{I}}}
 
 {I}const token = cursor.current();
 {I}if (token === null) {{

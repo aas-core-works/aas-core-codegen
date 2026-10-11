@@ -103,6 +103,37 @@ function dispatchParseElement<T>(
 }
 
 /**
+ * Wrap `parseElement` so that its errors are reported at the element it parses.
+ *
+ * We use it where an instance is its own element, at the root or nested in
+ * a property, so that the path names the element of the instance, *e.g.*,
+ * `someRoot/property/someClass/someProperty`, as in the other SDKs. The items of
+ * a list and of a tuple are not wrapped, as their index already selects
+ * the element of the instance.
+ *
+ * @param parseElement - to parse the element whole, the tags included
+ * @returns the wrapped parser
+ * @typeParam T - type of the parsed instance
+ */
+function namingElement<T>(
+  parseElement: ContentParser<T>
+): ContentParser<T> {
+  return (cursor: XmlCursor) => {
+    const startTagOrError = readNextOpenTag(cursor);
+    const localName =
+      startTagOrError.error === null
+        ? localNameOfTag(startTagOrError.mustValue().tag)
+        : null;
+
+    const valueOrError = parseElement(cursor);
+    if (valueOrError.error !== null && localName !== null) {
+      valueOrError.error.path.prepend(new ElementSegment(localName));
+    }
+    return valueOrError;
+  };
+}
+
+/**
  * Parse the content of an XML element as a literal of the enumeration called
  * `enumerationName`, looking the text up with `fromString`.
  *
@@ -305,12 +336,36 @@ function parseTuple2<T0, T1>(
   parseItem0: ContentParser<T0>,
   parseItem1: ContentParser<T1>
 ): OurCommon.Either<[T0, T1], DeserializationError> {
+  // NOTE (mristin):
+  // A missing item is reported at the tuple itself, and not at the position of
+  // the item, as there is no item element to point to.
+  cursor.skipIgnorable();
+  const maybeItem0 = cursor.current();
+  if (maybeItem0 === null || maybeItem0.kind === "close-tag") {
+    return newDeserializationError<[T0, T1]>(
+      "Expected the item 1 of the tuple of 2 item(s), " +
+        "but got no start element"
+    );
+  }
+
   const item0OrError = parseItem0(cursor);
   if (item0OrError.error !== null) {
     item0OrError.error.path.prepend(new IndexSegment(0));
     return new OurCommon.Either<[T0, T1], DeserializationError>(
       null,
       item0OrError.error
+    );
+  }
+
+  // NOTE (mristin):
+  // A missing item is reported at the tuple itself, and not at the position of
+  // the item, as there is no item element to point to.
+  cursor.skipIgnorable();
+  const maybeItem1 = cursor.current();
+  if (maybeItem1 === null || maybeItem1.kind === "close-tag") {
+    return newDeserializationError<[T0, T1]>(
+      "Expected the item 2 of the tuple of 2 item(s), " +
+        "but got no start element"
     );
   }
 
@@ -358,6 +413,18 @@ function parseTuple3<T0, T1, T2>(
   parseItem1: ContentParser<T1>,
   parseItem2: ContentParser<T2>
 ): OurCommon.Either<[T0, T1, T2], DeserializationError> {
+  // NOTE (mristin):
+  // A missing item is reported at the tuple itself, and not at the position of
+  // the item, as there is no item element to point to.
+  cursor.skipIgnorable();
+  const maybeItem0 = cursor.current();
+  if (maybeItem0 === null || maybeItem0.kind === "close-tag") {
+    return newDeserializationError<[T0, T1, T2]>(
+      "Expected the item 1 of the tuple of 3 item(s), " +
+        "but got no start element"
+    );
+  }
+
   const item0OrError = parseItem0(cursor);
   if (item0OrError.error !== null) {
     item0OrError.error.path.prepend(new IndexSegment(0));
@@ -367,12 +434,36 @@ function parseTuple3<T0, T1, T2>(
     );
   }
 
+  // NOTE (mristin):
+  // A missing item is reported at the tuple itself, and not at the position of
+  // the item, as there is no item element to point to.
+  cursor.skipIgnorable();
+  const maybeItem1 = cursor.current();
+  if (maybeItem1 === null || maybeItem1.kind === "close-tag") {
+    return newDeserializationError<[T0, T1, T2]>(
+      "Expected the item 2 of the tuple of 3 item(s), " +
+        "but got no start element"
+    );
+  }
+
   const item1OrError = parseItem1(cursor);
   if (item1OrError.error !== null) {
     item1OrError.error.path.prepend(new IndexSegment(1));
     return new OurCommon.Either<[T0, T1, T2], DeserializationError>(
       null,
       item1OrError.error
+    );
+  }
+
+  // NOTE (mristin):
+  // A missing item is reported at the tuple itself, and not at the position of
+  // the item, as there is no item element to point to.
+  cursor.skipIgnorable();
+  const maybeItem2 = cursor.current();
+  if (maybeItem2 === null || maybeItem2.kind === "close-tag") {
+    return newDeserializationError<[T0, T1, T2]>(
+      "Expected the item 3 of the tuple of 3 item(s), " +
+        "but got no start element"
     );
   }
 
@@ -1518,7 +1609,7 @@ export function abstractItemFromXmlString(
 
   const cursor = new XmlCursor(tokensOrError.mustValue());
 
-  const instanceOrError = dispatchParseAbstractItemElement(cursor);
+  const instanceOrError = namingElement(dispatchParseAbstractItemElement)(cursor);
   if (instanceOrError.error !== null) {
     return instanceOrError;
   }
@@ -1606,20 +1697,29 @@ export function fromXmlString(
   const rootOpenTag = rootOpenTagOrError.mustValue();
   const rootLocalName = localNameOfTag(rootOpenTag.tag);
 
+  // NOTE (mristin):
+  // The errors within the root element are reported at it, as in the other SDKs.
   const dispatch = ROOT_DISPATCH_BY_LOCAL_NAME.get(rootLocalName);
   if (dispatch === undefined) {
-    return newDeserializationError<OurTypes.Class>(
+    const error = new DeserializationError(
       `Unexpected root XML element: ${rootLocalName}`
+    );
+    error.path.prepend(new ElementSegment(rootLocalName));
+    return new OurCommon.Either<OurTypes.Class, DeserializationError>(
+      null,
+      error
     );
   }
 
   const instanceOrError = dispatch(cursor);
   if (instanceOrError.error !== null) {
+    instanceOrError.error.path.prepend(new ElementSegment(rootLocalName));
     return instanceOrError;
   }
 
   const closeError = consumeCloseTag(cursor, rootLocalName);
   if (closeError !== null) {
+    closeError.path.prepend(new ElementSegment(rootLocalName));
     return new OurCommon.Either<OurTypes.Class, DeserializationError>(
       null,
       closeError

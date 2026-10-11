@@ -1183,7 +1183,6 @@ private static <T> Reporting.Result<List<T>> readList(
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a start element opening an item of the list, " +
 {III}"but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
-{II}error.prependSegment(new Reporting.IndexSegment(index));
 {II}return Reporting.Result.failure(error);
 {I}}}
 
@@ -1232,7 +1231,6 @@ private static <T> Reporting.Result<Set<T>> readSet(
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a start element opening an item of the set, " +
 {III}"but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader)));
-{II}error.prependSegment(new Reporting.IndexSegment(index));
 {II}return Reporting.Result.failure(error);
 {I}}}
 
@@ -1298,6 +1296,12 @@ private static <{", ".join(type_params)}> Reporting.Result<{tuple_type}> readTup
     for i in range(arity):
         writer.write(
             f"""\
+{I}XmlCommon.skipWhitespaceAndComments(reader);
+{I}if (!XmlCommon.currentEvent(reader).isStartElement()) {{
+{II}return Reporting.Result.failure(new Reporting.Error(
+{III}"Expected a start element of the item {i} of the tuple, " +
+{III}"but got an XML " + XmlCommon.getEventTypeAsString(XmlCommon.currentEvent(reader))));
+{I}}}
 {I}final Reporting.Result<? extends T{i + 1}> item{i + 1}Result =
 {II}readItem{i + 1}.read(reader);
 {I}if (item{i + 1}Result.isError()) {{
@@ -1712,6 +1716,12 @@ if (!isEmptySequence) {{
 
 {II}final Reporting.Result<XMLEvent> endResult = XmlCommon.consumeEndElement(reader, elementName);
 {II}if (endResult.isError()) {{
+{III}// NOTE (mristin):
+{III}// Whatever unexpected node precedes the end element still lies within
+{III}// the property.
+{III}endResult.getError().prependSegment(
+{IIII}new Reporting.NameSegment(
+{IIIII}elementName));
 {III}return Reporting.Result.failure(endResult.getError());
 {II}}}
 {I}}}
@@ -2206,7 +2216,6 @@ private static class _DeserializeImplementation
 
 def _generate_deserialize_from(name: Identifier) -> Stripped:
     """Generate the facade method for deserialization of the class or interface."""
-    xml_prop_name_literal = java_common.string_literal(naming.xml_property(name))
     writer = io.StringIO()
 
     writer.write(
@@ -2226,12 +2235,22 @@ public static {name} deserialize{name}(
 {I}_DeserializeImplementation.skipStartDocument(reader);
 {I}XmlCommon.skipWhitespaceAndComments(reader);
 
+{I}// NOTE (mristin):
+{I}// The path starts at the root element as it is in the document, which
+{I}// might well be another element than the expected one.
+{I}final String rootElementName = (
+{II}XmlCommon.currentEvent(reader).isStartElement()
+{III}? XmlCommon.currentEvent(reader).asStartElement().getName().getLocalPart()
+{III}: null);
+
 {I}Reporting.Result<? extends {name}> result =
 {II}_DeserializeImplementation.read{name}FromElement(
 {III}reader);
 
 {I}return result.onError(error -> {{
-{II}error.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
+{II}if (rootElementName != null) {{
+{III}error.prependSegment(new Reporting.NameSegment(rootElementName));
+{II}}}
 {II}throw new XmlCommon.DeserializeException(
 {III}Reporting.generateRelativeXPath(error.getPathSegments()),
 {III}error.getCause());

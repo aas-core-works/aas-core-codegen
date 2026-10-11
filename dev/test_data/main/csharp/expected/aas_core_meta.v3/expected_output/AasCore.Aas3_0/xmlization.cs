@@ -1175,22 +1175,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1604,22 +1605,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1823,22 +1825,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -2035,22 +2038,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -2191,22 +2195,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -2301,22 +2306,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -2438,22 +2444,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -2668,22 +2675,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -2942,22 +2950,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -3218,22 +3227,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -3417,22 +3427,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -3664,22 +3675,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -3871,22 +3883,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -4077,22 +4090,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -4274,22 +4288,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -4469,22 +4484,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -4675,22 +4691,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -4891,22 +4908,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -5128,22 +5146,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -5306,22 +5325,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -5616,22 +5636,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -5858,22 +5879,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -5955,22 +5977,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -6131,22 +6154,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -6305,22 +6329,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -6429,22 +6454,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -6547,22 +6573,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -6703,22 +6730,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -6820,22 +6848,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -6947,22 +6976,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -7072,22 +7102,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -7209,22 +7240,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -7348,22 +7380,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -7455,22 +7488,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -7561,22 +7595,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -7678,22 +7713,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -7795,22 +7831,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -8012,22 +8049,23 @@ namespace AasCore.Aas3_0
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -8122,11 +8160,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IHasSemantics result = DeserializeImplementation.IHasSemanticsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8156,11 +8208,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Extension result = DeserializeImplementation.ExtensionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8190,11 +8256,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IHasExtensions result = DeserializeImplementation.IHasExtensionsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8224,11 +8304,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IReferable result = DeserializeImplementation.IReferableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8258,11 +8352,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IIdentifiable result = DeserializeImplementation.IIdentifiableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8292,11 +8400,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IHasKind result = DeserializeImplementation.IHasKindFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8326,11 +8448,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IHasDataSpecification result = DeserializeImplementation.IHasDataSpecificationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8360,11 +8496,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.AdministrativeInformation result = DeserializeImplementation.AdministrativeInformationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8394,11 +8544,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IQualifiable result = DeserializeImplementation.IQualifiableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8428,11 +8592,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Qualifier result = DeserializeImplementation.QualifierFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8462,11 +8640,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.AssetAdministrationShell result = DeserializeImplementation.AssetAdministrationShellFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8496,11 +8688,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.AssetInformation result = DeserializeImplementation.AssetInformationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8530,11 +8736,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Resource result = DeserializeImplementation.ResourceFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8564,11 +8784,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.SpecificAssetId result = DeserializeImplementation.SpecificAssetIdFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8598,11 +8832,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Submodel result = DeserializeImplementation.SubmodelFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8632,11 +8880,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ISubmodelElement result = DeserializeImplementation.ISubmodelElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8666,11 +8928,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IRelationshipElement result = DeserializeImplementation.IRelationshipElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8700,11 +8976,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.RelationshipElement result = DeserializeImplementation.RelationshipElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8734,11 +9024,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.SubmodelElementList result = DeserializeImplementation.SubmodelElementListFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8768,11 +9072,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.SubmodelElementCollection result = DeserializeImplementation.SubmodelElementCollectionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8802,11 +9120,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IDataElement result = DeserializeImplementation.IDataElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8836,11 +9168,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Property result = DeserializeImplementation.PropertyFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8870,11 +9216,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.MultiLanguageProperty result = DeserializeImplementation.MultiLanguagePropertyFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8904,11 +9264,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Range result = DeserializeImplementation.RangeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8938,11 +9312,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ReferenceElement result = DeserializeImplementation.ReferenceElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -8972,11 +9360,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Blob result = DeserializeImplementation.BlobFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9006,11 +9408,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.File result = DeserializeImplementation.FileFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9040,11 +9456,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.AnnotatedRelationshipElement result = DeserializeImplementation.AnnotatedRelationshipElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9074,11 +9504,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Entity result = DeserializeImplementation.EntityFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9108,11 +9552,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.EventPayload result = DeserializeImplementation.EventPayloadFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9142,11 +9600,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IEventElement result = DeserializeImplementation.IEventElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9176,11 +9648,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.BasicEventElement result = DeserializeImplementation.BasicEventElementFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9210,11 +9696,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Operation result = DeserializeImplementation.OperationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9244,11 +9744,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.OperationVariable result = DeserializeImplementation.OperationVariableFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9278,11 +9792,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Capability result = DeserializeImplementation.CapabilityFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9312,11 +9840,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ConceptDescription result = DeserializeImplementation.ConceptDescriptionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9346,11 +9888,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Reference result = DeserializeImplementation.ReferenceFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9380,11 +9936,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Key result = DeserializeImplementation.KeyFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9414,11 +9984,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IAbstractLangString result = DeserializeImplementation.IAbstractLangStringFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9448,11 +10032,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.LangStringNameType result = DeserializeImplementation.LangStringNameTypeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9482,11 +10080,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.LangStringTextType result = DeserializeImplementation.LangStringTextTypeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9516,11 +10128,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Environment result = DeserializeImplementation.EnvironmentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9550,11 +10176,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IDataSpecificationContent result = DeserializeImplementation.IDataSpecificationContentFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9584,11 +10224,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.EmbeddedDataSpecification result = DeserializeImplementation.EmbeddedDataSpecificationFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9618,11 +10272,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.LevelType result = DeserializeImplementation.LevelTypeFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9652,11 +10320,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ValueReferencePair result = DeserializeImplementation.ValueReferencePairFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9686,11 +10368,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ValueList result = DeserializeImplementation.ValueListFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9720,11 +10416,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.LangStringPreferredNameTypeIec61360 result = DeserializeImplementation.LangStringPreferredNameTypeIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9754,11 +10464,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.LangStringShortNameTypeIec61360 result = DeserializeImplementation.LangStringShortNameTypeIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9788,11 +10512,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.LangStringDefinitionTypeIec61360 result = DeserializeImplementation.LangStringDefinitionTypeIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -9822,11 +10560,25 @@ namespace AasCore.Aas3_0
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.DataSpecificationIec61360 result = DeserializeImplementation.DataSpecificationIec61360FromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);

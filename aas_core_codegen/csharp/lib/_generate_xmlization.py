@@ -195,8 +195,18 @@ def _generate_as_tuple_combinator(arity: int) -> Stripped:
 
     item_blocks = []  # type: List[Stripped]
     for i in range(arity):
+        # NOTE (mristin):
+        # A missing item has no element which an index could select, so we report
+        # it on the tuple itself, and index only the errors within an item.
         item_block = Stripped(
             f"""\
+if (reader.NodeType != Xml.XmlNodeType.Element)
+{{
+{I}error = new Reporting.Error(
+{II}"Expected a start element of the item {i} of the tuple, " +
+{II}$"but got a node of type {{reader.NodeType}}");
+{I}return default!;
+}}
 T{i} item{i} = readItem{i}(reader, out error);
 if (error != null)
 {{
@@ -1380,22 +1390,23 @@ while (TryNextProperty(
 {II}{indent_but_first_line(switch_body, II)}
 {I}}}
 
+{I}if (error == null)
+{I}{{
+{II}XmlCommon.ConsumeEndElement(
+{III}reader, elementName, isEmptyProperty, out error);
+{I}}}
+
 {I}// NOTE (mristin):
 {I}// Every property is read in this very loop, so we mark the error with
 {I}// the property's own element name here, once, instead of at every
 {I}// single case above. For a matched case, elementName *is* that name.
+{I}// This covers the end element of the property as well, since whatever
+{I}// unexpected node precedes it still lies within the property.
 {I}if (error != null)
 {I}{{
 {II}error.PrependSegment(
 {III}new Reporting.NameSegment(
 {IIII}elementName));
-{II}return default!;
-{I}}}
-
-{I}XmlCommon.ConsumeEndElement(
-{II}reader, elementName, isEmptyProperty, out error);
-{I}if (error != null)
-{I}{{
 {II}return default!;
 {I}}}
 }}
@@ -1992,11 +2003,25 @@ public static Our.{name} {name}From(
 {III}"to be set at content with MoveToContent");
 {I}}}
 
+{I}// NOTE (mristin):
+{I}// The path starts at the root element. The readers do not prepend their own
+{I}// names, so we prepend the name of the root element here, if there is any.
+{I}string? rootElementName = null;
+{I}if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+{I}{{
+{II}rootElementName = reader.LocalName;
+{I}}}
+
 {I}Our.{name} result = DeserializeImplementation.{name}FromElement(
 {II}reader,
 {II}out Reporting.Error? error);
 {I}if (error != null)
 {I}{{
+{II}if (rootElementName != null)
+{II}{{
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment(rootElementName));
+{II}}}
 {II}throw new Xmlization.Exception(
 {III}Reporting.GenerateRelativeXPath(error.PathSegments),
 {III}error.Cause);

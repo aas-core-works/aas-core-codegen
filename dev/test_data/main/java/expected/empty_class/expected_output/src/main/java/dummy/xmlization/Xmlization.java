@@ -126,12 +126,22 @@ public class Xmlization {
       _DeserializeImplementation.skipStartDocument(reader);
       XmlCommon.skipWhitespaceAndComments(reader);
 
+      // NOTE (mristin):
+      // The path starts at the root element as it is in the document, which
+      // might well be another element than the expected one.
+      final String rootElementName = (
+        XmlCommon.currentEvent(reader).isStartElement()
+          ? XmlCommon.currentEvent(reader).asStartElement().getName().getLocalPart()
+          : null);
+
       Reporting.Result<? extends Something> result =
         _DeserializeImplementation.readSomethingFromElement(
           reader);
 
       return result.onError(error -> {
-        error.prependSegment(new Reporting.NameSegment("something"));
+        if (rootElementName != null) {
+          error.prependSegment(new Reporting.NameSegment(rootElementName));
+        }
         throw new XmlCommon.DeserializeException(
           Reporting.generateRelativeXPath(error.getPathSegments()),
           error.getCause());

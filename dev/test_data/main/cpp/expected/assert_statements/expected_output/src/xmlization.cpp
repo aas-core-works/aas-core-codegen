@@ -733,18 +733,7 @@ std::pair<
   reader.Read();
 
   if (reader.node().kind() == xml_common::NodeKind::Error) {
-    auto no_instance_and_error = NoInstanceAndDeserializationErrorFromReader<
-      ValueT
-    >(
-      reader
-    );
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *(no_instance_and_error.second)
-    );
-
-    return no_instance_and_error;
+    return NoInstanceAndDeserializationErrorFromReader<ValueT>(reader);
   }
 
   common::optional<ValueT> instance;
@@ -754,21 +743,11 @@ std::pair<
   ) = dispatch(reader, *model_type, name);
 
   if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
     return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
   }
 
   error = SkipWhitespace(reader);
   if (error.has_value()) {
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
     return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
   }
 
@@ -784,11 +763,6 @@ std::pair<
       )
     );
 
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
     return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
   }
 
@@ -797,12 +771,6 @@ std::pair<
   reader.Read();
   if (reader.node().kind() == xml_common::NodeKind::Error) {
     error = DeserializationErrorFromReader(reader);
-
-    PrependElementSegmentToDeserializationError(
-      name,
-      *error
-    );
-
     return NoInstanceAndDeserializationError<ValueT>(std::move(*error));
   }
 
@@ -850,6 +818,60 @@ std::pair<
       return from_sequence(a_reader);
     }
   );
+}
+
+/**
+ * \brief De-serialize a value from the element nested in another element, such
+ * as the instance in a property, or from the root element.
+ *
+ * We prepend the name of the nested element to the path of an error, so that
+ * the path reads, *e.g.*, <code>value/property/idShort</code>.
+ *
+ * This looks redundant next to reading an item of a list, and it is not.
+ * An item is not nested in an element of its own -- the item element *is*
+ * the indexed child -- so its readers prepend only the index, and the path
+ * reads, *e.g.*, <code>annotations/&#42;[1]/idShort</code>.
+ *
+ * \param reader to read from
+ * \param deserialize_element de-serializes the nested element
+ * \return the value, or an error, if any
+ */
+template <typename T, typename DeserializeT>
+std::pair<
+  common::optional<T>,
+  common::optional<DeserializationError>
+> DeserializeNestedElement(
+  xml_common::ReaderMergingText& reader,
+  const DeserializeT& deserialize_element
+) {
+  common::optional<DeserializationError> error = SkipWhitespace(reader);
+  if (error.has_value()) {
+    return NoInstanceAndDeserializationError<T>(std::move(*error));
+  }
+
+  if (reader.node().kind() != xml_common::NodeKind::Start) {
+    return deserialize_element(reader);
+  }
+
+  const std::string name(
+    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+      const xml_common::StartNode&
+    >(reader.node()).name
+  );
+
+  std::pair<
+    common::optional<T>,
+    common::optional<DeserializationError>
+  > result = deserialize_element(reader);
+
+  if (result.second.has_value()) {
+    PrependElementSegmentToDeserializationError(
+      name,
+      *(result.second)
+    );
+  }
+
+  return result;
 }
 
 std::pair<
@@ -1480,12 +1502,6 @@ std::pair<
   ) = deserialize_content(reader);
 
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::ElementSegment>(
-        common::Utf8ToWstring(expected_name)
-      )
-    );
-
     return NoInstanceAndDeserializationError<T>(
       std::move(*error)
     );
@@ -1578,6 +1594,19 @@ std::pair<
     size_t i = 0;
 
     while (true) {
+      // NOTE (mristin):
+      // Anything but an item element is an error of the list, not of an item,
+      // so we do not prepend any index to its path.
+      if (reader.node().kind() != xml_common::NodeKind::Start) {
+        error = DeserializationError(
+          common::Concat(
+            L"Expected only item elements and whitespace text, but got ",
+            xml_common::NodeToHumanReadableWstring(reader.node())
+          )
+        );
+        break;
+      }
+
       common::optional<T> item;
 
       std::tie(
@@ -1977,7 +2006,12 @@ std::pair<
           case properties::OfSomething::kParent:
             return ReadInto(
               the_parent,
-              ParentFromElement(reader)
+              DeserializeNestedElement<
+                std::shared_ptr<types::IParent>
+              >(
+                reader,
+                ParentFromElement
+              )
             );
           case properties::OfSomething::kOptionalText:
             return ReadInto(
@@ -2079,13 +2113,19 @@ common::expected<
     );
   }
 
+  common::optional<DeserializationError> error = SkipBof(reader);
+  if (error.has_value()) {
+    return common::make_unexpected(
+      std::move(*error)
+    );
+  }
+
   common::optional<ValueT> instance;
-  common::optional<DeserializationError> error;
 
   std::tie(
     instance,
     error
-  ) = from_element(reader);
+  ) = DeserializeNestedElement<ValueT>(reader, from_element);
 
   if (error.has_value()) {
     return common::make_unexpected(

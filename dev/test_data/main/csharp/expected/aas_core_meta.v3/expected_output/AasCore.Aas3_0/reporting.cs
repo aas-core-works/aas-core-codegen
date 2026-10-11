@@ -195,7 +195,9 @@ namespace AasCore.Aas3_0
                         part = EscapeForXPath(nameSegment.Name);
                         break;
                     case IndexSegment indexSegment:
-                        part = $"*[{indexSegment.Index}]";
+                        // XPath counts the elements starting at one, while our indices
+                        // start at zero.
+                        part = $"*[{indexSegment.Index + 1}]";
                         break;
                     case KeySegment keySegment:
                         // A JSON-able object is written as an XML-RPC <struct>, which

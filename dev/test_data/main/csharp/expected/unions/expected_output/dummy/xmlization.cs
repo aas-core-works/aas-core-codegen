@@ -448,6 +448,13 @@ namespace dummy
 
                     XmlCommon.SkipNoneWhitespaceAndComments(reader);
 
+                    if (reader.NodeType != Xml.XmlNodeType.Element)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a start element of the item 0 of the tuple, " +
+                            $"but got a node of type {reader.NodeType}");
+                        return default!;
+                    }
                     T0 item0 = readItem0(reader, out error);
                     if (error != null)
                     {
@@ -458,6 +465,13 @@ namespace dummy
                     }
                     XmlCommon.SkipNoneWhitespaceAndComments(reader);
 
+                    if (reader.NodeType != Xml.XmlNodeType.Element)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a start element of the item 1 of the tuple, " +
+                            $"but got a node of type {reader.NodeType}");
+                        return default!;
+                    }
                     T1 item1 = readItem1(reader, out error);
                     if (error != null)
                     {
@@ -468,6 +482,13 @@ namespace dummy
                     }
                     XmlCommon.SkipNoneWhitespaceAndComments(reader);
 
+                    if (reader.NodeType != Xml.XmlNodeType.Element)
+                    {
+                        error = new Reporting.Error(
+                            "Expected a start element of the item 2 of the tuple, " +
+                            $"but got a node of type {reader.NodeType}");
+                        return default!;
+                    }
                     T2 item2 = readItem2(reader, out error);
                     if (error != null)
                     {
@@ -671,22 +692,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -767,22 +789,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -893,22 +916,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -989,22 +1013,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1085,22 +1110,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1221,22 +1247,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1328,22 +1355,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1424,22 +1452,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1520,22 +1549,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -1716,22 +1746,23 @@ namespace dummy
                                 return default!;
                         }
 
+                        if (error == null)
+                        {
+                            XmlCommon.ConsumeEndElement(
+                                reader, elementName, isEmptyProperty, out error);
+                        }
+
                         // NOTE (mristin):
                         // Every property is read in this very loop, so we mark the error with
                         // the property's own element name here, once, instead of at every
                         // single case above. For a matched case, elementName *is* that name.
+                        // This covers the end element of the property as well, since whatever
+                        // unexpected node precedes it still lies within the property.
                         if (error != null)
                         {
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     elementName));
-                            return default!;
-                        }
-
-                        XmlCommon.ConsumeEndElement(
-                            reader, elementName, isEmptyProperty, out error);
-                        if (error != null)
-                        {
                             return default!;
                         }
                     }
@@ -2107,11 +2138,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.StructuralFirst result = DeserializeImplementation.StructuralFirstFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2141,11 +2186,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.StructuralSecond result = DeserializeImplementation.StructuralSecondFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2175,11 +2234,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IMixedAbstractMember result = DeserializeImplementation.IMixedAbstractMemberFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2209,11 +2282,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.MixedAbstractDescendantOne result = DeserializeImplementation.MixedAbstractDescendantOneFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2243,11 +2330,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.MixedAbstractDescendantTwo result = DeserializeImplementation.MixedAbstractDescendantTwoFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2277,11 +2378,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.IMixedConcreteWithDescendants result = DeserializeImplementation.IMixedConcreteWithDescendantsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2311,11 +2426,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.MixedConcreteWithDescendants result = DeserializeImplementation.MixedConcreteWithDescendantsFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2345,11 +2474,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.MixedConcreteWithDescendantsChild result = DeserializeImplementation.MixedConcreteWithDescendantsChildFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2379,11 +2522,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.MixedConcreteLeaf result = DeserializeImplementation.MixedConcreteLeafFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2413,11 +2570,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ModelTypedFirst result = DeserializeImplementation.ModelTypedFirstFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2447,11 +2618,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ModelTypedSecond result = DeserializeImplementation.ModelTypedSecondFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2481,11 +2666,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.Something result = DeserializeImplementation.SomethingFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2515,11 +2714,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.StructuralUnion result = DeserializeImplementation.StructuralUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2549,11 +2762,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.MixedUnion result = DeserializeImplementation.MixedUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2583,11 +2810,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.ModelTypedUnion result = DeserializeImplementation.ModelTypedUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);
@@ -2617,11 +2858,25 @@ namespace dummy
                         "to be set at content with MoveToContent");
                 }
 
+                // NOTE (mristin):
+                // The path starts at the root element. The readers do not prepend their own
+                // names, so we prepend the name of the root element here, if there is any.
+                string? rootElementName = null;
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.Element)
+                {
+                    rootElementName = reader.LocalName;
+                }
+
                 Our.OverlappingUnion result = DeserializeImplementation.OverlappingUnionFromElement(
                     reader,
                     out Reporting.Error? error);
                 if (error != null)
                 {
+                    if (rootElementName != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(rootElementName));
+                    }
                     throw new Xmlization.Exception(
                         Reporting.GenerateRelativeXPath(error.PathSegments),
                         error.Cause);

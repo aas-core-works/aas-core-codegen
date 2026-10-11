@@ -497,8 +497,8 @@ public final class XmlCommon {
      * node is one step deeper than the property and the discriminator's name has
      * to be prepended: {@code value/property/idShort}. A list item is not
      * wrapped -- the item element *is* the indexed child -- so prepending the name
-     * there would give {@code annotations/*[0]/property/idShort}, which walks one
-     * level past the element {@code *[0]} already selects and resolves to
+     * there would give {@code annotations/*[1]/property/idShort}, which walks one
+     * level past the element {@code *[1]} already selects and resolves to
      * nothing.
      *
      * <p>The two callers therefore need different segments, which is why the name

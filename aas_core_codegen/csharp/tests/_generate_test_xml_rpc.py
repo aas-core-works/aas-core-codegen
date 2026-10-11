@@ -298,7 +298,7 @@ public void Test_deserialize_reports_path_on_nested_error()
 {I}// The item gets an index and no step of its own, as every item of
 {I}// a ``<data>`` element is a ``<value>`` element.
 {I}Assert.AreEqual(
-{II}"array/data/*[1]",
+{II}"array/data/*[2]",
 {II}Our.Reporting.GenerateRelativeXPath(error!.PathSegments));
 }}"""
         ),
