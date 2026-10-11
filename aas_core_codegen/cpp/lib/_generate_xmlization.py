@@ -2160,6 +2160,45 @@ std::pair<
     )
 
 
+def _generate_prepend_index_segment_of_item() -> Stripped:
+    """Generate the function to prepend the index of an item to an error path."""
+    return Stripped(
+        f"""\
+/**
+ * \\brief Prepend the index of an item of a list, a set or a tuple to
+ * the path of \\p deserialization_error.
+ *
+ * The item readers, such as ``DeserializeValueFromVElement`` or
+ * the ``*FromElement`` functions, prepend the segment of the item element to
+ * the path of an error within the item. However, the index segment already
+ * selects the item element, so we replace the segment of the item element with
+ * the index segment. This way, we report the same paths as the other SDKs,
+ * *e.g.*, <code>texts/&#42;[0]</code> instead of <code>texts/&#42;[0]/v</code>.
+ */
+void PrependIndexSegmentOfItemToDeserializationError(
+{I}size_t index,
+{I}DeserializationError& deserialization_error
+) {{
+{I}std::deque<std::unique_ptr<xml_path::ISegment> >& segments(
+{II}deserialization_error.path.segments
+{I});
+
+{I}if (
+{II}!segments.empty()
+{II}&& dynamic_cast<const xml_path::ElementSegment*>(
+{III}segments.front().get()
+{II}) != nullptr
+{I}) {{
+{II}segments.pop_front();
+{I}}}
+
+{I}segments.emplace_front(
+{II}common::make_unique<xml_path::IndexSegment>(index)
+{I});
+}}"""
+    )
+
+
 def _generate_deserialize_set() -> Stripped:
     """Generate a generic function to deserialize the sets."""
     return Stripped(
@@ -2235,9 +2274,7 @@ std::pair<
 {II}}}
 
 {II}if (error.has_value()) {{
-{III}error->path.segments.emplace_front(
-{IIII}common::make_unique<xml_path::IndexSegment>(i)
-{III});
+{III}PrependIndexSegmentOfItemToDeserializationError(i, *error);
 {III}break;
 {II}}}
 
@@ -2327,9 +2364,7 @@ std::pair<
 {III}) = deserialize_item(reader);
 
 {III}if (error.has_value()) {{
-{IIII}error->path.segments.emplace_front(
-{IIIII}common::make_unique<xml_path::IndexSegment>(i)
-{IIII});
+{IIII}PrependIndexSegmentOfItemToDeserializationError(i, *error);
 {IIII}break;
 {III}}}
 
@@ -2415,11 +2450,7 @@ std::tie(
 {I}error
 ) = deserialize_item{i}(reader);
 if (error.has_value()) {{
-{I}error->path.segments.emplace_front(
-{II}common::make_unique<xml_path::IndexSegment>(
-{III}{i}
-{II})
-{I});
+{I}PrependIndexSegmentOfItemToDeserializationError({i}, *error);
 {I}return std::make_pair(
 {II}common::nullopt,
 {II}std::move(error)
@@ -5592,14 +5623,23 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
     ):
         blocks.append(_generate_deserialize_atomic_value_from_v_element())
 
-    if any(
+    has_list_properties = any(
         _type_annotation_contains_list(prop.type_annotation)
         for cls in symbol_table.concrete_classes
         for prop in cls.properties
-    ):
-        blocks.append(_generate_deserialize_list())
+    )
 
     has_set_properties = intermediate_uses.set_properties(symbol_table)
+
+    if (
+        has_list_properties
+        or has_set_properties
+        or len(intermediate.tuple_arities(symbol_table)) > 0
+    ):
+        blocks.append(_generate_prepend_index_segment_of_item())
+
+    if has_list_properties:
+        blocks.append(_generate_deserialize_list())
 
     if has_set_properties:
         blocks.append(_generate_deserialize_set())

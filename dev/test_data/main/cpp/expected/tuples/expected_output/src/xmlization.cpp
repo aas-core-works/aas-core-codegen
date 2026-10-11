@@ -1531,6 +1531,39 @@ std::pair<
   return std::make_pair(std::move(value), common::nullopt);
 }
 
+/**
+ * \brief Prepend the index of an item of a list, a set or a tuple to
+ * the path of \p deserialization_error.
+ *
+ * The item readers, such as ``DeserializeValueFromVElement`` or
+ * the ``*FromElement`` functions, prepend the segment of the item element to
+ * the path of an error within the item. However, the index segment already
+ * selects the item element, so we replace the segment of the item element with
+ * the index segment. This way, we report the same paths as the other SDKs,
+ * *e.g.*, <code>texts/&#42;[0]</code> instead of <code>texts/&#42;[0]/v</code>.
+ */
+void PrependIndexSegmentOfItemToDeserializationError(
+  size_t index,
+  DeserializationError& deserialization_error
+) {
+  std::deque<std::unique_ptr<xml_path::ISegment> >& segments(
+    deserialization_error.path.segments
+  );
+
+  if (
+    !segments.empty()
+    && dynamic_cast<const xml_path::ElementSegment*>(
+      segments.front().get()
+    ) != nullptr
+  ) {
+    segments.pop_front();
+  }
+
+  segments.emplace_front(
+    common::make_unique<xml_path::IndexSegment>(index)
+  );
+}
+
 template <
   typename T0,
   typename T1,
@@ -1566,11 +1599,7 @@ std::pair<
     error
   ) = deserialize_item0(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        0
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(0, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
@@ -1590,11 +1619,7 @@ std::pair<
     error
   ) = deserialize_item1(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        1
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(1, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
@@ -1673,11 +1698,7 @@ std::pair<
     error
   ) = deserialize_item0(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        0
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(0, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
@@ -1697,11 +1718,7 @@ std::pair<
     error
   ) = deserialize_item1(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        1
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(1, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
@@ -1721,11 +1738,7 @@ std::pair<
     error
   ) = deserialize_item2(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        2
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(2, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
@@ -1745,11 +1758,7 @@ std::pair<
     error
   ) = deserialize_item3(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        3
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(3, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
@@ -1769,11 +1778,7 @@ std::pair<
     error
   ) = deserialize_item4(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        4
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(4, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
@@ -1793,11 +1798,7 @@ std::pair<
     error
   ) = deserialize_item5(reader);
   if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<xml_path::IndexSegment>(
-        5
-      )
-    );
+    PrependIndexSegmentOfItemToDeserializationError(5, *error);
     return std::make_pair(
       common::nullopt,
       std::move(error)
