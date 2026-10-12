@@ -26,6 +26,7 @@ from aas_core_codegen.typescript.common import (
     INDENT3 as III,
     INDENT4 as IIII,
     INDENT5 as IIIII,
+    INDENT6 as IIIIII,
 )
 
 
@@ -175,10 +176,15 @@ function extractModelType(
 {II});
 {I}}}
 {I}if (typeof modelType !== "string") {{
-{II}return newDeserializationError<string>(
+{II}// NOTE (mristin):
+{II}// A model type of a wrong type is reported at the property, as the type
+{II}// errors of all the other properties are, and as in the other SDKs.
+{II}const error = new DeserializationError(
 {III}`Expected the property modelType to be a string, ` +
 {III}`but got: ${{typeof modelType}}`
 {II});
+{II}error.path.prepend(new PropertySegment(jsonObject, "modelType"));
+{II}return new OurCommon.Either<string, DeserializationError>(null, error);
 {I}}}
 
 {I}return new OurCommon.Either<string, DeserializationError>(modelType, null);
@@ -2829,6 +2835,14 @@ export class KeySegment {{
 export type Segment = PropertySegment | IndexSegment | KeySegment;"""
         ),
         Stripped(
+            """\
+/**
+ * Match the property names which a path writes after a dot; the other names
+ * are written in brackets as JSON strings, *e.g.*, `["$eq"]`.
+ */
+const VARIABLE_NAME_RE = /^[a-zA-Z_][a-zA-Z_0-9]*$/;"""
+        ),
+        Stripped(
             f"""\
 /**
  * Represent the relative path to the erroneous value.
@@ -2862,7 +2876,11 @@ export class Path {{
 {II}let segment = this._segments[0];
 
 {II}if (segment instanceof PropertySegment) {{
-{III}parts.push(segment.name);
+{III}parts.push(
+{IIII}VARIABLE_NAME_RE.test(segment.name)
+{IIIII}? segment.name
+{IIIII}: `[${{JSON.stringify(segment.name)}}]`
+{III});
 {II}}} else if (segment instanceof IndexSegment) {{
 {III}parts.push(`[${{segment.index}}]`);
 {II}}} else if (segment instanceof KeySegment) {{
@@ -2874,7 +2892,11 @@ export class Path {{
 {II}for (let i = 1; i < this._segments.length; i++) {{
 {III}segment = this._segments[i];
 {III}if (segment instanceof PropertySegment) {{
-{IIII}parts.push(`.${{segment.name}}`);
+{IIII}parts.push(
+{IIIII}VARIABLE_NAME_RE.test(segment.name)
+{IIIIII}? `.${{segment.name}}`
+{IIIIII}: `[${{JSON.stringify(segment.name)}}]`
+{IIII});
 {III}}} else if (segment instanceof IndexSegment) {{
 {IIII}parts.push(`[${{segment.index}}]`);
 {III}}} else if (segment instanceof KeySegment) {{

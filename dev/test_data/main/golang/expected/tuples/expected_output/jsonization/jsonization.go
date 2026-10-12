@@ -356,13 +356,16 @@ func checkModelType(
 	}
 
 	if modelType != expected {
+		// NOTE (mristin):
+		// A wrong model type is reported at the instance, as an unknown one is,
+		// and as in the other SDKs.
 		err = newDeserializationError(
 			fmt.Sprintf(
 				"Expected the model type '%s', but got %s",
 				expected,
 				modelType,
 			),
-		).prependName("modelType")
+		)
 	}
 	return
 }

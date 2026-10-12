@@ -6,6 +6,7 @@ package reporting
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"strconv"
 )
@@ -79,21 +80,29 @@ func (p *Path) OverSegments(callback func(interface{})) {
 	}
 }
 
-// Translate the path to a JSON path.
+// Match the property names which a JSON path writes after a dot; the other
+// names are written in brackets as JSON strings, *e.g.*, `["$eq"]`.
+var variableNameRe = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z_0-9]*$`)
+
+// Render the path with dots and subscripts.
 //
-// The name segments are expected to denote the names of the properties
-// in JSON property names, not Golang property names.
-func ToJSONPath(p *Path) string {
+// If `bracketNonVariableNames` is set, the names which are no variable names
+// are written in brackets as JSON strings.
+func renderPath(p *Path, bracketNonVariableNames bool) string {
 	var b strings.Builder
 	i := 0
 	p.OverSegments(func(s interface{}) {
 		switch v := s.(type) {
 		case *NameSegment:
-			if i == 0 {
+			if !bracketNonVariableNames || variableNameRe.MatchString(v.Name) {
+				if i > 0 {
+					b.WriteString(".")
+				}
 				b.WriteString(v.Name)
 			} else {
-				b.WriteString(".")
-				b.WriteString(v.Name)
+				b.WriteString(`["`)
+				b.WriteString(escapeForJSONString(v.Name))
+				b.WriteString(`"]`)
 			}
 		case *IndexSegment:
 			b.WriteString("[")
@@ -117,34 +126,59 @@ func ToJSONPath(p *Path) string {
 	return b.String()
 }
 
+// Translate the path to a JSON path.
+//
+// The name segments are expected to denote the names of the properties
+// in JSON property names, not Golang property names.
+func ToJSONPath(p *Path) string {
+	return renderPath(p, true)
+}
+
 // Translate the path to a Golang access path.
 //
 // The name segments are expected to denote the names of the properties
 // in Golang, not JSON property names.
 func ToGolangPath(p *Path) string {
 	// NOTE(mristin):
-	// We re-use JSON path formatting as implementation, but introduce
-	// a separate function to signal to the reader in which form
-	// the name segments are expected (Golang property names instead
-	// of JSON property names).
-	return ToJSONPath(p)
+	// The name segments of a Golang path are accessors such as `Value()`,
+	// which we always write after a dot.
+	return renderPath(p, false)
 }
 
-var replacerForJSONString = strings.NewReplacer(
-	"\\", "\\\\",
-	"\"", "\\\"",
-	"\b", "\\b",
-	"\f", "\\f",
-	"\n", "\\n",
-	"\r", "\\r",
-	"\t", "\\t",
-)
-
 // Escape the characters which a JSON string may not hold as they are.
+//
+// The control characters without a short escape are written as Unicode
+// escapes, as JSON.stringify does.
 func escapeForJSONString(
 	text string,
 ) string {
-	return replacerForJSONString.Replace(text)
+	var b strings.Builder
+	b.Grow(len(text))
+	for _, r := range text {
+		switch r {
+		case '\\':
+			b.WriteString(`\\`)
+		case '"':
+			b.WriteString(`\"`)
+		case '\b':
+			b.WriteString(`\b`)
+		case '\f':
+			b.WriteString(`\f`)
+		case '\n':
+			b.WriteString(`\n`)
+		case '\r':
+			b.WriteString(`\r`)
+		case '\t':
+			b.WriteString(`\t`)
+		default:
+			if r < 0x20 {
+				fmt.Fprintf(&b, `\u%04x`, r)
+			} else {
+				b.WriteRune(r)
+			}
+		}
+	}
+	return b.String()
 }
 
 var replacerForXPath = strings.NewReplacer(

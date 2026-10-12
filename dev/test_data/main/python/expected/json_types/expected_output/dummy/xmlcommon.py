@@ -19,6 +19,7 @@ a caller to choose.
 # Do NOT edit or append.
 
 
+import json
 import re
 import sys
 from typing import (
@@ -318,7 +319,7 @@ class SerializationException(Exception):
         object is known only at run time and can be any string at all, so it is
         always rendered as a subscript.
         """
-        self._segments.insert(0, f'[{key!r}]')
+        self._segments.insert(0, f'[{json.dumps(key, ensure_ascii=False)}]')
 
     def __str__(self) -> str:
         if len(self._segments) == 0:

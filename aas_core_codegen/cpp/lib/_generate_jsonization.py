@@ -206,6 +206,29 @@ struct IndexSegment : public ISegment {{
         Stripped(
             f"""\
 /**
+ * Represent an access to a member of a JSON object whose key is known only at
+ * run time, such as a member of a JSON-able object, on a JSON path.
+ */
+struct KeySegment : public ISegment {{
+{I}/**
+{I} * Key of the member in a JSON object
+{I} */
+{I}std::wstring key;
+
+{I}explicit KeySegment(
+{II}std::wstring a_key
+{I});
+
+{I}std::wstring ToWstring() const override;
+
+{I}std::unique_ptr<ISegment> Clone() const override;
+
+{I}~KeySegment() override = default;
+}};  // struct KeySegment"""
+        ),
+        Stripped(
+            f"""\
+/**
  * Represent a JSON path to some value.
  */
 struct Path {{
@@ -306,6 +329,101 @@ nlohmann::json Serialize(
     return writer.getvalue()
 
 
+def _generate_json_path_helpers() -> List[Stripped]:
+    """Generate the functions shared by the segments of a JSON path."""
+    return [
+        Stripped("// region JSON path helpers"),
+        Stripped(
+            f"""\
+/**
+ * \\brief Escape \\p text as the content of a JSON string.
+ *
+ * The control characters without a short escape are written as Unicode
+ * escapes, as JSON.stringify does.
+ */
+std::wstring EscapeForJsonString(
+{I}const std::wstring& text
+) {{
+{I}static const wchar_t* const kHexDigits = L"0123456789abcdef";
+
+{I}std::wstring escaped;
+{I}escaped.reserve(text.size());
+{I}for (const wchar_t character : text) {{
+{II}switch (character) {{
+{III}case L'\\\\':
+{IIII}escaped.append(L"\\\\\\\\");
+{IIII}break;
+{III}case L'"':
+{IIII}escaped.append(L"\\\\\\"");
+{IIII}break;
+{III}case L'\\b':
+{IIII}escaped.append(L"\\\\b");
+{IIII}break;
+{III}case L'\\f':
+{IIII}escaped.append(L"\\\\f");
+{IIII}break;
+{III}case L'\\n':
+{IIII}escaped.append(L"\\\\n");
+{IIII}break;
+{III}case L'\\r':
+{IIII}escaped.append(L"\\\\r");
+{IIII}break;
+{III}case L'\\t':
+{IIII}escaped.append(L"\\\\t");
+{IIII}break;
+{III}default:
+{IIII}if (static_cast<uint32_t>(character) < 0x20) {{
+{IIIII}escaped.append(L"\\\\u00");
+{IIIII}escaped.push_back(kHexDigits[(character >> 4) & 0xF]);
+{IIIII}escaped.push_back(kHexDigits[character & 0xF]);
+{IIII}}} else {{
+{IIIII}escaped.push_back(character);
+{IIII}}}
+{IIII}break;
+{II}}}
+{I}}}
+
+{I}return escaped;
+}}"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * \\brief Check whether a JSON path writes the property \\p name after a dot.
+ *
+ * The other names are written in brackets as JSON strings,
+ * <em>e.g.</em>, <code>["$eq"]</code>.
+ */
+bool IsVariableName(
+{I}const std::wstring& name
+) {{
+{I}if (name.empty()) {{
+{II}return false;
+{I}}}
+
+{I}for (size_t i = 0; i < name.size(); ++i) {{
+{II}const wchar_t character = name[i];
+
+{II}const bool is_letter_or_underscore = (
+{III}(character >= L'a' && character <= L'z')
+{III}|| (character >= L'A' && character <= L'Z')
+{III}|| character == L'_'
+{II});
+
+{II}const bool is_digit = character >= L'0' && character <= L'9';
+
+{II}if (!(is_letter_or_underscore || (i > 0 && is_digit))) {{
+{III}return false;
+{II}}}
+{I}}}
+
+{I}return true;
+}}"""
+        ),
+        Stripped("// endregion JSON path helpers"),
+    ]
+
+
 def _generate_property_segment_implementation() -> List[Stripped]:
     """Generate the implementation of the struct ``PropertySegment``."""
     return [
@@ -322,9 +440,17 @@ PropertySegment::PropertySegment(
         Stripped(
             f"""\
 std::wstring PropertySegment::ToWstring() const {{
+{I}if (IsVariableName(name)) {{
+{II}return common::Concat(
+{III}L".",
+{III}name
+{II});
+{I}}}
+
 {I}return common::Concat(
-{II}L".",
-{II}name
+{II}L"[\\"",
+{II}EscapeForJsonString(name),
+{II}L"\\"]"
 {I});
 }}"""
         ),
@@ -368,6 +494,42 @@ std::unique_ptr<ISegment> IndexSegment::Clone() const {{
 }}"""
         ),
         Stripped("// endregion IndexSegment"),
+    ]
+
+
+def _generate_key_segment_implementation() -> List[Stripped]:
+    """Generate the implementation of the struct ``KeySegment``."""
+    return [
+        Stripped("// region KeySegment"),
+        Stripped(
+            f"""\
+KeySegment::KeySegment(
+{I}std::wstring a_key
+) :
+{I}key(std::move(a_key)) {{
+{I}// Intentionally empty.
+}}"""
+        ),
+        Stripped(
+            f"""\
+std::wstring KeySegment::ToWstring() const {{
+{I}// NOTE (mristin):
+{I}// A key can be any string at all, so we always write it as a JSON string in
+{I}// brackets, as in the other SDKs.
+{I}return common::Concat(
+{II}L"[\\"",
+{II}EscapeForJsonString(key),
+{II}L"\\"]"
+{I});
+}}"""
+        ),
+        Stripped(
+            f"""\
+std::unique_ptr<ISegment> KeySegment::Clone() const {{
+{I}return common::make_unique<KeySegment>(*this);
+}}"""
+        ),
+        Stripped("// endregion KeySegment"),
     ]
 
 
@@ -424,6 +586,16 @@ std::wstring Path::ToWstring() const {{
 {I}std::deque<std::wstring> parts;
 {I}for (const std::unique_ptr<ISegment>& segment : segments ) {{
 {II}parts.emplace_back(segment->ToWstring());
+{I}}}
+
+{I}// NOTE (mristin):
+{I}// The path starts with the name of the first property without a dot, as in
+{I}// the other SDKs, *e.g.*, ``items[0].name``.
+{I}const PropertySegment* first_property(
+{II}dynamic_cast<const PropertySegment*>(segments.front().get())
+{I});
+{I}if (first_property != nullptr && IsVariableName(first_property->name)) {{
+{II}parts.front() = first_property->name;
 {I}}}
 
 {I}size_t out_len = 0;
@@ -903,7 +1075,7 @@ std::pair<
 
 {III}if (error.has_value()) {{
 {IIII}error->path.segments.emplace_front(
-{IIIII}common::make_unique<PropertySegment>(
+{IIIII}common::make_unique<KeySegment>(
 {IIIIII}common::Utf8ToWstring(item.key())
 {IIIII})
 {IIII});
@@ -5596,8 +5768,10 @@ def generate_implementation(
 #pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(namespace),
+        *_generate_json_path_helpers(),
         *_generate_property_segment_implementation(),
         *_generate_index_segment_implementation(),
+        *_generate_key_segment_implementation(),
         *_generate_path_implementation(),
         Stripped("// region De-serialization"),
         *_generate_deserialization_error_implementation(),

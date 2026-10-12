@@ -13,6 +13,8 @@ properties do not have fixed order, and hence we can not read
 
 import base64
 import collections.abc
+import json
+import re
 import sys
 from typing import (
     Any,
@@ -139,6 +141,11 @@ class KeySegment:
 Segment = Union[PropertySegment, IndexSegment, KeySegment]
 
 
+#: Match the property names which a path writes after a dot; the other names
+#: are written in brackets as JSON strings, *e.g.*, ``["$eq"]``.
+_VARIABLE_NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z_0-9]*$")
+
+
 class Path:
     """Represent the relative path to the erroneous value."""
 
@@ -164,21 +171,27 @@ class Path:
         iterator = iter(self._segments)
         first = next(iterator)
         if isinstance(first, PropertySegment):
-            parts.append(f"{first.name}")
+            if _VARIABLE_NAME_RE.match(first.name):
+                parts.append(first.name)
+            else:
+                parts.append(f"[{json.dumps(first.name, ensure_ascii=False)}]")
         elif isinstance(first, IndexSegment):
             parts.append(f"[{first.index}]")
         elif isinstance(first, KeySegment):
-            parts.append(f"[{first.key!r}]")
+            parts.append(f"[{json.dumps(first.key, ensure_ascii=False)}]")
         else:
             our_common.assert_never(first)
 
         for segment in iterator:
             if isinstance(segment, PropertySegment):
-                parts.append(f".{segment.name}")
+                if _VARIABLE_NAME_RE.match(segment.name):
+                    parts.append(f".{segment.name}")
+                else:
+                    parts.append(f"[{json.dumps(segment.name, ensure_ascii=False)}]")
             elif isinstance(segment, IndexSegment):
                 parts.append(f"[{segment.index}]")
             elif isinstance(segment, KeySegment):
-                parts.append(f"[{segment.key!r}]")
+                parts.append(f"[{json.dumps(segment.key, ensure_ascii=False)}]")
             else:
                 our_common.assert_never(segment)
 
@@ -293,10 +306,15 @@ def _dispatch_from_jsonable(
         )
 
     if not isinstance(model_type, str):
-        raise DeserializationException(
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
             f"Expected the property modelType to be a str, "
             f"but got: {type(model_type)}"
         )
+        exception.path._prepend(PropertySegment(mapping, "modelType"))
+        raise exception
 
     parse = dispatch.get(model_type, None)
     if parse is None:
@@ -488,22 +506,25 @@ def item_from_jsonable(
 
     the_name: Optional[str] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'name':
+            if key == 'name':
                 the_name = _str_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_name is None:
         raise DeserializationException(
@@ -547,6 +568,17 @@ def child_a_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'ChildA':
         raise DeserializationException(
             f"Expected modelType to be 'ChildA', "
@@ -555,6 +587,8 @@ def child_a_from_jsonable(
 
     the_optional_text: Optional[str] = None
     the_a_only: Optional[int] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -566,14 +600,18 @@ def child_a_from_jsonable(
             elif key == 'aOnly':
                 the_a_only = _int_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_a_only is None:
         raise DeserializationException(
@@ -600,6 +638,17 @@ def child_b_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     model_type = mapping.get('modelType', None)
+    if model_type is not None and not isinstance(model_type, str):
+        # NOTE (mristin):
+        # A model type of a wrong type is reported at the property, as the type
+        # errors of all the other properties are.
+        exception = DeserializationException(
+            f"Expected the property modelType to be a str, "
+            f"but got: {type(model_type)}"
+        )
+        exception.path._prepend(PropertySegment(mapping, 'modelType'))
+        raise exception
+
     if model_type != 'ChildB':
         raise DeserializationException(
             f"Expected modelType to be 'ChildB', "
@@ -608,6 +657,8 @@ def child_b_from_jsonable(
 
     the_optional_text: Optional[str] = None
     the_b_only: Optional[int] = None
+
+    unexpected_key: Optional[str] = None
 
     try:
         for key, jsonable_value in mapping.items():
@@ -619,14 +670,18 @@ def child_b_from_jsonable(
             elif key == 'bOnly':
                 the_b_only = _int_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_b_only is None:
         raise DeserializationException(
@@ -726,12 +781,11 @@ def something_from_jsonable(
     the_optional_data: Optional[bytes] = None
     the_optional_member: Optional[our_types.ParentOrItem] = None
 
+    unexpected_key: Optional[str] = None
+
     try:
         for key, jsonable_value in mapping.items():
-            if key == 'modelType':
-                # The model type is redundant for this class, and we simply accept it.
-                pass
-            elif key == 'text':
+            if key == 'text':
                 the_text = _str_from_jsonable(jsonable_value)
             elif key == 'number':
                 the_number = _int_from_jsonable(jsonable_value)
@@ -762,14 +816,18 @@ def something_from_jsonable(
             elif key == 'optionalMember':
                 the_optional_member = parent_or_item_from_jsonable(jsonable_value)
             else:
-                raise DeserializationException(
-                    f"Unexpected property: {key}"
-                )
+                unexpected_key = key
+                break
     except DeserializationException as exception:
         exception.path._prepend(
             PropertySegment(mapping, key)
         )
         raise
+
+    if unexpected_key is not None:
+        raise DeserializationException(
+            f"Unexpected property: {unexpected_key}"
+        )
 
     if the_text is None:
         raise DeserializationException(
@@ -916,7 +974,7 @@ class SerializationException(Exception):
         object is known only at run time and can be any string at all, so it is
         always rendered as a subscript.
         """
-        self._segments.insert(0, f'[{key!r}]')
+        self._segments.insert(0, f'[{json.dumps(key, ensure_ascii=False)}]')
 
     def __str__(self) -> str:
         if len(self._segments) == 0:

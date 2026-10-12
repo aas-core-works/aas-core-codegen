@@ -324,7 +324,7 @@ class TestWriting(unittest.TestCase):
 {III})
 
 {II}self.assertEqual(
-{III}\"['a b'][1]\", context.exception.path
+{III}'["a b"][1]', context.exception.path
 {II})
 
 {I}def test_an_integer_too_large_for_a_float_is_not_written(self) -> None:

@@ -21,6 +21,7 @@ classes.
 
 
 import collections
+import json
 import sys
 from typing import (
     Any,
@@ -141,7 +142,7 @@ class KeySegment:
         self.key = key
 
     def __str__(self) -> str:
-        return f'[{self.key!r}]'
+        return f'[{json.dumps(self.key, ensure_ascii=False)}]'
 
 
 Segment = Union[PropertySegment, IndexSegment, KeySegment]

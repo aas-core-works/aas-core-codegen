@@ -96,16 +96,48 @@ public class KeySegment : Segment
 private static string EscapeForJsonString(
 {I}string text)
 {{
-{I}return (
-{II}text
-{III}.Replace("\\\\", "\\\\\\\\")
-{III}.Replace("\\"", "\\\\\\"")
-{III}.Replace("\\b", "\\\\b")
-{III}.Replace("\\f", "\\\\f")
-{III}.Replace("\\n", "\\\\n")
-{III}.Replace("\\r", "\\\\r")
-{III}.Replace("\\t", "\\\\t")
-{I});
+{I}var builder = new System.Text.StringBuilder(text.Length);
+{I}foreach (char character in text)
+{I}{{
+{II}switch (character)
+{II}{{
+{III}case '\\\\':
+{IIII}builder.Append("\\\\\\\\");
+{IIII}break;
+{III}case '"':
+{IIII}builder.Append("\\\\\\"");
+{IIII}break;
+{III}case '\\b':
+{IIII}builder.Append("\\\\b");
+{IIII}break;
+{III}case '\\f':
+{IIII}builder.Append("\\\\f");
+{IIII}break;
+{III}case '\\n':
+{IIII}builder.Append("\\\\n");
+{IIII}break;
+{III}case '\\r':
+{IIII}builder.Append("\\\\r");
+{IIII}break;
+{III}case '\\t':
+{IIII}builder.Append("\\\\t");
+{IIII}break;
+{III}default:
+{IIII}// NOTE (mristin):
+{IIII}// The other control characters can not stand in a JSON string as they
+{IIII}// are, so we write them as Unicode escapes, as JSON.stringify does.
+{IIII}if (character < 0x20)
+{IIII}{{
+{IIIII}builder.Append($"\\\\u{{(int)character:x4}}");
+{IIII}}}
+{IIII}else
+{IIII}{{
+{IIIII}builder.Append(character);
+{IIII}}}
+{IIII}break;
+{II}}}
+{I}}}
+{I}return builder.ToString();
 }}"""
         ),
         Stripped(

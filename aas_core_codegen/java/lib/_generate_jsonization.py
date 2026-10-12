@@ -364,7 +364,9 @@ private static Reporting.Error checkModelType(JsonNode node, String expected) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected the model type '" + expected + "', " +
 {III}"but got '" + modelType + "'");
-{II}error.prependSegment(new Reporting.NameSegment("modelType"));
+{II}// NOTE (mristin):
+{II}// A wrong model type is reported at the instance, as an unknown one is,
+{II}// and as in the other SDKs.
 {II}return error;
 {I}}}
 

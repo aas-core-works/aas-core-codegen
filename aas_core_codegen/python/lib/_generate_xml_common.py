@@ -196,6 +196,7 @@ def parse_unqualified_element_tag(
         # pylint: disable=line-too-long
         Stripped(
             f"""\
+import json
 import re
 import sys
 from typing import (
@@ -448,7 +449,7 @@ class SerializationException(Exception):
 {II}object is known only at run time and can be any string at all, so it is
 {II}always rendered as a subscript.
 {II}\"\"\"
-{II}self._segments.insert(0, f'[{{key!r}}]')
+{II}self._segments.insert(0, f'[{{json.dumps(key, ensure_ascii=False)}}]')
 
 {I}def __str__(self) -> str:
 {II}if len(self._segments) == 0:

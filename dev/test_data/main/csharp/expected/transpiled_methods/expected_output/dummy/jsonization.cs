@@ -341,7 +341,17 @@ namespace dummy
                     return default!;
                 }
 
-                return StringFrom(modelTypeNode, out error);
+                string modelType = StringFrom(modelTypeNode, out error);
+                if (error != null)
+                {
+                    // NOTE (mristin):
+                    // A model type of a wrong type is reported at the property, as the type
+                    // errors of all the other properties are, and as in the other SDKs.
+                    error.PrependSegment(
+                        new Reporting.NameSegment("modelType"));
+                    return default!;
+                }
+                return modelType;
             }
 
             private static readonly Deserializer<List<string>> Parse_ListOf_string = (
@@ -460,9 +470,14 @@ namespace dummy
                                 keyValue.Value, out error);
                             if (error == null && modelType != "First")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'First', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:
@@ -562,9 +577,14 @@ namespace dummy
                                 keyValue.Value, out error);
                             if (error == null && modelType != "Second")
                             {
+                                // NOTE (mristin):
+                                // A wrong model type is reported at the instance, as an unknown one is,
+                                // and as in the other SDKs, so we return before the property is
+                                // prepended to the path.
                                 error = new Reporting.Error(
                                     "Expected the model type 'Second', " +
                                     $"but got {modelType}");
+                                return default!;
                             }
                             break;
                         default:

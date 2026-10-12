@@ -58,6 +58,7 @@ def generate(qualified_module_name: python_common.QualifiedModuleName) -> str:
         Stripped(
             f"""\
 import collections
+import json
 import sys
 from typing import (
 {I}Any,
@@ -151,7 +152,7 @@ class KeySegment:
 {II}self.key = key
 
 {I}def __str__(self) -> str:
-{II}return f'[{{self.key!r}}]'"""
+{II}return f'[{{json.dumps(self.key, ensure_ascii=False)}}]'"""
         ),
         Stripped("Segment = Union[PropertySegment, IndexSegment, KeySegment]"),
         Stripped(

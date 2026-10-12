@@ -16,6 +16,93 @@ namespace aas_core {
 namespace aas_3_0 {
 namespace jsonization {
 
+// region JSON path helpers
+
+/**
+ * \brief Escape \p text as the content of a JSON string.
+ *
+ * The control characters without a short escape are written as Unicode
+ * escapes, as JSON.stringify does.
+ */
+std::wstring EscapeForJsonString(
+  const std::wstring& text
+) {
+  static const wchar_t* const kHexDigits = L"0123456789abcdef";
+
+  std::wstring escaped;
+  escaped.reserve(text.size());
+  for (const wchar_t character : text) {
+    switch (character) {
+      case L'\\':
+        escaped.append(L"\\\\");
+        break;
+      case L'"':
+        escaped.append(L"\\\"");
+        break;
+      case L'\b':
+        escaped.append(L"\\b");
+        break;
+      case L'\f':
+        escaped.append(L"\\f");
+        break;
+      case L'\n':
+        escaped.append(L"\\n");
+        break;
+      case L'\r':
+        escaped.append(L"\\r");
+        break;
+      case L'\t':
+        escaped.append(L"\\t");
+        break;
+      default:
+        if (static_cast<uint32_t>(character) < 0x20) {
+          escaped.append(L"\\u00");
+          escaped.push_back(kHexDigits[(character >> 4) & 0xF]);
+          escaped.push_back(kHexDigits[character & 0xF]);
+        } else {
+          escaped.push_back(character);
+        }
+        break;
+    }
+  }
+
+  return escaped;
+}
+
+/**
+ * \brief Check whether a JSON path writes the property \p name after a dot.
+ *
+ * The other names are written in brackets as JSON strings,
+ * <em>e.g.</em>, <code>["$eq"]</code>.
+ */
+bool IsVariableName(
+  const std::wstring& name
+) {
+  if (name.empty()) {
+    return false;
+  }
+
+  for (size_t i = 0; i < name.size(); ++i) {
+    const wchar_t character = name[i];
+
+    const bool is_letter_or_underscore = (
+      (character >= L'a' && character <= L'z')
+      || (character >= L'A' && character <= L'Z')
+      || character == L'_'
+    );
+
+    const bool is_digit = character >= L'0' && character <= L'9';
+
+    if (!(is_letter_or_underscore || (i > 0 && is_digit))) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// endregion JSON path helpers
+
 // region PropertySegment
 
 PropertySegment::PropertySegment(
@@ -26,9 +113,17 @@ PropertySegment::PropertySegment(
 }
 
 std::wstring PropertySegment::ToWstring() const {
+  if (IsVariableName(name)) {
+    return common::Concat(
+      L".",
+      name
+    );
+  }
+
   return common::Concat(
-    L".",
-    name
+    L"[\"",
+    EscapeForJsonString(name),
+    L"\"]"
   );
 }
 
@@ -60,6 +155,32 @@ std::unique_ptr<ISegment> IndexSegment::Clone() const {
 }
 
 // endregion IndexSegment
+
+// region KeySegment
+
+KeySegment::KeySegment(
+  std::wstring a_key
+) :
+  key(std::move(a_key)) {
+  // Intentionally empty.
+}
+
+std::wstring KeySegment::ToWstring() const {
+  // NOTE (mristin):
+  // A key can be any string at all, so we always write it as a JSON string in
+  // brackets, as in the other SDKs.
+  return common::Concat(
+    L"[\"",
+    EscapeForJsonString(key),
+    L"\"]"
+  );
+}
+
+std::unique_ptr<ISegment> KeySegment::Clone() const {
+  return common::make_unique<KeySegment>(*this);
+}
+
+// endregion KeySegment
 
 // region struct Path
 
@@ -100,6 +221,16 @@ std::wstring Path::ToWstring() const {
   std::deque<std::wstring> parts;
   for (const std::unique_ptr<ISegment>& segment : segments ) {
     parts.emplace_back(segment->ToWstring());
+  }
+
+  // NOTE (mristin):
+  // The path starts with the name of the first property without a dot, as in
+  // the other SDKs, *e.g.*, ``items[0].name``.
+  const PropertySegment* first_property(
+    dynamic_cast<const PropertySegment*>(segments.front().get())
+  );
+  if (first_property != nullptr && IsVariableName(first_property->name)) {
+    parts.front() = first_property->name;
   }
 
   size_t out_len = 0;

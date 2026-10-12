@@ -457,10 +457,15 @@ def _dispatch_from_jsonable(
 {II})
 
 {I}if not isinstance(model_type, str):
-{II}raise DeserializationException(
+{II}# NOTE (mristin):
+{II}# A model type of a wrong type is reported at the property, as the type
+{II}# errors of all the other properties are.
+{II}exception = DeserializationException(
 {III}f"Expected the property modelType to be a str, "
 {III}f"but got: {{type(model_type)}}"
 {II})
+{II}exception.path._prepend(PropertySegment(mapping, "modelType"))
+{II}raise exception
 
 {I}parse = dispatch.get(model_type, None)
 {I}if parse is None:
@@ -1342,6 +1347,17 @@ def _generate_concrete_class_from_jsonable(
             Stripped(
                 f"""\
 model_type = mapping.get('modelType', None)
+if model_type is not None and not isinstance(model_type, str):
+{I}# NOTE (mristin):
+{I}# A model type of a wrong type is reported at the property, as the type
+{I}# errors of all the other properties are.
+{I}exception = DeserializationException(
+{II}f"Expected the property modelType to be a str, "
+{II}f"but got: {{type(model_type)}}"
+{I})
+{I}exception.path._prepend(PropertySegment(mapping, 'modelType'))
+{I}raise exception
+
 if model_type != {model_type_literal}:
 {I}raise DeserializationException(
 {II}f"Expected modelType to be {model_type_literal}, "
@@ -1379,26 +1395,26 @@ if model_type != {model_type_literal}:
     # which carries one, while any other property may or may not be there, so it is
     # the branch most often taken. It has been dealt with before the loop -- either
     # above, or by the dispatch which got us here -- so we only have to accept it.
+    # A class which carries no model type refuses it as an unexpected property, as
+    # in the other SDKs.
     branches = []  # type: List[Stripped]
+    keys = []  # type: List[Stripped]
 
+    model_type_note: Optional[str] = None
     if checks_model_type:
         model_type_note = "# The model type has already been checked above."
     elif len(cls.concrete_descendants) > 0:
         model_type_note = "# The dispatch has already matched the model type."
-    else:
-        model_type_note = (
-            "# The model type is redundant for this class, and we simply accept it."
-        )
 
-    branches.append(
-        Stripped(
-            f"""\
+    if model_type_note is not None:
+        branches.append(
+            Stripped(
+                f"""\
 {model_type_note}
 pass"""
+            )
         )
-    )
-
-    keys = [Stripped("'modelType'")]  # type: List[Stripped]
+        keys.append(Stripped("'modelType'"))
 
     for prop in cls.properties:
         keys.append(Stripped(python_common.string_literal(prop.json_name)))
@@ -1423,39 +1439,59 @@ pass"""
                 )
             )
 
-    switch_writer = io.StringIO()
-    for i, (key, branch) in enumerate(zip(keys, branches)):
-        keyword = "if" if i == 0 else "elif"
-        switch_writer.write(
-            f"""\
+    # NOTE (mristin):
+    # An unexpected property is reported at the object which holds it, not at
+    # the property itself, as in the other SDKs. Hence we raise it only after
+    # the loop, where the property is not prepended to the path.
+    if len(keys) == 0:
+        # NOTE (mristin):
+        # A class without properties and without a model type expects an empty
+        # object, so that any property at all is unexpected.
+        blocks.append(
+            Stripped(
+                f"""\
+for key in mapping:
+{I}raise DeserializationException(
+{II}f"Unexpected property: {{key}}"
+{I})"""
+            )
+        )
+    else:
+        switch_writer = io.StringIO()
+        for i, (key, branch) in enumerate(zip(keys, branches)):
+            keyword = "if" if i == 0 else "elif"
+            switch_writer.write(
+                f"""\
 {II}{keyword} key == {key}:
 {III}{indent_but_first_line(branch, III)}
 """
+            )
+
+        switch_writer.write(
+            f"""\
+{II}else:
+{III}unexpected_key = key
+{III}break"""
         )
 
-    switch_writer.write(
-        f"""\
-{II}else:
-{III}raise DeserializationException(
-{IIII}f"Unexpected property: {{key}}"
-{III})"""
-    )
+        # NOTE (mristin):
+        # The property is marked on the error path here, once for all
+        # the properties, instead of in every branch: ``key`` *is* the JSON name of
+        # the property which we are parsing. We wrap the loop rather than its body,
+        # as the two are equivalent -- ``key`` still holds the culprit -- and
+        # the enclosing form is cheaper on the Python versions which do not have
+        # a zero-cost ``try``.
+        iteration = (
+            "for key, jsonable_value in mapping.items():"
+            if len(cls.properties) > 0
+            else "for key in mapping:"
+        )
 
-    # NOTE (mristin):
-    # The property is marked on the error path here, once for all the properties,
-    # instead of in every branch: ``key`` *is* the JSON name of the property which
-    # we are parsing. We wrap the loop rather than its body, as the two are
-    # equivalent -- ``key`` still holds the culprit -- and the enclosing form is
-    # cheaper on the Python versions which do not have a zero-cost ``try``.
-    iteration = (
-        "for key, jsonable_value in mapping.items():"
-        if len(cls.properties) > 0
-        else "for key in mapping:"
-    )
+        blocks.append(
+            Stripped(
+                f"""\
+unexpected_key: Optional[str] = None
 
-    blocks.append(
-        Stripped(
-            f"""\
 try:
 {I}{iteration}
 {switch_writer.getvalue()}
@@ -1463,9 +1499,14 @@ except DeserializationException as exception:
 {I}exception.path._prepend(
 {II}PropertySegment(mapping, key)
 {I})
-{I}raise"""
+{I}raise
+
+if unexpected_key is not None:
+{I}raise DeserializationException(
+{II}f"Unexpected property: {{unexpected_key}}"
+{I})"""
+            )
         )
-    )
 
     # endregion
 
@@ -2273,7 +2314,7 @@ class SerializationException(Exception):
 {II}object is known only at run time and can be any string at all, so it is
 {II}always rendered as a subscript.
 {II}"""
-{II}self._segments.insert(0, f'[{{key!r}}]')
+{II}self._segments.insert(0, f'[{{json.dumps(key, ensure_ascii=False)}}]')
 
 {I}def __str__(self) -> str:
 {II}if len(self._segments) == 0:
@@ -2570,7 +2611,9 @@ properties do not have fixed order, and hence we can not read
             f"""\
 {base64_import}\
 import collections.abc
+import json
 {math_import}\
+import re
 import sys
 from typing import (
 {I}Any,
@@ -2672,6 +2715,12 @@ class KeySegment:
 Segment = Union[PropertySegment, IndexSegment, KeySegment]"""
         ),
         Stripped(
+            """\
+#: Match the property names which a path writes after a dot; the other names
+#: are written in brackets as JSON strings, *e.g.*, ``["$eq"]``.
+_VARIABLE_NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z_0-9]*$")"""
+        ),
+        Stripped(
             f"""\
 class Path:
 {I}\"\"\"Represent the relative path to the erroneous value.\"\"\"
@@ -2698,21 +2747,27 @@ class Path:
 {II}iterator = iter(self._segments)
 {II}first = next(iterator)
 {II}if isinstance(first, PropertySegment):
-{III}parts.append(f"{{first.name}}")
+{III}if _VARIABLE_NAME_RE.match(first.name):
+{IIII}parts.append(first.name)
+{III}else:
+{IIII}parts.append(f"[{{json.dumps(first.name, ensure_ascii=False)}}]")
 {II}elif isinstance(first, IndexSegment):
 {III}parts.append(f"[{{first.index}}]")
 {II}elif isinstance(first, KeySegment):
-{III}parts.append(f"[{{first.key!r}}]")
+{III}parts.append(f"[{{json.dumps(first.key, ensure_ascii=False)}}]")
 {II}else:
 {III}our_common.assert_never(first)
 
 {II}for segment in iterator:
 {III}if isinstance(segment, PropertySegment):
-{IIII}parts.append(f".{{segment.name}}")
+{IIII}if _VARIABLE_NAME_RE.match(segment.name):
+{IIIII}parts.append(f".{{segment.name}}")
+{IIII}else:
+{IIIII}parts.append(f"[{{json.dumps(segment.name, ensure_ascii=False)}}]")
 {III}elif isinstance(segment, IndexSegment):
 {IIII}parts.append(f"[{{segment.index}}]")
 {III}elif isinstance(segment, KeySegment):
-{IIII}parts.append(f"[{{segment.key!r}}]")
+{IIII}parts.append(f"[{{json.dumps(segment.key, ensure_ascii=False)}}]")
 {III}else:
 {IIII}our_common.assert_never(segment)
 

@@ -65,16 +65,48 @@ namespace AasCore.Aas3_0
         private static string EscapeForJsonString(
             string text)
         {
-            return (
-                text
-                    .Replace("\\", "\\\\")
-                    .Replace("\"", "\\\"")
-                    .Replace("\b", "\\b")
-                    .Replace("\f", "\\f")
-                    .Replace("\n", "\\n")
-                    .Replace("\r", "\\r")
-                    .Replace("\t", "\\t")
-            );
+            var builder = new System.Text.StringBuilder(text.Length);
+            foreach (char character in text)
+            {
+                switch (character)
+                {
+                    case '\\':
+                        builder.Append("\\\\");
+                        break;
+                    case '"':
+                        builder.Append("\\\"");
+                        break;
+                    case '\b':
+                        builder.Append("\\b");
+                        break;
+                    case '\f':
+                        builder.Append("\\f");
+                        break;
+                    case '\n':
+                        builder.Append("\\n");
+                        break;
+                    case '\r':
+                        builder.Append("\\r");
+                        break;
+                    case '\t':
+                        builder.Append("\\t");
+                        break;
+                    default:
+                        // NOTE (mristin):
+                        // The other control characters can not stand in a JSON string as they
+                        // are, so we write them as Unicode escapes, as JSON.stringify does.
+                        if (character < 0x20)
+                        {
+                            builder.Append($"\\u{(int)character:x4}");
+                        }
+                        else
+                        {
+                            builder.Append(character);
+                        }
+                        break;
+                }
+            }
+            return builder.ToString();
         }
 
         private static readonly System.Text.RegularExpressions.Regex VariableNameRe = (
