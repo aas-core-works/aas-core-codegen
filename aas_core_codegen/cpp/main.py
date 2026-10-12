@@ -5,7 +5,11 @@ from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import run, intermediate, specific_implementations, cpp
 from aas_core_codegen.common import Stripped, Error
-from aas_core_codegen.cpp import lib as cpp_lib, tests as cpp_tests
+from aas_core_codegen.cpp import (
+    common as cpp_common,
+    lib as cpp_lib,
+    tests as cpp_tests,
+)
 from aas_core_codegen.intermediate import uses as intermediate_uses
 
 
@@ -320,6 +324,25 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                     symbol_table=context.symbol_table,
                     library_namespace=library_namespace,
                 ),
+                None,
+            ),
+        ),
+        (
+            test_dir / "catch_main.cpp",
+            lambda: (
+                f"""\
+{cpp_common.WARNING}
+
+/**
+ * Define the main function of Catch2 for all the tests.
+ *
+ * Compiling the implementation of Catch2 takes long, so we compile it only once
+ * in this translation unit, and link all the tests against it.
+ */
+
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
+""",
                 None,
             ),
         ),

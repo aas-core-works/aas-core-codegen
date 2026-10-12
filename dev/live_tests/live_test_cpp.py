@@ -80,7 +80,7 @@ def _generate_cmake_lists(
 
     add_executable(test_xml_rpc test/test_xml_rpc.cpp)
     target_include_directories(test_xml_rpc PRIVATE ${{CMAKE_CURRENT_SOURCE_DIR}}/src)
-    target_link_libraries(test_xml_rpc {target_prefix}_static)
+    target_link_libraries(test_xml_rpc {target_prefix}_static catch_main)
     add_test(
             NAME test_xml_rpc
             COMMAND $<TARGET_FILE:test_xml_rpc>
@@ -88,7 +88,7 @@ def _generate_cmake_lists(
 
     add_executable(test_json_value_verification test/test_json_value_verification.cpp)
     target_include_directories(test_json_value_verification PRIVATE ${{CMAKE_CURRENT_SOURCE_DIR}}/src)
-    target_link_libraries(test_json_value_verification {target_prefix}_static)
+    target_link_libraries(test_json_value_verification {target_prefix}_static catch_main)
     add_test(
             NAME test_json_value_verification
             COMMAND $<TARGET_FILE:test_json_value_verification>
@@ -102,7 +102,7 @@ def _generate_cmake_lists(
         f"""\
 
     add_executable(test_string_helpers test/test_string_helpers.cpp)
-    target_link_libraries(test_string_helpers {target_prefix}_static)
+    target_link_libraries(test_string_helpers {target_prefix}_static catch_main)
     add_test(
             NAME test_string_helpers
             COMMAND $<TARGET_FILE:test_string_helpers>
@@ -116,7 +116,7 @@ def _generate_cmake_lists(
         f"""\
 
     add_executable(test_arithmetic test/test_arithmetic.cpp)
-    target_link_libraries(test_arithmetic {target_prefix}_static)
+    target_link_libraries(test_arithmetic {target_prefix}_static catch_main)
     add_test(
             NAME test_arithmetic
             COMMAND $<TARGET_FILE:test_arithmetic>
@@ -130,7 +130,7 @@ def _generate_cmake_lists(
         f"""\
 
     add_executable(test_lstrip_and_int test/test_lstrip_and_int.cpp)
-    target_link_libraries(test_lstrip_and_int {target_prefix}_static)
+    target_link_libraries(test_lstrip_and_int {target_prefix}_static catch_main)
     add_test(
             NAME test_lstrip_and_int
             COMMAND $<TARGET_FILE:test_lstrip_and_int>
@@ -144,7 +144,7 @@ def _generate_cmake_lists(
         f"""\
 
     add_executable(test_assignment_targets test/test_assignment_targets.cpp)
-    target_link_libraries(test_assignment_targets {target_prefix}_static)
+    target_link_libraries(test_assignment_targets {target_prefix}_static catch_main)
     add_test(
             NAME test_assignment_targets
             COMMAND $<TARGET_FILE:test_assignment_targets>
@@ -331,6 +331,11 @@ if (${{BUILD_TESTS}})
     include(CTest)
     enable_testing()
 
+    # NOTE (mristin):
+    # The tests link only against the static library, so we do not build
+    # the shared library by default to speed up the build.
+    set_target_properties({target_prefix} PROPERTIES EXCLUDE_FROM_ALL ON)
+
     # region C++11 compatibility check
     # NOTE (mristin):
     # The library must compile as C++11, but the tests need C++17 for
@@ -341,9 +346,14 @@ if (${{BUILD_TESTS}})
     # disagree on the types. Instead, we compile the library once more as C++11
     # in this dedicated target. Nothing links against it, and no test runs it,
     # but any construct beyond C++11 breaks the build.
+    #
+    # We exclude this target from the default build to speed it up. The fast
+    # check compiles it with ``-fsyntax-only`` from the exported compile
+    # commands, which suffices to catch the constructs beyond C++11.
     add_library({target_prefix}_cpp11_compatibility_check OBJECT ${{HEADER}} ${{SRC}})
     set_target_properties({target_prefix}_cpp11_compatibility_check
             PROPERTIES
+            EXCLUDE_FROM_ALL ON
             CXX_STANDARD 11
             CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF
@@ -364,6 +374,11 @@ if (${{BUILD_TESTS}})
     include_directories(${{CMAKE_CURRENT_SOURCE_DIR}}/test-external)
 
     # region Common in test
+    # NOTE (mristin):
+    # Compiling the implementation of Catch2 takes long, so we compile it only
+    # once and link it into all the tests.
+    add_library(catch_main OBJECT test/catch_main.cpp)
+
     add_library(common_in_test test/common.hpp test/common.cpp)
     target_link_libraries(common_in_test {target_prefix}_static)
 
@@ -390,7 +405,7 @@ if (${{BUILD_TESTS}})
     # endregion Common in test
 
     add_executable(test_revm test/test_revm.cpp)
-    target_link_libraries(test_revm {target_prefix}_static)
+    target_link_libraries(test_revm {target_prefix}_static catch_main)
     add_test(
             NAME test_revm
             COMMAND $<TARGET_FILE:test_revm>
@@ -401,7 +416,7 @@ if (${{BUILD_TESTS}})
             test_stringification_base64
             test/test_stringification_base64.cpp
     )
-    target_link_libraries(test_stringification_base64 {target_prefix}_static)
+    target_link_libraries(test_stringification_base64 {target_prefix}_static catch_main)
     add_test(
             NAME test_stringification_base64
             COMMAND $<TARGET_FILE:test_stringification_base64>
@@ -411,7 +426,7 @@ if (${{BUILD_TESTS}})
             test_stringification_of_enums
             test/test_stringification_of_enums.cpp
     )
-    target_link_libraries(test_stringification_of_enums {target_prefix}_static)
+    target_link_libraries(test_stringification_of_enums {target_prefix}_static catch_main)
     add_test(
             NAME test_stringification_of_enums
             COMMAND $<TARGET_FILE:test_stringification_of_enums>
@@ -423,7 +438,7 @@ if (${{BUILD_TESTS}})
             test_wstringification_of_enums
             test/test_wstringification_of_enums.cpp
     )
-    target_link_libraries(test_wstringification_of_enums {target_prefix}_static)
+    target_link_libraries(test_wstringification_of_enums {target_prefix}_static catch_main)
     add_test(
             NAME test_wstringification_of_enums
             COMMAND $<TARGET_FILE:test_wstringification_of_enums>
@@ -438,6 +453,7 @@ if (${{BUILD_TESTS}})
     target_link_libraries(
             test_jsonization_of_concrete_classes
             {target_prefix}_static
+            catch_main
             common_in_test
             common_jsonization_in_test
     )
@@ -453,6 +469,7 @@ if (${{BUILD_TESTS}})
     target_link_libraries(
             test_jsonization_dispatch
             {target_prefix}_static
+            catch_main
             common_examples_in_test
             common_jsonization_in_test
     )
@@ -471,6 +488,7 @@ if (${{BUILD_TESTS}})
     target_link_libraries(
             test_xmlization_of_concrete_classes
             {target_prefix}_static
+            catch_main
             common_in_test
             common_xmlization_in_test
     )
@@ -486,6 +504,7 @@ if (${{BUILD_TESTS}})
     target_link_libraries(
             test_xmlization_dispatch
             {target_prefix}_static
+            catch_main
             common_in_test
             common_examples_in_test
     )
@@ -504,6 +523,7 @@ if (${{BUILD_TESTS}})
     target_link_libraries(
             test_verification
             {target_prefix}_static
+            catch_main
             common_in_test
             common_xmlization_in_test
     )
@@ -522,6 +542,7 @@ if (${{BUILD_TESTS}})
     target_link_libraries(
             test_descent_and_descent_once
             {target_prefix}_static
+            catch_main
             common_in_test
             common_examples_in_test
             common_xmlization_in_test
@@ -540,6 +561,7 @@ if (${{BUILD_TESTS}})
     target_link_libraries(
             test_x_or_default
             {target_prefix}_static
+            catch_main
             common_in_test
             common_examples_in_test
     )
@@ -716,6 +738,13 @@ def prepare_project(
         "-S.",
         "-Bbuild",
     ]
+
+    # NOTE (mristin):
+    # The live tests re-compile the same generated code over and over again,
+    # so we cache the compilation if ccache is available.
+    if shutil.which("ccache") is not None:
+        cmd.append("-DCMAKE_CXX_COMPILER_LAUNCHER=ccache")
+
     print(
         f"Running {live_tests_common.escape_and_join_command(cmd)} "
         f"from {project_dir} ..."
@@ -803,11 +832,22 @@ def main() -> int:
             namespace = prepare_project(case_dir, project_dir, vcpkg_cmake)
 
             cmd = ["cmake", "--build", "build", "-j", str(args.jobs)]
+
+            # NOTE (mristin):
+            # We make ccache ignore the absolute paths of the projects so that
+            # the cache is hit even if the output directory changes between
+            # the runs. Without ccache, these variables have no effect.
+            build_env = os.environ.copy()
+            build_env["CCACHE_BASEDIR"] = str(output_dir.resolve())
+            build_env["CCACHE_NOHASHDIR"] = "1"
+
             print(
-                f"Running {live_tests_common.escape_and_join_command(cmd)} "
+                f"Running CCACHE_BASEDIR={build_env['CCACHE_BASEDIR']} "
+                f"CCACHE_NOHASHDIR={build_env['CCACHE_NOHASHDIR']} "
+                f"{live_tests_common.escape_and_join_command(cmd)} "
                 f"from {project_dir} ..."
             )
-            subprocess.check_call(cmd, cwd=project_dir)
+            subprocess.check_call(cmd, cwd=project_dir, env=build_env)
 
             case_test_data_dir = _LIVE_TESTS_CPP_DIR / "test_data" / case_dir.name
 

@@ -8,7 +8,6 @@
 #include "aas_core/aas_3_0/common.hpp"
 #include "aas_core/aas_3_0/revm.hpp"
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 namespace our = aas_core::aas_3_0;

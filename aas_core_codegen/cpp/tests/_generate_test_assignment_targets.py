@@ -120,7 +120,6 @@ def generate_implementation(
 #include <vector>
 #pragma warning(pop)
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 namespace our = {library_namespace};"""
