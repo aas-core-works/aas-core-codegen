@@ -198,7 +198,6 @@ def generate_implementation(
 
 #include <{include_prefix_path}/xmlization.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 namespace our = {library_namespace};"""

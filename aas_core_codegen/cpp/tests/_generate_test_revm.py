@@ -42,7 +42,6 @@ def generate_implementation(library_namespace: Stripped) -> str:
         ),
         Stripped(
             """\
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>"""
         ),
         Stripped(

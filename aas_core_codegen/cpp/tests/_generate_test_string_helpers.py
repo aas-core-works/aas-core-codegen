@@ -41,7 +41,6 @@ def generate_implementation(library_namespace: Stripped) -> str:
         Stripped(f'#include "{include_prefix_path}/common.hpp"'),
         Stripped(
             """\
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>"""
         ),
         Stripped(f"namespace our = {library_namespace};"),

@@ -46,7 +46,6 @@ def generate_implementation(
 #include <{include_prefix_path}/stringification.hpp>
 #include <{include_prefix_path}/types.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 #include <deque>

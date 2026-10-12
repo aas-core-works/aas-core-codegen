@@ -7,7 +7,6 @@
 #include <aas_core/aas_3_0/verification.hpp>
 #include <aas_core/aas_3_0/xmlization.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 namespace our = aas_core::aas_3_0;
