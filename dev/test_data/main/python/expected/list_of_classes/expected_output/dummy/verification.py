@@ -62,6 +62,50 @@ Path = our_reporting.Path
 Error = our_reporting.Error
 
 
+def items_are_some(
+    items: Sequence[our_types.AbstractItem]
+) -> bool:
+    """Check a read-only list of base-class instances."""
+    # pylint: disable=all
+    return (
+        all(
+            isinstance(item, our_types.SomeItem)
+            for item in items
+        ))
+
+
+def some_items_are_some(
+    items: Sequence[our_types.SomeItem]
+) -> bool:
+    """Pass a list of descendants to a base-class list parameter."""
+    # pylint: disable=all
+    return items_are_some(items)
+
+
+def optional_some_items_are_some(
+    items: Optional[Sequence[our_types.SomeItem]]
+) -> bool:
+    """
+    Preserve an optional descendant list passed to an optional parameter.
+    """
+    # pylint: disable=all
+    return optional_items_are_some(items)
+
+
+def optional_items_are_some(
+    items: Optional[Sequence[our_types.AbstractItem]]
+) -> bool:
+    """
+    Check a possibly missing read-only list of base-class instances.
+    """
+    # pylint: disable=all
+    return (
+        (
+            (items is None)
+            or items_are_some(items)
+        ))
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]

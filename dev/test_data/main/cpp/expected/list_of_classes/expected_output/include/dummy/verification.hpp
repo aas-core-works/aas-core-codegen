@@ -212,6 +212,42 @@ class RecursiveVerification : public IVerification {
   const std::shared_ptr<types::IClass>& instance_;
 };  // class RecursiveVerification
 
+// region Verification functions
+
+/// \brief Check a read-only list of base-class instances.
+bool ItemsAreSome(
+  const std::vector<
+    std::shared_ptr<types::IAbstractItem>
+  >& items
+);
+
+/// \brief Pass a list of descendants to a base-class list parameter.
+bool SomeItemsAreSome(
+  const std::vector<
+    std::shared_ptr<types::ISomeItem>
+  >& items
+);
+
+/// \brief Preserve an optional descendant list passed to an optional parameter.
+bool OptionalSomeItemsAreSome(
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::ISomeItem>
+    >
+  >& items
+);
+
+/// \brief Check a possibly missing read-only list of base-class instances.
+bool OptionalItemsAreSome(
+  const common::optional<
+    std::vector<
+      std::shared_ptr<types::IAbstractItem>
+    >
+  >& items
+);
+
+// endregion Verification functions
+
 }  // namespace verification
 /**@}*/
 

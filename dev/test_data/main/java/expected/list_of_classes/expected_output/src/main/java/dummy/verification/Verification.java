@@ -28,8 +28,43 @@ import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
 import java.util.List;
+import java.util.Optional;
 
 public class Verification {
+  /**
+   * Check a read-only list of base-class instances.
+   */
+  public static Boolean itemsAreSome(
+    List<IAbstractItem> items) {
+    return items.stream().allMatch(
+        item -> item instanceof ISomeItem);
+  }
+
+  /**
+   * Pass a list of descendants to a base-class list parameter.
+   */
+  public static Boolean someItemsAreSome(
+    List<ISomeItem> items) {
+    return itemsAreSome(items);
+  }
+
+  /**
+   * Preserve an optional descendant list passed to an optional parameter.
+   */
+  public static Boolean optionalSomeItemsAreSome(
+    Optional<List<ISomeItem>> items) {
+    return optionalItemsAreSome(items);
+  }
+
+  /**
+   * Check a possibly missing read-only list of base-class instances.
+   */
+  public static Boolean optionalItemsAreSome(
+    Optional<List<IAbstractItem>> items) {
+    return (!items.isPresent())
+    || itemsAreSome(items.orElse(null));
+  }
+
   /**
    * Hash allowed enum values for efficient validation of enums.
    */
