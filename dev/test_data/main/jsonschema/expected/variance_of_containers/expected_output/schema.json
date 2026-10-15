@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "title": "DummyForTest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Container"
+    }
+  ],
+  "$id": "https://dummy.com",
+  "definitions": {
+    "Container": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Item_choice"
+          }
+        },
+        "someItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SomeItem_choice"
+          }
+        },
+        "specialItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SpecialItem"
+          }
+        }
+      },
+      "required": [
+        "items",
+        "someItems"
+      ]
+    },
+    "Item": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
+        }
+      },
+      "required": [
+        "name",
+        "modelType"
+      ]
+    },
+    "Item_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/SomeItem"
+        },
+        {
+          "$ref": "#/definitions/SpecialItem"
+        }
+      ]
+    },
+    "ModelType": {
+      "type": "string",
+      "enum": [
+        "SomeItem",
+        "SpecialItem"
+      ]
+    },
+    "SomeItem": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SomeItem_abstract"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "const": "SomeItem"
+            }
+          }
+        }
+      ]
+    },
+    "SomeItem_abstract": {
+      "$ref": "#/definitions/Item"
+    },
+    "SomeItem_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/SomeItem"
+        },
+        {
+          "$ref": "#/definitions/SpecialItem"
+        }
+      ]
+    },
+    "SpecialItem": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SomeItem_abstract"
+        },
+        {
+          "properties": {
+            "level": {
+              "type": "integer"
+            },
+            "modelType": {
+              "const": "SpecialItem"
+            }
+          },
+          "required": [
+            "level"
+          ]
+        }
+      ]
+    },
+    "Wrapper": {
+      "type": "object",
+      "properties": {
+        "container": {
+          "$ref": "#/definitions/Container"
+        }
+      },
+      "required": [
+        "container"
+      ]
+    }
+  }
+}

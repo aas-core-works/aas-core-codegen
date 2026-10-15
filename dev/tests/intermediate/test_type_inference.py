@@ -4808,6 +4808,37 @@ def some_func(numbers: List[int]) -> bool:
         )
 
 
+_COLLECTION_INVARIANCE_EXPLANATION: Final[str] = (
+    "The lists and the sets are invariant, so their items need to be of exactly "
+    "the same type. A mutable List[...] can not hold the instances of a subclass, "
+    "since the callee could insert an instance of another subclass into it. Only "
+    "a read-only Sequence[...] argument of a verification function accepts "
+    "the instances of a subclass, since the targets with invariant lists declare "
+    "it generic: Go with a type parameter, C++ with a template, C# with "
+    "IReadOnlyList<T> and Java with List<? extends T>. The methods can not accept "
+    "them, since Go methods can not have type parameters, and C++ virtual methods "
+    "can not be templates. We do not copy the list implicitly either, as that "
+    "would cost linear time and memory on each call. Please declare the argument "
+    "with the exact type of the items."
+)
+
+
+def _generic_sequence_explanation(name: str) -> str:
+    return (
+        f"The argument {name!r} is a read-only Sequence[...] of a class with "
+        f"descendants, so the targets declare it generic to accept the sequences "
+        f"of the descendants without a copy: Go with a type parameter, C++ with "
+        f"a template, C# with IReadOnlyList<T>, and Java with List<? extends T>. "
+        f"Hence, we support it only as the collection of a for-loop or of "
+        f"all/any, the collection of an index, the container of in, the argument "
+        f"of len, the value of a nullness check, an argument of a verification "
+        f"function, and the value of an immutable alias of the very same type, "
+        f"*e.g.*, ``alias: Final[Sequence[...]] = {name}``. Elsewhere, *e.g.*, "
+        f"passed to a method, assigned to a mutable variable or copied with list, "
+        f"the targets would expect the non-generic list."
+    )
+
+
 _SET_PRELUDE: Final[
     str
 ] = """\
@@ -4833,6 +4864,286 @@ def collect(text: str, texts: Set[str]) -> bool:
 
 
 """
+
+
+class Test_invariant_list_arguments(unittest.TestCase):
+    @staticmethod
+    def source_with_verification(verification: str) -> str:
+        return f"""\
+class Abstract_item(DBC):
+    @implementation_specific
+    @non_mutating
+    def count(self, items: Sequence["Abstract_item"]) -> int:
+        pass
+
+
+class Some_item(Abstract_item):
+    def __init__(self) -> None:
+        pass
+
+
+@verification
+def check(items: Sequence[Abstract_item]) -> bool:
+    return len(items) > 0
+
+
+@verification
+def fill(items: List[Abstract_item]) -> bool:
+    return len(items) > 0
+
+
+@verification
+@implementation_specific
+def check_specifically(items: Sequence[Abstract_item]) -> bool:
+    pass
+
+
+@verification
+@implementation_specific
+def check_optional_specifically(items: Optional[Sequence[Abstract_item]]) -> bool:
+    pass
+
+
+@verification
+@implementation_specific
+def fill_specifically(items: List[Abstract_item]) -> bool:
+    pass
+
+
+{verification}
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+    def test_sequence_of_same_items(self) -> None:
+        Test_with_smoke.execute(
+            Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: List[Abstract_item]) -> bool:
+    return check(items) and fill(items) and check_specifically(items)"""
+            )
+        )
+
+    def test_sequence_of_descendants_to_implementation_specific(self) -> None:
+        Test_with_smoke.execute(
+            Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(
+    items: Sequence[Some_item], optional_items: Optional[Sequence[Some_item]]
+) -> bool:
+    return (
+        check_specifically(items)
+        and check_optional_specifically(items)
+        and check_optional_specifically(optional_items)
+    )"""
+            )
+        )
+
+    def test_sequence_of_descendants_to_transpiled_verification(self) -> None:
+        Test_with_smoke.execute(
+            Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: Sequence[Some_item]) -> bool:
+    return check(items)"""
+            )
+        )
+
+    def test_supported_usages_of_generic_sequence(self) -> None:
+        Test_with_smoke.execute(
+            Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(
+    items: Sequence[Abstract_item], optional_items: Optional[Sequence[Abstract_item]]
+) -> bool:
+    for item in items:
+        if not isinstance(item, Some_item):
+            return False
+
+    if optional_items is not None:
+        if len(optional_items) > 0:
+            return check(optional_items)
+
+    return (
+        len(items) > 0
+        and isinstance(items[0], Some_item)
+        and all(isinstance(item, Some_item) for item in items)
+        and check(items)
+        and check_specifically(items)
+        and check_optional_specifically(optional_items)
+    )"""
+            )
+        )
+
+    def test_generic_sequence_to_method_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(item: Some_item, items: Sequence[Abstract_item]) -> bool:
+    return item.count(items) > 0"""
+            ),
+            expected_joined_message=_generic_sequence_explanation("items"),
+        )
+
+    def test_generic_sequence_assigned_to_variable_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: Sequence[Abstract_item]) -> bool:
+    alias: Sequence[Abstract_item] = items
+    return len(alias) > 0"""
+            ),
+            expected_joined_message=_generic_sequence_explanation("items"),
+        )
+
+    def test_immutable_alias_of_generic_sequence(self) -> None:
+        Test_with_smoke.execute(
+            Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(
+    items: Sequence[Abstract_item], optional_items: Optional[Sequence[Abstract_item]]
+) -> bool:
+    alias: Final[Sequence[Abstract_item]] = items
+    alias_of_alias: Final[Sequence[Abstract_item]] = alias
+    optional_alias: Final[Optional[Sequence[Abstract_item]]] = optional_items
+    return (
+        all(isinstance(item, Some_item) for item in alias_of_alias)
+        and check(alias)
+        and (optional_alias is None or check(optional_alias))
+    )"""
+            )
+        )
+
+    def test_immutable_alias_of_another_type_fails(self) -> None:
+        # NOTE (mristin):
+        # The optional alias does not share the type annotation of the required
+        # generic sequence, so the targets would need to convert it.
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: Sequence[Abstract_item]) -> bool:
+    alias: Final[Optional[Sequence[Abstract_item]]] = items
+    return alias is not None"""
+            ),
+            expected_joined_message=_generic_sequence_explanation("items"),
+        )
+
+    def test_copy_of_immutable_alias_of_generic_sequence_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: Sequence[Abstract_item]) -> bool:
+    alias: Final[Sequence[Abstract_item]] = items
+    copy = list(alias)
+    return len(copy) > 0"""
+            ),
+            expected_joined_message=_generic_sequence_explanation("alias"),
+        )
+
+    def test_generic_sequence_copied_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: Sequence[Abstract_item]) -> bool:
+    copy = list(items)
+    return len(copy) > 0"""
+            ),
+            expected_joined_message=_generic_sequence_explanation("items"),
+        )
+
+    def test_generic_sequence_as_container_of_in(self) -> None:
+        Test_with_smoke.execute(
+            Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(item: Some_item, items: Sequence[Abstract_item]) -> bool:
+    return item in items"""
+            )
+        )
+
+    def test_sequence_without_descendants_is_not_generic(self) -> None:
+        Test_with_smoke.execute(
+            Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(item: Some_item, items: Sequence[Some_item]) -> bool:
+    copy = list(items)
+    return len(copy) > 0"""
+            )
+        )
+
+    def test_mutable_list_of_descendants_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: List[Some_item]) -> bool:
+    return fill(items)"""
+            ),
+            expected_joined_message=(
+                "The argument 'items' of the verification function 'fill' is "
+                "of type List[Abstract_item], but got: List[Some_item]. "
+                + _COLLECTION_INVARIANCE_EXPLANATION
+            ),
+        )
+
+    def test_mutable_list_of_descendants_to_implementation_specific_fails(
+        self,
+    ) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: List[Some_item]) -> bool:
+    return fill_specifically(items)"""
+            ),
+            expected_joined_message=(
+                "The argument 'items' of the verification function "
+                "'fill_specifically' is of type List[Abstract_item], but got: "
+                "List[Some_item]. " + _COLLECTION_INVARIANCE_EXPLANATION
+            ),
+        )
+
+    def test_optional_sequence_of_descendants_to_non_optional_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(items: Optional[Sequence[Some_item]]) -> bool:
+    return check_specifically(items)"""
+            ),
+            expected_joined_message=(
+                "The argument 'items' of the verification function "
+                "'check_specifically' is of type List[Abstract_item], but got: "
+                "Optional[List[Some_item]]. " + _COLLECTION_INVARIANCE_EXPLANATION
+            ),
+        )
+
+    def test_sequence_of_descendants_to_method_fails(self) -> None:
+        Test_with_smoke().expect_type_inference_to_fail(
+            source=Test_invariant_list_arguments.source_with_verification(
+                """\
+@verification
+def some_func(item: Some_item, items: Sequence[Some_item]) -> bool:
+    return item.count(items) > 0"""
+            ),
+            expected_joined_message=(
+                "The argument 'items' of the method 'count' is of type "
+                "List[Abstract_item], but got: List[Some_item]. "
+                + _COLLECTION_INVARIANCE_EXPLANATION
+            ),
+        )
 
 
 class Test_set(unittest.TestCase):
@@ -5160,7 +5471,8 @@ def some_func(number: int) -> bool:
 """,
             expected_message=(
                 "The argument 'texts' of the verification function 'is_in' is of "
-                "type Set[str], but got: Set[int]"
+                "type Set[str], but got: Set[int]. "
+                + _COLLECTION_INVARIANCE_EXPLANATION
             ),
         )
 
@@ -5173,7 +5485,8 @@ def some_func(texts: Sequence[str]) -> bool:
 """,
             expected_message=(
                 "The argument 'texts' of the verification function 'is_in' is of "
-                "type Set[str], but got: List[str]"
+                "type Set[str], but got: List[str]. "
+                + _COLLECTION_INVARIANCE_EXPLANATION
             ),
         )
 
@@ -5799,6 +6112,49 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual(
             expected_messages,
             Test_method.infer(Test_method.source_with_methods(methods)),
+        )
+
+    def test_sequence_of_descendants_to_method_fails(self) -> None:
+        # NOTE (mristin):
+        # The arguments of the methods are never generic, since Go methods can not
+        # have type parameters, and C++ virtual methods can not be templates.
+        self.expect_errors(
+            methods="""\
+@non_mutating
+def count_parents(self, parents: Sequence["Parent"]) -> int:
+    return len(parents)
+
+@non_mutating
+def count_children(self, children: Sequence["Child"]) -> int:
+    return self.count_parents(children)""",
+            expected_messages=[
+                "The argument 'parents' of the method 'count_parents' is of type "
+                "List[Parent], but got: List[Child]. "
+                + _COLLECTION_INVARIANCE_EXPLANATION,
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class",
+            ],
+        )
+
+    def test_sequence_argument_of_method_is_not_generic(self) -> None:
+        # NOTE (mristin):
+        # The usages of the sequence arguments of the methods are not restricted,
+        # in contrast to the generic sequences of the verification functions, as
+        # the methods take the sequences of the exact items.
+        self.expect_errors(
+            methods="""\
+@non_mutating
+def count_parents(self, parents: Sequence["Parent"]) -> int:
+    return len(parents)
+
+@non_mutating
+def count_copies(self, parents: Sequence["Parent"]) -> int:
+    copies = list(parents)
+    return self.count_parents(parents) + len(copies)""",
+            expected_messages=[
+                "The method '__parent_private' of the class 'Child' is private, "
+                "so it can be only called on self from the methods of the class",
+            ],
         )
 
     def test_mutating_method_on_self(self) -> None:

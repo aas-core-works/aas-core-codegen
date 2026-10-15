@@ -47,13 +47,15 @@ func (ve *VerificationError) PathString() string {
 }
 
 // Check an optional class declared with `None` and assigned in a loop.
-func FirstChildAIsSmall(
-	parents []ourtypes.IParent,
+//
+// The items of the argument parents are of the type parameter ParentsT instead of ourtypes.IParent so that the slices of the descendants of ourtypes.IParent can be passed without a copy, as the slices are invariant in Go.
+func FirstChildAIsSmall[ParentsT ourtypes.IParent](
+	parents []ParentsT,
 ) bool {
 	var found ourtypes.IChildA = nil
 	for _, parent := range parents {
 		if ourtypes.IsChildA(parent) {
-			found = parent.(ourtypes.IChildA)
+			found = any(parent).(ourtypes.IChildA)
 			break
 		}
 	}
@@ -89,9 +91,11 @@ func TextIsAllowedUnlessLong(
 }
 
 // Check a non-optional variable declared wider than its value.
-func LastChildBIsNotZero(
+//
+// The items of the argument parents are of the type parameter ParentsT instead of ourtypes.IParent so that the slices of the descendants of ourtypes.IParent can be passed without a copy, as the slices are invariant in Go.
+func LastChildBIsNotZero[ParentsT ourtypes.IParent](
 	parent ourtypes.IParent,
-	parents []ourtypes.IParent,
+	parents []ParentsT,
 ) bool {
 	var last ourtypes.IParent = parent
 	for _, other := range parents {

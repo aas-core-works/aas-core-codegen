@@ -72,13 +72,15 @@ func SimplesWith(
 //
 // The appended items are narrowed down to [ourtypes.ISomeItem], while the list
 // holds [ourtypes.IAbstractItem]'s.
-func SomeItemsOf(
-	items []ourtypes.IAbstractItem,
+//
+// The items of the argument items are of the type parameter ItemsT instead of ourtypes.IAbstractItem so that the slices of the descendants of ourtypes.IAbstractItem can be passed without a copy, as the slices are invariant in Go.
+func SomeItemsOf[ItemsT ourtypes.IAbstractItem](
+	items []ItemsT,
 ) []ourtypes.IAbstractItem {
 	var result []ourtypes.IAbstractItem = []ourtypes.IAbstractItem{}
 	for _, item := range items {
 		if ourtypes.IsSomeItem(item) {
-			result = append(result, item.(ourtypes.ISomeItem))
+			result = append(result, any(item).(ourtypes.ISomeItem))
 		}
 	}
 	return result
@@ -91,7 +93,7 @@ func IsInSimples(
 	simple ourtypes.ISimple,
 	simples []ourtypes.ISimple,
 ) bool {
-	return ourcommon.SliceContains(
+	return ourcommon.SliceContainsInstance(
 			simples,
 			simple,
 		)
@@ -109,7 +111,7 @@ func IsInLocalCopyOfSimples(
 	for _, other := range simples {
 		copied = append(copied, other)
 	}
-	return ourcommon.SliceContains(
+	return ourcommon.SliceContainsInstance(
 			copied,
 			simple,
 		)

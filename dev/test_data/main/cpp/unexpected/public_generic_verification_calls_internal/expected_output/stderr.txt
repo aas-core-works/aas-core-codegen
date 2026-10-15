@@ -1,0 +1,2 @@
+Failed to generate include/dummy/verification.hpp based on <path to meta_model.py>:
+* At line 35 and column 17: The public verification function 'items_are_named' has generic sequences, so we generate it in C++ as a template defined in the header. However, it calls the internal verification function '_is_named', which is declared only in the implementation file. Please make '_is_named' public, or 'items_are_named' internal.

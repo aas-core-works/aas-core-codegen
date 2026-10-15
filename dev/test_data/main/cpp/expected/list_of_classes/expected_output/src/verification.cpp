@@ -68,24 +68,6 @@ std::vector<
   return result;
 }
 
-std::vector<
-  std::shared_ptr<types::IAbstractItem>
-> SomeItemsOf(
-  const std::vector<
-    std::shared_ptr<types::IAbstractItem>
-  >& items
-) {
-  std::vector<std::shared_ptr<types::IAbstractItem> > result = (
-    std::vector<std::shared_ptr<types::IAbstractItem> >()
-  );
-  for (const std::shared_ptr<types::IAbstractItem>& item : items) {
-    if (types::IsSomeItem(*item)) {
-      result.push_back(std::dynamic_pointer_cast<types::ISomeItem>(item));
-    }
-  }
-  return result;
-}
-
 bool IsInSimples(
   const std::shared_ptr<types::ISimple>& simple,
   const std::vector<

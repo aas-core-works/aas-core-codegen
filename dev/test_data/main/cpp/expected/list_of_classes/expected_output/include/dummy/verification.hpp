@@ -5,12 +5,17 @@
 // Do NOT edit or append.
 
 #include "dummy/common.hpp"
+#include "dummy/constants.hpp"
 #include "dummy/iteration.hpp"
 #include "dummy/pattern.hpp"
+#include "dummy/stringification.hpp"
 #include "dummy/types.hpp"
 
 #pragma warning(push, 0)
+#include <memory>
 #include <set>
+#include <type_traits>
+#include <vector>
 #pragma warning(pop)
 
 namespace dummy {
@@ -235,11 +240,16 @@ std::vector<
 ///
 /// The appended items are narrowed down to types::ISomeItem, while the list
 /// holds types::IAbstractItem's.
+///
+/// \tparam ItemsT type of the items of \p items, types::IAbstractItem or one of its descendants, so that the vectors of the descendants can be passed without a copy, as std::vector is invariant
+template<
+  typename ItemsT
+>
 std::vector<
   std::shared_ptr<types::IAbstractItem>
 > SomeItemsOf(
   const std::vector<
-    std::shared_ptr<types::IAbstractItem>
+    std::shared_ptr<ItemsT>
   >& items
 );
 
@@ -265,6 +275,35 @@ bool IsInLocalCopyOfSimples(
 );
 
 // endregion Verification functions
+
+// region Definitions of generic verification functions
+
+template<
+  typename ItemsT
+>
+std::vector<
+  std::shared_ptr<types::IAbstractItem>
+> SomeItemsOf(
+  const std::vector<
+    std::shared_ptr<ItemsT>
+  >& items
+) {
+  static_assert(
+    std::is_base_of<types::IAbstractItem, ItemsT>::value,
+    "Expected the items of items to be instances of types::IAbstractItem"
+  );
+  std::vector<std::shared_ptr<types::IAbstractItem> > result = (
+    std::vector<std::shared_ptr<types::IAbstractItem> >()
+  );
+  for (const std::shared_ptr<ItemsT>& item : items) {
+    if (types::IsSomeItem(*item)) {
+      result.push_back(std::dynamic_pointer_cast<types::ISomeItem>(item));
+    }
+  }
+  return result;
+}
+
+// endregion Definitions of generic verification functions
 
 }  // namespace verification
 /**@}*/

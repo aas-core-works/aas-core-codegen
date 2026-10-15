@@ -1860,6 +1860,19 @@ Enumerable.Range(
             target, error = self.transform_name(node=node.target)
             if error is not None:
                 errors.append(error)
+            elif (
+                node.annotation is not None
+                and isinstance(node.value, parse_tree.Name)
+                and self.type_map[node.target] is self.type_map[node.value]
+            ):
+                # NOTE (mristin):
+                # An immutable alias shares the type annotation of the aliased
+                # variable, see
+                # :py:meth:`intermediate_type_inference._Inferrer.transform_assignment`,
+                # so we infer its type with ``var``. This way, the alias of a generic
+                # sequence is also declared as ``IReadOnlyList<T>``, see
+                # :py:func:`intermediate.generic_sequence_item_class`.
+                target = Stripped(f"var {target}")
             elif node.annotation is not None:
                 # NOTE (mristin):
                 # We spell out the declared type, as it might differ from the type

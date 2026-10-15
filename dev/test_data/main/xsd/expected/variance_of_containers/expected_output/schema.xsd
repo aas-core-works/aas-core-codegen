@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://dummy.com" elementFormDefault="qualified" targetNamespace="https://dummy.com">
+  <xs:group name="container">
+    <xs:sequence>
+      <xs:element name="items">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group ref="item_choice" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="someItems">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group ref="someItem_choice" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="specialItems" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="specialItem" type="specialItem_t" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="item">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="nickname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="item_choice">
+    <xs:choice>
+      <xs:element name="someItem" type="someItem_t"/>
+      <xs:element name="specialItem" type="specialItem_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="someItem">
+    <xs:sequence>
+      <xs:group ref="item"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="someItem_choice">
+    <xs:choice>
+      <xs:element name="someItem" type="someItem_t"/>
+      <xs:element name="specialItem" type="specialItem_t"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="specialItem">
+    <xs:sequence>
+      <xs:group ref="someItem"/>
+      <xs:element name="level" type="xs:long"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="wrapper">
+    <xs:sequence>
+      <xs:element name="container" type="container_t"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="container_t">
+    <xs:sequence>
+      <xs:group ref="container"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="item_t">
+    <xs:sequence>
+      <xs:group ref="item"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="someItem_t">
+    <xs:sequence>
+      <xs:group ref="someItem"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="specialItem_t">
+    <xs:sequence>
+      <xs:group ref="specialItem"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="wrapper_t">
+    <xs:sequence>
+      <xs:group ref="wrapper"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="container" type="container_t"/>
+</xs:schema>

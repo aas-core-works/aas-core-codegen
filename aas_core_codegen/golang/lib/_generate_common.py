@@ -386,6 +386,24 @@ func SliceContains[T any](s []T, v T) bool {{
         ),
         Stripped(
             f"""\
+// Check if the slice contains the given instance of a class.
+//
+// In contrast to [SliceContains], the instance can be of a different type than
+// the items of the slice. This is necessary for the items of the generic sequences,
+// which are of a type parameter, and for the instances of the descendants of
+// the class of the items. We compare the instances as ``any``'s, *i.e.*, by their
+// references.
+func SliceContainsInstance[T any](s []T, v any) bool {{
+{I}for _, item := range s {{
+{II}if any(item) == v {{
+{III}return true
+{II}}}
+{I}}}
+{I}return false
+}}"""
+        ),
+        Stripped(
+            f"""\
 // Check if any of the elements satisfy the condition.
 func Some[V any](condition func(V) bool, l []V) bool {{
 {I}ok := false

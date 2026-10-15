@@ -3855,6 +3855,51 @@ def try_constrained_primitive(
     return None
 
 
+def generic_sequence_item_class(argument: Argument) -> Optional["ClassUnion"]:
+    """
+    Determine the class of the items if the ``argument`` is a generic sequence.
+
+    A generic sequence is a read-only ``Sequence[...]`` of instances of a class
+    with descendants, possibly beneath ``Optional[...]``. The verification functions
+    accept the sequences of the descendants for such an argument, as the type
+    inference allows it in :py:mod:`aas_core_codegen.intermediate.type_inference`.
+
+    Python and TypeScript accept the sequences of the descendants for free, as their
+    read-only sequences are covariant. The lists of the other targets are invariant,
+    so they declare the argument generic: Go with a type parameter, C++ with
+    a template defined in the header, C# with the covariant ``IReadOnlyList<T>``, and
+    Java with the wildcard ``List<? extends T>``. None of them copies the sequence.
+
+    The methods can not have generic arguments, since Go methods can not have type
+    parameters, and C++ virtual methods can not be templates. Hence, the generators
+    should check this only for the verification functions.
+
+    A mutable ``List[...]`` is never generic, since the callee could insert into it
+    an instance which is not of the caller's subclass.
+
+    :param argument: of a verification function
+    :return: the class of the items, if the argument is a generic sequence
+    """
+    if argument.mutable:
+        return None
+
+    type_anno = beneath_optional(argument.type_annotation)
+    if not isinstance(type_anno, ListTypeAnnotation):
+        return None
+
+    if not isinstance(type_anno.items, OurTypeAnnotation):
+        return None
+
+    our_type = type_anno.items.our_type
+    if not isinstance(our_type, (AbstractClass, ConcreteClass)):
+        return None
+
+    if len(our_type.descendant_id_set) == 0:
+        return None
+
+    return our_type
+
+
 def map_descendability(
     type_annotation: TypeAnnotationUnion,
 ) -> MutableMapping[TypeAnnotationUnion, bool]:

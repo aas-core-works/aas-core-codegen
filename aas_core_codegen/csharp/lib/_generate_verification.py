@@ -472,10 +472,41 @@ def _transpile_transpilable_verification(
         assert stmt is not None
         body.append(stmt)
 
+    # NOTE (mristin):
+    # The ``List<T>`` is invariant in C#, so we declare the generic sequences,
+    # see :py:func:`intermediate.generic_sequence_item_class`, as the covariant
+    # ``IReadOnlyList<T>``. This way, the lists of the descendants can be passed
+    # without a copy, as ``List<T>`` implements ``IReadOnlyList<T>``.
+    arg_defs = []  # type: List[Stripped]
+    remarks_on_generic_sequences = []  # type: List[str]
+    for arg in verification.arguments:
+        arg_name = csharp_naming.argument_name(arg.name)
+
+        if intermediate.generic_sequence_item_class(arg) is None:
+            arg_type = csharp_common.generate_type(arg.type_annotation)
+        else:
+            list_type_anno = intermediate.beneath_optional(arg.type_annotation)
+            assert isinstance(list_type_anno, intermediate.ListTypeAnnotation)
+
+            item_type = csharp_common.generate_type(list_type_anno.items)
+
+            arg_type = Stripped(f"IReadOnlyList<{item_type}>")
+            if isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
+                arg_type = Stripped(f"{arg_type}?")
+
+            remarks_on_generic_sequences.append(
+                f"The argument {arg_name} is declared as the covariant "
+                f"IReadOnlyList<{item_type}> instead of the invariant "
+                f"List<{item_type}> so that the lists of the descendants of "
+                f"{item_type} can be passed without a copy."
+            )
+
+        arg_defs.append(Stripped(f"{arg_type} {arg_name}"))
+
     writer = io.StringIO()
     if verification.description is not None:
         comment, comment_errors = csharp_description.generate_comment_for_signature(
-            verification.description
+            verification.description, extra_remarks=remarks_on_generic_sequences
         )
         if comment_errors is not None:
             return None, Error(
@@ -488,6 +519,15 @@ def _transpile_transpilable_verification(
 
         writer.write(comment)
         writer.write("\n")
+    elif len(remarks_on_generic_sequences) > 0:
+        writer.write(
+            csharp_description.generate_comment_for_remarks(
+                remarks_on_generic_sequences
+            )
+        )
+        writer.write("\n")
+    else:
+        pass
 
     method_name = csharp_naming.method_name(verification.name)
 
@@ -501,12 +541,6 @@ def _transpile_transpilable_verification(
         return_type = "void"
     else:
         return_type = csharp_common.generate_type(type_annotation=verification.returns)
-
-    arg_defs = []  # type: List[Stripped]
-    for arg in verification.arguments:
-        arg_type = csharp_common.generate_type(arg.type_annotation)
-        arg_name = csharp_naming.argument_name(arg.name)
-        arg_defs.append(Stripped(f"{arg_type} {arg_name}"))
 
     if len(arg_defs) == 0:
         writer.write(

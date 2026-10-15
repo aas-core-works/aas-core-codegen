@@ -77,6 +77,7 @@ TypeAnnotationExceptOptional = _types.TypeAnnotationExceptOptional
 try_primitive_type = _types.try_primitive_type
 try_constrained_primitive = _types.try_constrained_primitive
 map_descendability = _types.map_descendability
+generic_sequence_item_class = _types.generic_sequence_item_class
 collect_ids_of_our_types_in_properties = _types.collect_ids_of_our_types_in_properties
 over_type_annotation_and_nested_type_annotations = (
     _types.over_type_annotation_and_nested_type_annotations

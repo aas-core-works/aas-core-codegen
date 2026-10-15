@@ -237,9 +237,11 @@ public class Verification {
 
   /**
    * Check the narrowing after the {@code continue} and the early return in a loop.
+   *
+   * <p>The argument {@code parents} is declared with the wildcard {@code List<? extends IParent>} instead of the invariant {@code List<IParent>} so that the lists of the descendants of {@link IParent} can be passed without a copy.
    */
   public static Boolean childAsHaveTexts(
-    List<IParent> parents) {
+    List<? extends IParent> parents) {
     for (var parent : parents) {
         if (!(parent instanceof IChildA)) {
             continue;
@@ -256,9 +258,11 @@ public class Verification {
 
   /**
    * Check the narrowing after the {@code continue} in a loop with a {@code break}.
+   *
+   * <p>The argument {@code parents} is declared with the wildcard {@code List<? extends IParent>} instead of the invariant {@code List<IParent>} so that the lists of the descendants of {@link IParent} can be passed without a copy.
    */
   public static Boolean textsBeforeContainerAreShort(
-    List<IParent> parents) {
+    List<? extends IParent> parents) {
     long total = 0;
     for (var parent : parents) {
         if (parent instanceof IContainer) {
@@ -287,10 +291,12 @@ public class Verification {
 
   /**
    * Check the narrowing of a variable to a class by the assigned value.
+   *
+   * <p>The argument {@code parents} is declared with the wildcard {@code List<? extends IParent>} instead of the invariant {@code List<IParent>} so that the lists of the descendants of {@link IParent} can be passed without a copy.
    */
   public static Boolean lastChildAIsSmall(
     IParent parent,
-    List<IParent> parents) {
+    List<? extends IParent> parents) {
     var last = parent;
     for (var other : parents) {
         if (other instanceof IChildA) {

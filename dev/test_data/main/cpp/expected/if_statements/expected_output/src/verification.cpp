@@ -251,45 +251,6 @@ bool NarrowingAfterTheOnlyCompletingBranch(
   );
 }
 
-bool ChildAsHaveTexts(
-  const std::vector<
-    std::shared_ptr<types::IParent>
-  >& parents
-) {
-  for (const std::shared_ptr<types::IParent>& parent : parents) {
-    if (!types::IsChildA(*parent)) {
-      continue;
-    }
-    if (!(std::dynamic_pointer_cast<types::IChildA>(parent)->optional_text().has_value())) {
-      return false;
-    }
-    if (common::LenStr((*(std::dynamic_pointer_cast<types::IChildA>(parent)->optional_text()))) < 1) {
-      return false;
-    }
-  }
-  return true;
-}
-
-bool TextsBeforeContainerAreShort(
-  const std::vector<
-    std::shared_ptr<types::IParent>
-  >& parents
-) {
-  int64_t total = 0;
-  for (const std::shared_ptr<types::IParent>& parent : parents) {
-    if (types::IsContainer(*parent)) {
-      break;
-    }
-    if (!(parent->optional_text().has_value())) {
-      continue;
-    }
-    total = (
-      total + static_cast<int64_t>(common::LenStr((*(parent->optional_text()))))
-    );
-  }
-  return total < 20;
-}
-
 bool TextOrDefaultIsShort(
   const std::shared_ptr<types::IParent>& parent
 ) {
@@ -298,24 +259,6 @@ bool TextOrDefaultIsShort(
     text = L"default";
   }
   return common::LenStr((*text)) < 10;
-}
-
-bool LastChildAIsSmall(
-  const std::shared_ptr<types::IParent>& parent,
-  const std::vector<
-    std::shared_ptr<types::IParent>
-  >& parents
-) {
-  auto last = parent;
-  for (const std::shared_ptr<types::IParent>& other : parents) {
-    if (types::IsChildA(*other)) {
-      last = std::dynamic_pointer_cast<types::IChildA>(other);
-      if (std::dynamic_pointer_cast<types::IChildA>(last)->a_only() >= 1000) {
-        return false;
-      }
-    }
-  }
-  return true;
 }
 
 bool HasMarkerInTree(

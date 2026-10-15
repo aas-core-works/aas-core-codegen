@@ -471,6 +471,12 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="unions"
         )
 
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="variance_of_containers",
+        )
+
     def test_expected_visibility(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP, case_name="visibility"
@@ -494,6 +500,12 @@ class Test_cpp(_TestCase):
         self._run_unexpected_test(
             target=aas_core_codegen.main.Target.CPP,
             case_name="conflict_between_underlying_of_function_and_class",
+        )
+
+    def test_unexpected_public_generic_verification_calls_internal(self) -> None:
+        self._run_unexpected_test(
+            target=aas_core_codegen.main.Target.CPP,
+            case_name="public_generic_verification_calls_internal",
         )
 
 
@@ -695,6 +707,12 @@ class Test_csharp(_TestCase):
     def test_expected_unions(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP, case_name="unions"
+        )
+
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.CSHARP,
+            case_name="variance_of_containers",
         )
 
     def test_expected_visibility(self) -> None:
@@ -913,6 +931,12 @@ class Test_golang(_TestCase):
     def test_expected_unions(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG, case_name="unions"
+        )
+
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.GOLANG,
+            case_name="variance_of_containers",
         )
 
     def test_expected_visibility(self) -> None:
@@ -1138,6 +1162,12 @@ class Test_java(_TestCase):
     def test_expected_unions(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA, case_name="unions"
+        )
+
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JAVA,
+            case_name="variance_of_containers",
         )
 
     def test_expected_visibility(self) -> None:
@@ -1385,6 +1415,12 @@ class Test_jsonschema(_TestCase):
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="unions"
         )
 
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.JSONSCHEMA,
+            case_name="variance_of_containers",
+        )
+
     def test_expected_visibility(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="visibility"
@@ -1589,6 +1625,12 @@ class Test_python(_TestCase):
     def test_expected_unions(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON, case_name="unions"
+        )
+
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.PYTHON,
+            case_name="variance_of_containers",
         )
 
     def test_expected_visibility(self) -> None:
@@ -1822,6 +1864,12 @@ class Test_typescript(_TestCase):
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="unions"
         )
 
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.TYPESCRIPT,
+            case_name="variance_of_containers",
+        )
+
     def test_expected_visibility(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="visibility"
@@ -2048,6 +2096,12 @@ class Test_xsd(_TestCase):
     def test_expected_unions(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD, case_name="unions"
+        )
+
+    def test_expected_variance_of_containers(self) -> None:
+        self._run_expected_test(
+            target=aas_core_codegen.main.Target.XSD,
+            case_name="variance_of_containers",
         )
 
     def test_expected_visibility(self) -> None:

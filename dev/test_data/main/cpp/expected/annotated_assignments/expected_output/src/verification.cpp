@@ -39,24 +39,6 @@ Error::Error(
 
 // region Verification functions
 
-bool FirstChildAIsSmall(
-  const std::vector<
-    std::shared_ptr<types::IParent>
-  >& parents
-) {
-  common::optional<std::shared_ptr<types::IChildA> > found = common::nullopt;
-  for (const std::shared_ptr<types::IParent>& parent : parents) {
-    if (types::IsChildA(*parent)) {
-      found = std::dynamic_pointer_cast<types::IChildA>(parent);
-      break;
-    }
-  }
-  if (!(found.has_value())) {
-    return true;
-  }
-  return (*found)->a_only() < 100;
-}
-
 bool TextIsAllowedUnlessLong(
   const common::optional<std::wstring>& text
 ) {
@@ -92,24 +74,6 @@ bool TextIsAllowedUnlessLong(
       && common::LenStr((*trimmed)) <= 10
     )
   );
-}
-
-bool LastChildBIsNotZero(
-  const std::shared_ptr<types::IParent>& parent,
-  const std::vector<
-    std::shared_ptr<types::IParent>
-  >& parents
-) {
-  std::shared_ptr<types::IParent> last = parent;
-  for (const std::shared_ptr<types::IParent>& other : parents) {
-    last = other;
-  }
-  if (types::IsChildB(*last)) {
-    return (
-      std::dynamic_pointer_cast<types::IChildB>(last)->b_only() != 0
-    );
-  }
-  return true;
 }
 
 bool ChildADeclarationsAgree(
