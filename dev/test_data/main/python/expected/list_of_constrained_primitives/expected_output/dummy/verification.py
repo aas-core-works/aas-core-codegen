@@ -62,6 +62,31 @@ Path = our_reporting.Path
 Error = our_reporting.Error
 
 
+def names_with(
+    name: str,
+    names: Sequence[str]
+) -> List[str]:
+    """Give :paramref:`name` followed by :paramref:`names`."""
+    # pylint: disable=all
+    result = [name]
+    for other in names:
+        result.append(other)
+    return result
+
+
+def initials_of(
+    names: Sequence[str]
+) -> List[str]:
+    """
+    Give the first characters of :paramref:`names` in the same order.
+    """
+    # pylint: disable=all
+    initials: List[str] = []
+    for name in names:
+        initials.append(name[:1])
+    return initials
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -72,6 +97,27 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
+        if not (
+            all(
+                (len(names_with(name, that.some_names))) == (len(that.some_names) + 1)
+                for name in that.some_names
+            )
+        ):
+            yield Error(
+                'Each name followed by some names must be one longer than ' +
+                'some names.'
+            )
+
+        if not (
+            all(
+                initial != 'x'
+                for initial in initials_of(that.some_names)
+            )
+        ):
+            yield Error(
+                'Some names must not start with x.'
+            )
+
         for error in _verify_list_of__name(that.some_names):
             error.path._prepend(
                 PropertySegment(

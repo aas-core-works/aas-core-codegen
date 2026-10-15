@@ -190,6 +190,35 @@ export class VerificationError {
 }
 
 /**
+ * Check whether `result` is one of the known results.
+ */
+export function isKnown(
+  result: OurTypes.Result
+): boolean {
+  for (const known of [OurTypes.Result.Ok, OurTypes.Result.Fail]) {
+    if (known == result) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Give the failures among `results`.
+ */
+export function failuresOf(
+  results: Array<OurTypes.Result>
+): Array<OurTypes.Result> {
+  const failures: Array<OurTypes.Result> = [];
+  for (const result of results) {
+    if (result == OurTypes.Result.Fail) {
+      failures.push(result);
+    }
+  }
+  return failures;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -197,12 +226,29 @@ class Verifier
     boolean, IterableIterator<VerificationError>
   > {
   *transformSomethingWithContext(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     that: OurTypes.Something,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
-    // No verification has been defined for Something.
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someResults,
+          result =>
+            isKnown(result)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Some results must be known."
+      )
+    }
+
+    if (!(failuresOf(that.someResults).length <= 1)) {
+      yield new VerificationError(
+        "Some results must contain at most one failure."
+      )
+    }
   }
 }
 

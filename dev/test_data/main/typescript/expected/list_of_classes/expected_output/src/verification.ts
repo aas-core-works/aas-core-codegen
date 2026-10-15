@@ -190,6 +190,53 @@ export class VerificationError {
 }
 
 /**
+ * Give the names of `simples` in the same order.
+ */
+export function namesOf(
+  simples: Array<OurTypes.Simple>
+): Array<string> {
+  const names: Array<string> = [];
+  for (const simple of simples) {
+    names.push(simple.name);
+  }
+  return names;
+}
+
+/**
+ * Give `simple` followed by `simples`.
+ */
+export function simplesWith(
+  simple: OurTypes.Simple,
+  simples: Array<OurTypes.Simple>
+): Array<OurTypes.Simple> {
+  const result = [simple];
+  for (const other of simples) {
+    result.push(other);
+  }
+  return result;
+}
+
+/**
+ * Give the instances of {@link types!SomeItem} among `items`.
+ *
+ * @remarks
+ *
+ * The appended items are narrowed down to {@link types!SomeItem}, while the list
+ * holds {@link types!IAbstractItem}'s.
+ */
+export function someItemsOf(
+  items: Array<OurTypes.IAbstractItem>
+): Array<OurTypes.IAbstractItem> {
+  const result: Array<OurTypes.IAbstractItem> = [];
+  for (const item of items) {
+    if (OurTypes.isSomeItem(item)) {
+      result.push((item as OurTypes.SomeItem));
+    }
+  }
+  return result;
+}
+
+/**
  * Verify the items of `that` recursively.
  */
 function *verify_ListOf_class(
@@ -246,6 +293,35 @@ class Verifier
     that: OurTypes.Something,
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          namesOf(that.someSimples),
+          name =>
+            OurCommon.lenStr(name) > 0
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Names of some simples must not be empty."
+      )
+    }
+
+    if (!(
+      (simplesWith(that.item, that.someSimples).length) == (that.someSimples.length + 1)
+    )) {
+      yield new VerificationError(
+        "Item followed by some simples must be one longer than some " +
+        "simples."
+      )
+    }
+
+    if (!(someItemsOf(that.someItems).length <= 1)) {
+      yield new VerificationError(
+        "At most one of some items must be a some item."
+      )
+    }
+
     if (context === true) {
       for (const error of verify(that.item)) {
         error.path.prepend(

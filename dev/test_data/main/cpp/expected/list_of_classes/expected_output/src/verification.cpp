@@ -37,6 +37,57 @@ Error::Error(
 
 // endregion struct Error
 
+// region Verification functions
+
+std::vector<std::wstring> NamesOf(
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+) {
+  std::vector<std::wstring> names = std::vector<std::wstring>();
+  for (const std::shared_ptr<types::ISimple>& simple : simples) {
+    names.push_back(simple->name());
+  }
+  return names;
+}
+
+std::vector<
+  std::shared_ptr<types::ISimple>
+> SimplesWith(
+  const std::shared_ptr<types::ISimple>& simple,
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+) {
+  auto result = (
+    std::vector<std::shared_ptr<types::ISimple> >{simple}
+  );
+  for (const std::shared_ptr<types::ISimple>& other : simples) {
+    result.push_back(other);
+  }
+  return result;
+}
+
+std::vector<
+  std::shared_ptr<types::IAbstractItem>
+> SomeItemsOf(
+  const std::vector<
+    std::shared_ptr<types::IAbstractItem>
+  >& items
+) {
+  std::vector<std::shared_ptr<types::IAbstractItem> > result = (
+    std::vector<std::shared_ptr<types::IAbstractItem> >()
+  );
+  for (const std::shared_ptr<types::IAbstractItem>& item : items) {
+    if (types::IsSomeItem(*item)) {
+      result.push_back(std::dynamic_pointer_cast<types::ISomeItem>(item));
+    }
+  }
+  return result;
+}
+
+// endregion Verification functions
+
 namespace {
 
 /**
@@ -45,7 +96,7 @@ namespace {
  * A shape tells which checks apply to a value, see \ref ChecksOf.
  */
 enum class Shape : std::uint32_t {
-  
+  kSomething = 0
 };  // enum class Shape
 
 /**
@@ -67,11 +118,68 @@ struct Check {
 
 // region Checks
 
+bool Something_0(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](std::wstring name) -> bool {
+      return common::LenStr(name) > 0;
+    },
+    verification::NamesOf(
+      that->some_simples()
+    )
+  );
+}
+
+bool Something_1(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return (verification::SimplesWith(
+    that->item(),
+    that->some_simples()
+  ).size()) == (that->some_simples().size() + (1));
+}
+
+bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::SomeItemsOf(
+    that->some_items()
+  ).size() <= 1;
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
 const std::vector<Check>& ChecksOf(Shape shape) {
   switch (shape) {
+    case Shape::kSomething: {
+      static const std::vector<Check> checks = {
+        {
+          &Something_0,
+          L"Names of some simples must not be empty."
+        },
+        {
+          &Something_1,
+          L"Item followed by some simples must be one longer than some "
+          L"simples."
+        },
+        {
+          &Something_2,
+          L"At most one of some items must be a some item."
+        }
+      };
+      return checks;
+    }
     default:
       throw std::logic_error(
         common::Concat(
@@ -200,15 +308,86 @@ std::unique_ptr<IIterator> Empty() {
 }
 
 /**
+ * Iterate over a single value which lives in the model.
+ */
+class OneIterator : public IIterator {
+ public:
+  OneIterator(
+    const void* value,
+    Shape shape
+  ) :
+    value_(value),
+    shape_(shape),
+    done_(true) {
+    // Intentionally empty.
+  }
+
+  void Start() override {
+    done_ = false;
+  }
+
+  void Next() override {
+    done_ = true;
+  }
+
+  bool Done() const override {
+    return done_;
+  }
+
+  const void* Value() const override {
+    return value_;
+  }
+
+  Shape ShapeOf() const override {
+    return shape_;
+  }
+
+  void AppendToPath(iteration::Path&) const override {
+    // Intentionally empty, as the value itself is the end of the path.
+  }
+
+  std::unique_ptr<IIterator> Clone() const override {
+    return common::make_unique<OneIterator>(*this);
+  }
+
+ private:
+  const void* value_;
+  Shape shape_;
+  bool done_;
+};  // class OneIterator
+
+std::unique_ptr<IIterator> One(
+  const void* value,
+  Shape shape
+) {
+  return common::make_unique<OneIterator>(value, shape);
+}
+
+std::unique_ptr<IIterator> Over_Something(
+  const types::ISomething& that,
+  bool
+) {
+  return One(&that, Shape::kSomething);
+}
+
+/**
  * Iterate over the values of the \p instance, dispatched on its runtime type.
  */
 std::unique_ptr<IIterator> DispatchOnModelType(
-  const types::IClass&,
-  bool
+  const types::IClass& instance,
+  bool recursive
 ) {
-  // NOTE (mristin):
-  // The instances of no class have anything to verify.
-  return Empty();
+  switch (instance.model_type()) {
+    case types::ModelType::kSomething:
+      return Over_Something(
+        dynamic_cast<const types::ISomething&>(instance),
+        recursive
+      );
+    default:
+      // NOTE (mristin):
+      // The instances of the other classes have nothing to verify.
+      return Empty();
+  }
 }
 
 // endregion Iteration over the values

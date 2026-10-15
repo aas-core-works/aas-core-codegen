@@ -1039,6 +1039,22 @@ ourcommon.{function_name}(
                 item = self._as_int64_position(node.args[0], item)
                 return Stripped(f"{instance}[{item}] = struct{{}}{{}}"), None
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.LIST_APPEND:
+                # NOTE (mristin):
+                # The ``append`` gives a new slice whenever the array beneath has
+                # to grow, so we assign it back. The type inference allows
+                # ``append`` only on a local variable, which nobody else sees.
+                assert isinstance(node.member.instance, parse_tree.Name)
+
+                item, error = self._transform_and_dereference_if_necessary(node.args[0])
+                if error is not None:
+                    return None, error
+
+                assert item is not None
+                item = self._as_int64_position(node.args[0], item)
+
+                return Stripped(f"{instance} = append({instance}, {item})"), None
+
             else:
                 assert_never(kind)
 
@@ -1405,6 +1421,56 @@ ourcommon.{PARSE_SAFE_INT_FUNCTION_NAME}(
                 f"""\
 {go_tuple_type}{{
 {I}{indent_but_first_line(joined_item_exprs, I)},
+}}"""
+            ),
+            None,
+        )
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_list_literal(
+        self, node: parse_tree.ListLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        items = []  # type: List[Stripped]
+
+        for item_node in node.items:
+            item, error = self._transform_and_dereference_if_necessary(item_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert item is not None
+
+            # NOTE (mristin):
+            # The lengths are ``int``'s, so we convert them to our integers.
+            items.append(self._as_int64_position(item_node, item))
+
+        go_list_type, error_msg = generate_type(
+            type_annotation=self.type_map[node], types_package=self._types_package
+        )
+        if error_msg is not None:
+            errors.append(Error(node.original_node, error_msg))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the list literal", errors
+            )
+
+        assert go_list_type is not None
+
+        if len(items) == 0:
+            return Stripped(f"{go_list_type}{{}}"), None
+
+        one_liner = f"{go_list_type}{{{', '.join(items)}}}"
+        if "\n" not in one_liner and len(one_liner) <= 60:
+            return Stripped(one_liner), None
+
+        items_joined = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+{go_list_type}{{
+{I}{indent_but_first_line(items_joined, I)},
 }}"""
             ),
             None,

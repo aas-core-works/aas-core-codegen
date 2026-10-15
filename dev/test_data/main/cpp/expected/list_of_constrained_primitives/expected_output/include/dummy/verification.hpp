@@ -212,6 +212,21 @@ class RecursiveVerification : public IVerification {
   const std::shared_ptr<types::IClass>& instance_;
 };  // class RecursiveVerification
 
+// region Verification functions
+
+/// \brief Give \p name followed by \p names.
+std::vector<std::wstring> NamesWith(
+  const std::wstring& name,
+  const std::vector<std::wstring>& names
+);
+
+/// \brief Give the first characters of \p names in the same order.
+std::vector<std::wstring> InitialsOf(
+  const std::vector<std::wstring>& names
+);
+
+// endregion Verification functions
+
 // region Verification of constrained primitives
 
 /**

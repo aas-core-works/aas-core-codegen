@@ -212,6 +212,39 @@ class RecursiveVerification : public IVerification {
   const std::shared_ptr<types::IClass>& instance_;
 };  // class RecursiveVerification
 
+// region Verification functions
+
+/// \brief Give the names of \p simples in the same order.
+std::vector<std::wstring> NamesOf(
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+);
+
+/// \brief Give \p simple followed by \p simples.
+std::vector<
+  std::shared_ptr<types::ISimple>
+> SimplesWith(
+  const std::shared_ptr<types::ISimple>& simple,
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+);
+
+/// \brief Give the instances of types::ISomeItem among \p items.
+///
+/// The appended items are narrowed down to types::ISomeItem, while the list
+/// holds types::IAbstractItem's.
+std::vector<
+  std::shared_ptr<types::IAbstractItem>
+> SomeItemsOf(
+  const std::vector<
+    std::shared_ptr<types::IAbstractItem>
+  >& items
+);
+
+// endregion Verification functions
+
 }  // namespace verification
 /**@}*/
 

@@ -366,7 +366,110 @@ SymbolTable(
               name='some_simples',
               argument='some_simples',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Names of some simples must not be empty.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='name',
+                  original_node=...),
+                iteration=FunctionCall(
+                  name='names_of',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='some_simples',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              condition=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Name(
+                      identifier='name',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Item followed by some simples must be one longer than some simples.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  FunctionCall(
+                    name='simples_with',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='item',
+                        original_node=...),
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_simples',
+                        original_node=...)],
+                    original_node=...)],
+                original_node=...),
+              op='EQ',
+              right=Add(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='some_simples',
+                      original_node=...)],
+                  original_node=...),
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='At most one of some items must be a some item.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  FunctionCall(
+                    name='some_items_of',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_items',
+                        original_node=...)],
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=1,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       description=None,
@@ -398,7 +501,111 @@ SymbolTable(
   named_unions=[],
   constants=[],
   constants_by_name=...,
-  verification_functions=[],
+  verification_functions=[
+    TranspilableVerification(
+      name='names_of',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='simples',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Simple',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=PrimitiveTypeAnnotation(
+          a_type='STR',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give the names of <ReferenceToArgument refuri="simples">simples</ReferenceToArgument> in the same order.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='simples_with',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='simple',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Simple',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='simples',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Simple',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=OurTypeAnnotation(
+          our_type='Reference to our type Simple',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give <ReferenceToArgument refuri="simple">simple</ReferenceToArgument> followed by <ReferenceToArgument refuri="simples">simples</ReferenceToArgument>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='some_items_of',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Abstract_item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=OurTypeAnnotation(
+          our_type='Reference to our type Abstract_item',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give the instances of <ReferenceToOurType refuri="Some_item">Some_item</ReferenceToOurType> among <ReferenceToArgument refuri="items">items</ReferenceToArgument>.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The appended items are narrowed down to <ReferenceToOurType refuri="Some_item">Some_item</ReferenceToOurType>, while the list
+            holds <ReferenceToOurType refuri="Abstract_item">Abstract_item</ReferenceToOurType>'s.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,

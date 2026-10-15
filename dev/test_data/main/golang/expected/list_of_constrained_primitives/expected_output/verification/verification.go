@@ -45,6 +45,29 @@ func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
 }
 
+// Give name followed by names.
+func NamesWith(
+	name string,
+	names []string,
+) []string {
+	result := []string{name}
+	for _, other := range names {
+		result = append(result, other)
+	}
+	return result
+}
+
+// Give the first characters of names in the same order.
+func InitialsOf(
+	names []string,
+) []string {
+	var initials []string = []string{}
+	for _, name := range names {
+		initials = append(initials, ourcommon.SliceStr(name, 0, 1))
+	}
+	return initials
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -56,6 +79,40 @@ func VerifySomething(
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
+
+	if !(
+		ourcommon.All(
+			func(name string) bool {
+				return len(NamesWith(name, that.SomeNames())) == (len(that.SomeNames()) + 1)
+			},
+			that.SomeNames(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Each name followed by some names must be one longer than " +
+				"some names.",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.All(
+			func(initial string) bool {
+				return initial != "x"
+			},
+			InitialsOf(that.SomeNames()),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some names must not start with x.",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	if that.SomeNames() == nil {
 		abort = onError(

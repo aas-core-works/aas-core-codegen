@@ -186,7 +186,90 @@ SymbolTable(
               name='some_bytes',
               argument='some_bytes',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Some ints must not contain small primes.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='number',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_ints',
+                  original_node=...),
+                original_node=...),
+              condition=Not(
+                operand=FunctionCall(
+                  name='is_small_prime',
+                  args=[
+                    Name(
+                      identifier='number',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='There must be at most 10 strings of at most 10 characters each.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='number',
+                  original_node=...),
+                iteration=FunctionCall(
+                  name='count_and_lengths_of',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='some_strings',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              condition=Comparison(
+                left=Name(
+                  identifier='number',
+                  original_node=...),
+                op='LE',
+                right=Constant(
+                  value=10,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='At most one of some ints must be positive.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  FunctionCall(
+                    name='positives_of',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_ints',
+                        original_node=...)],
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=1,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       description=None,
@@ -207,9 +290,106 @@ SymbolTable(
   named_unions=[],
   constants=[],
   constants_by_name=...,
-  verification_functions=[],
+  verification_functions=[
+    TranspilableVerification(
+      name='is_small_prime',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='number',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="number">number</ReferenceToArgument> is a prime smaller than 10.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='count_and_lengths_of',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='texts',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=PrimitiveTypeAnnotation(
+          a_type='INT',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give the number of <ReferenceToArgument refuri="texts">texts</ReferenceToArgument> followed by their lengths.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='positives_of',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=PrimitiveTypeAnnotation(
+          a_type='INT',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give the positive <ReferenceToArgument refuri="numbers">numbers</ReferenceToArgument> in the same order.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
-    description=None,
+    description=DescriptionOfMetaModel(
+      summary='<paragraph>Check the lists of primitives.</paragraph>',
+      remarks=[
+        textwrap.dedent("""\
+          <paragraph>We also check the list literals and the local lists built with <literal>append</literal>.
+          The lengths are appended to and put in a list literal on purpose, since
+          the targets represent them differently from our integers.</paragraph>""")],
+      constraints_by_identifier=[],
+      parsed=...),
     version='dummy',
     xml_namespace='https://dummy.com'))

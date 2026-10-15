@@ -363,12 +363,11 @@ class _Collector(parse_tree.Visitor):
 
         method_type = self.type_map.get(node.member, None)
 
-        if (
-            isinstance(
-                method_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
-            )
-            and method_type.method.kind
-            is intermediate_type_inference.BuiltinMethodKind.SET_ADD
+        if isinstance(
+            method_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
+        ) and method_type.method.kind in (
+            intermediate_type_inference.BuiltinMethodKind.SET_ADD,
+            intermediate_type_inference.BuiltinMethodKind.LIST_APPEND,
         ):
             self.mutated.append(node.member.instance)
             self.mutates_in_place = True

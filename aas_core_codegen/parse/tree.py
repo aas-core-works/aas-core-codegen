@@ -334,6 +334,23 @@ class Tuple(Expression):
         visitor.visit_tuple(self)
 
 
+class ListLiteral(Expression):
+    """Represent a list literal such as ``["oi", "hoi"]``."""
+
+    def __init__(self, items: Sequence["Expression"], original_node: ast.AST) -> None:
+        """Initialize with the given values."""
+        Expression.__init__(self, original_node=original_node)
+        self.items = items
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_list_literal(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_list_literal(self)
+
+
 class IsNone(Expression):
     """Represent a check whether something ``is None``."""
 
@@ -1052,6 +1069,11 @@ class Visitor(DBC):
         for value in node.values:
             self.visit(value)
 
+    def visit_list_literal(self, node: ListLiteral) -> None:
+        """Visit a list literal."""
+        for item in node.items:
+            self.visit(item)
+
     def visit_is_none(self, node: IsNone) -> None:
         """Visit an is-none check."""
         self.visit(node.value)
@@ -1250,6 +1272,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_tuple(self, node: Tuple) -> T:
         """Transform a tuple literal into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_list_literal(self, node: ListLiteral) -> T:
+        """Transform a list literal into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -1502,6 +1529,17 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property(
                     "values", [self.transform(value) for value in node.values]
+                ),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_list_literal(self, node: ListLiteral) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property(
+                    "items", [self.transform(item) for item in node.items]
                 ),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
@@ -1887,6 +1925,10 @@ class RestrictedTransformer(Transformer[T]):
         """Transform a tuple literal into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
+    def transform_list_literal(self, node: ListLiteral) -> T:
+        """Transform a list literal into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
     def transform_is_none(self, node: IsNone) -> T:
         """Transform an is-none check into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -2054,6 +2096,11 @@ class _IterationTransformer(Transformer[Iterator[Node]]):
         yield node
         for value in node.values:
             yield from self.transform(value)
+
+    def transform_list_literal(self, node: ListLiteral) -> Iterator[Node]:
+        yield node
+        for item in node.items:
+            yield from self.transform(item)
 
     def transform_is_none(self, node: IsNone) -> Iterator[Node]:
         yield node

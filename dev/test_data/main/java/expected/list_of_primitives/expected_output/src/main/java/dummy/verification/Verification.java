@@ -27,8 +27,49 @@ import dummy.reporting.Reporting;
 import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
+import java.util.List;
 
 public class Verification {
+  /**
+   * Check whether {@code number} is a prime smaller than 10.
+   */
+  public static Boolean isSmallPrime(
+    Long number) {
+    for (var prime : new java.util.ArrayList<Long>(java.util.List.of(2L, 3L, 5L, 7L))) {
+        if (prime == number) {
+            return true;
+        }
+    }
+    return false;
+  }
+
+  /**
+   * Give the number of {@code texts} followed by their lengths.
+   */
+  public static List<Long> countAndLengthsOf(
+    List<String> texts) {
+    var result = (
+        new java.util.ArrayList<Long>(java.util.List.of((long) texts.size())));
+    for (var text : texts) {
+        result.add((long) StringHelpers.len(text));
+    }
+    return result;
+  }
+
+  /**
+   * Give the positive {@code numbers} in the same order.
+   */
+  public static List<Long> positivesOf(
+    List<Long> numbers) {
+    List<Long> result = new java.util.ArrayList<Long>();
+    for (var number : numbers) {
+        if (number > 0) {
+            result.add(number);
+        }
+    }
+    return result;
+  }
+
   /**
    * Hash allowed enum values for efficient validation of enums.
    */
@@ -44,7 +85,31 @@ public class Verification {
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
-      // No verification has been defined for Something.
+      if (!(
+        that.getSomeInts().stream().allMatch(
+            number -> !isSmallPrime(number)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some ints must not contain small primes.")));
+      }
+
+      if (!(
+        countAndLengthsOf(that.getSomeStrings()).stream().allMatch(
+            number -> number <= 10))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "There must be at most 10 strings of at most 10 characters " +
+            "each.")));
+      }
+
+      if (!((positivesOf(that.getSomeInts())).size() <= 1)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "At most one of some ints must be positive.")));
+      }
 
       return errorStream;
     }

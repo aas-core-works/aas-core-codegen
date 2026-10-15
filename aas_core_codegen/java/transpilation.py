@@ -472,6 +472,94 @@ class Transpiler(
         return java_common.generate_tuple_literal(item_exprs=item_exprs), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def _transform_as_collection_member(
+        self, node: parse_tree.Expression, collection_node: parse_tree.Expression
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        """
+        Transpile the ``node`` to be looked up in or added to ``collection_node``.
+
+        A set or a list of integers holds ``Long``'s, while the integer literals and
+        the lengths are ``int``'s. Java boxes them to ``Integer``'s, which are never
+        equal to any ``Long``, so ``contains`` would silently give ``false``.
+        """
+        collection_type = intermediate_type_inference.beneath_optional(
+            self.type_map[collection_node]
+        )
+        if (
+            isinstance(
+                collection_type,
+                (
+                    intermediate_type_inference.SetTypeAnnotation,
+                    intermediate_type_inference.ListTypeAnnotation,
+                ),
+            )
+            and intermediate_type_inference.try_primitive_type(collection_type.items)
+            is intermediate_type_inference.PrimitiveType.INT
+        ):
+            return self._transform_as_long(node)
+
+        return self.transform(node)
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_list_literal(
+        self, node: parse_tree.ListLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        items = []  # type: List[Stripped]
+
+        for item_node in node.items:
+            item, error = self._transform_as_collection_member(
+                node=item_node, collection_node=node
+            )
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert item is not None
+            items.append(item)
+
+        list_type = self.type_map[node]
+        assert isinstance(list_type, intermediate_type_inference.ListTypeAnnotation)
+
+        # NOTE (mristin):
+        # We spell out the items, since Java can not infer them when the new list
+        # is wrapped, *e.g.*, in an ``Optional.of``.
+        item_type, error = generate_type(list_type.items)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the list literal", errors
+            )
+
+        if len(items) == 0:
+            return Stripped(f"new java.util.ArrayList<{item_type}>()"), None
+
+        # NOTE (mristin):
+        # The ``List.of`` gives an immutable list, so we copy it into
+        # an ``ArrayList``, which can be appended to as the Python list.
+        one_liner = (
+            f"new java.util.ArrayList<{item_type}>("
+            f"java.util.List.of({', '.join(items)}))"
+        )
+        if "\n" not in one_liner and len(one_liner) <= 80:
+            return Stripped(one_liner), None
+
+        items_joined = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+new java.util.ArrayList<{item_type}>(
+{I}java.util.List.of(
+{II}{indent_but_first_line(items_joined, II)}
+{I})
+)"""
+            ),
+            None,
+        )
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_slice(
         self, node: parse_tree.Slice
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -567,34 +655,13 @@ class Transpiler(
         return Stripped(f"({left}) {comparator} ({right})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def _transform_as_set_member(
-        self, node: parse_tree.Expression, set_node: parse_tree.Expression
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        """
-        Transpile the ``node`` to be looked up in or added to the set ``set_node``.
-
-        A set of integers holds ``Long``'s, while the integer literals and
-        the lengths are ``int``'s. Java boxes them to ``Integer``'s, which are never
-        equal to any ``Long``, so ``contains`` would silently give ``false``.
-        """
-        set_type = intermediate_type_inference.beneath_optional(self.type_map[set_node])
-        if (
-            isinstance(set_type, intermediate_type_inference.SetTypeAnnotation)
-            and intermediate_type_inference.try_primitive_type(set_type.items)
-            is intermediate_type_inference.PrimitiveType.INT
-        ):
-            return self._transform_as_long(node)
-
-        return self.transform(node)
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(
         self, node: parse_tree.IsIn
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []
 
-        member, error = self._transform_as_set_member(
-            node=node.member, set_node=node.container
+        member, error = self._transform_as_collection_member(
+            node=node.member, collection_node=node.container
         )
         if error is not None:
             errors.append(error)
@@ -865,8 +932,18 @@ class Transpiler(
                 )
 
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
-                item, error = self._transform_as_set_member(
-                    node=node.args[0], set_node=node.member.instance
+                item, error = self._transform_as_collection_member(
+                    node=node.args[0], collection_node=node.member.instance
+                )
+                if error is not None:
+                    return None, error
+
+                assert item is not None
+                return Stripped(f"{instance}.add({item})"), None
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.LIST_APPEND:
+                item, error = self._transform_as_collection_member(
+                    node=node.args[0], collection_node=node.member.instance
                 )
                 if error is not None:
                     return None, error

@@ -89,7 +89,91 @@ SymbolTable(
               name='some_names',
               argument='some_names',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Each name followed by some names must be one longer than some names.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='name',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_names',
+                  original_node=...),
+                original_node=...),
+              condition=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    FunctionCall(
+                      name='names_with',
+                      args=[
+                        Name(
+                          identifier='name',
+                          original_node=...),
+                        Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='some_names',
+                          original_node=...)],
+                      original_node=...)],
+                  original_node=...),
+                op='EQ',
+                right=Add(
+                  left=FunctionCall(
+                    name='len',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_names',
+                        original_node=...)],
+                    original_node=...),
+                  right=Constant(
+                    value=1,
+                    original_node=...),
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some names must not start with x.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='initial',
+                  original_node=...),
+                iteration=FunctionCall(
+                  name='initials_of',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='some_names',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              condition=Comparison(
+                left=Name(
+                  identifier='initial',
+                  original_node=...),
+                op='NE',
+                right=Constant(
+                  value='x',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       description=None,
@@ -112,9 +196,86 @@ SymbolTable(
   named_unions=[],
   constants=[],
   constants_by_name=...,
-  verification_functions=[],
+  verification_functions=[
+    TranspilableVerification(
+      name='names_with',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='name',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Name',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='names',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Name',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=OurTypeAnnotation(
+          our_type='Reference to our type Name',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give <ReferenceToArgument refuri="name">name</ReferenceToArgument> followed by <ReferenceToArgument refuri="names">names</ReferenceToArgument>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='initials_of',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='names',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Name',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=PrimitiveTypeAnnotation(
+          a_type='STR',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give the first characters of <ReferenceToArgument refuri="names">names</ReferenceToArgument> in the same order.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
-    description=None,
+    description=DescriptionOfMetaModel(
+      summary='<paragraph>Check the lists of constrained primitives, their list literals and <literal>append</literal>.</paragraph>',
+      remarks=[
+        textwrap.dedent("""\
+          <paragraph>The list literal holds constrained primitives, while the appended items are
+          plain strings sliced from them.</paragraph>""")],
+      constraints_by_identifier=[],
+      parsed=...),
     version='dummy',
     xml_namespace='https://dummy.com'))

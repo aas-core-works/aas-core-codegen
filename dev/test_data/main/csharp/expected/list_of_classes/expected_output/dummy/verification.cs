@@ -32,6 +32,59 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
+        /// Give the names of <paramref name="simples" /> in the same order.
+        /// </summary>
+        public static List<string> NamesOf(
+            List<ISimple> simples
+        )
+        {
+            List<string> names = new List<string>();
+            foreach (var simple in simples)
+            {
+                names.Add(simple.Name);
+            }
+            return names;
+        }  // public static List<string> NamesOf
+
+        /// <summary>
+        /// Give <paramref name="simple" /> followed by <paramref name="simples" />.
+        /// </summary>
+        public static List<ISimple> SimplesWith(
+            ISimple simple,
+            List<ISimple> simples
+        )
+        {
+            var result = new List<Our.ISimple> { simple };
+            foreach (var other in simples)
+            {
+                result.Add(other);
+            }
+            return result;
+        }  // public static List<ISimple> SimplesWith
+
+        /// <summary>
+        /// Give the instances of <see cref="Our.SomeItem" /> among <paramref name="items" />.
+        /// </summary>
+        /// <remarks>
+        /// The appended items are narrowed down to <see cref="Our.SomeItem" />, while the list
+        /// holds <see cref="Our.IAbstractItem" />'s.
+        /// </remarks>
+        public static List<IAbstractItem> SomeItemsOf(
+            List<IAbstractItem> items
+        )
+        {
+            List<Our.IAbstractItem> result = new List<Our.IAbstractItem>();
+            foreach (var item in items)
+            {
+                if (item is Our.ISomeItem)
+                {
+                    result.Add(((Our.ISomeItem)item));
+                }
+            }
+            return result;
+        }  // public static List<IAbstractItem> SomeItemsOf
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -78,6 +131,32 @@ namespace dummy
                 Our.ISomething that
             )
             {
+                if (!(
+                    Verification.NamesOf(that.SomeSimples).All(
+                        name => Common.StringHelpers.Len(name) > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Names of some simples must not be empty.");
+                }
+
+                if (!(
+                    ((Verification.SimplesWith(that.Item, that.SomeSimples)).Count) == (that.SomeSimples.Count + 1)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Item followed by some simples must be one longer than some " +
+                        "simples.");
+                }
+
+                if (!(
+                    (Verification.SomeItemsOf(that.SomeItems)).Count <= 1))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "At most one of some items must be a some item.");
+                }
+
                 foreach (var error in Verification.Verify(that.Item))
                 {
                     error.PrependSegment(

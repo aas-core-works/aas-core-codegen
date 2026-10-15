@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Sequence
 
 from icontract import invariant
 
@@ -35,6 +35,55 @@ class Simple:
         self.name = name
 
 
+@verification
+def names_of(simples: Sequence[Simple]) -> List[str]:
+    """Give the names of :paramref:`simples` in the same order."""
+    names: List[str] = []
+    for simple in simples:
+        names.append(simple.name)
+
+    return names
+
+
+@verification
+def simples_with(simple: Simple, simples: Sequence[Simple]) -> List[Simple]:
+    """Give :paramref:`simple` followed by :paramref:`simples`."""
+    result = [simple]
+    for other in simples:
+        result.append(other)
+
+    return result
+
+
+@verification
+def some_items_of(items: Sequence[Abstract_item]) -> List[Abstract_item]:
+    """
+    Give the instances of :class:`Some_item` among :paramref:`items`.
+
+    The appended items are narrowed down to :class:`Some_item`, while the list
+    holds :class:`Abstract_item`'s.
+    """
+    result: List[Abstract_item] = []
+    for item in items:
+        if isinstance(item, Some_item):
+            result.append(item)
+
+    return result
+
+
+@invariant(
+    lambda self: len(some_items_of(self.some_items)) <= 1,
+    "At most one of some items must be a some item.",
+)
+@invariant(
+    lambda self: len(simples_with(self.item, self.some_simples))
+    == len(self.some_simples) + 1,
+    "Item followed by some simples must be one longer than some simples.",
+)
+@invariant(
+    lambda self: all(len(name) > 0 for name in names_of(self.some_simples)),
+    "Names of some simples must not be empty.",
+)
 class Something:
     # NOTE (mristin):
     # The property ``item`` comes before the lists of classes on purpose, so that

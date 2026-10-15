@@ -32,6 +32,37 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
+        /// Give <paramref name="name" /> followed by <paramref name="names" />.
+        /// </summary>
+        public static List<string> NamesWith(
+            string name,
+            List<string> names
+        )
+        {
+            var result = new List<string> { name };
+            foreach (var other in names)
+            {
+                result.Add(other);
+            }
+            return result;
+        }  // public static List<string> NamesWith
+
+        /// <summary>
+        /// Give the first characters of <paramref name="names" /> in the same order.
+        /// </summary>
+        public static List<string> InitialsOf(
+            List<string> names
+        )
+        {
+            List<string> initials = new List<string>();
+            foreach (var name in names)
+            {
+                initials.Add(Common.StringHelpers.Slice(name, 0, 1));
+            }
+            return initials;
+        }  // public static List<string> InitialsOf
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -51,6 +82,25 @@ namespace dummy
                 Our.ISomething that
             )
             {
+                if (!(
+                    that.SomeNames.All(
+                        name => ((Verification.NamesWith(name, that.SomeNames)).Count) == (that.SomeNames.Count + 1))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Each name followed by some names must be one longer than " +
+                        "some names.");
+                }
+
+                if (!(
+                    Verification.InitialsOf(that.SomeNames).All(
+                        initial => initial != "x")))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some names must not start with x.");
+                }
+
                 foreach (var error in Verification.Verify_ListOf_Name(that.SomeNames))
                 {
                     error.PrependSegment(

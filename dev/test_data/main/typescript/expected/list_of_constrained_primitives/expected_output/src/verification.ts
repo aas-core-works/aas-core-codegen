@@ -190,6 +190,33 @@ export class VerificationError {
 }
 
 /**
+ * Give `name` followed by `names`.
+ */
+export function namesWith(
+  name: string,
+  names: Array<string>
+): Array<string> {
+  const result = [name];
+  for (const other of names) {
+    result.push(other);
+  }
+  return result;
+}
+
+/**
+ * Give the first characters of `names` in the same order.
+ */
+export function initialsOf(
+  names: Array<string>
+): Array<string> {
+  const initials: Array<string> = [];
+  for (const name of names) {
+    initials.push(OurCommon.sliceStr(name, 0, 1));
+  }
+  return initials;
+}
+
+/**
  * Verify the items of `that` recursively.
  */
 function *verify_ListOf_Name(
@@ -219,6 +246,35 @@ class Verifier
     that: OurTypes.Something,
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someNames,
+          name =>
+            (namesWith(name, that.someNames).length) == (that.someNames.length + 1)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Each name followed by some names must be one longer than " +
+        "some names."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          initialsOf(that.someNames),
+          initial =>
+            initial != "x"
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Some names must not start with x."
+      )
+    }
+
     if (context === true) {
       for (const error of verify_ListOf_Name(that.someNames)) {
         error.path.prepend(

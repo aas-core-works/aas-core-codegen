@@ -5370,6 +5370,368 @@ def some_func(text: str) -> Tuple[str, int]:
         )
 
 
+class Test_list_literal_and_append(unittest.TestCase):
+    def expect_type_inference_to_fail(self, body: str, expected_message: str) -> None:
+        """Expect the type inference of the verification functions to fail."""
+        source = _ANNOTATED_ASSIGNMENT_PRELUDE + body + _ANNOTATED_ASSIGNMENT_EPILOGUE
+
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        base_environment = intermediate_type_inference.populate_base_environment(
+            symbol_table=symbol_table
+        )
+
+        messages = []  # type: List[str]
+        for verification in symbol_table.verification_functions:
+            assert isinstance(verification, intermediate.TranspilableVerification)
+
+            # fmt: off
+            _, inference_error = (
+                intermediate_type_inference.infer_for_verification(
+                    verification=verification,
+                    base_environment=base_environment
+                )
+            )
+            # fmt: on
+
+            if inference_error is not None:
+                messages.append(
+                    tests.common.most_underlying_messages([inference_error])
+                )
+
+        self.assertEqual(expected_message, "\n".join(messages), source)
+
+    def test_append_on_argument_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: List[str], text: str) -> bool:
+    texts.append(text)
+    return True
+""",
+            expected_message=(
+                "We support ``append`` only on a local list variable, but texts "
+                "is an argument. Python appends to the list in place, while Go "
+                "appends to a slice with ``items = append(items, item)``, which "
+                "gives a new slice whenever the array beneath it has to grow. "
+                "Only the appended variable sees the new slice, so that the "
+                "caller, the instance or the collection holding the list would "
+                "miss the appended item in Go. Please build a local list "
+                "instead, *e.g.*, ``items: List[...] = []``, append to it, and "
+                "then return it, or assign a copy of it with ``list(items)``."
+            ),
+        )
+
+    def test_append_on_loop_variable_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(lists: List[List[str]], text: str) -> bool:
+    for texts in lists:
+        texts.append(text)
+    return True
+""",
+            expected_message=(
+                "We support ``append`` only on a local list variable, but texts "
+                "is a loop variable. Python appends to the list in place, while "
+                "Go appends to a slice with ``items = append(items, item)``, "
+                "which gives a new slice whenever the array beneath it has to "
+                "grow. Only the appended variable sees the new slice, so that "
+                "the caller, the instance or the collection holding the list "
+                "would miss the appended item in Go. Please build a local list "
+                "instead, *e.g.*, ``items: List[...] = []``, append to it, and "
+                "then return it, or assign a copy of it with ``list(items)``."
+            ),
+        )
+
+    def test_append_on_property_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+class Bag(DBC):
+    texts: List[str]
+
+    def __init__(self, texts: List[str]) -> None:
+        self.texts = texts
+
+
+@verification
+def some_func(bag: Mutable[Bag], text: str) -> bool:
+    bag.texts.append(text)
+    return True
+""",
+            expected_message=(
+                "We support ``append`` only on a local list variable, but "
+                "bag.texts is not a variable. Python appends to the list in "
+                "place, while Go appends to a slice with ``items = "
+                "append(items, item)``, which gives a new slice whenever the "
+                "array beneath it has to grow. Only the appended variable sees "
+                "the new slice, so that the caller, the instance or the "
+                "collection holding the list would miss the appended item in "
+                "Go. Please build a local list instead, *e.g.*, ``items: "
+                "List[...] = []``, append to it, and then return it, or assign "
+                "a copy of it with ``list(items)``."
+            ),
+        )
+
+    def test_alias_of_appended_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    texts: List[str] = []
+    other = texts
+    texts.append(text)
+    return len(other) > 0
+""",
+            expected_message=(
+                "The list 'texts' is appended to, so we support it only as the "
+                "receiver of ``append``, the container of ``in``, the "
+                "collection of a for-loop, an argument of a call, such as "
+                "``len(texts)``, the collection of an index or of a slice, the "
+                "returned value, and the target of an assignment of a fresh "
+                "list. Here it would be aliased, *e.g.*, as in ``other = "
+                "texts``, in a tuple literal or as the value assigned to a "
+                "property, and the targets disagree on the aliases of a list "
+                "appended to: Python appends to the list in place, so that all "
+                "the aliases see the appended items. Go appends to a slice with "
+                "``texts = append(texts, item)``, which gives a new slice "
+                "whenever the array beneath it has to grow, so that the aliases "
+                "miss the items appended afterwards. C++ copies the list on an "
+                "assignment, so that the copy never sees the items appended "
+                "afterwards. Please copy the list explicitly with "
+                "``list(texts)`` instead."
+            ),
+        )
+
+    def test_assignment_of_non_fresh_list_to_appended_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: List[str], text: str) -> bool:
+    result: List[str] = []
+    result = texts
+    result.append(text)
+    return True
+""",
+            expected_message=(
+                "The list 'result' is appended to, so it can be assigned only a "
+                "fresh list, *i.e.*, a list literal, a list copied with "
+                "``list(...)`` or the result of a call, but got: texts. The "
+                "list 'result' would be an alias of texts, and the targets "
+                "disagree on the aliases of a list appended to: Python appends "
+                "to the list in place, so that texts would see the appended "
+                "items as well. Go appends to a slice with ``result = "
+                "append(result, item)``, which gives a new slice whenever the "
+                "array beneath it has to grow, so that texts would miss the "
+                "items appended afterwards. C++ copies the list on an "
+                "assignment, so that texts would never see the appended items. "
+                "Please assign an explicit copy, ``result = list(texts)``, "
+                "instead."
+            ),
+        )
+
+    def test_appended_list_in_tuple_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> Tuple[List[str], int]:
+    texts: List[str] = []
+    texts.append(text)
+    return (texts, 1)
+""",
+            expected_message=(
+                "The list 'texts' is appended to, so we support it only as the "
+                "receiver of ``append``, the container of ``in``, the "
+                "collection of a for-loop, an argument of a call, such as "
+                "``len(texts)``, the collection of an index or of a slice, the "
+                "returned value, and the target of an assignment of a fresh "
+                "list. Here it would be aliased, *e.g.*, as in ``other = "
+                "texts``, in a tuple literal or as the value assigned to a "
+                "property, and the targets disagree on the aliases of a list "
+                "appended to: Python appends to the list in place, so that all "
+                "the aliases see the appended items. Go appends to a slice with "
+                "``texts = append(texts, item)``, which gives a new slice "
+                "whenever the array beneath it has to grow, so that the aliases "
+                "miss the items appended afterwards. C++ copies the list on an "
+                "assignment, so that the copy never sees the items appended "
+                "afterwards. Please copy the list explicitly with "
+                "``list(texts)`` instead."
+            ),
+        )
+
+    def test_append_in_loop_over_the_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    texts = [text]
+    for other in texts:
+        texts.append(other)
+    return True
+""",
+            expected_message=(
+                "The list texts can not be appended to in the for-loop over it, "
+                "since the targets disagree on that: Python and TypeScript "
+                "iterate over the appended items as well, Go does not, C# and "
+                "Java throw an exception, and the behavior is undefined in C++."
+            ),
+        )
+
+    def test_append_as_value_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    texts = [text]
+    result = texts.append(text)
+    return True
+""",
+            expected_message=(
+                "The ``append`` of a list returns nothing, so it can only be "
+                "called as a statement on its own.\n"
+                "We can not infer the type of the variable 'result' from "
+                "``None``. Please declare the variable with a type annotation, "
+                "*e.g.*, ``result: Optional[...] = None``."
+            ),
+        )
+
+    def test_empty_list_literal_without_annotation_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    texts = []
+    return True
+""",
+            expected_message=(
+                "We support an empty list literal ``[]`` only as the value "
+                "assigned to a list, *e.g.*, ``x: List[str] = []``, or as the "
+                "value returned from a function which returns a list, since the "
+                "targets need to know the type of the items of the new list."
+            ),
+        )
+
+    def test_list_literal_of_mixed_types_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str, number: int) -> bool:
+    things = [text, number]
+    return True
+""",
+            expected_message=(
+                "Expected the items of the list literal to be assignable to "
+                "str, but got: int. If the items are of different types, please "
+                "declare the type of the list explicitly, *e.g.*, ``x: "
+                "List[...] = [text, number]``."
+            ),
+        )
+
+    def test_append_on_optional_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    texts: Optional[List[str]] = []
+    if texts is not None:
+        texts.append(text)
+    return True
+""",
+            expected_message=(
+                "We support ``append`` only on a local list variable which is "
+                "not optional, but the variable 'texts' is declared as "
+                "Optional[List[str]]. The targets represent an optional list "
+                "differently, *e.g.*, Go as a pointer to a slice and C++ as an "
+                "optional, so that they disagree on how to append to it. Please "
+                "declare the variable as a list, *e.g.*, ``texts: List[str] = "
+                "[]``."
+            ),
+        )
+
+    def test_unknown_method_on_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: str) -> bool:
+    texts = [text]
+    texts.extend([text])
+    return True
+""",
+            expected_message=(
+                "The member 'extend' is not supported on lists; we support only "
+                "the following methods: 'append'"
+            ),
+        )
+
+    def test_list_literal_of_shared_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    nested = [texts]
+    return True
+""",
+            expected_message=(
+                "The item texts of the list literal holds lists or sets, which "
+                "Python would share, but C++ would copy. We can not transpile "
+                "the sharing to C++, so please use an explicit copy, *e.g.*, a "
+                "list copied with ``list(...)``, a list literal or a new set."
+            ),
+        )
+
+    def test_append_of_shared_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(texts: Sequence[str]) -> bool:
+    nested: List[List[str]] = []
+    nested.append(texts)
+    return True
+""",
+            expected_message=(
+                "The item appended to nested holds lists or sets, which Python "
+                "would share, but C++ would copy. We can not transpile the "
+                "sharing to C++, so please append an explicit copy, *e.g.*, a "
+                "list copied with ``list(...)``, a list literal or a new set."
+            ),
+        )
+
+    def test_append_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int) -> bool:
+    texts: List[str] = []
+    texts.append(number)
+    return True
+""",
+            expected_message=(
+                "Expected the item appended to List[str] to be assignable to "
+                "str, but got: int"
+            ),
+        )
+
+    def test_list_literal_of_optional_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(text: Optional[str]) -> bool:
+    texts = [text]
+    return True
+""",
+            expected_message=(
+                "The items of a list literal can not be None, as we support "
+                "Optional only at the top of a type annotation, but the item is "
+                "inferred to be Optional[str]. Please check first that the item "
+                "is not None, *e.g.*, with ``if text is not None:``."
+            ),
+        )
+
+
 class Test_method(unittest.TestCase):
     @staticmethod
     def source_with_methods(methods: str) -> str:

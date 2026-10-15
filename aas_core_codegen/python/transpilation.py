@@ -385,6 +385,7 @@ class Transpiler(
             parse_tree.Constant,
             parse_tree.Index,
             parse_tree.Slice,
+            parse_tree.ListLiteral,
         )
 
         if not isinstance(node.container, no_parentheses_types):
@@ -576,6 +577,13 @@ not (
                 instance = Stripped(f"({instance})")
 
             return Stripped(f"{instance}.add({args[0]})"), None
+
+        elif kind is intermediate_type_inference.BuiltinMethodKind.LIST_APPEND:
+            # NOTE (mristin):
+            # The type inference allows ``append`` only on a local variable.
+            assert isinstance(node.member.instance, parse_tree.Name)
+
+            return Stripped(f"{instance}.append({args[0]})"), None
 
         elif (
             kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
@@ -871,6 +879,33 @@ not (
 
         joined_values = ", ".join(value_reprs)
         return Stripped(f"({joined_values})"), None
+
+    def transform_list_literal(
+        self, node: parse_tree.ListLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        items = []  # type: List[Stripped]
+        for item_node in node.items:
+            item, error = self.transform(item_node)
+            if error is not None:
+                return None, error
+
+            assert item is not None
+            items.append(item)
+
+        one_liner = f"[{', '.join(items)}]"
+        if "\n" not in one_liner and len(one_liner) <= 60:
+            return Stripped(one_liner), None
+
+        items_joined = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+[
+{I}{indent_but_first_line(items_joined, I)}
+]"""
+            ),
+            None,
+        )
 
     def transform_is_none(
         self, node: parse_tree.IsNone

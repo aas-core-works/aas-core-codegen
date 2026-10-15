@@ -12,6 +12,7 @@ package verification
 
 import (
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
@@ -42,6 +43,45 @@ func (ve *VerificationError) Error() string {
 // Render the path as a string.
 func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
+}
+
+// Give the names of simples in the same order.
+func NamesOf(
+	simples []ourtypes.ISimple,
+) []string {
+	var names []string = []string{}
+	for _, simple := range simples {
+		names = append(names, simple.Name())
+	}
+	return names
+}
+
+// Give simple followed by simples.
+func SimplesWith(
+	simple ourtypes.ISimple,
+	simples []ourtypes.ISimple,
+) []ourtypes.ISimple {
+	result := []ourtypes.ISimple{simple}
+	for _, other := range simples {
+		result = append(result, other)
+	}
+	return result
+}
+
+// Give the instances of [ourtypes.ISomeItem] among items.
+//
+// The appended items are narrowed down to [ourtypes.ISomeItem], while the list
+// holds [ourtypes.IAbstractItem]'s.
+func SomeItemsOf(
+	items []ourtypes.IAbstractItem,
+) []ourtypes.IAbstractItem {
+	var result []ourtypes.IAbstractItem = []ourtypes.IAbstractItem{}
+	for _, item := range items {
+		if ourtypes.IsSomeItem(item) {
+			result = append(result, item.(ourtypes.ISomeItem))
+		}
+	}
+	return result
 }
 
 // Verify `that` instance of [ourtypes.ISomeItem].
@@ -106,6 +146,45 @@ func VerifySomething(
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
+
+	if !(
+		ourcommon.All(
+			func(name string) bool {
+				return ourcommon.LenStr(name) > 0
+			},
+			NamesOf(that.SomeSimples()),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Names of some simples must not be empty.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		len(SimplesWith(that.Item(), that.SomeSimples())) == (len(that.SomeSimples()) + 1)) {
+		abort = onError(
+			newVerificationError(
+				"Item followed by some simples must be one longer than some " +
+				"simples.",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(len(SomeItemsOf(that.SomeItems())) <= 1) {
+		abort = onError(
+			newVerificationError(
+				"At most one of some items must be a some item.",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	if that.Item() == nil {
 		abort = onError(

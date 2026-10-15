@@ -212,6 +212,25 @@ class RecursiveVerification : public IVerification {
   const std::shared_ptr<types::IClass>& instance_;
 };  // class RecursiveVerification
 
+// region Verification functions
+
+/// \brief Check whether \p number is a prime smaller than 10.
+bool IsSmallPrime(
+  int64_t number
+);
+
+/// \brief Give the number of \p texts followed by their lengths.
+std::vector<int64_t> CountAndLengthsOf(
+  const std::vector<std::wstring>& texts
+);
+
+/// \brief Give the positive \p numbers in the same order.
+std::vector<int64_t> PositivesOf(
+  const std::vector<int64_t>& numbers
+);
+
+// endregion Verification functions
+
 }  // namespace verification
 /**@}*/
 
