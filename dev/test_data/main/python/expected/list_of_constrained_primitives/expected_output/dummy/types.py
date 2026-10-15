@@ -3,6 +3,10 @@ Check the lists of constrained primitives, their list literals and ``append``.
 
 The list literal holds constrained primitives, while the appended items are
 plain strings sliced from them.
+
+We also check the membership ``in`` them. We look up a plain string in the list
+of constrained primitives, a sliced string in a local list built with
+``append``, and check for a sub-string in a constrained primitive.
 """
 
 

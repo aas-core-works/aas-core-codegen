@@ -3,6 +3,10 @@ Check the lists of constrained primitives, their list literals and ``append``.
 
 The list literal holds constrained primitives, while the appended items are
 plain strings sliced from them.
+
+We also check the membership ``in`` them. We look up a plain string in the list
+of constrained primitives, a sliced string in a local list built with
+``append``, and check for a sub-string in a constrained primitive.
 """
 from typing import List, Sequence
 
@@ -34,6 +38,48 @@ def initials_of(names: Sequence[Name]) -> List[str]:
     return initials
 
 
+@verification
+def initials_are_unique(names: Sequence[Name]) -> bool:
+    """Check that :paramref:`names` start with unique characters."""
+    initials: List[str] = []
+    for name in names:
+        initial = name[:1]
+        if initial in initials:
+            return False
+
+        initials.append(initial)
+
+    return True
+
+
+@verification
+def is_in_names(text: str, names: Sequence[Name]) -> bool:
+    """Check whether :paramref:`text` is in :paramref:`names`."""
+    return text in names
+
+
+@verification
+def contains_space(name: Name) -> bool:
+    """Check whether :paramref:`name` contains a space."""
+    return " " in name
+
+
+@invariant(
+    lambda self: initials_are_unique(self.some_names),
+    "Initials of some names must be unique.",
+)
+@invariant(
+    lambda self: all(not contains_space(name) for name in self.some_names),
+    "Some names must not contain spaces.",
+)
+@invariant(
+    lambda self: not is_in_names("Mallory", self.some_names),
+    "Some names must not contain Mallory.",
+)
+@invariant(
+    lambda self: not ("Eve" in self.some_names),
+    "Some names must not contain Eve.",
+)
 @invariant(
     lambda self: all(initial != "x" for initial in initials_of(self.some_names)),
     "Some names must not start with x.",

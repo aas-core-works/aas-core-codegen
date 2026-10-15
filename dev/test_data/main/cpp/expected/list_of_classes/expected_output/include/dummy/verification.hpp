@@ -243,6 +243,27 @@ std::vector<
   >& items
 );
 
+/// \brief Check whether \p simple is in \p simples.
+///
+/// The targets compare the instances of the classes by their references.
+bool IsInSimples(
+  const std::shared_ptr<types::ISimple>& simple,
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+);
+
+/// \brief Check whether \p simple is in a local copy of \p simples.
+///
+/// The local copy is built with `append`, and holds the same instances as
+/// \p simples.
+bool IsInLocalCopyOfSimples(
+  const std::shared_ptr<types::ISimple>& simple,
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+);
+
 // endregion Verification functions
 
 }  // namespace verification

@@ -87,6 +87,37 @@ def initials_of(
     return initials
 
 
+def initials_are_unique(
+    names: Sequence[str]
+) -> bool:
+    """Check that :paramref:`names` start with unique characters."""
+    # pylint: disable=all
+    initials: List[str] = []
+    for name in names:
+        initial = name[:1]
+        if initial in initials:
+            return False
+        initials.append(initial)
+    return True
+
+
+def is_in_names(
+    text: str,
+    names: Sequence[str]
+) -> bool:
+    """Check whether :paramref:`text` is in :paramref:`names`."""
+    # pylint: disable=all
+    return text in names
+
+
+def contains_space(
+    name: str
+) -> bool:
+    """Check whether :paramref:`name` contains a space."""
+    # pylint: disable=all
+    return ' ' in name
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -116,6 +147,31 @@ class _Transformer(
         ):
             yield Error(
                 'Some names must not start with x.'
+            )
+
+        if not (not ('Eve' in that.some_names)):
+            yield Error(
+                'Some names must not contain Eve.'
+            )
+
+        if not (not is_in_names('Mallory', that.some_names)):
+            yield Error(
+                'Some names must not contain Mallory.'
+            )
+
+        if not (
+            all(
+                not contains_space(name)
+                for name in that.some_names
+            )
+        ):
+            yield Error(
+                'Some names must not contain spaces.'
+            )
+
+        if not initials_are_unique(that.some_names):
+            yield Error(
+                'Initials of some names must be unique.'
             )
 
         for error in _verify_list_of__name(that.some_names):

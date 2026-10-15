@@ -1155,6 +1155,30 @@ std::make_tuple(
             )
 
         # NOTE (mristin):
+        # The membership in a string is a check for a sub-string, while
+        # ``common::Contains`` would look for a single character.
+        if (
+            intermediate_type_inference.try_primitive_type(container_type)
+            is intermediate_type_inference.PrimitiveType.STR
+        ):
+            if not isinstance(node.container, parse_tree.Name):
+                container = Stripped(f"({container})")
+
+            one_liner = f"{container}.find({member}) != std::wstring::npos"
+            if "\n" not in one_liner and len(one_liner) <= 60:
+                return Stripped(one_liner), None
+
+            return (
+                Stripped(
+                    f"""\
+{container}.find(
+{I}{indent_but_first_line(member, I)}
+) != std::wstring::npos"""
+                ),
+                None,
+            )
+
+        # NOTE (mristin):
         # We look up the member in a set in constant time, while
         # ``common::Contains`` iterates over all the items.
         if isinstance(container_type, intermediate_type_inference.SetTypeAnnotation):
@@ -1176,6 +1200,12 @@ std::make_tuple(
                 ),
                 None,
             )
+
+        # NOTE (mristin):
+        # The lengths are ``size_t``'s, so we convert them to our integers to avoid
+        # comparing the signed and the unsigned integers in ``std::find``.
+        if isinstance(container_type, intermediate_type_inference.ListTypeAnnotation):
+            member = self._as_int64_position(node.member, member)
 
         contains_function = cpp_naming.function_name(Identifier("contains"))
 

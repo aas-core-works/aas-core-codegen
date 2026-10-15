@@ -85,6 +85,40 @@ namespace dummy
         }  // public static List<IAbstractItem> SomeItemsOf
 
         /// <summary>
+        /// Check whether <paramref name="simple" /> is in <paramref name="simples" />.
+        /// </summary>
+        /// <remarks>
+        /// The targets compare the instances of the classes by their references.
+        /// </remarks>
+        public static bool IsInSimples(
+            ISimple simple,
+            List<ISimple> simples
+        )
+        {
+            return simples.Contains(simple);
+        }  // public static bool IsInSimples
+
+        /// <summary>
+        /// Check whether <paramref name="simple" /> is in a local copy of <paramref name="simples" />.
+        /// </summary>
+        /// <remarks>
+        /// The local copy is built with <c>append</c>, and holds the same instances as
+        /// <paramref name="simples" />.
+        /// </remarks>
+        public static bool IsInLocalCopyOfSimples(
+            ISimple simple,
+            List<ISimple> simples
+        )
+        {
+            List<Our.ISimple> copied = new List<Our.ISimple>();
+            foreach (var other in simples)
+            {
+                copied.Add(other);
+            }
+            return copied.Contains(simple);
+        }  // public static bool IsInLocalCopyOfSimples
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -155,6 +189,24 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "At most one of some items must be a some item.");
+                }
+
+                if (!(
+                    !Verification.IsInSimples(that.Item, that.SomeSimples)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Item must not be one of some simples.");
+                }
+
+                if (!(
+                    that.SomeSimples.All(
+                        simple => Verification.IsInLocalCopyOfSimples(simple, that.SomeSimples))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Each of some simples must be in a local copy of some " +
+                        "simples.");
                 }
 
                 foreach (var error in Verification.Verify(that.Item))

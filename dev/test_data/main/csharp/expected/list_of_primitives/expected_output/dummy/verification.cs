@@ -82,6 +82,72 @@ namespace dummy
         }  // public static List<long> PositivesOf
 
         /// <summary>
+        /// Check that <paramref name="numbers" /> are unique with a local list of the seen.
+        /// </summary>
+        public static bool IntsAreUnique(
+            List<long> numbers
+        )
+        {
+            List<long> seen = new List<long>();
+            foreach (var number in numbers)
+            {
+                if (seen.Contains(number))
+                {
+                    return false;
+                }
+                seen.Add(number);
+            }
+            return true;
+        }  // public static bool IntsAreUnique
+
+        /// <summary>
+        /// Check whether <paramref name="text" /> is one of the separators.
+        /// </summary>
+        public static bool IsSeparator(
+            string text
+        )
+        {
+            return (
+                (new List<string> { ".", ",", ";" }).Contains(text));
+        }  // public static bool IsSeparator
+
+        /// <summary>
+        /// Check whether <paramref name="number" /> is in <paramref name="numbers" />.
+        /// </summary>
+        public static bool IsInInts(
+            long number,
+            List<long> numbers
+        )
+        {
+            return numbers.Contains(number);
+        }  // public static bool IsInInts
+
+        /// <summary>
+        /// Check whether <paramref name="text" /> is in <paramref name="texts" />, if specified.
+        /// </summary>
+        public static bool IsInOptionalStrings(
+            string text,
+            List<string>? texts
+        )
+        {
+            if (texts == null)
+            {
+                return false;
+            }
+            return texts.Contains(text);
+        }  // public static bool IsInOptionalStrings
+
+        /// <summary>
+        /// Check whether <paramref name="text" /> contains a dot.
+        /// </summary>
+        public static bool ContainsDot(
+            string text
+        )
+        {
+            return text.Contains(".");
+        }  // public static bool ContainsDot
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -126,6 +192,61 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "At most one of some ints must be positive.");
+                }
+
+                if (!(!that.SomeInts.Contains(0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Ints must not contain zero.");
+                }
+
+                if (!(
+                    !Verification.IsInInts(that.SomeStrings.Count, that.SomeInts)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Ints must not contain the number of strings.");
+                }
+
+                if (!(!that.SomeFloats.Contains(-1.0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Floats must not contain minus one.");
+                }
+
+                if (!(
+                    !Verification.IsInOptionalStrings("", that.SomeStrings)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Strings must not contain an empty string.");
+                }
+
+                if (!(
+                    that.SomeStrings.All(
+                        text => !Verification.ContainsDot(text))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Strings must not contain dots.");
+                }
+
+                if (!Verification.IntsAreUnique(that.SomeInts))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some ints must be unique.");
+                }
+
+                if (!(
+                    that.SomeStrings.All(
+                        text => !Verification.IsSeparator(text))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some strings must not be separators.");
                 }
             }
         }  // private class Transformer

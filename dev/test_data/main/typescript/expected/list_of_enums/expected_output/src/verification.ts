@@ -219,6 +219,16 @@ export function failuresOf(
 }
 
 /**
+ * Check whether `result` is in `results`.
+ */
+export function isInResults(
+  result: OurTypes.Result,
+  results: Array<OurTypes.Result>
+): boolean {
+  return results.includes(result);
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -247,6 +257,29 @@ class Verifier
     if (!(failuresOf(that.someResults).length <= 1)) {
       yield new VerificationError(
         "Some results must contain at most one failure."
+      )
+    }
+
+    if (!(
+      !isInResults(OurTypes.Result.Fail, that.someResults)
+      || (that.someResults.includes(OurTypes.Result.Ok))
+    )) {
+      yield new VerificationError(
+        "Some results must contain an ok if they contain a failure."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someResults,
+          result =>
+            [OurTypes.Result.Ok, OurTypes.Result.Fail].includes(result)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Some results must be either ok or fail."
       )
     }
   }

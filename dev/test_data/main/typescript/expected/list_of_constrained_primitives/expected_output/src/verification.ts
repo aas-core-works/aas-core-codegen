@@ -217,6 +217,42 @@ export function initialsOf(
 }
 
 /**
+ * Check that `names` start with unique characters.
+ */
+export function initialsAreUnique(
+  names: Array<string>
+): boolean {
+  const initials: Array<string> = [];
+  for (const name of names) {
+    const initial = OurCommon.sliceStr(name, 0, 1);
+    if (initials.includes(initial)) {
+      return false;
+    }
+    initials.push(initial);
+  }
+  return true;
+}
+
+/**
+ * Check whether `text` is in `names`.
+ */
+export function isInNames(
+  text: string,
+  names: Array<string>
+): boolean {
+  return names.includes(text);
+}
+
+/**
+ * Check whether `name` contains a space.
+ */
+export function containsSpace(
+  name: string
+): boolean {
+  return name.includes(" ");
+}
+
+/**
  * Verify the items of `that` recursively.
  */
 function *verify_ListOf_Name(
@@ -272,6 +308,38 @@ class Verifier
     )) {
       yield new VerificationError(
         "Some names must not start with x."
+      )
+    }
+
+    if (!(!(that.someNames.includes("Eve")))) {
+      yield new VerificationError(
+        "Some names must not contain Eve."
+      )
+    }
+
+    if (!(!isInNames("Mallory", that.someNames))) {
+      yield new VerificationError(
+        "Some names must not contain Mallory."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someNames,
+          name =>
+            !containsSpace(name)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Some names must not contain spaces."
+      )
+    }
+
+    if (!initialsAreUnique(that.someNames)) {
+      yield new VerificationError(
+        "Initials of some names must be unique."
       )
     }
 

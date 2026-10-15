@@ -86,6 +86,38 @@ std::vector<
   return result;
 }
 
+bool IsInSimples(
+  const std::shared_ptr<types::ISimple>& simple,
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+) {
+  return (
+    common::Contains(
+      simples,
+      simple
+    )
+  );
+}
+
+bool IsInLocalCopyOfSimples(
+  const std::shared_ptr<types::ISimple>& simple,
+  const std::vector<
+    std::shared_ptr<types::ISimple>
+  >& simples
+) {
+  std::vector<std::shared_ptr<types::ISimple> > copied = std::vector<std::shared_ptr<types::ISimple> >();
+  for (const std::shared_ptr<types::ISimple>& other : simples) {
+    copied.push_back(other);
+  }
+  return (
+    common::Contains(
+      copied,
+      simple
+    )
+  );
+}
+
 // endregion Verification functions
 
 namespace {
@@ -157,6 +189,35 @@ bool Something_2(
   ).size() <= 1;
 }
 
+bool Something_3(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !verification::IsInSimples(
+    that->item(),
+    that->some_simples()
+  );
+}
+
+bool Something_4(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](const std::shared_ptr<types::ISimple>& simple) -> bool {
+      return verification::IsInLocalCopyOfSimples(
+        simple,
+        that->some_simples()
+      );
+    },
+    that->some_simples()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -176,6 +237,15 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_2,
           L"At most one of some items must be a some item."
+        },
+        {
+          &Something_3,
+          L"Item must not be one of some simples."
+        },
+        {
+          &Something_4,
+          L"Each of some simples must be in a local copy of some "
+          L"simples."
         }
       };
       return checks;

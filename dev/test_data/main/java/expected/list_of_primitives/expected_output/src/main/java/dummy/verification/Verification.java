@@ -28,6 +28,7 @@ import dummy.types.enums.*;
 import dummy.types.model.*;
 import dummy.visitation.AbstractTransformer;
 import java.util.List;
+import java.util.Optional;
 
 public class Verification {
   /**
@@ -71,6 +72,59 @@ public class Verification {
   }
 
   /**
+   * Check that {@code numbers} are unique with a local list of the seen.
+   */
+  public static Boolean intsAreUnique(
+    List<Long> numbers) {
+    List<Long> seen = new java.util.ArrayList<Long>();
+    for (var number : numbers) {
+        if (seen.contains(number)) {
+            return false;
+        }
+        seen.add(number);
+    }
+    return true;
+  }
+
+  /**
+   * Check whether {@code text} is one of the separators.
+   */
+  public static Boolean isSeparator(
+    String text) {
+    return (
+        (new java.util.ArrayList<String>(java.util.List.of(".", ",", ";"))).contains(text));
+  }
+
+  /**
+   * Check whether {@code number} is in {@code numbers}.
+   */
+  public static Boolean isInInts(
+    Long number,
+    List<Long> numbers) {
+    return numbers.contains(number);
+  }
+
+  /**
+   * Check whether {@code text} is in {@code texts}, if specified.
+   */
+  public static Boolean isInOptionalStrings(
+    String text,
+    Optional<List<String>> texts) {
+    if (!texts.isPresent()) {
+        return false;
+    }
+    return texts.get().contains(text);
+  }
+
+  /**
+   * Check whether {@code text} contains a dot.
+   */
+  public static Boolean containsDot(
+    String text) {
+    return text.contains(".");
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -109,6 +163,63 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "At most one of some ints must be positive.")));
+      }
+
+      if (!(!that.getSomeInts().contains(0L))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Ints must not contain zero.")));
+      }
+
+      if (!(
+        !isInInts(
+            (long) that.getSomeStrings().size(),
+            that.getSomeInts()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Ints must not contain the number of strings.")));
+      }
+
+      if (!(!that.getSomeFloats().contains(-1.0))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Floats must not contain minus one.")));
+      }
+
+      if (!(
+        !isInOptionalStrings("", Optional.of(that.getSomeStrings())))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Strings must not contain an empty string.")));
+      }
+
+      if (!(
+        that.getSomeStrings().stream().allMatch(
+            text -> !containsDot(text)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Strings must not contain dots.")));
+      }
+
+      if (!intsAreUnique(that.getSomeInts())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some ints must be unique.")));
+      }
+
+      if (!(
+        that.getSomeStrings().stream().allMatch(
+            text -> !isSeparator(text)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some strings must not be separators.")));
       }
 
       return errorStream;

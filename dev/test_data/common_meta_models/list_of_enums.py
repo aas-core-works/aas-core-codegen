@@ -1,4 +1,9 @@
-"""Check the lists of enumeration literals, their list literals and ``append``."""
+"""
+Check the lists of enumeration literals, their list literals and ``append``.
+
+We also check the membership ``in`` a list of enumeration literals, passed as
+an argument and given as a list literal.
+"""
 from enum import Enum
 from typing import List, Sequence
 
@@ -31,6 +36,23 @@ def failures_of(results: Sequence[Result]) -> List[Result]:
     return failures
 
 
+@verification
+def is_in_results(result: Result, results: Sequence[Result]) -> bool:
+    """Check whether :paramref:`result` is in :paramref:`results`."""
+    return result in results
+
+
+@invariant(
+    lambda self: all(
+        result in [Result.Ok, Result.Fail] for result in self.some_results
+    ),
+    "Some results must be either ok or fail.",
+)
+@invariant(
+    lambda self: not is_in_results(Result.Fail, self.some_results)
+    or Result.Ok in self.some_results,
+    "Some results must contain an ok if they contain a failure.",
+)
 @invariant(
     lambda self: len(failures_of(self.some_results)) <= 1,
     "Some results must contain at most one failure.",

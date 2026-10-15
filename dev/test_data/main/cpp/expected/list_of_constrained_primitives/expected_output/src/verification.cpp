@@ -60,6 +60,43 @@ std::vector<std::wstring> InitialsOf(
   return initials;
 }
 
+bool InitialsAreUnique(
+  const std::vector<std::wstring>& names
+) {
+  std::vector<std::wstring> initials = std::vector<std::wstring>();
+  for (const std::wstring& name : names) {
+    std::wstring initial = common::SliceStr(name, 0, 1);
+    if (
+      common::Contains(
+        initials,
+        initial
+      )
+    ) {
+      return false;
+    }
+    initials.push_back(initial);
+  }
+  return true;
+}
+
+bool IsInNames(
+  const std::wstring& text,
+  const std::vector<std::wstring>& names
+) {
+  return (
+    common::Contains(
+      names,
+      text
+    )
+  );
+}
+
+bool ContainsSpace(
+  const std::wstring& name
+) {
+  return name.find(L" ") != std::wstring::npos;
+}
+
 // endregion Verification functions
 
 namespace {
@@ -133,6 +170,57 @@ bool Something_1(
   );
 }
 
+bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !common::Contains(
+    that->some_names(),
+    L"Eve"
+  );
+}
+
+bool Something_3(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !verification::IsInNames(
+    L"Mallory",
+    that->some_names()
+  );
+}
+
+bool Something_4(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](std::wstring name) -> bool {
+      return !verification::ContainsSpace(
+        name
+      );
+    },
+    that->some_names()
+  );
+}
+
+bool Something_5(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::InitialsAreUnique(
+    that->some_names()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -157,6 +245,22 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_1,
           L"Some names must not start with x."
+        },
+        {
+          &Something_2,
+          L"Some names must not contain Eve."
+        },
+        {
+          &Something_3,
+          L"Some names must not contain Mallory."
+        },
+        {
+          &Something_4,
+          L"Some names must not contain spaces."
+        },
+        {
+          &Something_5,
+          L"Initials of some names must be unique."
         }
       };
       return checks;

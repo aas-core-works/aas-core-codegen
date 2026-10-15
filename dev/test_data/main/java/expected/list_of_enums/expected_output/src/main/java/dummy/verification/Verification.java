@@ -58,6 +58,15 @@ public class Verification {
   }
 
   /**
+   * Check whether {@code result} is in {@code results}.
+   */
+  public static Boolean isInResults(
+    Result result,
+    List<Result> results) {
+    return results.contains(result);
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -98,6 +107,24 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "Some results must contain at most one failure.")));
+      }
+
+      if (!(
+        !isInResults(Result.FAIL, that.getSomeResults())
+        || that.getSomeResults().contains(Result.OK))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some results must contain an ok if they contain a failure.")));
+      }
+
+      if (!(
+        that.getSomeResults().stream().allMatch(
+            result -> (new java.util.ArrayList<Result>(java.util.List.of(Result.OK, Result.FAIL))).contains(result)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some results must be either ok or fail.")));
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,

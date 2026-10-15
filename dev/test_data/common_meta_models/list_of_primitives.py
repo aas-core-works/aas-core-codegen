@@ -1,11 +1,17 @@
 """
 Check the lists of primitives.
 
-We also check the list literals and the local lists built with ``append``.
+We check the list literals and the local lists built with ``append``.
 The lengths are appended to and put in a list literal on purpose, since
 the targets represent them differently from our integers.
+
+We also check the membership ``in`` a list of primitives, passed as a read-only
+and as an optional argument, built locally with ``append`` or given as a list
+literal, and the membership ``in`` a string, *i.e.*, the check for a sub-string.
+The integer literals and the lengths are looked up in the list of integers on
+purpose, since the targets represent them differently from the items.
 """
-from typing import List, Sequence
+from typing import List, Optional, Sequence
 
 from icontract import DBC, invariant
 
@@ -41,6 +47,74 @@ def positives_of(numbers: Sequence[int]) -> List[int]:
     return result
 
 
+@verification
+def ints_are_unique(numbers: Sequence[int]) -> bool:
+    """Check that :paramref:`numbers` are unique with a local list of the seen."""
+    seen: List[int] = []
+    for number in numbers:
+        if number in seen:
+            return False
+
+        seen.append(number)
+
+    return True
+
+
+@verification
+def is_separator(text: str) -> bool:
+    """Check whether :paramref:`text` is one of the separators."""
+    return text in [".", ",", ";"]
+
+
+@verification
+def is_in_ints(number: int, numbers: Sequence[int]) -> bool:
+    """Check whether :paramref:`number` is in :paramref:`numbers`."""
+    return number in numbers
+
+
+@verification
+def is_in_optional_strings(text: str, texts: Optional[Sequence[str]]) -> bool:
+    """Check whether :paramref:`text` is in :paramref:`texts`, if specified."""
+    if texts is None:
+        return False
+
+    return text in texts
+
+
+@verification
+def contains_dot(text: str) -> bool:
+    """Check whether :paramref:`text` contains a dot."""
+    return "." in text
+
+
+@invariant(
+    lambda self: all(not is_separator(text) for text in self.some_strings),
+    "Some strings must not be separators.",
+)
+@invariant(
+    lambda self: ints_are_unique(self.some_ints),
+    "Some ints must be unique.",
+)
+@invariant(
+    lambda self: all(not contains_dot(text) for text in self.some_strings),
+    "Strings must not contain dots.",
+)
+@invariant(
+    lambda self: not is_in_optional_strings("", self.some_strings),
+    "Strings must not contain an empty string.",
+)
+@invariant(
+    lambda self: not (-1.0 in self.some_floats),
+    "Floats must not contain minus one.",
+)
+@invariant(
+    lambda self: not is_in_ints(len(self.some_strings), self.some_ints),
+    "Ints must not contain the number of strings.",
+)
+@invariant(
+    lambda self: not (0 in self.some_ints),
+    "Ints must not contain zero.",
+)
 @invariant(
     lambda self: len(positives_of(self.some_ints)) <= 1,
     "At most one of some ints must be positive.",

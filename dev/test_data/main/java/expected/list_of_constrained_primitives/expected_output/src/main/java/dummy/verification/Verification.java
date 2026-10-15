@@ -57,6 +57,39 @@ public class Verification {
   }
 
   /**
+   * Check that {@code names} start with unique characters.
+   */
+  public static Boolean initialsAreUnique(
+    List<String> names) {
+    List<String> initials = new java.util.ArrayList<String>();
+    for (var name : names) {
+        var initial = StringHelpers.slice(name, 0, 1);
+        if (initials.contains(initial)) {
+            return false;
+        }
+        initials.add(initial);
+    }
+    return true;
+  }
+
+  /**
+   * Check whether {@code text} is in {@code names}.
+   */
+  public static Boolean isInNames(
+    String text,
+    List<String> names) {
+    return names.contains(text);
+  }
+
+  /**
+   * Check whether {@code name} contains a space.
+   */
+  public static Boolean containsSpace(
+    String name) {
+    return name.contains(" ");
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -88,6 +121,36 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "Some names must not start with x.")));
+      }
+
+      if (!(!that.getSomeNames().contains("Eve"))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some names must not contain Eve.")));
+      }
+
+      if (!(!isInNames("Mallory", that.getSomeNames()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some names must not contain Mallory.")));
+      }
+
+      if (!(
+        that.getSomeNames().stream().allMatch(
+            name -> !containsSpace(name)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some names must not contain spaces.")));
+      }
+
+      if (!initialsAreUnique(that.getSomeNames())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Initials of some names must be unique.")));
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,

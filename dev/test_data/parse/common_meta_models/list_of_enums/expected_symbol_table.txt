@@ -113,6 +113,79 @@ UnverifiedSymbolTable(
                 value=1,
                 original_node=...),
               original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Some results must contain an ok if they contain a failure.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=FunctionCall(
+                name='is_in_results',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='Result',
+                      original_node=...),
+                    name='Fail',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='some_results',
+                    original_node=...)],
+                original_node=...),
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='Result',
+                    original_node=...),
+                  name='Ok',
+                  original_node=...),
+                container=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_results',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Some results must be either ok or fail.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='result',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_results',
+                  original_node=...),
+                original_node=...),
+              condition=IsIn(
+                member=Name(
+                  identifier='result',
+                  original_node=...),
+                container=ListLiteral(
+                  items=[
+                    Member(
+                      instance=Name(
+                        identifier='Result',
+                        original_node=...),
+                      name='Ok',
+                      original_node=...),
+                    Member(
+                      instance=Name(
+                        identifier='Result',
+                        original_node=...),
+                      name='Fail',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
           node=...)],
       serialization=None,
       description=None,
@@ -297,6 +370,54 @@ UnverifiedSymbolTable(
           Return(
             value=Name(
               identifier='failures',
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...),
+    UnderstoodMethod(
+      name='is_in_results',
+      verification=True,
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='result',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Result',
+            node=...),
+          default=None,
+          node=...),
+        Argument(
+          name='results',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Sequence',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Result',
+                node=...)],
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      non_mutating=False,
+      body=[
+        textwrap.dedent("""\
+          Return(
+            value=IsIn(
+              member=Name(
+                identifier='result',
+                original_node=...),
+              container=Name(
+                identifier='results',
+                original_node=...),
               original_node=...),
             original_node=...)""")],
       node=...,
