@@ -248,6 +248,49 @@ export function intsAreUnique(
 }
 
 /**
+ * Check whether `number` is in `numbers`, item by item.
+ *
+ * @remarks
+ *
+ * Java boxes both `number` and the items as `Long`'s, so that `==`
+ * would compare their references. The test data looks up the numbers beyond -128
+ * and 127 on purpose, as Java caches the boxed values in that range, and
+ * the references would be equal by chance.
+ */
+export function containsByLoop(
+  number: number,
+  numbers: Array<number>
+): boolean {
+  for (const other of numbers) {
+    if (other == number) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check that `numbers` are unique by comparing them pair-wise.
+ *
+ * @remarks
+ *
+ * Java boxes the items as `Double`'s, so that `==` would compare their
+ * references.
+ */
+export function floatsAreUnique(
+  numbers: Array<number>
+): boolean {
+  for (let i = 0; i < numbers.length; i++) {
+    for (let j = i + 1; j < numbers.length; j++) {
+      if (OurCommon.at(numbers, i) == OurCommon.at(numbers, j)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
  * Check whether `text` is one of the separators.
  */
 export function isSeparator(
@@ -390,6 +433,18 @@ class Verifier
     )) {
       yield new VerificationError(
         "Some strings must not be separators."
+      )
+    }
+
+    if (!(!containsByLoop(-500, that.someInts))) {
+      yield new VerificationError(
+        "Some ints must not contain -500."
+      )
+    }
+
+    if (!floatsAreUnique(that.someFloats)) {
+      yield new VerificationError(
+        "Some floats must be unique."
       )
     }
   }

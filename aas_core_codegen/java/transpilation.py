@@ -4,6 +4,7 @@ import ast
 import io
 import textwrap
 from typing import (
+    Final,
     Tuple,
     List,
     Mapping,
@@ -156,6 +157,27 @@ def _is_parenthesized_is_instance(node: parse_tree.Node) -> bool:
     an ``isinstance`` is checked against multiple classes.
     """
     return isinstance(node, parse_tree.IsInstance) and len(node.classes) > 1
+
+
+#: Map the primitive types to the primitive Java types which unbox their values,
+#: see :py:meth:`Transpiler.transform_comparison`
+_UNBOXED_TYPE_BY_PRIMITIVE_TYPE: Final[
+    Mapping[intermediate_type_inference.PrimitiveType, str]
+] = {
+    intermediate_type_inference.PrimitiveType.BOOL: "boolean",
+    intermediate_type_inference.PrimitiveType.INT: "long",
+    intermediate_type_inference.PrimitiveType.FLOAT: "double",
+}
+
+#: List the nodes which are transpiled to Java primitives, and never to boxed values,
+#: see :py:meth:`Transpiler.transform_comparison`
+_CERTAINLY_PRIMITIVE_NODE_TYPES: Final = (
+    parse_tree.Constant,
+    parse_tree.Add,
+    parse_tree.Sub,
+    parse_tree.Mod,
+    parse_tree.Neg,
+)
 
 
 class Transpiler(
@@ -647,12 +669,46 @@ new java.util.ArrayList<{item_type}>(
             parse_tree.Slice,
         )
 
-        if isinstance(node.left, no_parentheses_types) and isinstance(
-            node.right, no_parentheses_types
+        if not (
+            isinstance(node.left, no_parentheses_types)
+            and isinstance(node.right, no_parentheses_types)
         ):
-            return Stripped(f"{left} {comparator} {right}"), None
+            left = Stripped(f"({left})")
+            right = Stripped(f"({right})")
 
-        return Stripped(f"({left}) {comparator} ({right})"), None
+        # NOTE (mristin):
+        # We represent the integers, the floats and the booleans as ``Long``'s,
+        # ``Double``'s and ``Boolean``'s in the arguments, the properties and
+        # the collections. The operators ``==`` and ``!=`` compare the references of
+        # two such boxed values, which are equal only by chance, *e.g.*, for
+        # the ``Long``'s between -128 and 127, which Java caches. Hence, we unbox
+        # the left operand, unless an operand is certainly a primitive already, as
+        # Java then unboxes the other operand itself.
+        if node.op in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE):
+            left_primitive_type = intermediate_type_inference.try_primitive_type(
+                self.type_map[node.left]
+            )
+            right_primitive_type = intermediate_type_inference.try_primitive_type(
+                self.type_map[node.right]
+            )
+
+            unboxed_type = (
+                _UNBOXED_TYPE_BY_PRIMITIVE_TYPE.get(left_primitive_type, None)
+                if left_primitive_type is not None
+                else None
+            )
+
+            if (
+                unboxed_type is not None
+                and right_primitive_type is not None
+                and right_primitive_type
+                is not intermediate_type_inference.PrimitiveType.LENGTH
+                and not isinstance(node.left, _CERTAINLY_PRIMITIVE_NODE_TYPES)
+                and not isinstance(node.right, _CERTAINLY_PRIMITIVE_NODE_TYPES)
+            ):
+                left = Stripped(f"({unboxed_type}) {left}")
+
+        return Stripped(f"{left} {comparator} {right}"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(

@@ -234,6 +234,25 @@ bool IntsAreUnique(
   const std::vector<int64_t>& numbers
 );
 
+/// \brief Check whether \p number is in \p numbers, item by item.
+///
+/// Java boxes both \p number and the items as `Long`'s, so that `==`
+/// would compare their references. The test data looks up the numbers beyond -128
+/// and 127 on purpose, as Java caches the boxed values in that range, and
+/// the references would be equal by chance.
+bool ContainsByLoop(
+  int64_t number,
+  const std::vector<int64_t>& numbers
+);
+
+/// \brief Check that \p numbers are unique by comparing them pair-wise.
+///
+/// Java boxes the items as `Double`'s, so that `==` would compare their
+/// references.
+bool FloatsAreUnique(
+  const std::vector<double>& numbers
+);
+
 /// \brief Check whether \p text is one of the separators.
 bool IsSeparator(
   const std::wstring& text

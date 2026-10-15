@@ -92,6 +92,31 @@ bool IntsAreUnique(
   return true;
 }
 
+bool ContainsByLoop(
+  int64_t number,
+  const std::vector<int64_t>& numbers
+) {
+  for (int64_t other : numbers) {
+    if (other == number) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool FloatsAreUnique(
+  const std::vector<double>& numbers
+) {
+  for (size_t i = 0; i < numbers.size(); ++i) {
+    for (size_t j = i + (1); j < numbers.size(); ++j) {
+      if (numbers.at(i) == numbers.at(j)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 bool IsSeparator(
   const std::wstring& text
 ) {
@@ -304,6 +329,29 @@ bool Something_9(
   );
 }
 
+bool Something_10(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !verification::ContainsByLoop(
+    -500,
+    that->some_ints()
+  );
+}
+
+bool Something_11(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::FloatsAreUnique(
+    that->some_floats()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -351,6 +399,14 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_9,
           L"Some strings must not be separators."
+        },
+        {
+          &Something_10,
+          L"Some ints must not contain -500."
+        },
+        {
+          &Something_11,
+          L"Some floats must be unique."
         }
       };
       return checks;
