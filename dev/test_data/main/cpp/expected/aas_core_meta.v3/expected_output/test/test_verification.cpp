@@ -9,6 +9,8 @@
 
 #include <catch2/catch.hpp>
 
+#include <fstream>
+
 namespace our = aas_core::aas_3_0;
 
 void AssertNoVerificationError(

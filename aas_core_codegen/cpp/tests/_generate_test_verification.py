@@ -45,6 +45,8 @@ def generate_implementation(
 
 #include <catch2/catch.hpp>
 
+#include <fstream>
+
 namespace our = {library_namespace};"""
         ),
         Stripped(

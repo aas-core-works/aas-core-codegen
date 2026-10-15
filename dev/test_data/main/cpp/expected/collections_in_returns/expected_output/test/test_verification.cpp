@@ -9,6 +9,8 @@
 
 #include <catch2/catch.hpp>
 
+#include <fstream>
+
 namespace our = dummy;
 
 void AssertNoVerificationError(
