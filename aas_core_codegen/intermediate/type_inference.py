@@ -13,6 +13,7 @@ import ast
 import contextlib
 import enum
 from typing import (
+    AbstractSet,
     FrozenSet,
     Mapping,
     MutableMapping,
@@ -285,6 +286,7 @@ class BuiltinMethodKind(enum.Enum):
     SET_ADD = "set.add"
     SET_INTERSECTION = "set.intersection"
     SET_DIFFERENCE = "set.difference"
+    LIST_APPEND = "list.append"
 
 
 class BuiltinMethod:
@@ -470,6 +472,26 @@ SET_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
     SET_ADD.name: SET_ADD,
     SET_INTERSECTION.name: SET_INTERSECTION,
     SET_DIFFERENCE.name: SET_DIFFERENCE,
+}
+
+
+#: Represent ``list.append(item)``.
+#:
+#: The item has to be assignable to the items of the list, and the list has to be
+#: a local variable, see :py:func:`_check_appended_lists`. The call returns nothing,
+#: so it can only be a statement on its own.
+LIST_APPEND = BuiltinMethod(
+    kind=BuiltinMethodKind.LIST_APPEND,
+    name=Identifier("append"),
+    returns=PrimitiveTypeAnnotation(PrimitiveType.NONE),
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
+#: Map the names of the built-in methods on lists to their definitions
+LIST_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
+    LIST_APPEND.name: LIST_APPEND,
 }
 
 
@@ -1403,6 +1425,13 @@ class _Canonicalizer(parse_tree.RestrictedTransformer[str]):
         else:
             result = f"({values_joined})"
 
+        self.representation_map[node] = result
+        return result
+
+    def transform_list_literal(self, node: parse_tree.ListLiteral) -> str:
+        items = [self.transform(item) for item in node.items]
+
+        result = f"[{', '.join(items)}]"
         self.representation_map[node] = result
         return result
 
@@ -2367,6 +2396,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         argument_by_name: Mapping[Identifier, _types.Argument],
         enclosing_method: Optional[_types.UnderstoodMethod],
         returns: Optional[_types.TypeAnnotationUnion],
+        appended_name_set: AbstractSet[Identifier],
     ) -> None:
         """
         Initialize with the given values.
@@ -2378,6 +2408,9 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         The ``returns`` is the return type of the verification function or
         of the method, and ``None`` for a procedure or an invariant.
+
+        The ``appended_name_set`` gives the variables which are appended to,
+        see :py:func:`_collect_appended_names`.
         """
         # We need to create our own child environment so that we can introduce new
         # entries without affecting the variables from the outer scopes.
@@ -2388,6 +2421,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self._argument_by_name = argument_by_name
 
         self._enclosing_method = enclosing_method
+
+        self._appended_name_set = appended_name_set
 
         self._returns = (
             convert_type_annotation(returns)
@@ -2512,10 +2547,14 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         """
         Check that all the lists and the sets held by ``node`` are copies.
 
-        A copy is a list copied with ``list(...)`` or a new set, possibly as an item
-        of a tuple literal.
+        A copy is a list copied with ``list(...)``, a list literal or a new set,
+        possibly as an item of a tuple literal.
         """
-        if _is_list_copy(node, self.type_map) or _is_new_set(node, self.type_map):
+        if (
+            _is_list_copy(node, self.type_map)
+            or isinstance(node, parse_tree.ListLiteral)
+            or _is_new_set(node, self.type_map)
+        ):
             return True
 
         if isinstance(node, parse_tree.Tuple):
@@ -2624,9 +2663,12 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
             return None
 
-        if _is_list_copy(node, self.type_map):
+        if _is_list_copy(node, self.type_map) or isinstance(
+            node, parse_tree.ListLiteral
+        ):
             # NOTE (mristin):
-            # A copy of a list is a fresh value, and hence mutable.
+            # A copy of a list and a list literal are fresh values, and hence
+            # mutable.
             return None
 
         if _is_new_set(node, self.type_map):
@@ -2651,10 +2693,14 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         * ``None``,
         * a list copied with ``list(...)``, if its items hold no lists and no sets,
           since the copy is shallow,
+        * a list literal, since its items hold only the fresh lists and sets,
+          see :py:meth:`_transform_list_literal`,
         * a new set,
         * a local set variable, which is neither a loop variable nor read-only,
           since the local set variables can be assigned only the new sets and
           the results of the calls, see :py:func:`_check_sets`,
+        * a local list variable which is appended to, since it can be assigned
+          only the fresh lists, see :py:func:`_check_appended_lists`,
         * the result of a call, since the verification functions and the methods
           return only the fresh values themselves, and
         * a tuple literal of fresh values.
@@ -2668,12 +2714,22 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 list_type.items
             )
 
-        if isinstance(node, (parse_tree.FunctionCall, parse_tree.MethodCall)):
+        if isinstance(
+            node,
+            (parse_tree.FunctionCall, parse_tree.MethodCall, parse_tree.ListLiteral),
+        ):
             return True
 
         if isinstance(node, parse_tree.Name):
+            type_anno = beneath_optional(self.type_map[node])
             return (
-                isinstance(beneath_optional(self.type_map[node]), SetTypeAnnotation)
+                (
+                    isinstance(type_anno, SetTypeAnnotation)
+                    or (
+                        isinstance(type_anno, ListTypeAnnotation)
+                        and node.identifier in self._appended_name_set
+                    )
+                )
                 and node.identifier not in self._argument_by_name
                 and node.identifier not in self._loop_variable_set
                 and self._read_only_reason(node) is None
@@ -3109,6 +3165,25 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             self.type_map[node] = set_method_type
             return set_method_type
 
+        if isinstance(instance_type, ListTypeAnnotation):
+            list_method = LIST_METHODS_BY_NAME.get(node.name, None)
+            if list_method is None:
+                supported = ", ".join(
+                    repr(name) for name in sorted(LIST_METHODS_BY_NAME.keys())
+                )
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The member {node.name!r} is not supported on lists; "
+                        f"we support only the following methods: {supported}",
+                    )
+                )
+                return None
+
+            list_method_type = BuiltinMethodTypeAnnotation(method=list_method)
+            self.type_map[node] = list_method_type
+            return list_method_type
+
         if try_primitive_type(instance_type) is PrimitiveType.STR:
             builtin_method = STR_METHODS_BY_NAME.get(node.name, None)
             if builtin_method is None:
@@ -3543,6 +3618,125 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.type_map[node] = result
         return result
 
+    def _transform_list_literal(
+        self,
+        node: parse_tree.ListLiteral,
+        target_type: Optional["TypeAnnotationUnion"],
+    ) -> Optional["TypeAnnotationUnion"]:
+        """
+        Infer the type of the list literal ``node``.
+
+        If the literal is assigned to a list, *e.g.*, to a variable declared as
+        ``x: List[Abstract_item] = [...]`` or returned from a function returning
+        a list, the list literal is of the ``target_type``. Otherwise, we infer
+        the type of the items from the first item. Python infers the type of
+        the empty list from the declaration, *e.g.*, ``x: List[str] = []``, and
+        so do we.
+        """
+        item_types = []  # type: List[TypeAnnotationUnion]
+        failed = False
+        for item in node.items:
+            item_type = self.transform(item)
+            if item_type is None:
+                failed = True
+
+            elif isinstance(item_type, OptionalTypeAnnotation):
+                self.errors.append(
+                    Error(
+                        item.original_node,
+                        f"The items of a list literal can not be None, as we "
+                        f"support Optional only at the top of a type annotation, "
+                        f"but the item is inferred to be {item_type}. Please check "
+                        f"first that the item is not None, *e.g.*, with "
+                        f"``if {self._representation_map[item]} is not None:``.",
+                    )
+                )
+                failed = True
+
+            elif _holds_list_or_set(item_type) and not self._is_copy(item):
+                self.errors.append(
+                    Error(
+                        item.original_node,
+                        f"The item {self._representation_map[item]} of the list "
+                        f"literal holds lists or sets, which Python would share, "
+                        f"but C++ would copy. We can not transpile the sharing to "
+                        f"C++, so please use an explicit copy, *e.g.*, a list "
+                        f"copied with ``list(...)``, a list literal or a new set.",
+                    )
+                )
+                failed = True
+
+            else:
+                item_types.append(item_type)
+
+        if failed:
+            return None
+
+        target_type_beneath = (
+            beneath_optional(target_type) if target_type is not None else None
+        )
+
+        result: ListTypeAnnotation
+        if isinstance(target_type_beneath, ListTypeAnnotation):
+            result = target_type_beneath
+
+        elif len(item_types) == 0:
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    "We support an empty list literal ``[]`` only as the value "
+                    "assigned to a list, *e.g.*, ``x: List[str] = []``, or as "
+                    "the value returned from a function which returns a list, "
+                    "since the targets need to know the type of the items of "
+                    "the new list"
+                    + (
+                        "."
+                        if target_type is None
+                        else f", but the target is of type {target_type}."
+                    ),
+                )
+            )
+            return None
+
+        else:
+            # NOTE (mristin):
+            # The lengths are integers in the meta-model, so a list of lengths is
+            # a list of integers.
+            first_item_type = item_types[0]
+            result = ListTypeAnnotation(
+                items=(
+                    PrimitiveTypeAnnotation(PrimitiveType.INT)
+                    if isinstance(first_item_type, PrimitiveTypeAnnotation)
+                    and first_item_type.a_type is PrimitiveType.LENGTH
+                    else first_item_type
+                )
+            )
+
+        for item, item_type in zip(node.items, item_types):
+            if not _assignable(target_type=result.items, value_type=item_type):
+                self.errors.append(
+                    Error(
+                        item.original_node,
+                        f"Expected the items of the list literal to be assignable "
+                        f"to {result.items}, but got: {item_type}. If the items "
+                        f"are of different types, please declare the type of "
+                        f"the list explicitly, *e.g.*, "
+                        f"``x: List[...] = {self._representation_map[node]}``.",
+                    )
+                )
+                failed = True
+
+        if failed:
+            return None
+
+        self.type_map[node] = result
+        return result
+
+    def transform_list_literal(
+        self, node: parse_tree.ListLiteral
+    ) -> Optional["TypeAnnotationUnion"]:
+        return self._transform_list_literal(node=node, target_type=None)
+
     def transform_comparison(
         self, node: parse_tree.Comparison
     ) -> Optional["TypeAnnotationUnion"]:
@@ -3942,6 +4136,105 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     Error(
                         node.original_node,
                         f"The ``add`` mutates the set, but {reason}.",
+                    )
+                )
+                return None
+
+        elif method.kind is BuiltinMethodKind.LIST_APPEND:
+            receiver = node.member.instance
+            list_type = self.type_map[receiver]
+            assert isinstance(list_type, ListTypeAnnotation)
+
+            # NOTE (mristin):
+            # Go appends to a slice with ``items = append(items, item)``, which
+            # gives a new slice whenever the array beneath it has to grow. Only
+            # the appended variable sees the new slice, so we support ``append``
+            # only on the local variables, which nobody else sees,
+            # see :py:func:`_check_appended_lists`.
+            what = None  # type: Optional[str]
+            if not isinstance(receiver, parse_tree.Name):
+                what = "not a variable"
+            elif receiver.identifier in self._argument_by_name:
+                what = "an argument"
+            elif receiver.identifier in self._loop_variable_set:
+                what = "a loop variable"
+            else:
+                pass
+
+            if what is not None:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"We support ``append`` only on a local list variable, "
+                        f"but {self._representation_map[receiver]} is {what}. "
+                        f"Python appends to the list in place, while "
+                        f"Go appends to a slice with "
+                        f"``items = append(items, item)``, which gives a new "
+                        f"slice whenever the array beneath it has to grow. Only "
+                        f"the appended variable sees the new slice, so that "
+                        f"the caller, the instance or the collection holding "
+                        f"the list would miss the appended item in Go. Please "
+                        f"build a local list instead, *e.g.*, "
+                        f"``items: List[...] = []``, append to it, and then "
+                        f"return it, or assign a copy of it with "
+                        f"``list(items)``.",
+                    )
+                )
+                return None
+
+            assert isinstance(receiver, parse_tree.Name)
+
+            # NOTE (mristin):
+            # The targets represent an optional list differently, *e.g.*, Go as
+            # a pointer to a slice, and C++ as an optional, so that the appended
+            # optional variable would need to be re-assigned in Go, but not in C++.
+            declared_type = self._environment.find(receiver.identifier)
+            if isinstance(declared_type, OptionalTypeAnnotation):
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"We support ``append`` only on a local list variable "
+                        f"which is not optional, but the variable "
+                        f"{receiver.identifier!r} is declared as {declared_type}. "
+                        f"The targets represent an optional list differently, "
+                        f"*e.g.*, Go as a pointer to a slice and C++ as "
+                        f"an optional, so that they disagree on how to append to "
+                        f"it. Please declare the variable as a list, *e.g.*, "
+                        f"``{receiver.identifier}: {declared_type.value} = []``.",
+                    )
+                )
+                return None
+
+            reason = self._read_only_reason(receiver)
+            if reason is not None:
+                self.errors.append(
+                    Error(
+                        node.original_node,
+                        f"The ``append`` mutates the list, but {reason}.",
+                    )
+                )
+                return None
+
+            if not _assignable(target_type=list_type.items, value_type=arg_types[0]):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the item appended to {list_type} to be "
+                        f"assignable to {list_type.items}, but got: {arg_types[0]}",
+                    )
+                )
+                return None
+
+            if _holds_list_or_set(arg_types[0]) and not self._is_copy(node.args[0]):
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"The item appended to "
+                        f"{self._representation_map[receiver]} holds lists or "
+                        f"sets, which Python would share, but C++ would copy. We "
+                        f"can not transpile the sharing to C++, so please append "
+                        f"an explicit copy, *e.g.*, a list copied with "
+                        f"``list(...)``, a list literal or a new set.",
                     )
                 )
                 return None
@@ -5667,6 +5960,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             value_type = self._transform_new_set(
                 node=node.value, target_type=target_type
             )
+        elif isinstance(node.value, parse_tree.ListLiteral):
+            value_type = self._transform_list_literal(
+                node=node.value, target_type=target_type
+            )
         else:
             value_type = self.transform(node.value)
 
@@ -6039,7 +6336,11 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self, node: parse_tree.Return
     ) -> Optional["TypeAnnotationUnion"]:
         if node.value is not None:
-            value_type = self.transform(node.value)
+            value_type = (
+                self._transform_list_literal(node=node.value, target_type=self._returns)
+                if isinstance(node.value, parse_tree.ListLiteral)
+                else self.transform(node.value)
+            )
             if value_type is None:
                 return None
 
@@ -7037,6 +7338,237 @@ def _check_sets(
     return errors
 
 
+def _collect_appended_names(body: Sequence[parse_tree.Node]) -> Set[Identifier]:
+    """
+    Collect the names of the variables appended to in the ``body``.
+
+    We collect them syntactically, before the type inference, since we need them to
+    decide on the freshness of the returned values, see
+    :py:meth:`_Inferrer._is_fresh`. Only the lists have ``append``, and the type
+    inference refuses it on all the other types.
+    """
+    return {
+        node.member.instance.identifier
+        for node_in_body in body
+        for node in parse_tree.over_nodes(node_in_body)
+        if isinstance(node, parse_tree.MethodCall)
+        and node.member.name == "append"
+        and isinstance(node.member.instance, parse_tree.Name)
+    }
+
+
+def _check_appended_lists(
+    body: Sequence[parse_tree.Node],
+    type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
+    representation_map: Mapping[parse_tree.Node, str],
+) -> List[Error]:
+    """
+    Check that the lists appended to in the ``body`` are never aliased.
+
+    Python appends to a list in place, so that all the variables, properties and
+    tuples which share the list see the appended item. Go appends to a slice with
+    ``items = append(items, item)``, which gives a new slice whenever the array
+    beneath it has to grow, and only the appended variable sees the new slice.
+    C++ copies a list on an assignment, so that a copy never sees the appended
+    item. Hence, the targets disagree on the aliases of a list appended to.
+
+    The type inference already allows ``append`` only on the local variables, see
+    :py:meth:`_Inferrer._transform_builtin_method_call`, and reports the other
+    calls, which we skip here. We check that such a local list is never aliased. It can be the receiver of ``append``,
+    the container of ``in``, the collection of a for-loop, an argument of a call,
+    such as ``len``, the collection of an index or of a slice and the returned
+    value. It can be the target of
+    an assignment only of a fresh list, *i.e.*, a list literal, a list copied with
+    ``list(...)`` or the result of a call. Elsewhere, *e.g.*, in ``b = items``,
+    in a tuple literal or as the value assigned to a property, the list would be
+    aliased.
+
+    The ``append`` returns nothing, so it can only be a statement on its own.
+
+    A list can not be appended to in a for-loop over it, as the targets disagree on
+    that: Python and TypeScript iterate over the appended items as well, Go does
+    not, C# and Java throw an exception, and the behavior is undefined in C++.
+    """
+    appends = []  # type: List[parse_tree.MethodCall]
+    appended_name_set = set()  # type: Set[Identifier]
+
+    for node_in_body in body:
+        for node in parse_tree.over_nodes(node_in_body):
+            if not isinstance(node, parse_tree.MethodCall):
+                continue
+
+            # NOTE (mristin):
+            # A call is in ``type_map`` only if its inference succeeded.
+            member_type = type_map.get(node.member, None)
+            if (
+                node in type_map
+                and isinstance(member_type, BuiltinMethodTypeAnnotation)
+                and member_type.method.kind is BuiltinMethodKind.LIST_APPEND
+                and isinstance(node.member.instance, parse_tree.Name)
+            ):
+                appends.append(node)
+                appended_name_set.add(node.member.instance.identifier)
+
+    if len(appends) == 0:
+        return []
+
+    def is_appended_list(node: parse_tree.Node) -> bool:
+        """Check that ``node`` is a variable of a list appended to."""
+        type_anno = type_map.get(node, None)
+        return (
+            isinstance(node, parse_tree.Name)
+            and node.identifier in appended_name_set
+            and type_anno is not None
+            and isinstance(beneath_optional(type_anno), ListTypeAnnotation)
+        )
+
+    allowed_set = set()  # type: Set[parse_tree.Node]
+    statement_calls = set()  # type: Set[parse_tree.Node]
+    appended_nodes = []  # type: List[parse_tree.Name]
+    assignments = []  # type: List[parse_tree.Assignment]
+    loops = []  # type: List[parse_tree.For]
+
+    for node_in_body in body:
+        for node in parse_tree.over_nodes(node_in_body):
+            if isinstance(node, parse_tree.IsIn):
+                allowed_set.add(node.container)
+
+            elif isinstance(node, parse_tree.Assignment):
+                allowed_set.add(node.target)
+                assignments.append(node)
+
+            elif isinstance(node, parse_tree.Return):
+                if node.value is not None:
+                    allowed_set.add(node.value)
+
+            elif isinstance(node, parse_tree.ExpressionStatement):
+                statement_calls.add(node.expression)
+
+            elif isinstance(node, (parse_tree.MethodCall, parse_tree.FunctionCall)):
+                allowed_set.update(node.args)
+
+            elif isinstance(node, parse_tree.Member):
+                allowed_set.add(node.instance)
+
+            elif isinstance(node, parse_tree.Index):
+                allowed_set.add(node.collection)
+
+            elif isinstance(node, parse_tree.Slice):
+                allowed_set.add(node.collection)
+
+            elif isinstance(node, parse_tree.For):
+                loops.append(node)
+
+                if isinstance(node.generator, parse_tree.ForEach):
+                    allowed_set.add(node.generator.iteration)
+
+            else:
+                pass
+
+            if is_appended_list(node):
+                assert isinstance(node, parse_tree.Name)
+                appended_nodes.append(node)
+
+    errors = []  # type: List[Error]
+
+    for node in appended_nodes:
+        if node in allowed_set:
+            continue
+
+        name = node.identifier
+        errors.append(
+            Error(
+                node.original_node,
+                f"The list {name!r} is appended to, so we support it only as "
+                f"the receiver of ``append``, the container of ``in``, "
+                f"the collection of a for-loop, an argument of a call, such as "
+                f"``len({name})``, the collection of an index or of a slice, "
+                f"the returned value, and the target of an assignment of a fresh "
+                f"list. Here it would be "
+                f"aliased, *e.g.*, as in ``other = {name}``, in a tuple literal or "
+                f"as the value assigned to a property, and the targets disagree "
+                f"on the aliases of a list appended to: Python appends to "
+                f"the list in place, so that all the aliases see the appended "
+                f"items. Go appends to a slice with "
+                f"``{name} = append({name}, item)``, which gives a new slice "
+                f"whenever the array beneath it has to grow, so that the aliases "
+                f"miss the items appended afterwards. C++ copies the list on "
+                f"an assignment, so that the copy never sees the items appended "
+                f"afterwards. Please copy the list explicitly with "
+                f"``list({name})`` instead.",
+            )
+        )
+
+    for assignment in assignments:
+        if not is_appended_list(assignment.target):
+            continue
+
+        assert isinstance(assignment.target, parse_tree.Name)
+
+        value = assignment.value
+        if isinstance(
+            value,
+            (parse_tree.ListLiteral, parse_tree.FunctionCall, parse_tree.MethodCall),
+        ):
+            continue
+
+        name = assignment.target.identifier
+        value_repr = representation_map[value]
+        errors.append(
+            Error(
+                value.original_node,
+                f"The list {name!r} is appended to, so it can be assigned only "
+                f"a fresh list, *i.e.*, a list literal, a list copied with "
+                f"``list(...)`` or the result of a call, but got: {value_repr}. "
+                f"The list {name!r} would be an alias of {value_repr}, and "
+                f"the targets disagree on the aliases of a list appended to: "
+                f"Python appends to the list in place, so that {value_repr} "
+                f"would see the appended items as well. Go appends to a slice "
+                f"with ``{name} = append({name}, item)``, which gives a new slice "
+                f"whenever the array beneath it has to grow, so that {value_repr} "
+                f"would miss the items appended afterwards. C++ copies the list "
+                f"on an assignment, so that {value_repr} would never see "
+                f"the appended items. Please assign an explicit copy, "
+                f"``{name} = list({value_repr})``, instead.",
+            )
+        )
+
+    errors.extend(
+        Error(
+            append.original_node,
+            "The ``append`` of a list returns nothing, so it can only be called as "
+            "a statement on its own.",
+        )
+        for append in appends
+        if append not in statement_calls
+    )
+
+    for loop in loops:
+        if not isinstance(loop.generator, parse_tree.ForEach):
+            continue
+
+        iterated = representation_map[loop.generator.iteration]
+
+        nodes_in_loop = {
+            node for stmt in loop.body for node in parse_tree.over_nodes(stmt)
+        }
+
+        errors.extend(
+            Error(
+                append.original_node,
+                f"The list {iterated} can not be appended to in the for-loop over "
+                f"it, since the targets disagree on that: Python and TypeScript "
+                f"iterate over the appended items as well, Go does not, C# and "
+                f"Java throw an exception, and the behavior is undefined in C++.",
+            )
+            for append in appends
+            if append in nodes_in_loop
+            and representation_map[append.member.instance] == iterated
+        )
+
+    return errors
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _infer_for_function(
     body: Sequence[parse_tree.Node],
@@ -7064,6 +7596,7 @@ def _infer_for_function(
         argument_by_name={arg.name: arg for arg in arguments},
         enclosing_method=enclosing_method,
         returns=returns,
+        appended_name_set=_collect_appended_names(body),
     )
 
     for node_in_body in body:
@@ -7072,6 +7605,13 @@ def _infer_for_function(
     type_inferrer.errors.extend(_check_nones(body=body, returns=returns))
     type_inferrer.errors.extend(
         _check_sets(
+            body=body,
+            type_map=type_inferrer.type_map,
+            representation_map=canonicalizer.representation_map,
+        )
+    )
+    type_inferrer.errors.extend(
+        _check_appended_lists(
             body=body,
             type_map=type_inferrer.type_map,
             representation_map=canonicalizer.representation_map,
@@ -7245,6 +7785,7 @@ def infer_for_invariant(
         argument_by_name=dict(),
         enclosing_method=None,
         returns=None,
+        appended_name_set=frozenset(),
     )
 
     _ = type_inferrer.transform(invariant.body)

@@ -62,6 +62,46 @@ Path = our_reporting.Path
 Error = our_reporting.Error
 
 
+def names_of(
+    simples: Sequence[our_types.Simple]
+) -> List[str]:
+    """Give the names of :paramref:`simples` in the same order."""
+    # pylint: disable=all
+    names: List[str] = []
+    for simple in simples:
+        names.append(simple.name)
+    return names
+
+
+def simples_with(
+    simple: our_types.Simple,
+    simples: Sequence[our_types.Simple]
+) -> List[our_types.Simple]:
+    """Give :paramref:`simple` followed by :paramref:`simples`."""
+    # pylint: disable=all
+    result = [simple]
+    for other in simples:
+        result.append(other)
+    return result
+
+
+def some_items_of(
+    items: Sequence[our_types.AbstractItem]
+) -> List[our_types.AbstractItem]:
+    """
+    Give the instances of :py:class:`.types.SomeItem` among :paramref:`items`.
+
+    The appended items are narrowed down to :py:class:`.types.SomeItem`, while the list
+    holds :py:class:`.types.AbstractItem`'s.
+    """
+    # pylint: disable=all
+    result: List[our_types.AbstractItem] = []
+    for item in items:
+        if isinstance(item, our_types.SomeItem):
+            result.append(item)
+    return result
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -108,6 +148,29 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
+        if not (
+            all(
+                len(name) > 0
+                for name in names_of(that.some_simples)
+            )
+        ):
+            yield Error(
+                'Names of some simples must not be empty.'
+            )
+
+        if not (
+            (len(simples_with(that.item, that.some_simples))) == (len(that.some_simples) + 1)
+        ):
+            yield Error(
+                'Item followed by some simples must be one longer than some ' +
+                'simples.'
+            )
+
+        if not (len(some_items_of(that.some_items)) <= 1):
+            yield Error(
+                'At most one of some items must be a some item.'
+            )
+
         for error in verify(that.item):
             error.path._prepend(
                 PropertySegment(

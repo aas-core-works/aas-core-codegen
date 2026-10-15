@@ -31,6 +31,33 @@ import java.util.List;
 
 public class Verification {
   /**
+   * Check whether {@code result} is one of the known results.
+   */
+  public static Boolean isKnown(
+    Result result) {
+    for (var known : new java.util.ArrayList<Result>(java.util.List.of(Result.OK, Result.FAIL))) {
+        if (known == result) {
+            return true;
+        }
+    }
+    return false;
+  }
+
+  /**
+   * Give the failures among {@code results}.
+   */
+  public static List<Result> failuresOf(
+    List<Result> results) {
+    List<Result> failures = new java.util.ArrayList<Result>();
+    for (var result : results) {
+        if (result == Result.FAIL) {
+            failures.add(result);
+        }
+    }
+    return failures;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -56,6 +83,22 @@ public class Verification {
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!(
+        that.getSomeResults().stream().allMatch(
+            result -> isKnown(result)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some results must be known.")));
+      }
+
+      if (!((failuresOf(that.getSomeResults())).size() <= 1)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some results must contain at most one failure.")));
+      }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
         Stream.of(that.getSomeResults())

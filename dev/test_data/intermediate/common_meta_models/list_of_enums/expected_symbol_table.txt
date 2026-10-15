@@ -77,7 +77,57 @@ SymbolTable(
               name='some_results',
               argument='some_results',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Some results must be known.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='result',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_results',
+                  original_node=...),
+                original_node=...),
+              condition=FunctionCall(
+                name='is_known',
+                args=[
+                  Name(
+                    identifier='result',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some results must contain at most one failure.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  FunctionCall(
+                    name='failures_of',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_results',
+                        original_node=...)],
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=1,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       description=None,
@@ -99,9 +149,71 @@ SymbolTable(
   named_unions=[],
   constants=[],
   constants_by_name=...,
-  verification_functions=[],
+  verification_functions=[
+    TranspilableVerification(
+      name='is_known',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='result',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Result',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="result">result</ReferenceToArgument> is one of the known results.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='failures_of',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='results',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Result',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=ListTypeAnnotation(
+        items=OurTypeAnnotation(
+          our_type='Reference to our type Result',
+          parsed=...),
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Give the failures among <ReferenceToArgument refuri="results">results</ReferenceToArgument>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
-    description=None,
+    description=DescriptionOfMetaModel(
+      summary='<paragraph>Check the lists of enumeration literals, their list literals and <literal>append</literal>.</paragraph>',
+      remarks=[],
+      constraints_by_identifier=[],
+      parsed=...),
     version='dummy',
     xml_namespace='https://dummy.com'))

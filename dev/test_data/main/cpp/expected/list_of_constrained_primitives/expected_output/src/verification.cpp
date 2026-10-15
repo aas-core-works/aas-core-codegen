@@ -37,6 +37,31 @@ Error::Error(
 
 // endregion struct Error
 
+// region Verification functions
+
+std::vector<std::wstring> NamesWith(
+  const std::wstring& name,
+  const std::vector<std::wstring>& names
+) {
+  auto result = std::vector<std::wstring>{name};
+  for (const std::wstring& other : names) {
+    result.push_back(other);
+  }
+  return result;
+}
+
+std::vector<std::wstring> InitialsOf(
+  const std::vector<std::wstring>& names
+) {
+  std::vector<std::wstring> initials = std::vector<std::wstring>();
+  for (const std::wstring& name : names) {
+    initials.push_back(common::SliceStr(name, 0, 1));
+  }
+  return initials;
+}
+
+// endregion Verification functions
+
 namespace {
 
 /**
@@ -45,7 +70,8 @@ namespace {
  * A shape tells which checks apply to a value, see \ref ChecksOf.
  */
 enum class Shape : std::uint32_t {
-  kName = 0
+  kName = 0,
+  kSomething = 1
 };  // enum class Shape
 
 /**
@@ -74,6 +100,39 @@ bool Name_0(
   return common::LenStr(that) > 0;
 }
 
+bool Something_0(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](std::wstring name) -> bool {
+      return (verification::NamesWith(
+        name,
+        that->some_names()
+      ).size()) == (that->some_names().size() + (1));
+    },
+    that->some_names()
+  );
+}
+
+bool Something_1(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](std::wstring initial) -> bool {
+      return initial != L"x";
+    },
+    verification::InitialsOf(
+      that->some_names()
+    )
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -84,6 +143,20 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Name_0,
           L"Non-empty"
+        }
+      };
+      return checks;
+    }
+    case Shape::kSomething: {
+      static const std::vector<Check> checks = {
+        {
+          &Something_0,
+          L"Each name followed by some names must be one longer than "
+          L"some names."
+        },
+        {
+          &Something_1,
+          L"Some names must not start with x."
         }
       };
       return checks;
@@ -269,6 +342,113 @@ std::unique_ptr<IIterator> One(
   Shape shape
 ) {
   return common::make_unique<OneIterator>(value, shape);
+}
+
+/**
+ * \brief Iterate over the values of the children, one child after another.
+ *
+ * A child is started only once the previous child is done.
+ */
+class ChainIterator : public IIterator {
+ public:
+  explicit ChainIterator(
+    std::vector<std::unique_ptr<IIterator> > children
+  ) :
+    children_(std::move(children)),
+    active_(0) {
+    // Intentionally empty.
+  }
+
+  ChainIterator(const ChainIterator& other) :
+    active_(other.active_) {
+    children_.reserve(other.children_.size());
+    for (const std::unique_ptr<IIterator>& child : other.children_) {
+      children_.emplace_back(child->Clone());
+    }
+  }
+
+  void Start() override {
+    active_ = 0;
+    if (!children_.empty()) {
+      children_[0]->Start();
+    }
+    SkipDoneChildren();
+  }
+
+  void Next() override {
+    children_[active_]->Next();
+    SkipDoneChildren();
+  }
+
+  bool Done() const override {
+    return active_ >= children_.size();
+  }
+
+  const void* Value() const override {
+    return children_[active_]->Value();
+  }
+
+  Shape ShapeOf() const override {
+    return children_[active_]->ShapeOf();
+  }
+
+  void AppendToPath(iteration::Path& path) const override {
+    children_[active_]->AppendToPath(path);
+  }
+
+  std::unique_ptr<IIterator> Clone() const override {
+    return common::make_unique<ChainIterator>(*this);
+  }
+
+ private:
+  std::vector<std::unique_ptr<IIterator> > children_;
+
+  /**
+   * Index of the child we currently iterate over
+   */
+  std::size_t active_;
+
+  /**
+   * Move on to the next children, and start them, until one is not done.
+   */
+  void SkipDoneChildren() {
+    while (active_ < children_.size() && children_[active_]->Done()) {
+      ++active_;
+      if (active_ < children_.size()) {
+        children_[active_]->Start();
+      }
+    }
+  }
+};  // class ChainIterator
+
+void CollectChildren(
+  std::vector<std::unique_ptr<IIterator> >&
+) {
+  // Intentionally empty, as there are no more children to collect.
+}
+
+template<typename... Rest>
+void CollectChildren(
+  std::vector<std::unique_ptr<IIterator> >& children,
+  std::unique_ptr<IIterator> first,
+  Rest... rest
+) {
+  children.emplace_back(std::move(first));
+  CollectChildren(children, std::move(rest)...);
+}
+
+// NOTE (mristin):
+// We can not use an initializer list here, as we can not move the unique pointers
+// out of it.
+template<typename... Children>
+std::unique_ptr<IIterator> Chain(
+  Children... children
+) {
+  std::vector<std::unique_ptr<IIterator> > collected;
+  collected.reserve(sizeof...(Children));
+  CollectChildren(collected, std::move(children)...);
+
+  return common::make_unique<ChainIterator>(std::move(collected));
 }
 
 /**
@@ -466,9 +646,12 @@ std::unique_ptr<IIterator> Over_Something(
   const types::ISomething& that,
   bool recursive
 ) {
-  return InProperty(
-    iteration::Property::kSomeNames,
-    Over_listOf_Name(that.some_names(), recursive)
+  return Chain(
+    One(&that, Shape::kSomething),
+    InProperty(
+      iteration::Property::kSomeNames,
+      Over_listOf_Name(that.some_names(), recursive)
+    )
   );
 }
 

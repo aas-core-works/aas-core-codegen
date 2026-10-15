@@ -31,6 +31,49 @@ import java.util.List;
 
 public class Verification {
   /**
+   * Give the names of {@code simples} in the same order.
+   */
+  public static List<String> namesOf(
+    List<ISimple> simples) {
+    List<String> names = new java.util.ArrayList<String>();
+    for (var simple : simples) {
+        names.add(simple.getName());
+    }
+    return names;
+  }
+
+  /**
+   * Give {@code simple} followed by {@code simples}.
+   */
+  public static List<ISimple> simplesWith(
+    ISimple simple,
+    List<ISimple> simples) {
+    var result = (
+        new java.util.ArrayList<ISimple>(java.util.List.of(simple)));
+    for (var other : simples) {
+        result.add(other);
+    }
+    return result;
+  }
+
+  /**
+   * Give the instances of {@link dummy.types.impl.SomeItem} among {@code items}.
+   *
+   * <p>The appended items are narrowed down to {@link dummy.types.impl.SomeItem}, while the list
+   * holds {@link dummy.types.model.IAbstractItem}'s.
+   */
+  public static List<IAbstractItem> someItemsOf(
+    List<IAbstractItem> items) {
+    List<IAbstractItem> result = new java.util.ArrayList<IAbstractItem>();
+    for (var item : items) {
+        if (item instanceof ISomeItem) {
+            result.add(((ISomeItem) item));
+        }
+    }
+    return result;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -74,6 +117,31 @@ public class Verification {
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!(
+        namesOf(that.getSomeSimples()).stream().allMatch(
+            name -> StringHelpers.len(name) > 0))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Names of some simples must not be empty.")));
+      }
+
+      if (!(
+        ((simplesWith(that.getItem(), that.getSomeSimples())).size()) == (that.getSomeSimples().size() + 1))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Item followed by some simples must be one longer than some " +
+            "simples.")));
+      }
+
+      if (!((someItemsOf(that.getSomeItems())).size() <= 1)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "At most one of some items must be a some item.")));
+      }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
         Stream.of(that.getItem())

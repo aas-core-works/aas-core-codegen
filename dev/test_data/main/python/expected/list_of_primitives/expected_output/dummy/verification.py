@@ -62,6 +62,40 @@ Path = our_reporting.Path
 Error = our_reporting.Error
 
 
+def is_small_prime(
+    number: int
+) -> bool:
+    """Check whether :paramref:`number` is a prime smaller than 10."""
+    # pylint: disable=all
+    for prime in [2, 3, 5, 7]:
+        if prime == number:
+            return True
+    return False
+
+
+def count_and_lengths_of(
+    texts: Sequence[str]
+) -> List[int]:
+    """Give the number of :paramref:`texts` followed by their lengths."""
+    # pylint: disable=all
+    result = [len(texts)]
+    for text in texts:
+        result.append(len(text))
+    return result
+
+
+def positives_of(
+    numbers: Sequence[int]
+) -> List[int]:
+    """Give the positive :paramref:`numbers` in the same order."""
+    # pylint: disable=all
+    result: List[int] = []
+    for number in numbers:
+        if number > 0:
+            result.append(number)
+    return result
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -72,12 +106,31 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
-        # No verification has been defined for Something.
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        if not (
+            all(
+                not is_small_prime(number)
+                for number in that.some_ints
+            )
+        ):
+            yield Error(
+                'Some ints must not contain small primes.'
+            )
+
+        if not (
+            all(
+                number <= 10
+                for number in count_and_lengths_of(that.some_strings)
+            )
+        ):
+            yield Error(
+                'There must be at most 10 strings of at most 10 characters ' +
+                'each.'
+            )
+
+        if not (len(positives_of(that.some_ints)) <= 1):
+            yield Error(
+                'At most one of some ints must be positive.'
+            )
 
 
 _TRANSFORMER = _Transformer()

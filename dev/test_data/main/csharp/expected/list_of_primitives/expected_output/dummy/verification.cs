@@ -32,6 +32,56 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
+        /// Check whether <paramref name="number" /> is a prime smaller than 10.
+        /// </summary>
+        public static bool IsSmallPrime(
+            long number
+        )
+        {
+            foreach (var prime in new List<long> { 2, 3, 5, 7 })
+            {
+                if (prime == number)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }  // public static bool IsSmallPrime
+
+        /// <summary>
+        /// Give the number of <paramref name="texts" /> followed by their lengths.
+        /// </summary>
+        public static List<long> CountAndLengthsOf(
+            List<string> texts
+        )
+        {
+            var result = new List<long> { texts.Count };
+            foreach (var text in texts)
+            {
+                result.Add(Common.StringHelpers.Len(text));
+            }
+            return result;
+        }  // public static List<long> CountAndLengthsOf
+
+        /// <summary>
+        /// Give the positive <paramref name="numbers" /> in the same order.
+        /// </summary>
+        public static List<long> PositivesOf(
+            List<long> numbers
+        )
+        {
+            List<long> result = new List<long>();
+            foreach (var number in numbers)
+            {
+                if (number > 0)
+                {
+                    result.Add(number);
+                }
+            }
+            return result;
+        }  // public static List<long> PositivesOf
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -51,8 +101,32 @@ namespace dummy
                 Our.ISomething that
             )
             {
-                // No verification has been defined for Something.
-                yield break;
+                if (!(
+                    that.SomeInts.All(
+                        number => !Verification.IsSmallPrime(number))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some ints must not contain small primes.");
+                }
+
+                if (!(
+                    Verification.CountAndLengthsOf(that.SomeStrings).All(
+                        number => number <= 10)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "There must be at most 10 strings of at most 10 characters " +
+                        "each.");
+                }
+
+                if (!(
+                    (Verification.PositivesOf(that.SomeInts)).Count <= 1))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "At most one of some ints must be positive.");
+                }
             }
         }  // private class Transformer
 

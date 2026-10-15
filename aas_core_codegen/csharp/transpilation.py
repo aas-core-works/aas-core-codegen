@@ -582,6 +582,53 @@ class Transpiler(
         return csharp_common.generate_tuple_literal(value_reprs), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_list_literal(
+        self, node: parse_tree.ListLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        items = []  # type: List[Stripped]
+
+        # NOTE (mristin):
+        # A list of ``long`` does not accept a ``long?``, so we unwrap a narrowed
+        # nullable value type.
+        for item_node in node.items:
+            item, error = self._transform_and_unwrap_narrowed_nullable_value(item_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert item is not None
+            items.append(item)
+
+        list_type, error_message = generate_type(self.type_map[node])
+        if error_message is not None:
+            errors.append(Error(node.original_node, error_message))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the list literal", errors
+            )
+
+        if len(items) == 0:
+            return Stripped(f"new {list_type}()"), None
+
+        one_liner = f"new {list_type} {{ {', '.join(items)} }}"
+        if "\n" not in one_liner and len(one_liner) <= 60:
+            return Stripped(one_liner), None
+
+        items_joined = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+new {list_type}
+{{
+{I}{indent_but_first_line(items_joined, I)}
+}}"""
+            ),
+            None,
+        )
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(
         self, node: parse_tree.Comparison
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -874,6 +921,19 @@ class Transpiler(
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 # NOTE (mristin):
                 # A set of value types does not hold nullables, so we unwrap
+                # a narrowed item.
+                item, error = self._transform_and_unwrap_narrowed_nullable_value(
+                    node.args[0]
+                )
+                if error is not None:
+                    return None, error
+
+                assert item is not None
+                return Stripped(f"{parenthesized_instance}.Add({item})"), None
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.LIST_APPEND:
+                # NOTE (mristin):
+                # A list of value types does not hold nullables, so we unwrap
                 # a narrowed item.
                 item, error = self._transform_and_unwrap_narrowed_nullable_value(
                     node.args[0]

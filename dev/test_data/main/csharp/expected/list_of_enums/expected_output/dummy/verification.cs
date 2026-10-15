@@ -32,6 +32,41 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
+        /// Check whether <paramref name="result" /> is one of the known results.
+        /// </summary>
+        public static bool IsKnown(
+            Result result
+        )
+        {
+            foreach (var known in new List<Our.Result> { Result.Ok, Result.Fail })
+            {
+                if (known == result)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }  // public static bool IsKnown
+
+        /// <summary>
+        /// Give the failures among <paramref name="results" />.
+        /// </summary>
+        public static List<Result> FailuresOf(
+            List<Result> results
+        )
+        {
+            List<Our.Result> failures = new List<Our.Result>();
+            foreach (var result in results)
+            {
+                if (result == Result.Fail)
+                {
+                    failures.Add(result);
+                }
+            }
+            return failures;
+        }  // public static List<Result> FailuresOf
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -56,6 +91,23 @@ namespace dummy
                 Our.ISomething that
             )
             {
+                if (!(
+                    that.SomeResults.All(
+                        result => Verification.IsKnown(result))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some results must be known.");
+                }
+
+                if (!(
+                    (Verification.FailuresOf(that.SomeResults)).Count <= 1))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some results must contain at most one failure.");
+                }
+
                 foreach (
                     var error in Verification.Verify_ListOf_Result(
                         that.SomeResults))

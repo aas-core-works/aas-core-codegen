@@ -502,6 +502,24 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         self.is_pointer_map[node] = False
         return None
 
+    def transform_list_literal(self, node: parse_tree.ListLiteral) -> Optional[Error]:
+        last_error = None  # type: Optional[Error]
+        for item in node.items:
+            error = self.transform(item)
+
+            # NOTE (mristin):
+            # Do not immediately return so that other items are processed as well.
+            # This way we get a longer list of errors which the caller can report
+            # using :py:prop:`errors`.
+            if error is not None:
+                last_error = error
+
+        if last_error is not None:
+            return last_error
+
+        self.is_pointer_map[node] = False
+        return None
+
     def transform_is_none(self, node: parse_tree.IsNone) -> Optional[Error]:
         error = self.transform(node.value)
         if error is not None:
@@ -733,6 +751,15 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         error = self.transform(node.generator)
         if error is not None:
             return error
+
+        # NOTE (mristin):
+        # The for-each in a generator does not descend into the iteration, but we
+        # need to infer the is-pointer of the collection that we loop over as we
+        # transpile it, *e.g.*, of the arguments of a call giving the collection.
+        if isinstance(node.generator, parse_tree.ForEach):
+            error = self.transform(node.generator.iteration)
+            if error is not None:
+                return error
 
         try:
             loop_variable_type = self._type_map[node.generator.variable]

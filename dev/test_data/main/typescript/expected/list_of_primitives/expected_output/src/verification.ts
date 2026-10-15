@@ -190,6 +190,48 @@ export class VerificationError {
 }
 
 /**
+ * Check whether `number` is a prime smaller than 10.
+ */
+export function isSmallPrime(
+  number: number
+): boolean {
+  for (const prime of [2, 3, 5, 7]) {
+    if (prime == number) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Give the number of `texts` followed by their lengths.
+ */
+export function countAndLengthsOf(
+  texts: Array<string>
+): Array<number> {
+  const result = [texts.length];
+  for (const text of texts) {
+    result.push(OurCommon.lenStr(text));
+  }
+  return result;
+}
+
+/**
+ * Give the positive `numbers` in the same order.
+ */
+export function positivesOf(
+  numbers: Array<number>
+): Array<number> {
+  const result: Array<number> = [];
+  for (const number of numbers) {
+    if (number > 0) {
+      result.push(number);
+    }
+  }
+  return result;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -197,12 +239,44 @@ class Verifier
     boolean, IterableIterator<VerificationError>
   > {
   *transformSomethingWithContext(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     that: OurTypes.Something,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
-    // No verification has been defined for Something.
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someInts,
+          number =>
+            !isSmallPrime(number)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Some ints must not contain small primes."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          countAndLengthsOf(that.someStrings),
+          number =>
+            number <= 10
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "There must be at most 10 strings of at most 10 characters " +
+        "each."
+      )
+    }
+
+    if (!(positivesOf(that.someInts).length <= 1)) {
+      yield new VerificationError(
+        "At most one of some ints must be positive."
+      )
+    }
   }
 }
 

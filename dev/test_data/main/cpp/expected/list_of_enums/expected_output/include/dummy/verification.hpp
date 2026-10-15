@@ -212,6 +212,20 @@ class RecursiveVerification : public IVerification {
   const std::shared_ptr<types::IClass>& instance_;
 };  // class RecursiveVerification
 
+// region Verification functions
+
+/// \brief Check whether \p result is one of the known results.
+bool IsKnown(
+  types::Result result
+);
+
+/// \brief Give the failures among \p results.
+std::vector<types::Result> FailuresOf(
+  const std::vector<types::Result>& results
+);
+
+// endregion Verification functions
+
 }  // namespace verification
 /**@}*/
 

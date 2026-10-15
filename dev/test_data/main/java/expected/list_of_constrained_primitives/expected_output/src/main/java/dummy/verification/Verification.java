@@ -31,6 +31,32 @@ import java.util.List;
 
 public class Verification {
   /**
+   * Give {@code name} followed by {@code names}.
+   */
+  public static List<String> namesWith(
+    String name,
+    List<String> names) {
+    var result = (
+        new java.util.ArrayList<String>(java.util.List.of(name)));
+    for (var other : names) {
+        result.add(other);
+    }
+    return result;
+  }
+
+  /**
+   * Give the first characters of {@code names} in the same order.
+   */
+  public static List<String> initialsOf(
+    List<String> names) {
+    List<String> initials = new java.util.ArrayList<String>();
+    for (var name : names) {
+        initials.add(StringHelpers.slice(name, 0, 1));
+    }
+    return initials;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -44,6 +70,25 @@ public class Verification {
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!(
+        that.getSomeNames().stream().allMatch(
+            name -> ((namesWith(name, that.getSomeNames())).size()) == (that.getSomeNames().size() + 1)))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Each name followed by some names must be one longer than " +
+            "some names.")));
+      }
+
+      if (!(
+        initialsOf(that.getSomeNames()).stream().allMatch(
+            initial -> !Objects.equals(initial, "x")))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some names must not start with x.")));
+      }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
         Stream.of(that.getSomeNames())

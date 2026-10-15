@@ -508,6 +508,42 @@ OurCommon.at(
         return Stripped(f"[{joined}]"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_list_literal(
+        self, node: parse_tree.ListLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        items = []  # type: List[Stripped]
+
+        for item_node in node.items:
+            item, error = self.transform(item_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert item is not None
+            items.append(item)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the list literal", errors
+            )
+
+        one_liner = f"[{', '.join(items)}]"
+        if "\n" not in one_liner and len(one_liner) <= 60:
+            return Stripped(one_liner), None
+
+        items_joined = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+[
+{I}{indent_but_first_line(items_joined, I)}
+]"""
+            ),
+            None,
+        )
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_slice(
         self, node: parse_tree.Slice
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -619,6 +655,7 @@ OurCommon.at(
             parse_tree.Constant,
             parse_tree.Index,
             parse_tree.Slice,
+            parse_tree.ListLiteral,
         )
 
         if not isinstance(node.container, no_parentheses_types):
@@ -832,6 +869,9 @@ OurCommon.at(
 
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 return Stripped(f"{instance}.add({args[0]})"), None
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.LIST_APPEND:
+                return Stripped(f"{instance}.push({args[0]})"), None
 
             elif (
                 kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION

@@ -12,6 +12,7 @@ package verification
 
 import (
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
@@ -44,6 +45,42 @@ func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
 }
 
+// Check whether number is a prime smaller than 10.
+func IsSmallPrime(
+	number int64,
+) bool {
+	for _, prime := range []int64{2, 3, 5, 7} {
+		if prime == number {
+			return true
+		}
+	}
+	return false
+}
+
+// Give the number of texts followed by their lengths.
+func CountAndLengthsOf(
+	texts []string,
+) []int64 {
+	result := []int64{int64(len(texts))}
+	for _, text := range texts {
+		result = append(result, int64(ourcommon.LenStr(text)))
+	}
+	return result
+}
+
+// Give the positive numbers in the same order.
+func PositivesOf(
+	numbers []int64,
+) []int64 {
+	var result []int64 = []int64{}
+	for _, number := range numbers {
+		if number > 0 {
+			result = append(result, number)
+		}
+	}
+	return result
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -55,6 +92,50 @@ func VerifySomething(
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
+
+	if !(
+		ourcommon.All(
+			func(number int64) bool {
+				return !IsSmallPrime(number)
+			},
+			that.SomeInts(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some ints must not contain small primes.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.All(
+			func(number int64) bool {
+				return number <= 10
+			},
+			CountAndLengthsOf(that.SomeStrings()),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"There must be at most 10 strings of at most 10 characters " +
+				"each.",
+			),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(len(PositivesOf(that.SomeInts())) <= 1) {
+		abort = onError(
+			newVerificationError(
+				"At most one of some ints must be positive.",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	if that.SomeBools() == nil {
 		abort = onError(

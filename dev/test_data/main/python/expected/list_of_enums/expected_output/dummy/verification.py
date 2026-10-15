@@ -62,6 +62,29 @@ Path = our_reporting.Path
 Error = our_reporting.Error
 
 
+def is_known(
+    result: our_types.Result
+) -> bool:
+    """Check whether :paramref:`result` is one of the known results."""
+    # pylint: disable=all
+    for known in [our_types.Result.OK, our_types.Result.FAIL]:
+        if known == result:
+            return True
+    return False
+
+
+def failures_of(
+    results: Sequence[our_types.Result]
+) -> List[our_types.Result]:
+    """Give the failures among :paramref:`results`."""
+    # pylint: disable=all
+    failures: List[our_types.Result] = []
+    for result in results:
+        if result == our_types.Result.FAIL:
+            failures.append(result)
+    return failures
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -72,12 +95,20 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
-        # No verification has been defined for Something.
-        return
-        # For this uncommon return-yield construction, see:
-        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
-        # noinspection PyUnreachableCode
-        yield
+        if not (
+            all(
+                is_known(result)
+                for result in that.some_results
+            )
+        ):
+            yield Error(
+                'Some results must be known.'
+            )
+
+        if not (len(failures_of(that.some_results)) <= 1):
+            yield Error(
+                'Some results must contain at most one failure.'
+            )
 
 
 _TRANSFORMER = _Transformer()

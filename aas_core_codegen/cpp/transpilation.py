@@ -947,6 +947,73 @@ std::make_tuple(
             None,
         )
 
+    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
+        """
+        Convert the transpiled position ``node`` to an ``int64_t``.
+
+        The string helpers take the positions as ``int64_t``'s, our integers,
+        while the lengths are ``size_t``'s.
+        """
+        type_anno = self.type_map[node]
+        if (
+            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
+            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
+        ):
+            return Stripped(f"static_cast<int64_t>({code})")
+
+        return code
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_list_literal(
+        self, node: parse_tree.ListLiteral
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+        items = []  # type: List[Stripped]
+
+        for item_node in node.items:
+            item, error = self._transform_and_value_if_necessary(item_node)
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert item is not None
+
+            # NOTE (mristin):
+            # The lengths are ``size_t``'s, which an initializer list of our
+            # integers does not accept, as it would be a narrowing conversion.
+            items.append(self._as_int64_position(item_node, item))
+
+        list_type, error_msg = generate_type(
+            self.type_map[node], types_namespace=self._types_namespace
+        )
+        if error_msg is not None:
+            errors.append(Error(node.original_node, error_msg))
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the list literal", errors
+            )
+
+        assert list_type is not None
+
+        if len(items) == 0:
+            return Stripped(f"{list_type}()"), None
+
+        one_liner = f"{list_type}{{{', '.join(items)}}}"
+        if "\n" not in one_liner and len(one_liner) <= 60:
+            return Stripped(one_liner), None
+
+        items_joined = ",\n".join(items)
+        return (
+            Stripped(
+                f"""\
+{list_type}{{
+{I}{indent_but_first_line(items_joined, I)}
+}}"""
+            ),
+            None,
+        )
+
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(
         self, node: parse_tree.Comparison
@@ -1022,22 +1089,6 @@ std::make_tuple(
             return Stripped(f"{left} {comparator} {right}"), None
 
         return Stripped(f"({left}) {comparator} ({right})"), None
-
-    def _as_int64_position(self, node: parse_tree.Node, code: Stripped) -> Stripped:
-        """
-        Convert the transpiled position ``node`` to an ``int64_t``.
-
-        The string helpers take the positions as ``int64_t``'s, our integers,
-        while the lengths are ``size_t``'s.
-        """
-        type_anno = self.type_map[node]
-        if (
-            isinstance(type_anno, intermediate_type_inference.PrimitiveTypeAnnotation)
-            and type_anno.a_type is intermediate_type_inference.PrimitiveType.LENGTH
-        ):
-            return Stripped(f"static_cast<int64_t>({code})")
-
-        return code
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_is_in(
@@ -1400,6 +1451,17 @@ common::{contains_function}(
                 instance = Stripped(f"({instance})")
 
             return Stripped(f"{instance}.insert({item})"), None
+
+        elif kind is intermediate_type_inference.BuiltinMethodKind.LIST_APPEND:
+            # NOTE (mristin):
+            # The type inference allows ``append`` only on a local variable.
+            assert isinstance(node.member.instance, parse_tree.Name)
+
+            # NOTE (mristin):
+            # The lengths are ``size_t``'s, so we convert them to our integers.
+            item = self._as_int64_position(node.args[0], args[0])
+
+            return Stripped(f"{instance}.push_back({item})"), None
 
         elif (
             kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION

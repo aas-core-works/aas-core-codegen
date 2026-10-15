@@ -12,6 +12,7 @@ package verification
 
 import (
 	"fmt"
+	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourtypes "github.com/dummy-works/dummy/types"
 )
@@ -44,6 +45,31 @@ func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
 }
 
+// Check whether result is one of the known results.
+func IsKnown(
+	result ourtypes.Result,
+) bool {
+	for _, known := range []ourtypes.Result{ourtypes.ResultOk, ourtypes.ResultFail} {
+		if known == result {
+			return true
+		}
+	}
+	return false
+}
+
+// Give the failures among results.
+func FailuresOf(
+	results []ourtypes.Result,
+) []ourtypes.Result {
+	var failures []ourtypes.Result = []ourtypes.Result{}
+	for _, result := range results {
+		if result == ourtypes.ResultFail {
+			failures = append(failures, result)
+		}
+	}
+	return failures
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -55,6 +81,32 @@ func VerifySomething(
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
+
+	if !(
+		ourcommon.All(
+			func(result ourtypes.Result) bool {
+				return IsKnown(result)
+			},
+			that.SomeResults(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some results must be known.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(len(FailuresOf(that.SomeResults())) <= 1) {
+		abort = onError(
+			newVerificationError(
+				"Some results must contain at most one failure.",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	if that.SomeResults() == nil {
 		abort = onError(
