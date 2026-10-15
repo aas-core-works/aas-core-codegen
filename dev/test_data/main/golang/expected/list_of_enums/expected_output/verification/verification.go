@@ -70,6 +70,17 @@ func FailuresOf(
 	return failures
 }
 
+// Check whether result is in results.
+func IsInResults(
+	result ourtypes.Result,
+	results []ourtypes.Result,
+) bool {
+	return ourcommon.SliceContains(
+			results,
+			result,
+		)
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -102,6 +113,40 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"Some results must contain at most one failure.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!IsInResults(ourtypes.ResultFail, that.SomeResults()) ||
+		ourcommon.SliceContains(
+			that.SomeResults(),
+			ourtypes.ResultOk,
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some results must contain an ok if they contain a failure.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.All(
+			func(result ourtypes.Result) bool {
+				return ourcommon.SliceContains(
+						[]ourtypes.Result{ourtypes.ResultOk, ourtypes.ResultFail},
+						result,
+					)
+			},
+			that.SomeResults(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some results must be either ok or fail.",),
 		)
 		if abort {
 			return

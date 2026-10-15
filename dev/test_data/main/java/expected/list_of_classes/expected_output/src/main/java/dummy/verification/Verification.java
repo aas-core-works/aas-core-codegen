@@ -74,6 +74,33 @@ public class Verification {
   }
 
   /**
+   * Check whether {@code simple} is in {@code simples}.
+   *
+   * <p>The targets compare the instances of the classes by their references.
+   */
+  public static Boolean isInSimples(
+    ISimple simple,
+    List<ISimple> simples) {
+    return simples.contains(simple);
+  }
+
+  /**
+   * Check whether {@code simple} is in a local copy of {@code simples}.
+   *
+   * <p>The local copy is built with {@code append}, and holds the same instances as
+   * {@code simples}.
+   */
+  public static Boolean isInLocalCopyOfSimples(
+    ISimple simple,
+    List<ISimple> simples) {
+    List<ISimple> copied = new java.util.ArrayList<ISimple>();
+    for (var other : simples) {
+        copied.add(other);
+    }
+    return copied.contains(simple);
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -141,6 +168,24 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "At most one of some items must be a some item.")));
+      }
+
+      if (!(
+        !isInSimples(that.getItem(), that.getSomeSimples()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Item must not be one of some simples.")));
+      }
+
+      if (!(
+        that.getSomeSimples().stream().allMatch(
+            simple -> isInLocalCopyOfSimples(simple, that.getSomeSimples())))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Each of some simples must be in a local copy of some " +
+            "simples.")));
       }
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,

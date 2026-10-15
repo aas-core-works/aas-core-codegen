@@ -84,6 +84,37 @@ func SomeItemsOf(
 	return result
 }
 
+// Check whether simple is in simples.
+//
+// The targets compare the instances of the classes by their references.
+func IsInSimples(
+	simple ourtypes.ISimple,
+	simples []ourtypes.ISimple,
+) bool {
+	return ourcommon.SliceContains(
+			simples,
+			simple,
+		)
+}
+
+// Check whether simple is in a local copy of simples.
+//
+// The local copy is built with `append`, and holds the same instances as
+// simples.
+func IsInLocalCopyOfSimples(
+	simple ourtypes.ISimple,
+	simples []ourtypes.ISimple,
+) bool {
+	var copied []ourtypes.ISimple = []ourtypes.ISimple{}
+	for _, other := range simples {
+		copied = append(copied, other)
+	}
+	return ourcommon.SliceContains(
+			copied,
+			simple,
+		)
+}
+
 // Verify `that` instance of [ourtypes.ISomeItem].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -180,6 +211,34 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"At most one of some items must be a some item.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(!IsInSimples(that.Item(), that.SomeSimples())) {
+		abort = onError(
+			newVerificationError(
+				"Item must not be one of some simples.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.All(
+			func(simple ourtypes.ISimple) bool {
+				return IsInLocalCopyOfSimples(simple, that.SomeSimples())
+			},
+			that.SomeSimples(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Each of some simples must be in a local copy of some " +
+				"simples.",
+			),
 		)
 		if abort {
 			return

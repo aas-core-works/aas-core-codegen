@@ -681,10 +681,8 @@ OurCommon.at(
                 None,
             )
         elif (
-            isinstance(
-                container_type, intermediate_type_inference.PrimitiveTypeAnnotation
-            )
-            and container_type.a_type is intermediate_type_inference.PrimitiveType.STR
+            intermediate_type_inference.try_primitive_type(container_type)
+            is intermediate_type_inference.PrimitiveType.STR
         ):
             return Stripped(f"{container}.includes({member})"), None
         else:

@@ -102,6 +102,36 @@ def some_items_of(
     return result
 
 
+def is_in_simples(
+    simple: our_types.Simple,
+    simples: Sequence[our_types.Simple]
+) -> bool:
+    """
+    Check whether :paramref:`simple` is in :paramref:`simples`.
+
+    The targets compare the instances of the classes by their references.
+    """
+    # pylint: disable=all
+    return simple in simples
+
+
+def is_in_local_copy_of_simples(
+    simple: our_types.Simple,
+    simples: Sequence[our_types.Simple]
+) -> bool:
+    """
+    Check whether :paramref:`simple` is in a local copy of :paramref:`simples`.
+
+    The local copy is built with ``append``, and holds the same instances as
+    :paramref:`simples`.
+    """
+    # pylint: disable=all
+    copied: List[our_types.Simple] = []
+    for other in simples:
+        copied.append(other)
+    return simple in copied
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -169,6 +199,25 @@ class _Transformer(
         if not (len(some_items_of(that.some_items)) <= 1):
             yield Error(
                 'At most one of some items must be a some item.'
+            )
+
+        if not (not is_in_simples(that.item, that.some_simples)):
+            yield Error(
+                'Item must not be one of some simples.'
+            )
+
+        if not (
+            all(
+                is_in_local_copy_of_simples(
+                    simple,
+                    that.some_simples
+                )
+                for simple in that.some_simples
+            )
+        ):
+            yield Error(
+                'Each of some simples must be in a local copy of some ' +
+                'simples.'
             )
 
         for error in verify(that.item):

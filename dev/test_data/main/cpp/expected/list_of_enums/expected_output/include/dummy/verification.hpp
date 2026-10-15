@@ -224,6 +224,12 @@ std::vector<types::Result> FailuresOf(
   const std::vector<types::Result>& results
 );
 
+/// \brief Check whether \p result is in \p results.
+bool IsInResults(
+  types::Result result,
+  const std::vector<types::Result>& results
+);
+
 // endregion Verification functions
 
 }  // namespace verification

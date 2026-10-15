@@ -225,6 +225,22 @@ std::vector<std::wstring> InitialsOf(
   const std::vector<std::wstring>& names
 );
 
+/// \brief Check that \p names start with unique characters.
+bool InitialsAreUnique(
+  const std::vector<std::wstring>& names
+);
+
+/// \brief Check whether \p text is in \p names.
+bool IsInNames(
+  const std::wstring& text,
+  const std::vector<std::wstring>& names
+);
+
+/// \brief Check whether \p name contains a space.
+bool ContainsSpace(
+  const std::wstring& name
+);
+
 // endregion Verification functions
 
 // region Verification of constrained primitives

@@ -3874,22 +3874,82 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             success = False
 
-        if not success:
-            return None
-
         # NOTE (mristin):
-        # The targets look up the member in a hash set, so the member has to be of
-        # the same type as the items. We accept the constrained primitives in
-        # either direction, as they are represented by their constrainees.
-        if isinstance(container_type, SetTypeAnnotation) and not (
-            _assignable(target_type=container_type.items, value_type=member_type)
-            or _assignable(target_type=member_type, value_type=container_type.items)
+        # The membership in a JSON-able object is a question about its keys, so
+        # we restrict only the search in a list.
+        if isinstance(container_type, ListTypeAnnotation) and isinstance(
+            member_type,
+            (
+                JsonValueTypeAnnotation,
+                JsonArrayTypeAnnotation,
+                JsonObjectTypeAnnotation,
+            ),
         ):
             self.errors.append(
                 Error(
                     node.member.original_node,
+                    f"We do not support searching for a JSON-able value in a list "
+                    f"with ``in``, but the member is inferred to be {member_type}. "
+                    f"The targets disagree on the comparison: Python compares "
+                    f"the JSON-able values by value, while C#, Java and "
+                    f"TypeScript compare the references of their arrays and "
+                    f"objects, and Go panics when comparing them. Please "
+                    f"contact the developers if you need this feature.",
+                )
+            )
+            success = False
+
+        if try_primitive_type(member_type) is PrimitiveType.BYTEARRAY:
+            self.errors.append(
+                Error(
+                    node.member.original_node,
+                    f"We do not support looking up a byte array with ``in``, "
+                    f"but the member is inferred to be {member_type}. "
+                    f"The targets disagree on the comparison: Python compares "
+                    f"the byte arrays byte by byte, C# and Java compare "
+                    f"the references of their ``byte[]``'s, while Go can not "
+                    f"compare ``[]byte`` with ``==`` at all. Please compare "
+                    f"the byte arrays explicitly instead, *e.g.*, in a for-loop.",
+                )
+            )
+            success = False
+
+        if not success:
+            return None
+
+        # NOTE (mristin):
+        # The targets look up the member in a hash set or search for it in a list
+        # with the equality of the items, so the member has to be of the same type
+        # as the items. We accept the constrained primitives in either direction,
+        # as they are represented by their constrainees.
+        if isinstance(container_type, (SetTypeAnnotation, ListTypeAnnotation)) and not (
+            _assignable(target_type=container_type.items, value_type=member_type)
+            or _assignable(target_type=member_type, value_type=container_type.items)
+        ):
+            what = "set" if isinstance(container_type, SetTypeAnnotation) else "list"
+
+            self.errors.append(
+                Error(
+                    node.member.original_node,
                     f"Expected the member to be of the type of the items of "
-                    f"the set {container_type}, but got: {member_type}",
+                    f"the {what} {container_type}, but got: {member_type}",
+                )
+            )
+            return None
+
+        # NOTE (mristin):
+        # The membership in a string is a check for a sub-string, so the member
+        # has to be a string as well.
+        if (
+            try_primitive_type(container_type) is PrimitiveType.STR
+            and try_primitive_type(member_type) is not PrimitiveType.STR
+        ):
+            self.errors.append(
+                Error(
+                    node.member.original_node,
+                    f"Expected the member to be a string as we check for "
+                    f"a sub-string in the container {container_type}, "
+                    f"but got: {member_type}",
                 )
             )
             return None

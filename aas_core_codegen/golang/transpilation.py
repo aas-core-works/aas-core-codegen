@@ -776,8 +776,14 @@ len(
 
         # NOTE (mristin):
         # The lengths are ``int``'s, so we convert them to our integers to look
-        # them up in a set.
-        if isinstance(container_type, intermediate_type_inference.SetTypeAnnotation):
+        # them up in a set or a list.
+        if isinstance(
+            container_type,
+            (
+                intermediate_type_inference.SetTypeAnnotation,
+                intermediate_type_inference.ListTypeAnnotation,
+            ),
+        ):
             member = self._as_int64_position(node.member, member)
 
         # NOTE (mristin):
@@ -794,6 +800,36 @@ len(
                 Stripped(
                     f"""\
 ourcommon.MapContains(
+{I}{indent_but_first_line(container, I)},
+{I}{indent_but_first_line(member, I)},
+)"""
+                ),
+                None,
+            )
+
+        elif isinstance(container_type, intermediate_type_inference.ListTypeAnnotation):
+            return (
+                Stripped(
+                    f"""\
+ourcommon.SliceContains(
+{I}{indent_but_first_line(container, I)},
+{I}{indent_but_first_line(member, I)},
+)"""
+                ),
+                None,
+            )
+
+        elif (
+            intermediate_type_inference.try_primitive_type(container_type)
+            is intermediate_type_inference.PrimitiveType.STR
+        ):
+            # NOTE (mristin):
+            # The native ``strings.Contains`` works on the UTF-8 bytes, which is
+            # equivalent to the check on the characters for a valid UTF-8.
+            return (
+                Stripped(
+                    f"""\
+strings.Contains(
 {I}{indent_but_first_line(container, I)},
 {I}{indent_but_first_line(member, I)},
 )"""

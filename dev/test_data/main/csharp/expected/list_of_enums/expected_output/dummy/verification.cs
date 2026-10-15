@@ -67,6 +67,17 @@ namespace dummy
         }  // public static List<Result> FailuresOf
 
         /// <summary>
+        /// Check whether <paramref name="result" /> is in <paramref name="results" />.
+        /// </summary>
+        public static bool IsInResults(
+            Result result,
+            List<Result> results
+        )
+        {
+            return results.Contains(result);
+        }  // public static bool IsInResults
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -106,6 +117,24 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Some results must contain at most one failure.");
+                }
+
+                if (!(
+                    !Verification.IsInResults(Result.Fail, that.SomeResults)
+                    || that.SomeResults.Contains(Result.Ok)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some results must contain an ok if they contain a failure.");
+                }
+
+                if (!(
+                    that.SomeResults.All(
+                        result => (new List<Our.Result> { Result.Ok, Result.Fail }).Contains(result))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some results must be either ok or fail.");
                 }
 
                 foreach (

@@ -63,6 +63,47 @@ namespace dummy
         }  // public static List<string> InitialsOf
 
         /// <summary>
+        /// Check that <paramref name="names" /> start with unique characters.
+        /// </summary>
+        public static bool InitialsAreUnique(
+            List<string> names
+        )
+        {
+            List<string> initials = new List<string>();
+            foreach (var name in names)
+            {
+                var initial = Common.StringHelpers.Slice(name, 0, 1);
+                if (initials.Contains(initial))
+                {
+                    return false;
+                }
+                initials.Add(initial);
+            }
+            return true;
+        }  // public static bool InitialsAreUnique
+
+        /// <summary>
+        /// Check whether <paramref name="text" /> is in <paramref name="names" />.
+        /// </summary>
+        public static bool IsInNames(
+            string text,
+            List<string> names
+        )
+        {
+            return names.Contains(text);
+        }  // public static bool IsInNames
+
+        /// <summary>
+        /// Check whether <paramref name="name" /> contains a space.
+        /// </summary>
+        public static bool ContainsSpace(
+            string name
+        )
+        {
+            return name.Contains(" ");
+        }  // public static bool ContainsSpace
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -99,6 +140,36 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Some names must not start with x.");
+                }
+
+                if (!(!that.SomeNames.Contains("Eve")))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some names must not contain Eve.");
+                }
+
+                if (!(!Verification.IsInNames("Mallory", that.SomeNames)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some names must not contain Mallory.");
+                }
+
+                if (!(
+                    that.SomeNames.All(
+                        name => !Verification.ContainsSpace(name))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some names must not contain spaces.");
+                }
+
+                if (!Verification.InitialsAreUnique(that.SomeNames))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Initials of some names must be unique.");
                 }
 
                 foreach (var error in Verification.Verify_ListOf_Name(that.SomeNames))

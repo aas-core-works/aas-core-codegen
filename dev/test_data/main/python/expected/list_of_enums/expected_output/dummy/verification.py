@@ -85,6 +85,15 @@ def failures_of(
     return failures
 
 
+def is_in_results(
+    result: our_types.Result,
+    results: Sequence[our_types.Result]
+) -> bool:
+    """Check whether :paramref:`result` is in :paramref:`results`."""
+    # pylint: disable=all
+    return result in results
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -108,6 +117,27 @@ class _Transformer(
         if not (len(failures_of(that.some_results)) <= 1):
             yield Error(
                 'Some results must contain at most one failure.'
+            )
+
+        if not (
+            not is_in_results(
+                our_types.Result.FAIL,
+                that.some_results
+            )
+            or (our_types.Result.OK in that.some_results)
+        ):
+            yield Error(
+                'Some results must contain an ok if they contain a failure.'
+            )
+
+        if not (
+            all(
+                result in [our_types.Result.OK, our_types.Result.FAIL]
+                for result in that.some_results
+            )
+        ):
+            yield Error(
+                'Some results must be either ok or fail.'
             )
 
 

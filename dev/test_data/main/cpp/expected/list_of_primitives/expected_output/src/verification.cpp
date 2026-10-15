@@ -74,6 +74,70 @@ std::vector<int64_t> PositivesOf(
   return result;
 }
 
+bool IntsAreUnique(
+  const std::vector<int64_t>& numbers
+) {
+  std::vector<int64_t> seen = std::vector<int64_t>();
+  for (int64_t number : numbers) {
+    if (
+      common::Contains(
+        seen,
+        number
+      )
+    ) {
+      return false;
+    }
+    seen.push_back(number);
+  }
+  return true;
+}
+
+bool IsSeparator(
+  const std::wstring& text
+) {
+  return (
+    common::Contains(
+      std::vector<std::wstring>{L".", L",", L";"},
+      text
+    )
+  );
+}
+
+bool IsInInts(
+  int64_t number,
+  const std::vector<int64_t>& numbers
+) {
+  return (
+    common::Contains(
+      numbers,
+      number
+    )
+  );
+}
+
+bool IsInOptionalStrings(
+  const std::wstring& text,
+  const common::optional<
+    std::vector<std::wstring>
+  >& texts
+) {
+  if (!(texts.has_value())) {
+    return false;
+  }
+  return (
+    common::Contains(
+      (*texts),
+      text
+    )
+  );
+}
+
+bool ContainsDot(
+  const std::wstring& text
+) {
+  return text.find(L".") != std::wstring::npos;
+}
+
 // endregion Verification functions
 
 namespace {
@@ -149,6 +213,97 @@ bool Something_2(
   ).size() <= 1;
 }
 
+bool Something_3(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !common::Contains(
+    that->some_ints(),
+    0
+  );
+}
+
+bool Something_4(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !verification::IsInInts(
+    that->some_strings().size(),
+    that->some_ints()
+  );
+}
+
+bool Something_5(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !common::Contains(
+    that->some_floats(),
+    -1.0
+  );
+}
+
+bool Something_6(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !verification::IsInOptionalStrings(
+    L"",
+    that->some_strings()
+  );
+}
+
+bool Something_7(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](std::wstring text) -> bool {
+      return !verification::ContainsDot(
+        text
+      );
+    },
+    that->some_strings()
+  );
+}
+
+bool Something_8(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return verification::IntsAreUnique(
+    that->some_ints()
+  );
+}
+
+bool Something_9(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](std::wstring text) -> bool {
+      return !verification::IsSeparator(
+        text
+      );
+    },
+    that->some_strings()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -168,6 +323,34 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_2,
           L"At most one of some ints must be positive."
+        },
+        {
+          &Something_3,
+          L"Ints must not contain zero."
+        },
+        {
+          &Something_4,
+          L"Ints must not contain the number of strings."
+        },
+        {
+          &Something_5,
+          L"Floats must not contain minus one."
+        },
+        {
+          &Something_6,
+          L"Strings must not contain an empty string."
+        },
+        {
+          &Something_7,
+          L"Strings must not contain dots."
+        },
+        {
+          &Something_8,
+          L"Some ints must be unique."
+        },
+        {
+          &Something_9,
+          L"Some strings must not be separators."
         }
       };
       return checks;

@@ -68,6 +68,18 @@ std::vector<types::Result> FailuresOf(
   return failures;
 }
 
+bool IsInResults(
+  types::Result result,
+  const std::vector<types::Result>& results
+) {
+  return (
+    common::Contains(
+      results,
+      result
+    )
+  );
+}
+
 // endregion Verification functions
 
 namespace {
@@ -127,6 +139,42 @@ bool Something_1(
   ).size() <= 1;
 }
 
+bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return !verification::IsInResults(
+    types::Result::kFail,
+    that->some_results()
+  )
+  || common::Contains(
+    that->some_results(),
+    types::Result::kOk
+  );
+}
+
+bool Something_3(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::All(
+    [&](types::Result result) -> bool {
+      return common::Contains(
+        std::vector<types::Result>{
+          types::Result::kOk,
+          types::Result::kFail
+        },
+        result
+      );
+    },
+    that->some_results()
+  );
+}
+
 /**
  * Give out the checks of the values of the \p shape.
  */
@@ -141,6 +189,14 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_1,
           L"Some results must contain at most one failure."
+        },
+        {
+          &Something_2,
+          L"Some results must contain an ok if they contain a failure."
+        },
+        {
+          &Something_3,
+          L"Some results must be either ok or fail."
         }
       };
       return checks;

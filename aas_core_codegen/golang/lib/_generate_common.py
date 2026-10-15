@@ -370,6 +370,22 @@ func MapContains[K comparable, V any](m map[K]V, k K) bool {{
         ),
         Stripped(
             f"""\
+// Check if the slice contains the given value.
+//
+// We can not use ``slices.Contains`` as it is available only from Go 1.21 on.
+// We compare the values as ``any``'s, since the interfaces, such as our classes,
+// satisfy the constraint ``comparable`` only from Go 1.20 on.
+func SliceContains[T any](s []T, v T) bool {{
+{I}for _, item := range s {{
+{II}if any(item) == any(v) {{
+{III}return true
+{II}}}
+{I}}}
+{I}return false
+}}"""
+        ),
+        Stripped(
+            f"""\
 // Check if any of the elements satisfy the condition.
 func Some[V any](condition func(V) bool, l []V) bool {{
 {I}ok := false

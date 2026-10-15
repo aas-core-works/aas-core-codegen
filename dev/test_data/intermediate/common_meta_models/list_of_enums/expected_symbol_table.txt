@@ -127,6 +127,81 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some results must contain an ok if they contain a failure.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=FunctionCall(
+                name='is_in_results',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='Result',
+                      original_node=...),
+                    name='Fail',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='some_results',
+                    original_node=...)],
+                original_node=...),
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='Result',
+                    original_node=...),
+                  name='Ok',
+                  original_node=...),
+                container=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_results',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some results must be either ok or fail.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='result',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_results',
+                  original_node=...),
+                original_node=...),
+              condition=IsIn(
+                member=Name(
+                  identifier='result',
+                  original_node=...),
+                container=ListLiteral(
+                  items=[
+                    Member(
+                      instance=Name(
+                        identifier='Result',
+                        original_node=...),
+                      name='Ok',
+                      original_node=...),
+                    Member(
+                      instance=Name(
+                        identifier='Result',
+                        original_node=...),
+                      name='Fail',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
@@ -207,12 +282,52 @@ SymbolTable(
         snapshots=[],
         postconditions=[]),
       parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='is_in_results',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='result',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Result',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='results',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Result',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="result">result</ReferenceToArgument> is in <ReferenceToArgument refuri="results">results</ReferenceToArgument>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
       arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=DescriptionOfMetaModel(
       summary='<paragraph>Check the lists of enumeration literals, their list literals and <literal>append</literal>.</paragraph>',
-      remarks=[],
+      remarks=[
+        textwrap.dedent("""\
+          <paragraph>We also check the membership <literal>in</literal> a list of enumeration literals, passed as
+          an argument and given as a list literal.</paragraph>""")],
       constraints_by_identifier=[],
       parsed=...),
     version='dummy',

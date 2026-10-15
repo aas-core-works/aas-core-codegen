@@ -237,6 +237,39 @@ export function someItemsOf(
 }
 
 /**
+ * Check whether `simple` is in `simples`.
+ *
+ * @remarks
+ *
+ * The targets compare the instances of the classes by their references.
+ */
+export function isInSimples(
+  simple: OurTypes.Simple,
+  simples: Array<OurTypes.Simple>
+): boolean {
+  return simples.includes(simple);
+}
+
+/**
+ * Check whether `simple` is in a local copy of `simples`.
+ *
+ * @remarks
+ *
+ * The local copy is built with `append`, and holds the same instances as
+ * `simples`.
+ */
+export function isInLocalCopyOfSimples(
+  simple: OurTypes.Simple,
+  simples: Array<OurTypes.Simple>
+): boolean {
+  const copied: Array<OurTypes.Simple> = [];
+  for (const other of simples) {
+    copied.push(other);
+  }
+  return copied.includes(simple);
+}
+
+/**
  * Verify the items of `that` recursively.
  */
 function *verify_ListOf_class(
@@ -319,6 +352,27 @@ class Verifier
     if (!(someItemsOf(that.someItems).length <= 1)) {
       yield new VerificationError(
         "At most one of some items must be a some item."
+      )
+    }
+
+    if (!(!isInSimples(that.item, that.someSimples))) {
+      yield new VerificationError(
+        "Item must not be one of some simples."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someSimples,
+          simple =>
+            isInLocalCopyOfSimples(simple, that.someSimples)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Each of some simples must be in a local copy of some " +
+        "simples."
       )
     }
 

@@ -229,6 +229,35 @@ std::vector<int64_t> PositivesOf(
   const std::vector<int64_t>& numbers
 );
 
+/// \brief Check that \p numbers are unique with a local list of the seen.
+bool IntsAreUnique(
+  const std::vector<int64_t>& numbers
+);
+
+/// \brief Check whether \p text is one of the separators.
+bool IsSeparator(
+  const std::wstring& text
+);
+
+/// \brief Check whether \p number is in \p numbers.
+bool IsInInts(
+  int64_t number,
+  const std::vector<int64_t>& numbers
+);
+
+/// \brief Check whether \p text is in \p texts, if specified.
+bool IsInOptionalStrings(
+  const std::wstring& text,
+  const common::optional<
+    std::vector<std::wstring>
+  >& texts
+);
+
+/// \brief Check whether \p text contains a dot.
+bool ContainsDot(
+  const std::wstring& text
+);
+
 // endregion Verification functions
 
 }  // namespace verification

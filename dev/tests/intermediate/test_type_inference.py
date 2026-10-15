@@ -6023,6 +6023,63 @@ def some_func(lists: Sequence[Sequence[str]], texts: Sequence[str]) -> bool:
             ),
         )
 
+    def test_is_in_list_of_wrong_type_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int, texts: Sequence[str]) -> bool:
+    return number in texts""",
+            expected_joined_message=(
+                "Expected the member to be of the type of the items of the list "
+                "List[str], but got: int"
+            ),
+        )
+
+    def test_is_in_str_of_non_str_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(number: int, text: str) -> bool:
+    return number in text""",
+            expected_joined_message=(
+                "Expected the member to be a string as we check for a sub-string "
+                "in the container str, but got: int"
+            ),
+        )
+
+    def test_bytearray_as_member_of_in_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(blob: bytearray, blobs: Sequence[bytearray]) -> bool:
+    return blob in blobs""",
+            expected_joined_message=(
+                "We do not support looking up a byte array with ``in``, but "
+                "the member is inferred to be bytearray. The targets disagree on "
+                "the comparison: Python compares the byte arrays byte by byte, "
+                "C# and Java compare the references of their ``byte[]``'s, while "
+                "Go can not compare ``[]byte`` with ``==`` at all. Please compare "
+                "the byte arrays explicitly instead, *e.g.*, in a for-loop."
+            ),
+        )
+
+    def test_json_value_as_member_of_in_list_fails(self) -> None:
+        self.expect_type_inference_to_fail(
+            body="""\
+@verification
+def some_func(value: JSONValue, values: Sequence[JSONValue]) -> bool:
+    return value in values""",
+            expected_joined_message=(
+                "We do not support searching for a JSON-able value in a list "
+                "with ``in``, but the member is inferred to be JSONValue. "
+                "The targets disagree on the comparison: Python compares "
+                "the JSON-able values by value, while C#, Java and TypeScript "
+                "compare the references of their arrays and objects, and Go "
+                "panics when comparing them. Please contact the developers if "
+                "you need this feature."
+            ),
+        )
+
     def test_copy_of_list_of_sets_fails(self) -> None:
         self.expect_type_inference_to_fail(
             body="""\

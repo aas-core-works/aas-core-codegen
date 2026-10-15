@@ -96,6 +96,59 @@ def positives_of(
     return result
 
 
+def ints_are_unique(
+    numbers: Sequence[int]
+) -> bool:
+    """
+    Check that :paramref:`numbers` are unique with a local list of the seen.
+    """
+    # pylint: disable=all
+    seen: List[int] = []
+    for number in numbers:
+        if number in seen:
+            return False
+        seen.append(number)
+    return True
+
+
+def is_separator(
+    text: str
+) -> bool:
+    """Check whether :paramref:`text` is one of the separators."""
+    # pylint: disable=all
+    return text in ['.', ',', ';']
+
+
+def is_in_ints(
+    number: int,
+    numbers: Sequence[int]
+) -> bool:
+    """Check whether :paramref:`number` is in :paramref:`numbers`."""
+    # pylint: disable=all
+    return number in numbers
+
+
+def is_in_optional_strings(
+    text: str,
+    texts: Optional[Sequence[str]]
+) -> bool:
+    """
+    Check whether :paramref:`text` is in :paramref:`texts`, if specified.
+    """
+    # pylint: disable=all
+    if texts is None:
+        return False
+    return text in texts
+
+
+def contains_dot(
+    text: str
+) -> bool:
+    """Check whether :paramref:`text` contains a dot."""
+    # pylint: disable=all
+    return '.' in text
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -130,6 +183,53 @@ class _Transformer(
         if not (len(positives_of(that.some_ints)) <= 1):
             yield Error(
                 'At most one of some ints must be positive.'
+            )
+
+        if not (not (0 in that.some_ints)):
+            yield Error(
+                'Ints must not contain zero.'
+            )
+
+        if not (
+            not is_in_ints(len(that.some_strings), that.some_ints)
+        ):
+            yield Error(
+                'Ints must not contain the number of strings.'
+            )
+
+        if not (not (-1.0 in that.some_floats)):
+            yield Error(
+                'Floats must not contain minus one.'
+            )
+
+        if not (not is_in_optional_strings('', that.some_strings)):
+            yield Error(
+                'Strings must not contain an empty string.'
+            )
+
+        if not (
+            all(
+                not contains_dot(text)
+                for text in that.some_strings
+            )
+        ):
+            yield Error(
+                'Strings must not contain dots.'
+            )
+
+        if not ints_are_unique(that.some_ints):
+            yield Error(
+                'Some ints must be unique.'
+            )
+
+        if not (
+            all(
+                not is_separator(text)
+                for text in that.some_strings
+            )
+        ):
+            yield Error(
+                'Some strings must not be separators.'
             )
 
 

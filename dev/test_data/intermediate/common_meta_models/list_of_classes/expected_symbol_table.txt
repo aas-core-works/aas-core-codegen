@@ -469,6 +469,60 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Item must not be one of some simples.',
+          body=textwrap.dedent("""\
+            Not(
+              operand=FunctionCall(
+                name='is_in_simples',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='item',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='some_simples',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Each of some simples must be in a local copy of some simples.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='simple',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_simples',
+                  original_node=...),
+                original_node=...),
+              condition=FunctionCall(
+                name='is_in_local_copy_of_simples',
+                args=[
+                  Name(
+                    identifier='simple',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='some_simples',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
@@ -597,6 +651,84 @@ SymbolTable(
           textwrap.dedent("""\
             <paragraph>The appended items are narrowed down to <ReferenceToOurType refuri="Some_item">Some_item</ReferenceToOurType>, while the list
             holds <ReferenceToOurType refuri="Abstract_item">Abstract_item</ReferenceToOurType>'s.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='is_in_simples',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='simple',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Simple',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='simples',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Simple',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="simple">simple</ReferenceToArgument> is in <ReferenceToArgument refuri="simples">simples</ReferenceToArgument>.</paragraph>',
+        remarks=[
+          '<paragraph>The targets compare the instances of the classes by their references.</paragraph>'],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='is_in_local_copy_of_simples',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='simple',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Simple',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='simples',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Simple',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="simple">simple</ReferenceToArgument> is in a local copy of <ReferenceToArgument refuri="simples">simples</ReferenceToArgument>.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The local copy is built with <literal>append</literal>, and holds the same instances as
+            <ReferenceToArgument refuri="simples">simples</ReferenceToArgument>.</paragraph>""")],
         arguments_by_name=[],
         returns=None,
         parsed=...),

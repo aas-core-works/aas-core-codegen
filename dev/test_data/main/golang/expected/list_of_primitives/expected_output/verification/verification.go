@@ -12,6 +12,7 @@ package verification
 
 import (
 	"fmt"
+	"strings"
 	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourtypes "github.com/dummy-works/dummy/types"
@@ -81,6 +82,69 @@ func PositivesOf(
 	return result
 }
 
+// Check that numbers are unique with a local list of the seen.
+func IntsAreUnique(
+	numbers []int64,
+) bool {
+	var seen []int64 = []int64{}
+	for _, number := range numbers {
+		if (
+			ourcommon.SliceContains(
+				seen,
+				number,
+			)) {
+			return false
+		}
+		seen = append(seen, number)
+	}
+	return true
+}
+
+// Check whether text is one of the separators.
+func IsSeparator(
+	text string,
+) bool {
+	return ourcommon.SliceContains(
+			[]string{".", ",", ";"},
+			text,
+		)
+}
+
+// Check whether number is in numbers.
+func IsInInts(
+	number int64,
+	numbers []int64,
+) bool {
+	return ourcommon.SliceContains(
+			numbers,
+			number,
+		)
+}
+
+// Check whether text is in texts, if specified.
+func IsInOptionalStrings(
+	text string,
+	texts []string,
+) bool {
+	if texts == nil {
+		return false
+	}
+	return ourcommon.SliceContains(
+			texts,
+			text,
+		)
+}
+
+// Check whether text contains a dot.
+func ContainsDot(
+	text string,
+) bool {
+	return strings.Contains(
+			text,
+			".",
+		)
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -131,6 +195,100 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"At most one of some ints must be positive.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!ourcommon.SliceContains(
+			that.SomeInts(),
+			0,
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Ints must not contain zero.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!IsInInts(
+			int64(len(that.SomeStrings())),
+			that.SomeInts(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Ints must not contain the number of strings.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!ourcommon.SliceContains(
+			that.SomeFloats(),
+			-1.0,
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Floats must not contain minus one.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(!IsInOptionalStrings("", that.SomeStrings())) {
+		abort = onError(
+			newVerificationError(
+				"Strings must not contain an empty string.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.All(
+			func(text string) bool {
+				return !ContainsDot(text)
+			},
+			that.SomeStrings(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Strings must not contain dots.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !IntsAreUnique(that.SomeInts()) {
+		abort = onError(
+			newVerificationError(
+				"Some ints must be unique.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.All(
+			func(text string) bool {
+				return !IsSeparator(text)
+			},
+			that.SomeStrings(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some strings must not be separators.",),
 		)
 		if abort {
 			return

@@ -12,6 +12,7 @@ package verification
 
 import (
 	"fmt"
+	"strings"
 	ourcommon "github.com/dummy-works/dummy/common"
 	ourreporting "github.com/dummy-works/dummy/reporting"
 	ourtypes "github.com/dummy-works/dummy/types"
@@ -68,6 +69,46 @@ func InitialsOf(
 	return initials
 }
 
+// Check that names start with unique characters.
+func InitialsAreUnique(
+	names []string,
+) bool {
+	var initials []string = []string{}
+	for _, name := range names {
+		initial := ourcommon.SliceStr(name, 0, 1)
+		if (
+			ourcommon.SliceContains(
+				initials,
+				initial,
+			)) {
+			return false
+		}
+		initials = append(initials, initial)
+	}
+	return true
+}
+
+// Check whether text is in names.
+func IsInNames(
+	text string,
+	names []string,
+) bool {
+	return ourcommon.SliceContains(
+			names,
+			text,
+		)
+}
+
+// Check whether name contains a space.
+func ContainsSpace(
+	name string,
+) bool {
+	return strings.Contains(
+			name,
+			" ",
+		)
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -108,6 +149,56 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"Some names must not start with x.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		!ourcommon.SliceContains(
+			that.SomeNames(),
+			"Eve",
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some names must not contain Eve.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(!IsInNames("Mallory", that.SomeNames())) {
+		abort = onError(
+			newVerificationError(
+				"Some names must not contain Mallory.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(
+		ourcommon.All(
+			func(name string) bool {
+				return !ContainsSpace(name)
+			},
+			that.SomeNames(),
+		)) {
+		abort = onError(
+			newVerificationError(
+				"Some names must not contain spaces.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !InitialsAreUnique(that.SomeNames()) {
+		abort = onError(
+			newVerificationError(
+				"Initials of some names must be unique.",),
 		)
 		if abort {
 			return

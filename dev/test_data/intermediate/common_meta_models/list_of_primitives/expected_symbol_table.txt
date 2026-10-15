@@ -269,6 +269,158 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Ints must not contain zero.',
+          body=textwrap.dedent("""\
+            Not(
+              operand=IsIn(
+                member=Constant(
+                  value=0,
+                  original_node=...),
+                container=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_ints',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Ints must not contain the number of strings.',
+          body=textwrap.dedent("""\
+            Not(
+              operand=FunctionCall(
+                name='is_in_ints',
+                args=[
+                  FunctionCall(
+                    name='len',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_strings',
+                        original_node=...)],
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='some_ints',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Floats must not contain minus one.',
+          body=textwrap.dedent("""\
+            Not(
+              operand=IsIn(
+                member=Constant(
+                  value=-1.0,
+                  original_node=...),
+                container=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_floats',
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Strings must not contain an empty string.',
+          body=textwrap.dedent("""\
+            Not(
+              operand=FunctionCall(
+                name='is_in_optional_strings',
+                args=[
+                  Constant(
+                    value='',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='some_strings',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Strings must not contain dots.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='text',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_strings',
+                  original_node=...),
+                original_node=...),
+              condition=Not(
+                operand=FunctionCall(
+                  name='contains_dot',
+                  args=[
+                    Name(
+                      identifier='text',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some ints must be unique.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='ints_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_ints',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some strings must not be separators.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='text',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_strings',
+                  original_node=...),
+                original_node=...),
+              condition=Not(
+                operand=FunctionCall(
+                  name='is_separator',
+                  args=[
+                    Name(
+                      identifier='text',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
@@ -379,6 +531,165 @@ SymbolTable(
         snapshots=[],
         postconditions=[]),
       parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='ints_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that <ReferenceToArgument refuri="numbers">numbers</ReferenceToArgument> are unique with a local list of the seen.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='is_separator',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="text">text</ReferenceToArgument> is one of the separators.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='is_in_ints',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='number',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="number">number</ReferenceToArgument> is in <ReferenceToArgument refuri="numbers">numbers</ReferenceToArgument>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='is_in_optional_strings',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='texts',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="text">text</ReferenceToArgument> is in <ReferenceToArgument refuri="texts">texts</ReferenceToArgument>, if specified.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='contains_dot',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="text">text</ReferenceToArgument> contains a dot.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
       arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
@@ -386,9 +697,15 @@ SymbolTable(
       summary='<paragraph>Check the lists of primitives.</paragraph>',
       remarks=[
         textwrap.dedent("""\
-          <paragraph>We also check the list literals and the local lists built with <literal>append</literal>.
+          <paragraph>We check the list literals and the local lists built with <literal>append</literal>.
           The lengths are appended to and put in a list literal on purpose, since
-          the targets represent them differently from our integers.</paragraph>""")],
+          the targets represent them differently from our integers.</paragraph>"""),
+        textwrap.dedent("""\
+          <paragraph>We also check the membership <literal>in</literal> a list of primitives, passed as a read-only
+          and as an optional argument, built locally with <literal>append</literal> or given as a list
+          literal, and the membership <literal>in</literal> a string, <emphasis>i.e.</emphasis>, the check for a sub-string.
+          The integer literals and the lengths are looked up in the list of integers on
+          purpose, since the targets represent them differently from the items.</paragraph>""")],
       constraints_by_identifier=[],
       parsed=...),
     version='dummy',

@@ -1,0 +1,9 @@
+{
+  "someBools": [],
+  "someInts": [],
+  "someFloats": [],
+  "someStrings": [
+    "a.b"
+  ],
+  "someBytes": []
+}

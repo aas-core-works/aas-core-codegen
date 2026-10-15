@@ -71,6 +71,42 @@ def some_items_of(items: Sequence[Abstract_item]) -> List[Abstract_item]:
     return result
 
 
+@verification
+def is_in_simples(simple: Simple, simples: Sequence[Simple]) -> bool:
+    """
+    Check whether :paramref:`simple` is in :paramref:`simples`.
+
+    The targets compare the instances of the classes by their references.
+    """
+    return simple in simples
+
+
+@verification
+def is_in_local_copy_of_simples(simple: Simple, simples: Sequence[Simple]) -> bool:
+    """
+    Check whether :paramref:`simple` is in a local copy of :paramref:`simples`.
+
+    The local copy is built with ``append``, and holds the same instances as
+    :paramref:`simples`.
+    """
+    copied: List[Simple] = []
+    for other in simples:
+        copied.append(other)
+
+    return simple in copied
+
+
+@invariant(
+    lambda self: all(
+        is_in_local_copy_of_simples(simple, self.some_simples)
+        for simple in self.some_simples
+    ),
+    "Each of some simples must be in a local copy of some simples.",
+)
+@invariant(
+    lambda self: not is_in_simples(self.item, self.some_simples),
+    "Item must not be one of some simples.",
+)
 @invariant(
     lambda self: len(some_items_of(self.some_items)) <= 1,
     "At most one of some items must be a some item.",

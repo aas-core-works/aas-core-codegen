@@ -1,5 +1,8 @@
 """
 Check the lists of enumeration literals, their list literals and ``append``.
+
+We also check the membership ``in`` a list of enumeration literals, passed as
+an argument and given as a list literal.
 """
 
 

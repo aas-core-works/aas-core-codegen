@@ -232,6 +232,63 @@ export function positivesOf(
 }
 
 /**
+ * Check that `numbers` are unique with a local list of the seen.
+ */
+export function intsAreUnique(
+  numbers: Array<number>
+): boolean {
+  const seen: Array<number> = [];
+  for (const number of numbers) {
+    if (seen.includes(number)) {
+      return false;
+    }
+    seen.push(number);
+  }
+  return true;
+}
+
+/**
+ * Check whether `text` is one of the separators.
+ */
+export function isSeparator(
+  text: string
+): boolean {
+  return [".", ",", ";"].includes(text);
+}
+
+/**
+ * Check whether `number` is in `numbers`.
+ */
+export function isInInts(
+  number: number,
+  numbers: Array<number>
+): boolean {
+  return numbers.includes(number);
+}
+
+/**
+ * Check whether `text` is in `texts`, if specified.
+ */
+export function isInOptionalStrings(
+  text: string,
+  texts: Array<string> | null
+): boolean {
+  if (texts === null) {
+    return false;
+  }
+  return texts.includes(text);
+}
+
+/**
+ * Check whether `text` contains a dot.
+ */
+export function containsDot(
+  text: string
+): boolean {
+  return text.includes(".");
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -275,6 +332,64 @@ class Verifier
     if (!(positivesOf(that.someInts).length <= 1)) {
       yield new VerificationError(
         "At most one of some ints must be positive."
+      )
+    }
+
+    if (!(!(that.someInts.includes(0)))) {
+      yield new VerificationError(
+        "Ints must not contain zero."
+      )
+    }
+
+    if (!(!isInInts(that.someStrings.length, that.someInts))) {
+      yield new VerificationError(
+        "Ints must not contain the number of strings."
+      )
+    }
+
+    if (!(!(that.someFloats.includes(-1.0)))) {
+      yield new VerificationError(
+        "Floats must not contain minus one."
+      )
+    }
+
+    if (!(!isInOptionalStrings("", that.someStrings))) {
+      yield new VerificationError(
+        "Strings must not contain an empty string."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someStrings,
+          text =>
+            !containsDot(text)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Strings must not contain dots."
+      )
+    }
+
+    if (!intsAreUnique(that.someInts)) {
+      yield new VerificationError(
+        "Some ints must be unique."
+      )
+    }
+
+    if (!(
+      OurCommon.every(
+        OurCommon.map(
+          that.someStrings,
+          text =>
+            !isSeparator(text)
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "Some strings must not be separators."
       )
     }
   }
