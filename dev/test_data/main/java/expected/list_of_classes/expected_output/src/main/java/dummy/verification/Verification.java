@@ -61,9 +61,11 @@ public class Verification {
    *
    * <p>The appended items are narrowed down to {@link dummy.types.impl.SomeItem}, while the list
    * holds {@link dummy.types.model.IAbstractItem}'s.
+   *
+   * <p>The argument {@code items} is declared with the wildcard {@code List<? extends IAbstractItem>} instead of the invariant {@code List<IAbstractItem>} so that the lists of the descendants of {@link IAbstractItem} can be passed without a copy.
    */
   public static List<IAbstractItem> someItemsOf(
-    List<IAbstractItem> items) {
+    List<? extends IAbstractItem> items) {
     List<IAbstractItem> result = new java.util.ArrayList<IAbstractItem>();
     for (var item : items) {
         if (item instanceof ISomeItem) {

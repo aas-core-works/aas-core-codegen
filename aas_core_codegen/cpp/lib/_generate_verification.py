@@ -11,6 +11,7 @@ from typing import (
     Mapping,
     Set,
     Final,
+    Dict,
 )
 
 from icontract import ensure, require
@@ -57,6 +58,109 @@ def _generate_return_type(verification: intermediate.Verification) -> Stripped:
     )
 
 
+def _type_parameter_name(argument: intermediate.Argument) -> Identifier:
+    """
+    Generate the name of the template parameter for the items of the ``argument``.
+
+    For example, ``items`` gives ``ItemsT``.
+    """
+    return Identifier(f"{cpp_naming.class_name(argument.name)}T")
+
+
+def _is_generic(verification: intermediate.VerificationUnion) -> bool:
+    """
+    Check whether the transpiled ``verification`` function is a template.
+
+    The verification function is a template if it has one or more generic
+    sequences, see :py:func:`intermediate.generic_sequence_item_class`.
+    The implementation-specific verification functions declare their templates
+    in their snippets.
+    """
+    return isinstance(verification, intermediate.TranspilableVerification) and any(
+        intermediate.generic_sequence_item_class(arg) is not None
+        for arg in verification.arguments
+    )
+
+
+def _generate_signature(
+    verification: Union[
+        intermediate.TranspilableVerification,
+        intermediate.PatternVerification,
+    ],
+) -> Stripped:
+    """
+    Generate the signature of the ``verification`` function.
+
+    The ``std::vector`` is invariant in C++, so we declare a template parameter
+    for the items of each generic sequence, see
+    :py:func:`intermediate.generic_sequence_item_class`. This way, the vectors of
+    the descendants can be passed without a copy. The virtual methods can not be
+    templates in C++, so only the verification functions have generic sequences.
+
+    The template parameters are constrained by ``static_assert``'s in the body
+    instead of ``std::enable_if`` in the signature so that the template can be
+    declared and defined separately.
+    """
+    type_parameters = []  # type: List[Identifier]
+    arg_definitions = []  # type: List[Stripped]
+    for arg in verification.arguments:
+        arg_name = cpp_naming.argument_name(arg.name)
+
+        if intermediate.generic_sequence_item_class(arg) is None:
+            arg_type = cpp_common.generate_argument_type(
+                argument=arg, types_namespace=cpp_common.TYPES_NAMESPACE
+            )
+        else:
+            type_parameter = _type_parameter_name(arg)
+            type_parameters.append(type_parameter)
+
+            vector_type = Stripped(
+                f"""\
+std::vector<
+{I}std::shared_ptr<{type_parameter}>
+>"""
+            )
+            if isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
+                arg_type = Stripped(
+                    f"""\
+const common::optional<
+{I}{indent_but_first_line(vector_type, I)}
+>&"""
+                )
+            else:
+                arg_type = Stripped(f"const {vector_type}&")
+
+        arg_definitions.append(Stripped(f"{arg_type} {arg_name}"))
+
+    function_name = cpp_naming.function_name(verification.name)
+    return_type = _generate_return_type(verification)
+
+    if len(arg_definitions) == 0:
+        signature = Stripped(f"{return_type} {function_name}()")
+    else:
+        arg_definitions_joined = ",\n".join(arg_definitions)
+        signature = Stripped(
+            f"""\
+{return_type} {function_name}(
+{I}{indent_but_first_line(arg_definitions_joined, I)}
+)"""
+        )
+
+    if len(type_parameters) == 0:
+        return signature
+
+    type_parameters_joined = ",\n".join(
+        f"typename {type_parameter}" for type_parameter in type_parameters
+    )
+    return Stripped(
+        f"""\
+template<
+{I}{indent_but_first_line(type_parameters_joined, I)}
+>
+{signature}"""
+    )
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_verification_function_definition(
     verification: Union[
@@ -84,20 +188,21 @@ def _generate_verification_function_definition(
 
         return code, None
 
-    arg_types_names = [
-        (
-            cpp_common.generate_argument_type(
-                argument=arg, types_namespace=cpp_common.TYPES_NAMESPACE
-            ),
-            cpp_naming.argument_name(arg.name),
-        )
-        for arg in verification.arguments
-    ]
+    remarks_on_generic_sequences = []  # type: List[str]
+    for arg in verification.arguments:
+        item_cls = intermediate.generic_sequence_item_class(arg)
+        if item_cls is None:
+            continue
 
-    function_name = cpp_naming.function_name(verification.name)
-    arg_definitions_joined = ",\n".join(
-        f"{arg_type} {arg_name}" for arg_type, arg_name in arg_types_names
-    )
+        interface_name = (
+            f"{cpp_common.TYPES_NAMESPACE}::{cpp_naming.interface_name(item_cls.name)}"
+        )
+        remarks_on_generic_sequences.append(
+            f"\\tparam {_type_parameter_name(arg)} type of the items of "
+            f"\\p {cpp_naming.argument_name(arg.name)}, {interface_name} or one of "
+            f"its descendants, so that the vectors of the descendants can be passed "
+            f"without a copy, as std::vector is invariant"
+        )
 
     blocks = []  # type: List[Stripped]
     if verification.description is not None:
@@ -106,6 +211,7 @@ def _generate_verification_function_definition(
             context=cpp_description.Context(
                 namespace=cpp_common.VERIFICATION_NAMESPACE, cls_or_enum=None
             ),
+            extra_remarks=remarks_on_generic_sequences,
         )
         if errors is not None:
             return None, Error(
@@ -116,20 +222,16 @@ def _generate_verification_function_definition(
             )
         assert comment is not None
         blocks.append(comment)
-
-    return_type = _generate_return_type(verification)
-
-    if len(arg_types_names) == 0:
-        signature = Stripped(f"{return_type} {function_name}()")
-    else:
-        signature = Stripped(
-            f"""\
-{return_type} {function_name}(
-{I}{indent_but_first_line(arg_definitions_joined, I)}
-)"""
+    elif len(remarks_on_generic_sequences) > 0:
+        blocks.append(
+            cpp_description.documentation_comment(
+                Stripped("\n\n".join(remarks_on_generic_sequences))
+            )
         )
+    else:
+        pass
 
-    blocks.append(Stripped(f"{signature};"))
+    blocks.append(Stripped(f"{_generate_signature(verification)};"))
 
     return Stripped("\n".join(blocks)), None
 
@@ -180,6 +282,268 @@ std::unique_ptr<IVerification> {verify_name}(
     )
 
 
+def _check_no_calls_to_internal_verifications(
+    verification: intermediate.TranspilableVerification,
+    symbol_table: intermediate.SymbolTable,
+) -> List[Error]:
+    """
+    Check that the public generic ``verification`` calls no internal verification.
+
+    The public generic verification functions are templates defined in the header,
+    see :py:func:`_is_generic`, while the internal verification functions are
+    declared only in the implementation file.
+    """
+    errors = []  # type: List[Error]
+    for node_in_body in verification.parsed.body:
+        for node in parse_tree.over_nodes(node_in_body):
+            if not isinstance(node, parse_tree.FunctionCall):
+                continue
+
+            callee = symbol_table.verification_functions_by_name.get(
+                node.name.identifier, None
+            )
+            if (
+                callee is None
+                or callee.visibility is not intermediate.Visibility.INTERNAL
+            ):
+                continue
+
+            errors.append(
+                Error(
+                    node.original_node,
+                    f"The public verification function {verification.name!r} has "
+                    f"generic sequences, so we generate it in C++ as a template "
+                    f"defined in the header. However, it calls the internal "
+                    f"verification function {callee.name!r}, which is declared "
+                    f"only in the implementation file. Please make "
+                    f"{callee.name!r} public, or {verification.name!r} internal.",
+                )
+            )
+
+    return errors
+
+
+class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
+    """Transpile the body of a :class:`TranspilableVerification`."""
+
+    # fmt: off
+    @require(
+        lambda environment, verification:
+        all(
+            environment.find(arg.name) is not None
+            for arg in verification.arguments
+        ),
+        "All arguments defined in the environment"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        is_optional_map: Mapping[parse_tree.Node, bool],
+        downcast_map: Mapping[parse_tree.Node, intermediate_type_inference.Downcast],
+        is_optional_before_downcast_map: Mapping[parse_tree.Node, bool],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
+        verification: intermediate.TranspilableVerification,
+        aliasing: cpp_aliasing.Aliasing,
+    ) -> None:
+        """Initialize with the given values."""
+        cpp_transpilation.Transpiler.__init__(
+            self,
+            type_map=type_map,
+            is_optional_map=is_optional_map,
+            downcast_map=downcast_map,
+            is_optional_before_downcast_map=is_optional_before_downcast_map,
+            environment=environment,
+            types_namespace=cpp_common.TYPES_NAMESPACE,
+            aliasing=aliasing,
+        )
+
+        self._symbol_table = symbol_table
+
+        self._argument_name_set = frozenset(arg.name for arg in verification.arguments)
+
+        # NOTE (mristin):
+        # The type inference propagates the very type annotation of the items of
+        # an argument to the loop variables, the generator variables and
+        # the indexed items, so we can tell by the identity of the type annotation
+        # that a value is of the template parameter of a generic sequence.
+        type_parameter_by_items_id = dict()  # type: Dict[int, Identifier]
+        for arg in verification.arguments:
+            if intermediate.generic_sequence_item_class(arg) is None:
+                continue
+
+            arg_type_anno = environment.find(arg.name)
+            assert arg_type_anno is not None
+
+            list_type_anno = intermediate_type_inference.beneath_optional(arg_type_anno)
+            assert isinstance(
+                list_type_anno, intermediate_type_inference.ListTypeAnnotation
+            )
+
+            type_parameter_by_items_id[id(list_type_anno.items)] = _type_parameter_name(
+                arg
+            )
+
+        self._type_parameter_by_items_id = type_parameter_by_items_id
+
+    def _type_parameter_of(
+        self, type_annotation: intermediate_type_inference.TypeAnnotationUnion
+    ) -> Optional[Identifier]:
+        return self._type_parameter_by_items_id.get(id(type_annotation), None)
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(cpp_naming.variable_name(node.identifier)), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(cpp_naming.argument_name(node.identifier)), None
+
+        if node.identifier in self._symbol_table.constants_by_name:
+            constant = cpp_naming.constant_name(node.identifier)
+            return Stripped(f"{cpp_common.CONSTANTS_NAMESPACE}::{constant}"), None
+
+        if node.identifier in self._symbol_table.verification_functions_by_name:
+            return Stripped(cpp_naming.function_name(node.identifier)), None
+
+        our_type = self._symbol_table.find_our_type(name=node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return (
+                Stripped(
+                    f"{cpp_common.TYPES_NAMESPACE}::{cpp_naming.enum_name(node.identifier)}"
+                ),
+                None,
+            )
+
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to C++. We could not find it neither in the constants, nor in "
+            f"verification functions, nor as an enumeration. "
+            f"If you expect this name to be transpilable, please contact "
+            f"the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_implementation_of_transpilable_verification(
+    verification: intermediate.TranspilableVerification,
+    symbol_table: intermediate.SymbolTable,
+    base_environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile the verification to a function implementation."""
+    # fmt: off
+    type_inference, inference_error = (
+        intermediate_type_inference.infer_for_verification(
+            verification=verification,
+            base_environment=base_environment
+        )
+    )
+    # fmt: on
+
+    if inference_error is not None:
+        return None, inference_error
+
+    assert type_inference is not None
+
+    aliasing, aliasing_errors = cpp_aliasing.analyze(
+        body=verification.parsed.body,
+        arguments=verification.arguments,
+        type_map=type_inference.type_map,
+        binds_self=False,
+    )
+    if aliasing_errors is not None:
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to transpile the verification function {verification.name!r} "
+            f"so that its C++ variables alias the values as in Python",
+            aliasing_errors,
+        )
+
+    assert aliasing is not None
+
+    optional_inferrer = cpp_optionaling.Inferrer(
+        environment=type_inference.environment_with_args,
+        type_map=type_inference.type_map,
+        downcast_map=type_inference.downcast_map,
+    )
+    for node in verification.parsed.body:
+        _ = optional_inferrer.transform(node)
+
+    if len(optional_inferrer.errors) > 0:
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to infer whether one or more nodes are ``common::optional`` "
+            f"in the verification function {verification.name!r}",
+            optional_inferrer.errors,
+        )
+
+    transpiler = _TranspilableVerificationTranspiler(
+        type_map=type_inference.type_map,
+        is_optional_map=optional_inferrer.is_optional_map,
+        downcast_map=type_inference.downcast_map,
+        is_optional_before_downcast_map=(
+            optional_inferrer.is_optional_before_downcast_map
+        ),
+        environment=type_inference.environment_with_args,
+        symbol_table=symbol_table,
+        verification=verification,
+        aliasing=aliasing,
+    )
+
+    body = []  # type: List[Stripped]
+    for node in verification.parsed.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                verification.parsed.node,
+                f"Failed to transpile the verification function {verification.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    # NOTE (mristin):
+    # We constrain the template parameters of the generic sequences here instead
+    # of in the signature, see :py:func:`_generate_signature`.
+    static_asserts = []  # type: List[Stripped]
+    for arg in verification.arguments:
+        item_cls = intermediate.generic_sequence_item_class(arg)
+        if item_cls is None:
+            continue
+
+        interface_name = (
+            f"{cpp_common.TYPES_NAMESPACE}::{cpp_naming.interface_name(item_cls.name)}"
+        )
+        arg_name = cpp_naming.argument_name(arg.name)
+        static_asserts.append(
+            Stripped(
+                f"""\
+static_assert(
+{I}std::is_base_of<{interface_name}, {_type_parameter_name(arg)}>::value,
+{I}"Expected the items of {arg_name} to be instances of {interface_name}"
+);"""
+            )
+        )
+
+    body_joined = "\n".join([*static_asserts, *body])
+
+    return (
+        Stripped(
+            f"""\
+{_generate_signature(verification)} {{
+{I}{indent_but_first_line(body_joined, I)}
+}}"""
+        ),
+        None,
+    )
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
@@ -198,13 +562,54 @@ def generate_header(
 
     include_guard_var = cpp_common.include_guard_var(namespace)
 
-    unordered_set_include = (
-        "#include <unordered_set>\n"
-        if intermediate_uses.sets_in(symbol_table.verification_functions)
-        else ""
-    )
-
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
+
+    # NOTE (mristin):
+    # The public generic verification functions are templates, so we define them
+    # in the header, see :py:func:`_is_generic`. Their bodies need the same
+    # includes as the definitions in the implementation file.
+    public_generic_verifications = [
+        verification
+        for verification in symbol_table.verification_functions
+        if (
+            verification.visibility is intermediate.Visibility.PUBLIC
+            and _is_generic(verification)
+        )
+    ]
+
+    our_includes = [
+        f'#include "{include_prefix_path}/common.hpp"',
+        f'#include "{include_prefix_path}/iteration.hpp"',
+        f'#include "{include_prefix_path}/pattern.hpp"',
+        f'#include "{include_prefix_path}/types.hpp"',
+    ]
+
+    std_includes = ["<set>"]
+    if intermediate_uses.sets_in(symbol_table.verification_functions):
+        std_includes.append("<unordered_set>")
+
+    if len(public_generic_verifications) > 0:
+        our_includes.extend(
+            [
+                f'#include "{include_prefix_path}/constants.hpp"',
+                f'#include "{include_prefix_path}/stringification.hpp"',
+            ]
+        )
+
+        std_includes.extend(["<memory>", "<type_traits>", "<vector>"])
+
+        # NOTE (mristin):
+        # See the includes in :py:func:`generate_implementation`.
+        if intermediate_uses.abs_call(symbol_table):
+            std_includes.extend(["<cmath>", "<cstdlib>"])
+
+        if intermediate_uses.assert_statements_in(public_generic_verifications):
+            std_includes.append("<stdexcept>")
+
+    our_includes_joined = "\n".join(sorted(our_includes))
+    std_includes_joined = "\n".join(
+        f"#include {std_include}" for std_include in sorted(std_includes)
+    )
 
     blocks = [
         Stripped(
@@ -215,14 +620,10 @@ def generate_header(
         cpp_common.WARNING,
         Stripped(
             f"""\
-#include "{include_prefix_path}/common.hpp"
-#include "{include_prefix_path}/iteration.hpp"
-#include "{include_prefix_path}/pattern.hpp"
-#include "{include_prefix_path}/types.hpp"
+{our_includes_joined}
 
 #pragma warning(push, 0)
-#include <set>
-{unordered_set_include}\
+{std_includes_joined}
 #pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
@@ -466,6 +867,46 @@ class RecursiveVerification : public IVerification {{
 
         blocks.append(Stripped("// endregion Verification functions"))
 
+    # NOTE (mristin):
+    # The templates need to be defined in the header so that the users of
+    # the library can instantiate them. We define them after all the declarations of
+    # the verification functions, since the templates look up the functions which
+    # they call at their definitions.
+    if len(public_generic_verifications) > 0:
+        blocks.append(
+            Stripped("// region Definitions of generic verification functions")
+        )
+
+        base_environment = intermediate_type_inference.populate_base_environment(
+            symbol_table=symbol_table
+        )
+
+        for verification in public_generic_verifications:
+            assert isinstance(verification, intermediate.TranspilableVerification)
+
+            internal_call_errors = _check_no_calls_to_internal_verifications(
+                verification=verification, symbol_table=symbol_table
+            )
+            if len(internal_call_errors) > 0:
+                errors.extend(internal_call_errors)
+                continue
+
+            block, error = _generate_implementation_of_transpilable_verification(
+                verification=verification,
+                symbol_table=symbol_table,
+                base_environment=base_environment,
+            )
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert block is not None
+            blocks.append(block)
+
+        blocks.append(
+            Stripped("// endregion Definitions of generic verification functions")
+        )
+
     if len(symbol_table.constrained_primitives) > 0:
         blocks.append(Stripped("// region Verification of constrained primitives"))
 
@@ -664,202 +1105,6 @@ bool {verification_name}(
 {II}{arg_name}
 {I});
 }}"""
-    )
-
-
-class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
-    """Transpile the body of a :class:`TranspilableVerification`."""
-
-    # fmt: off
-    @require(
-        lambda environment, verification:
-        all(
-            environment.find(arg.name) is not None
-            for arg in verification.arguments
-        ),
-        "All arguments defined in the environment"
-    )
-    # fmt: on
-    def __init__(
-        self,
-        type_map: Mapping[
-            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
-        ],
-        is_optional_map: Mapping[parse_tree.Node, bool],
-        downcast_map: Mapping[parse_tree.Node, intermediate_type_inference.Downcast],
-        is_optional_before_downcast_map: Mapping[parse_tree.Node, bool],
-        environment: intermediate_type_inference.Environment,
-        symbol_table: intermediate.SymbolTable,
-        verification: intermediate.TranspilableVerification,
-        aliasing: cpp_aliasing.Aliasing,
-    ) -> None:
-        """Initialize with the given values."""
-        cpp_transpilation.Transpiler.__init__(
-            self,
-            type_map=type_map,
-            is_optional_map=is_optional_map,
-            downcast_map=downcast_map,
-            is_optional_before_downcast_map=is_optional_before_downcast_map,
-            environment=environment,
-            types_namespace=cpp_common.TYPES_NAMESPACE,
-            aliasing=aliasing,
-        )
-
-        self._symbol_table = symbol_table
-
-        self._argument_name_set = frozenset(arg.name for arg in verification.arguments)
-
-    def transform_name(
-        self, node: parse_tree.Name
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if node.identifier in self._variable_name_set:
-            return Stripped(cpp_naming.variable_name(node.identifier)), None
-
-        if node.identifier in self._argument_name_set:
-            return Stripped(cpp_naming.argument_name(node.identifier)), None
-
-        if node.identifier in self._symbol_table.constants_by_name:
-            constant = cpp_naming.constant_name(node.identifier)
-            return Stripped(f"{cpp_common.CONSTANTS_NAMESPACE}::{constant}"), None
-
-        if node.identifier in self._symbol_table.verification_functions_by_name:
-            return Stripped(cpp_naming.function_name(node.identifier)), None
-
-        our_type = self._symbol_table.find_our_type(name=node.identifier)
-        if isinstance(our_type, intermediate.Enumeration):
-            return (
-                Stripped(
-                    f"{cpp_common.TYPES_NAMESPACE}::{cpp_naming.enum_name(node.identifier)}"
-                ),
-                None,
-            )
-
-        return None, Error(
-            node.original_node,
-            f"We can not determine how to transpile the name {node.identifier!r} "
-            f"to C++. We could not find it neither in the constants, nor in "
-            f"verification functions, nor as an enumeration. "
-            f"If you expect this name to be transpilable, please contact "
-            f"the developers.",
-        )
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_implementation_of_transpilable_verification(
-    verification: intermediate.TranspilableVerification,
-    symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Transpile the verification to a function implementation."""
-    # fmt: off
-    type_inference, inference_error = (
-        intermediate_type_inference.infer_for_verification(
-            verification=verification,
-            base_environment=base_environment
-        )
-    )
-    # fmt: on
-
-    if inference_error is not None:
-        return None, inference_error
-
-    assert type_inference is not None
-
-    aliasing, aliasing_errors = cpp_aliasing.analyze(
-        body=verification.parsed.body,
-        arguments=verification.arguments,
-        type_map=type_inference.type_map,
-        binds_self=False,
-    )
-    if aliasing_errors is not None:
-        return None, Error(
-            verification.parsed.node,
-            f"Failed to transpile the verification function {verification.name!r} "
-            f"so that its C++ variables alias the values as in Python",
-            aliasing_errors,
-        )
-
-    assert aliasing is not None
-
-    optional_inferrer = cpp_optionaling.Inferrer(
-        environment=type_inference.environment_with_args,
-        type_map=type_inference.type_map,
-        downcast_map=type_inference.downcast_map,
-    )
-    for node in verification.parsed.body:
-        _ = optional_inferrer.transform(node)
-
-    if len(optional_inferrer.errors) > 0:
-        return None, Error(
-            verification.parsed.node,
-            f"Failed to infer whether one or more nodes are ``common::optional`` "
-            f"in the verification function {verification.name!r}",
-            optional_inferrer.errors,
-        )
-
-    transpiler = _TranspilableVerificationTranspiler(
-        type_map=type_inference.type_map,
-        is_optional_map=optional_inferrer.is_optional_map,
-        downcast_map=type_inference.downcast_map,
-        is_optional_before_downcast_map=(
-            optional_inferrer.is_optional_before_downcast_map
-        ),
-        environment=type_inference.environment_with_args,
-        symbol_table=symbol_table,
-        verification=verification,
-        aliasing=aliasing,
-    )
-
-    body = []  # type: List[Stripped]
-    for node in verification.parsed.body:
-        stmt, error = transpiler.transform(node)
-        if error is not None:
-            return None, Error(
-                verification.parsed.node,
-                f"Failed to transpile the verification function {verification.name!r}",
-                [error],
-            )
-
-        assert stmt is not None
-        body.append(stmt)
-
-    arg_types_names = [
-        (
-            cpp_common.generate_argument_type(
-                argument=arg, types_namespace=cpp_common.TYPES_NAMESPACE
-            ),
-            cpp_naming.argument_name(arg.name),
-        )
-        for arg in verification.arguments
-    ]
-
-    function_name = cpp_naming.function_name(verification.name)
-    arg_definitions_joined = ",\n".join(
-        f"{arg_type} {arg_name}" for arg_type, arg_name in arg_types_names
-    )
-
-    body_joined = "\n".join(body)
-
-    return_type = _generate_return_type(verification)
-
-    if len(arg_types_names) == 0:
-        signature = Stripped(f"{return_type} {function_name}()")
-    else:
-        signature = Stripped(
-            f"""\
-{return_type} {function_name}(
-{I}{indent_but_first_line(arg_definitions_joined, I)}
-)"""
-        )
-
-    return (
-        Stripped(
-            f"""\
-{signature} {{
-{I}{indent_but_first_line(body_joined, I)}
-}}"""
-        ),
-        None,
     )
 
 
@@ -3439,6 +3684,15 @@ def generate_implementation(
                 )
 
             elif isinstance(verification, intermediate.TranspilableVerification):
+                # NOTE (mristin):
+                # The public generic verification functions are templates defined
+                # in the header, see :py:func:`generate_header`.
+                if (
+                    _is_generic(verification)
+                    and verification.visibility is intermediate.Visibility.PUBLIC
+                ):
+                    continue
+
                 block, error = _generate_implementation_of_transpilable_verification(
                     verification=verification,
                     symbol_table=symbol_table,

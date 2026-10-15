@@ -516,11 +516,45 @@ def _transpile_transpilable_verification(
         assert stmt is not None
         body.append(stmt)
 
+    # NOTE (mristin):
+    # The ``List<T>`` is invariant in Java, so we declare the generic sequences,
+    # see :py:func:`intermediate.generic_sequence_item_class`, with the wildcard
+    # ``List<? extends T>``. This way, the lists of the descendants can be passed
+    # without a copy. The ``Optional<T>`` is invariant as well, so we declare
+    # the optional generic sequences as ``Optional<? extends List<? extends T>>``.
+    arg_defs = []  # type: List[Stripped]
+    remarks_on_generic_sequences = []  # type: List[str]
+    for arg in verification.arguments:
+        arg_name = java_naming.argument_name(arg.name)
+
+        if intermediate.generic_sequence_item_class(arg) is None:
+            arg_type = java_common.generate_type(arg.type_annotation)
+        else:
+            list_type_anno = intermediate.beneath_optional(arg.type_annotation)
+            assert isinstance(list_type_anno, intermediate.ListTypeAnnotation)
+
+            item_type = java_common.generate_type(list_type_anno.items)
+
+            arg_type = Stripped(f"List<? extends {item_type}>")
+            if isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
+                arg_type = Stripped(f"Optional<? extends {arg_type}>")
+
+            remarks_on_generic_sequences.append(
+                f"The argument {{@code {arg_name}}} is declared with the wildcard "
+                f"{{@code List<? extends {item_type}>}} instead of the invariant "
+                f"{{@code List<{item_type}>}} so that the lists of "
+                f"the descendants of {{@link {item_type}}} can be passed without "
+                f"a copy."
+            )
+
+        arg_defs.append(Stripped(f"{arg_type} {arg_name}"))
+
     writer = io.StringIO()
     if verification.description is not None:
         comment, comment_errors = java_description.generate_comment_for_signature(
             description=verification.description,
             context=java_description.Context(package=package, cls_or_enum=None),
+            extra_remarks=remarks_on_generic_sequences,
         )
         if comment_errors is not None:
             return None, Error(
@@ -533,6 +567,15 @@ def _transpile_transpilable_verification(
 
         writer.write(comment)
         writer.write("\n")
+    elif len(remarks_on_generic_sequences) > 0:
+        writer.write(
+            java_description.documentation_comment(
+                Stripped("\n\n".join(remarks_on_generic_sequences))
+            )
+        )
+        writer.write("\n")
+    else:
+        pass
 
     method_name = java_naming.method_name(verification.name)
 
@@ -549,12 +592,6 @@ def _transpile_transpilable_verification(
         return_type = "void"
     else:
         return_type = java_common.generate_type(type_annotation=verification.returns)
-
-    arg_defs = []  # type: List[Stripped]
-    for arg in verification.arguments:
-        arg_type = java_common.generate_type(arg.type_annotation)
-        arg_name = java_naming.argument_name(arg.name)
-        arg_defs.append(Stripped(f"{arg_type} {arg_name}"))
 
     if len(arg_defs) == 0:
         writer.write(

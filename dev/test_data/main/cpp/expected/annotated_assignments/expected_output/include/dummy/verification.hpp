@@ -5,13 +5,18 @@
 // Do NOT edit or append.
 
 #include "dummy/common.hpp"
+#include "dummy/constants.hpp"
 #include "dummy/iteration.hpp"
 #include "dummy/pattern.hpp"
+#include "dummy/stringification.hpp"
 #include "dummy/types.hpp"
 
 #pragma warning(push, 0)
+#include <memory>
 #include <set>
+#include <type_traits>
 #include <unordered_set>
+#include <vector>
 #pragma warning(pop)
 
 namespace dummy {
@@ -216,9 +221,14 @@ class RecursiveVerification : public IVerification {
 // region Verification functions
 
 /// \brief Check an optional class declared with `None` and assigned in a loop.
+///
+/// \tparam ParentsT type of the items of \p parents, types::IParent or one of its descendants, so that the vectors of the descendants can be passed without a copy, as std::vector is invariant
+template<
+  typename ParentsT
+>
 bool FirstChildAIsSmall(
   const std::vector<
-    std::shared_ptr<types::IParent>
+    std::shared_ptr<ParentsT>
   >& parents
 );
 
@@ -228,10 +238,15 @@ bool TextIsAllowedUnlessLong(
 );
 
 /// \brief Check a non-optional variable declared wider than its value.
+///
+/// \tparam ParentsT type of the items of \p parents, types::IParent or one of its descendants, so that the vectors of the descendants can be passed without a copy, as std::vector is invariant
+template<
+  typename ParentsT
+>
 bool LastChildBIsNotZero(
   const std::shared_ptr<types::IParent>& parent,
   const std::vector<
-    std::shared_ptr<types::IParent>
+    std::shared_ptr<ParentsT>
   >& parents
 );
 
@@ -325,6 +340,60 @@ bool NoneIsShortAndTextIsShort(
 );
 
 // endregion Verification functions
+
+// region Definitions of generic verification functions
+
+template<
+  typename ParentsT
+>
+bool FirstChildAIsSmall(
+  const std::vector<
+    std::shared_ptr<ParentsT>
+  >& parents
+) {
+  static_assert(
+    std::is_base_of<types::IParent, ParentsT>::value,
+    "Expected the items of parents to be instances of types::IParent"
+  );
+  common::optional<std::shared_ptr<types::IChildA> > found = common::nullopt;
+  for (const std::shared_ptr<ParentsT>& parent : parents) {
+    if (types::IsChildA(*parent)) {
+      found = std::dynamic_pointer_cast<types::IChildA>(parent);
+      break;
+    }
+  }
+  if (!(found.has_value())) {
+    return true;
+  }
+  return (*found)->a_only() < 100;
+}
+
+template<
+  typename ParentsT
+>
+bool LastChildBIsNotZero(
+  const std::shared_ptr<types::IParent>& parent,
+  const std::vector<
+    std::shared_ptr<ParentsT>
+  >& parents
+) {
+  static_assert(
+    std::is_base_of<types::IParent, ParentsT>::value,
+    "Expected the items of parents to be instances of types::IParent"
+  );
+  std::shared_ptr<types::IParent> last = parent;
+  for (const std::shared_ptr<ParentsT>& other : parents) {
+    last = other;
+  }
+  if (types::IsChildB(*last)) {
+    return (
+      std::dynamic_pointer_cast<types::IChildB>(last)->b_only() != 0
+    );
+  }
+  return true;
+}
+
+// endregion Definitions of generic verification functions
 
 // region Verification of constrained primitives
 

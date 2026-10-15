@@ -976,6 +976,46 @@ def _assignable(
     return False
 
 
+def _is_list_of_descendants(
+    target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationUnion"
+) -> bool:
+    """
+    Check that the ``value_type`` is a list of the descendants of the items of
+    the ``target_type``.
+
+    An optional value can be passed only to an optional target.
+    """
+    if isinstance(value_type, OptionalTypeAnnotation) and not isinstance(
+        target_type, OptionalTypeAnnotation
+    ):
+        return False
+
+    target_type_beneath = beneath_optional(target_type)
+    value_type_beneath = beneath_optional(value_type)
+
+    if not (
+        isinstance(target_type_beneath, ListTypeAnnotation)
+        and isinstance(value_type_beneath, ListTypeAnnotation)
+    ):
+        return False
+
+    target_items = target_type_beneath.items
+    value_items = value_type_beneath.items
+
+    if not (
+        isinstance(target_items, OurTypeAnnotation)
+        and isinstance(target_items.our_type, _types.Class)
+        and isinstance(value_items, OurTypeAnnotation)
+        and isinstance(value_items.our_type, _types.Class)
+    ):
+        return False
+
+    return (
+        _types.runtime_id(value_items.our_type)
+        in target_items.our_type.descendant_id_set
+    )
+
+
 def needs_wrapping_into_named_union(
     target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationUnion"
 ) -> bool:
@@ -2287,22 +2327,6 @@ _COLLECTION_TYPE_ANNOTATIONS = (
     TupleTypeAnnotation,
     SetTypeAnnotation,
 )  # type: Final
-
-
-def _holds_set(type_annotation: "TypeAnnotationUnion") -> bool:
-    """Check whether a value of ``type_annotation`` is or contains a set at any depth."""
-    type_anno = beneath_optional(type_annotation)
-
-    if isinstance(type_anno, SetTypeAnnotation):
-        return True
-
-    if isinstance(type_anno, ListTypeAnnotation):
-        return _holds_set(type_anno.items)
-
-    if isinstance(type_anno, TupleTypeAnnotation):
-        return any(_holds_set(item) for item in type_anno.items)
-
-    return False
 
 
 def _holds_list_or_set(type_annotation: "TypeAnnotationUnion") -> bool:
@@ -4334,41 +4358,78 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         self.type_map[node] = result
         return result
 
-    def _check_arguments(
+    def _check_call_arguments(
         self,
         args: Sequence[parse_tree.Expression],
-        arguments: Sequence[_types.Argument],
-        what: str,
+        callee: Union[_types.Verification, _types.Method],
     ) -> bool:
         """
-        Check that the ``args`` fit the ``arguments`` beyond their types.
+        Check that the ``args`` fit the arguments of the ``callee``.
 
-        We check that the ``args`` passed to the mutable ``arguments`` are mutable,
-        and that ``None`` is passed only to the optional ``arguments``.
+        The lists and the sets are invariant in their items, see
+        :py:func:`_assignable`, as the targets represent them with invariant types.
+        The only exception is a read-only ``Sequence[...]`` argument of
+        a verification function, which also accepts a list of the descendants of
+        its items, as the targets declare it generic, see
+        :py:func:`aas_core_codegen.intermediate.generic_sequence_item_class`.
+        The methods can not have generic arguments, since Go methods can not have
+        type parameters, and C++ virtual methods can not be templates.
 
-        The ``what`` describes the called function or method in the error messages,
-        *e.g.*, ``the verification function 'foo'``.
+        We further check that ``None`` is passed only to the optional arguments, and
+        that the ``args`` passed to the mutable arguments are mutable.
 
         :return: True if the check passed
         """
+        what = (
+            f"the verification function {callee.name!r}"
+            if isinstance(callee, _types.Verification)
+            else f"the method {callee.name!r}"
+        )
+
         ok = True
-        for arg_node, argument in zip(args, arguments):
+        for arg_node, argument in zip(args, callee.arguments):
             # NOTE (mristin):
             # We do not check the types of the arguments in general. However, we
-            # have to check the sets, since the targets represent them with
-            # different types which only the checks here make compatible.
+            # have to check the lists and the sets, see the docstring.
             arg_type = self.type_map.get(arg_node, None)
             argument_type = convert_type_annotation(argument.type_annotation)
+
+            accepts_descendants = (
+                isinstance(callee, _types.Verification)
+                and not argument.mutable
+                and arg_type is not None
+                and _is_list_of_descendants(
+                    target_type=argument_type, value_type=arg_type
+                )
+            )
+
             if (
                 arg_type is not None
-                and (_holds_set(arg_type) or _holds_set(argument_type))
+                and (_holds_list_or_set(arg_type) or _holds_list_or_set(argument_type))
                 and not _assignable(target_type=argument_type, value_type=arg_type)
+                and not accepts_descendants
             ):
                 self.errors.append(
                     Error(
                         arg_node.original_node,
                         f"The argument {argument.name!r} of {what} is "
-                        f"of type {argument_type}, but got: {arg_type}",
+                        f"of type {argument_type}, but got: {arg_type}. "
+                        f"The lists and the sets are invariant, so their items "
+                        f"need to be of exactly the same type. A mutable "
+                        f"List[...] can not hold the instances of a subclass, "
+                        f"since the callee could insert an instance of another "
+                        f"subclass into it. Only a read-only Sequence[...] "
+                        f"argument of a verification function accepts "
+                        f"the instances of a subclass, since the targets with "
+                        f"invariant lists declare it generic: Go with a type "
+                        f"parameter, C++ with a template, C# with IReadOnlyList<T> "
+                        f"and Java with List<? extends T>. The methods can not "
+                        f"accept them, since Go methods can not have type "
+                        f"parameters, and C++ virtual methods can not be "
+                        f"templates. We do not copy the list implicitly either, as "
+                        f"that would cost linear time and memory on each call. "
+                        f"Please declare the argument with the exact type of "
+                        f"the items.",
                     )
                 )
                 ok = False
@@ -4471,11 +4532,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             )
             return None
 
-        if not self._check_arguments(
-            args=node.args,
-            arguments=member_type.method.arguments,
-            what=f"the method {node.member.name!r}",
-        ):
+        if not self._check_call_arguments(args=node.args, callee=member_type.method):
             return None
 
         if not member_type.method.non_mutating:
@@ -4634,11 +4691,7 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
 
         if isinstance(
             func_type, VerificationTypeAnnotation
-        ) and not self._check_arguments(
-            args=node.args,
-            arguments=func_type.func.arguments,
-            what=f"the verification function {func_type.func.name!r}",
-        ):
+        ) and not self._check_call_arguments(args=node.args, callee=func_type.func):
             return None
 
         # NOTE (mristin):
@@ -6051,6 +6104,20 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
         # The type of a new variable is its declared type, if it has been annotated,
         # and the type of the assigned value otherwise.
         variable_type = target_type if target_type is not None else value_type
+
+        # NOTE (mristin):
+        # An immutable alias of a variable of the very same type shares the type
+        # annotation of the variable. This way, the transpilers can tell by
+        # the identity of the type annotation that the alias holds a generic
+        # sequence, see :py:func:`_types.generic_sequence_item_class`.
+        if (
+            is_new_variable
+            and is_final
+            and isinstance(node.value, parse_tree.Name)
+            and target_type is not None
+            and _type_annotations_equal(target_type, value_type)
+        ):
+            variable_type = value_type
 
         if is_new_variable:
             assert isinstance(node.target, parse_tree.Name)
@@ -7629,6 +7696,117 @@ def _check_appended_lists(
     return errors
 
 
+def _check_usages_of_generic_sequences(
+    body: Sequence[parse_tree.Node],
+    arguments: Sequence[_types.Argument],
+    type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
+) -> List[Error]:
+    """
+    Check that the generic sequences in the ``body`` are used only where we can
+    transpile them.
+
+    The ``arguments`` belong to a verification function. A generic sequence,
+    see :py:func:`aas_core_codegen.intermediate.generic_sequence_item_class`,
+    accepts the sequences of the descendants. The targets with invariant lists
+    declare it generic: Go with a type parameter, C++ with a template, C# with
+    ``IReadOnlyList<T>``, and Java with ``List<? extends T>``. Such an argument
+    can be only the collection of a for-loop or of ``all``/``any``, the collection
+    of an index, the container of ``in``, the argument of ``len``, the value of
+    a nullness check, an argument of a verification function, which is generic
+    as well, and the value of an immutable alias, *e.g.*,
+    ``alias: Final[Sequence[Item]] = items``, which is generic as well. Elsewhere,
+    *e.g.*, passed to a method or assigned to a variable, the targets would expect
+    the non-generic list, and we would have to copy it.
+    """
+    generic_name_set = {
+        argument.name
+        for argument in arguments
+        if _types.generic_sequence_item_class(argument) is not None
+    }
+
+    if len(generic_name_set) == 0:
+        return []
+
+    allowed_set = set()  # type: Set[parse_tree.Node]
+    generic_names = []  # type: List[parse_tree.Name]
+
+    for node_in_body in body:
+        for node in parse_tree.over_nodes(node_in_body):
+            if (
+                isinstance(node, parse_tree.Name)
+                and node.identifier in generic_name_set
+            ):
+                generic_names.append(node)
+
+            # NOTE (mristin):
+            # An immutable alias of a generic sequence is a generic sequence itself,
+            # since it shares the type annotation of the aliased variable, see
+            # :py:meth:`_Inferrer.transform_assignment`. The targets declare
+            # the alias with the type parameter.
+            if (
+                isinstance(node, parse_tree.Assignment)
+                and node.annotation is not None
+                and is_final_annotation(node.annotation)
+                and isinstance(node.target, parse_tree.Name)
+                and isinstance(node.value, parse_tree.Name)
+                and node.value.identifier in generic_name_set
+                and type_map.get(node.target, None) is type_map.get(node.value, None)
+            ):
+                allowed_set.add(node.target)
+                allowed_set.add(node.value)
+                generic_name_set.add(node.target.identifier)
+
+            if isinstance(node, parse_tree.ForEach):
+                allowed_set.add(node.iteration)
+
+            elif isinstance(node, parse_tree.Index):
+                allowed_set.add(node.collection)
+
+            elif isinstance(node, parse_tree.IsIn):
+                allowed_set.add(node.container)
+
+            elif isinstance(node, (parse_tree.IsNone, parse_tree.IsNotNone)):
+                allowed_set.add(node.value)
+
+            elif isinstance(node, parse_tree.FunctionCall):
+                func_type = type_map.get(node.name, None)
+
+                if isinstance(func_type, VerificationTypeAnnotation):
+                    allowed_set.update(node.args)
+
+                elif (
+                    isinstance(func_type, BuiltinFunctionTypeAnnotation)
+                    and func_type.func.kind is BuiltinFunctionKind.LEN
+                ):
+                    allowed_set.update(node.args)
+
+                else:
+                    pass
+
+            else:
+                pass
+
+    return [
+        Error(
+            name.original_node,
+            f"The argument {name.identifier!r} is a read-only Sequence[...] of "
+            f"a class with descendants, so the targets declare it generic to "
+            f"accept the sequences of the descendants without a copy: Go with "
+            f"a type parameter, C++ with a template, C# with IReadOnlyList<T>, "
+            f"and Java with List<? extends T>. Hence, we support it only as "
+            f"the collection of a for-loop or of all/any, the collection of "
+            f"an index, the container of in, the argument of len, the value of "
+            f"a nullness check, an argument of a verification function, and "
+            f"the value of an immutable alias of the very same type, *e.g.*, "
+            f"``alias: Final[Sequence[...]] = {name.identifier}``. Elsewhere, "
+            f"*e.g.*, passed to a method, assigned to a mutable variable or copied "
+            f"with list, the targets would expect the non-generic list.",
+        )
+        for name in generic_names
+        if name not in allowed_set
+    ]
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _infer_for_function(
     body: Sequence[parse_tree.Node],
@@ -7677,6 +7855,16 @@ def _infer_for_function(
             representation_map=canonicalizer.representation_map,
         )
     )
+
+    # NOTE (mristin):
+    # Only the verification functions have generic arguments, as the methods can
+    # not be generic, see :py:func:`_types.generic_sequence_item_class`.
+    if enclosing_method is None:
+        type_inferrer.errors.extend(
+            _check_usages_of_generic_sequences(
+                body=body, arguments=arguments, type_map=type_inferrer.type_map
+            )
+        )
 
     # NOTE (mristin):
     # Some targets, such as Go or Java, refuse to compile a function which misses

@@ -11,6 +11,7 @@ from typing import (
     Mapping,
     Union,
     Set,
+    Dict,
 )
 
 from icontract import ensure, require
@@ -411,6 +412,15 @@ func {function_name}({arg_name} string) bool {{
     return Stripped(writer.getvalue()), None
 
 
+def _type_parameter_name(argument: intermediate.Argument) -> Identifier:
+    """
+    Generate the name of the type parameter for the items of the ``argument``.
+
+    For example, ``items`` gives ``ItemsT``.
+    """
+    return Identifier(f"{golang_naming.function_name(argument.name)}T")
+
+
 class _TranspilableVerificationTranspiler(golang_transpilation.Transpiler):
     """Transpile the body of a :py:class:`TranspilableVerification`."""
 
@@ -448,6 +458,35 @@ class _TranspilableVerificationTranspiler(golang_transpilation.Transpiler):
         self._symbol_table = symbol_table
 
         self._argument_name_set = frozenset(arg.name for arg in verification.arguments)
+
+        # NOTE (mristin):
+        # The type inference propagates the very type annotation of the items of
+        # an argument to the loop variables, the generator variables and
+        # the indexed items, so we can tell by the identity of the type annotation
+        # that a value is of the type parameter of a generic sequence.
+        type_parameter_by_items_id = dict()  # type: Dict[int, Identifier]
+        for arg in verification.arguments:
+            if intermediate.generic_sequence_item_class(arg) is None:
+                continue
+
+            arg_type_anno = environment.find(arg.name)
+            assert arg_type_anno is not None
+
+            list_type_anno = intermediate_type_inference.beneath_optional(arg_type_anno)
+            assert isinstance(
+                list_type_anno, intermediate_type_inference.ListTypeAnnotation
+            )
+
+            type_parameter_by_items_id[id(list_type_anno.items)] = _type_parameter_name(
+                arg
+            )
+
+        self._type_parameter_by_items_id = type_parameter_by_items_id
+
+    def _type_parameter_of(
+        self, type_annotation: intermediate_type_inference.TypeAnnotationUnion
+    ) -> Optional[Identifier]:
+        return self._type_parameter_by_items_id.get(id(type_annotation), None)
 
     def _transform_enumeration_literal(
         self, enumeration_name: Identifier, literal_name: Identifier
@@ -548,6 +587,46 @@ def _transpile_transpilable_verification(
         assert stmt is not None
         body.append(stmt)
 
+    # NOTE (mristin):
+    # The slices are invariant in Go, so we declare a type parameter for the items
+    # of each generic sequence, see :py:func:`intermediate.generic_sequence_item_class`.
+    # This way, the slices of the descendants can be passed without a copy.
+    # The methods can not have type parameters in Go, so only the verification
+    # functions have generic sequences.
+    arg_defs = []  # type: List[Stripped]
+    type_parameter_defs = []  # type: List[Stripped]
+    remarks_on_generic_sequences = []  # type: List[str]
+    for arg in verification.arguments:
+        arg_name = golang_naming.argument_name(arg.name)
+
+        if intermediate.generic_sequence_item_class(arg) is None:
+            arg_type = golang_common.generate_type(
+                arg.type_annotation, types_package=Identifier("ourtypes")
+            )
+        else:
+            list_type_anno = intermediate.beneath_optional(arg.type_annotation)
+            assert isinstance(list_type_anno, intermediate.ListTypeAnnotation)
+
+            item_type = golang_common.generate_type(
+                list_type_anno.items, types_package=Identifier("ourtypes")
+            )
+
+            type_parameter = _type_parameter_name(arg)
+            type_parameter_defs.append(Stripped(f"{type_parameter} {item_type}"))
+
+            # NOTE (mristin):
+            # The optional slices are not pointers in Go, as the slices are nilable.
+            arg_type = Stripped(f"[]{type_parameter}")
+
+            remarks_on_generic_sequences.append(
+                f"The items of the argument {arg_name} are of the type parameter "
+                f"{type_parameter} instead of {item_type} so that the slices of "
+                f"the descendants of {item_type} can be passed without a copy, as "
+                f"the slices are invariant in Go."
+            )
+
+        arg_defs.append(Stripped(f"{arg_name} {arg_type}"))
+
     writer = io.StringIO()
 
     if verification.description is not None:
@@ -557,6 +636,7 @@ def _transpile_transpilable_verification(
                 package=golang_common.VERIFICATION_PACKAGE,
                 cls_or_enum=None,
             ),
+            extra_remarks=remarks_on_generic_sequences,
         )
         if comment_errors is not None:
             return None, Error(
@@ -570,8 +650,21 @@ def _transpile_transpilable_verification(
 
         writer.write(comment)
         writer.write("\n")
+    elif len(remarks_on_generic_sequences) > 0:
+        writer.write(
+            golang_description.documentation_comment(
+                Stripped("\n\n".join(remarks_on_generic_sequences))
+            )
+        )
+        writer.write("\n")
+    else:
+        pass
 
     function_name = golang_naming.function_name(verification.name)
+
+    type_parameters = (
+        f"[{', '.join(type_parameter_defs)}]" if len(type_parameter_defs) > 0 else ""
+    )
 
     if verification.returns is None:
         return_type_suffix = ""
@@ -581,24 +674,16 @@ def _transpile_transpilable_verification(
         )
         return_type_suffix = f" {return_type}"
 
-    arg_defs = []  # type: List[Stripped]
-    for arg in verification.arguments:
-        arg_type = golang_common.generate_type(
-            arg.type_annotation, types_package=Identifier("ourtypes")
-        )
-        arg_name = golang_naming.argument_name(arg.name)
-        arg_defs.append(Stripped(f"{arg_name} {arg_type}"))
-
     if len(arg_defs) == 0:
         writer.write(
             f"""\
-func {function_name}(){return_type_suffix} {{"""
+func {function_name}{type_parameters}(){return_type_suffix} {{"""
         )
     else:
         arg_defs_joined = "\n".join(f"{arg_def}," for arg_def in arg_defs)
         writer.write(
             f"""\
-func {function_name}(
+func {function_name}{type_parameters}(
 {I}{indent_but_first_line(arg_defs_joined, I)}
 ){return_type_suffix} {{"""
         )

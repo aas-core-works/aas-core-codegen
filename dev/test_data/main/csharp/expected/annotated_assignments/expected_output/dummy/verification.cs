@@ -34,8 +34,11 @@ namespace dummy
         /// <summary>
         /// Check an optional class declared with <c>None</c> and assigned in a loop.
         /// </summary>
+        /// <remarks>
+        /// The argument parents is declared as the covariant IReadOnlyList&lt;IParent&gt; instead of the invariant List&lt;IParent&gt; so that the lists of the descendants of IParent can be passed without a copy.
+        /// </remarks>
         public static bool FirstChildAIsSmall(
-            List<IParent> parents
+            IReadOnlyList<IParent> parents
         )
         {
             Our.IChildA? found = null;
@@ -91,9 +94,12 @@ namespace dummy
         /// <summary>
         /// Check a non-optional variable declared wider than its value.
         /// </summary>
+        /// <remarks>
+        /// The argument parents is declared as the covariant IReadOnlyList&lt;IParent&gt; instead of the invariant List&lt;IParent&gt; so that the lists of the descendants of IParent can be passed without a copy.
+        /// </remarks>
         public static bool LastChildBIsNotZero(
             IParent parent,
-            List<IParent> parents
+            IReadOnlyList<IParent> parents
         )
         {
             Our.IParent last = parent;
@@ -374,9 +380,9 @@ namespace dummy
         )
         {
             long limit = 1000;
-            string label = text;
-            string? maybeText = optionalText;
-            List<string> allTexts = texts;
+            var label = text;
+            var maybeText = optionalText;
+            var allTexts = texts;
             HashSet<string> seen = new HashSet<string>();
             seen.Add(text);
             HashSet<string> reservedSeen = (
@@ -385,7 +391,7 @@ namespace dummy
                 text,
                 number
             );
-            Our.IParent basE = parent;
+            var basE = parent;
             if (
                 reservedSeen.Count > 0
                 || Common.StringHelpers.Len(label) > limit

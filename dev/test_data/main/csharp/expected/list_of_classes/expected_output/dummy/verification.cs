@@ -66,11 +66,16 @@ namespace dummy
         /// Give the instances of <see cref="Our.SomeItem" /> among <paramref name="items" />.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The appended items are narrowed down to <see cref="Our.SomeItem" />, while the list
         /// holds <see cref="Our.IAbstractItem" />'s.
+        /// </para>
+        /// <para>
+        /// The argument items is declared as the covariant IReadOnlyList&lt;IAbstractItem&gt; instead of the invariant List&lt;IAbstractItem&gt; so that the lists of the descendants of IAbstractItem can be passed without a copy.
+        /// </para>
         /// </remarks>
         public static List<IAbstractItem> SomeItemsOf(
-            List<IAbstractItem> items
+            IReadOnlyList<IAbstractItem> items
         )
         {
             List<Our.IAbstractItem> result = new List<Our.IAbstractItem>();

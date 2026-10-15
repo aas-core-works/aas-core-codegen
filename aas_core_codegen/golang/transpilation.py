@@ -256,6 +256,24 @@ class Transpiler(
         # generate the reference in the Go code.
         self._variable_name_set = set()  # type: Set[Identifier]
 
+    def _type_parameter_of(
+        self, type_annotation: intermediate_type_inference.TypeAnnotationUnion
+    ) -> Optional[Identifier]:
+        """
+        Determine the type parameter which stands for the ``type_annotation``.
+
+        Only the verification functions have type parameters, namely for the items
+        of the generic sequences, see
+        :py:func:`intermediate.generic_sequence_item_class`. The transpiler of
+        the verification functions overrides this method.
+
+        :param type_annotation: inferred type of a value
+        :return:
+            the type parameter, if the value is an item of a generic sequence,
+            and None otherwise
+        """
+        return None
+
     def _our_type_name(self, name: Identifier) -> Stripped:
         """Prepend the types package, if specified, to the ``name`` of our type."""
         if self._types_package is None:
@@ -309,6 +327,12 @@ class Transpiler(
 
         source_type = downcast.source.our_type
         if isinstance(source_type, intermediate.Class):
+            # NOTE (mristin):
+            # Go forbids type assertions on the values of a type parameter, so we
+            # convert the item of a generic sequence to an interface first.
+            if self._type_parameter_of(downcast.source) is not None:
+                return Stripped(f"any({code}).({interface_name})"), None
+
             return Stripped(f"{code}.({interface_name})"), None
 
         elif isinstance(source_type, intermediate.NamedUnion):
@@ -808,10 +832,24 @@ ourcommon.MapContains(
             )
 
         elif isinstance(container_type, intermediate_type_inference.ListTypeAnnotation):
+            # NOTE (mristin):
+            # The ``ourcommon.SliceContains`` infers its type parameter from both
+            # the slice and the member, so that the untyped constants take the type of
+            # the items. The instances of the classes are never constants, but they
+            # can be of a different type than the items, *e.g.*, if the items are of
+            # the type parameter of a generic sequence, see
+            # :py:func:`intermediate.generic_sequence_item_class`, or if the member
+            # is an instance of a descendant. Hence, we look them up as ``any``'s.
+            function_name = "SliceContains"
+            if isinstance(
+                container_type.items, intermediate_type_inference.OurTypeAnnotation
+            ) and isinstance(container_type.items.our_type, intermediate.Class):
+                function_name = "SliceContainsInstance"
+
             return (
                 Stripped(
                     f"""\
-ourcommon.SliceContains(
+ourcommon.{function_name}(
 {I}{indent_but_first_line(container, I)},
 {I}{indent_but_first_line(member, I)},
 )"""
@@ -1146,6 +1184,32 @@ ourcommon.{function_name}(
 
         args = []  # type: List[Stripped]
         for i, arg_node in enumerate(node.args):
+            # NOTE (mristin):
+            # The type parameter of a generic sequence can not be inferred from
+            # an untyped ``nil``, so we pass on a typed ``nil`` instead, see
+            # :py:func:`intermediate.generic_sequence_item_class`.
+            if (
+                isinstance(
+                    func_type, intermediate_type_inference.VerificationTypeAnnotation
+                )
+                and isinstance(arg_node, parse_tree.Constant)
+                and arg_node.value is None
+                and intermediate.generic_sequence_item_class(
+                    func_type.func.arguments[i]
+                )
+                is not None
+            ):
+                list_type_anno = intermediate.beneath_optional(
+                    func_type.func.arguments[i].type_annotation
+                )
+                assert isinstance(list_type_anno, intermediate.ListTypeAnnotation)
+
+                list_type = golang_common.generate_type(
+                    type_annotation=list_type_anno, types_package=self._types_package
+                )
+                args.append(Stripped(f"{list_type}(nil)"))
+                continue
+
             # NOTE (mristin):
             # We pass on a pointer to an optional argument of a verification
             # function, and de-reference the values otherwise.
@@ -2066,11 +2130,22 @@ fmt.Sprintf(
         variable_type_annotation = self.type_map[node.generator.variable]
 
         variable_name_go = golang_naming.variable_name(variable_name)
-        variable_type_go, error_msg = generate_type(
-            type_annotation=variable_type_annotation, types_package=self._types_package
-        )
-        if error_msg is not None:
-            errors.append(Error(node.generator.variable.original_node, error_msg))
+
+        # NOTE (mristin):
+        # The items of a generic sequence are of the type parameter, and
+        # the ``ourcommon.All`` and ``ourcommon.Some`` infer their type from both
+        # the condition and the slice, so the condition needs to expect the type
+        # parameter as well.
+        type_parameter = self._type_parameter_of(variable_type_annotation)
+        if type_parameter is not None:
+            variable_type_go = Stripped(type_parameter)  # type: Optional[Stripped]
+        else:
+            variable_type_go, error_msg = generate_type(
+                type_annotation=variable_type_annotation,
+                types_package=self._types_package,
+            )
+            if error_msg is not None:
+                errors.append(Error(node.generator.variable.original_node, error_msg))
 
         try:
             self._environment.set(
@@ -2409,6 +2484,21 @@ ourcommon.{qualifier_function}(
             )
             if error_msg is not None:
                 return None, Error(node.annotation.original_node, error_msg)
+
+            # NOTE (mristin):
+            # An immutable alias of a generic sequence shares its type annotation,
+            # see :py:meth:`intermediate_type_inference._Inferrer.transform_assignment`,
+            # so we declare the alias with the type parameter as well. The optional
+            # slices are not pointers, as the slices are nilable.
+            target_type_beneath = intermediate_type_inference.beneath_optional(
+                self.type_map[node.target]
+            )
+            if isinstance(
+                target_type_beneath, intermediate_type_inference.ListTypeAnnotation
+            ):
+                type_parameter = self._type_parameter_of(target_type_beneath.items)
+                if type_parameter is not None:
+                    declared_type = Stripped(f"[]{type_parameter}")
 
             target = Stripped(f"var {target} {declared_type}")
             assignment = "="

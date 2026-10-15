@@ -228,17 +228,19 @@ func NarrowingAfterTheOnlyCompletingBranch(
 }
 
 // Check the narrowing after the `continue` and the early return in a loop.
-func ChildAsHaveTexts(
-	parents []ourtypes.IParent,
+//
+// The items of the argument parents are of the type parameter ParentsT instead of ourtypes.IParent so that the slices of the descendants of ourtypes.IParent can be passed without a copy, as the slices are invariant in Go.
+func ChildAsHaveTexts[ParentsT ourtypes.IParent](
+	parents []ParentsT,
 ) bool {
 	for _, parent := range parents {
 		if !ourtypes.IsChildA(parent) {
 			continue
 		}
-		if parent.(ourtypes.IChildA).OptionalText() == nil {
+		if any(parent).(ourtypes.IChildA).OptionalText() == nil {
 			return false
 		}
-		if ourcommon.LenStr(*parent.(ourtypes.IChildA).OptionalText()) < 1 {
+		if ourcommon.LenStr(*any(parent).(ourtypes.IChildA).OptionalText()) < 1 {
 			return false
 		}
 	}
@@ -246,8 +248,10 @@ func ChildAsHaveTexts(
 }
 
 // Check the narrowing after the `continue` in a loop with a `break`.
-func TextsBeforeContainerAreShort(
-	parents []ourtypes.IParent,
+//
+// The items of the argument parents are of the type parameter ParentsT instead of ourtypes.IParent so that the slices of the descendants of ourtypes.IParent can be passed without a copy, as the slices are invariant in Go.
+func TextsBeforeContainerAreShort[ParentsT ourtypes.IParent](
+	parents []ParentsT,
 ) bool {
 	total := int64(0)
 	for _, parent := range parents {
@@ -275,14 +279,16 @@ func TextOrDefaultIsShort(
 }
 
 // Check the narrowing of a variable to a class by the assigned value.
-func LastChildAIsSmall(
+//
+// The items of the argument parents are of the type parameter ParentsT instead of ourtypes.IParent so that the slices of the descendants of ourtypes.IParent can be passed without a copy, as the slices are invariant in Go.
+func LastChildAIsSmall[ParentsT ourtypes.IParent](
 	parent ourtypes.IParent,
-	parents []ourtypes.IParent,
+	parents []ParentsT,
 ) bool {
 	last := parent
 	for _, other := range parents {
 		if ourtypes.IsChildA(other) {
-			last = other.(ourtypes.IChildA)
+			last = any(other).(ourtypes.IChildA)
 			if last.(ourtypes.IChildA).AOnly() >= 1000 {
 				return false
 			}

@@ -296,8 +296,11 @@ namespace dummy
         /// <summary>
         /// Check the narrowing after the <c>continue</c> and the early return in a loop.
         /// </summary>
+        /// <remarks>
+        /// The argument parents is declared as the covariant IReadOnlyList&lt;IParent&gt; instead of the invariant List&lt;IParent&gt; so that the lists of the descendants of IParent can be passed without a copy.
+        /// </remarks>
         public static bool ChildAsHaveTexts(
-            List<IParent> parents
+            IReadOnlyList<IParent> parents
         )
         {
             foreach (var parent in parents)
@@ -321,8 +324,11 @@ namespace dummy
         /// <summary>
         /// Check the narrowing after the <c>continue</c> in a loop with a <c>break</c>.
         /// </summary>
+        /// <remarks>
+        /// The argument parents is declared as the covariant IReadOnlyList&lt;IParent&gt; instead of the invariant List&lt;IParent&gt; so that the lists of the descendants of IParent can be passed without a copy.
+        /// </remarks>
         public static bool TextsBeforeContainerAreShort(
-            List<IParent> parents
+            IReadOnlyList<IParent> parents
         )
         {
             long total = 0;
@@ -360,9 +366,12 @@ namespace dummy
         /// <summary>
         /// Check the narrowing of a variable to a class by the assigned value.
         /// </summary>
+        /// <remarks>
+        /// The argument parents is declared as the covariant IReadOnlyList&lt;IParent&gt; instead of the invariant List&lt;IParent&gt; so that the lists of the descendants of IParent can be passed without a copy.
+        /// </remarks>
         public static bool LastChildAIsSmall(
             IParent parent,
-            List<IParent> parents
+            IReadOnlyList<IParent> parents
         )
         {
             var last = parent;

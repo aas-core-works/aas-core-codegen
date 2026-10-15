@@ -1,0 +1,1637 @@
+SymbolTable(
+  our_types=[
+    AbstractClass(
+      name='Item',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      interface=Interface(
+        base='Reference to AbstractClass Item',
+        name='Item',
+        inheritances=[],
+        implementers=[
+          'Reference to ConcreteClass Some_item',
+          'Reference to ConcreteClass Special_item'],
+        properties=[
+          Property(
+            name='name',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            description=None,
+            specified_for='Reference to AbstractClass Item',
+            json_name='name',
+            xml_name='name',
+            parsed=...),
+          Property(
+            name='nickname',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            description=None,
+            specified_for='Reference to AbstractClass Item',
+            json_name='nickname',
+            xml_name='nickname',
+            parsed=...)],
+        signatures=[],
+        description=None,
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Some_item',
+        'Reference to ConcreteClass Special_item'],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Some_item',
+        'Reference to ConcreteClass Special_item'],
+      properties=[
+        Property(
+          name='name',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='name',
+          xml_name='name',
+          parsed=...),
+        Property(
+          name='nickname',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='nickname',
+          xml_name='nickname',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='name',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='nickname',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='name',
+              argument='name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='nickname',
+              argument='nickname',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='name',
+              argument='name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='nickname',
+              argument='nickname',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Some_item',
+      inheritances=[
+        'Reference to AbstractClass Item'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Item'],
+      ancestor_id_set=...,
+      interface=Interface(
+        base='Reference to ConcreteClass Some_item',
+        name='Some_item',
+        inheritances=[
+          'Reference to Interface Item'],
+        implementers=[
+          'Reference to ConcreteClass Special_item',
+          'Reference to ConcreteClass Some_item'],
+        properties=[],
+        signatures=[],
+        description=None,
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Special_item'],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Special_item'],
+      properties=[
+        Property(
+          name='name',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='name',
+          xml_name='name',
+          parsed=...),
+        Property(
+          name='nickname',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='nickname',
+          xml_name='nickname',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='name',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='nickname',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Item')""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='name',
+              argument='name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='nickname',
+              argument='nickname',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Special_item',
+      inheritances=[
+        'Reference to ConcreteClass Some_item'],
+      inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass Item',
+        'Reference to ConcreteClass Some_item'],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='name',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='name',
+          xml_name='name',
+          parsed=...),
+        Property(
+          name='nickname',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to AbstractClass Item',
+          json_name='nickname',
+          xml_name='nickname',
+          parsed=...),
+        Property(
+          name='level',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Special_item',
+          json_name='level',
+          xml_name='level',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='name',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='level',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...),
+          Argument(
+            name='nickname',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Some_item')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='level',
+              argument='level',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='name',
+              argument='name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='nickname',
+              argument='nickname',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='level',
+              argument='level',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Container',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Container',
+          json_name='items',
+          xml_name='items',
+          parsed=...),
+        Property(
+          name='some_items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Some_item',
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Container',
+          json_name='someItems',
+          xml_name='someItems',
+          parsed=...),
+        Property(
+          name='special_items',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Special_item',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Container',
+          json_name='specialItems',
+          xml_name='specialItems',
+          parsed=...)],
+      methods=[
+        UnderstoodMethod(
+          name='count_items',
+          visibility='PUBLIC',
+          arguments=[
+            Argument(
+              name='items',
+              type_annotation=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Item',
+                  parsed=...),
+                parsed=...),
+              default=None,
+              mutable=False,
+              parsed=...)],
+          returns=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          description=DescriptionOfSignature(
+            summary='<paragraph>Count the <ReferenceToArgument refuri="items">items</ReferenceToArgument>.</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <paragraph>The arguments of the methods are never generic, so only the sequences of
+                <ReferenceToOurType refuri="Item">Item</ReferenceToOurType> can be passed to it, but not the sequences of
+                the descendants.</paragraph>""")],
+            arguments_by_name=[],
+            returns=None,
+            parsed=...),
+          specified_for='Reference to ConcreteClass Container',
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          parsed=...,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=FunctionCall(
+                  name='len',
+                  args=[
+                    Name(
+                      identifier='items',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...)""")],
+          arguments_by_name=...)],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='items',
+            type_annotation=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Item',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='some_items',
+            type_annotation=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Some_item',
+                parsed=...),
+              parsed=...),
+            default=None,
+            mutable=True,
+            parsed=...),
+          Argument(
+            name='special_items',
+            type_annotation=OptionalTypeAnnotation(
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Special_item',
+                  parsed=...),
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            mutable=True,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='items',
+              argument='items',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_items',
+              argument='some_items',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='special_items',
+              argument='special_items',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='items',
+              argument='items',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_items',
+              argument='some_items',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='special_items',
+              argument='special_items',
+              default=None)""")]),
+      invariants=[
+        Invariant(
+          description='Each special item must be among the special items.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='special_items',
+                  original_node=...),
+                original_node=...),
+              consequent=All(
+                generator=ForEach(
+                  variable=Name(
+                    identifier='special_item',
+                    original_node=...),
+                  iteration=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='special_items',
+                    original_node=...),
+                  original_node=...),
+                condition=FunctionCall(
+                  name='contains_special_item',
+                  args=[
+                    Name(
+                      identifier='special_item',
+                      original_node=...),
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='special_items',
+                      original_node=...)],
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='If there are some items, they must overlap with the items.',
+          body=textwrap.dedent("""\
+            Or(
+              values=[
+                Comparison(
+                  left=FunctionCall(
+                    name='len',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='some_items',
+                        original_node=...)],
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...),
+                FunctionCall(
+                  name='items_overlap',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='items',
+                      original_node=...),
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='some_items',
+                      original_node=...)],
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Some items must be among the items.',
+          body=textwrap.dedent("""\
+            All(
+              generator=ForEach(
+                variable=Name(
+                  identifier='some_item',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_items',
+                  original_node=...),
+                original_node=...),
+              condition=FunctionCall(
+                name='contains_some_item',
+                args=[
+                  Name(
+                    identifier='some_item',
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='items',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Names of some items and of special items must be unique through aliases.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='aliased_names_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_items',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='special_items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Names of the items and of some items must be disjoint.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='names_are_disjoint',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='items',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_items',
+                  original_node=...),
+                Constant(
+                  value='x',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='If there is a special item with level, the last item must be special.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=FunctionCall(
+                name='some_special_item_has_level',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='items',
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='last_is_special',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='items',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Levels of the special items among the items must be positive.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='levels_of_special_items_are_positive',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Nicknames of some items must be unique.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='nicknames_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Count of the items must match the number of the items.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=MethodCall(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='count_items',
+                  original_node=...),
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='items',
+                    original_node=...)],
+                original_node=...),
+              op='EQ',
+              right=FunctionCall(
+                name='len',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='items',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Names of the special items must be unique.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='optional_names_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='special_items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='The first special item must be special.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='special_items',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='first_is_special',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='special_items',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Levels of the special items must be positive.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='special_items',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='levels_are_positive',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='special_items',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='If there is a special item with level, the first item must be special.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=FunctionCall(
+                name='some_special_item_has_level',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='items',
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='first_is_special',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='items',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Names of some items must be non-empty.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='names_are_non_empty',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Names of some items and of special items must be unique.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='some_names_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_items',
+                  original_node=...),
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='special_items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...),
+        Invariant(
+          description='Names of the items must be unique.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='names_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='items',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Container',
+          parsed=...)],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Wrapper',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      interface=None,
+      descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='container',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Container',
+            parsed=...),
+          description=None,
+          specified_for='Reference to ConcreteClass Wrapper',
+          json_name='container',
+          xml_name='container',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='container',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Container',
+              parsed=...),
+            default=None,
+            mutable=False,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='container',
+              argument='container',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='container',
+              argument='container',
+              default=None)""")]),
+      invariants=[
+        Invariant(
+          description='Names of some items of the container must be unique.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='container_names_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='container',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Wrapper',
+          parsed=...)],
+      serialization=Serialization(
+        with_model_type=False),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      method_id_set=...,
+      invariant_id_set=...)],
+  our_types_topologically_sorted=[
+    'Reference to our type Container',
+    'Reference to our type Item',
+    'Reference to our type Some_item',
+    'Reference to our type Special_item',
+    'Reference to our type Wrapper'],
+  enumerations=[],
+  constrained_primitives=[],
+  classes=[
+    'Reference to our type Item',
+    'Reference to our type Some_item',
+    'Reference to our type Special_item',
+    'Reference to our type Container',
+    'Reference to our type Wrapper'],
+  concrete_classes=[
+    'Reference to our type Some_item',
+    'Reference to our type Special_item',
+    'Reference to our type Container',
+    'Reference to our type Wrapper'],
+  named_unions=[],
+  constants=[],
+  constants_by_name=...,
+  verification_functions=[
+    TranspilableVerification(
+      name='names_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that the names of the <ReferenceToArgument refuri="items">items</ReferenceToArgument> are unique.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The <ReferenceToArgument refuri="items">items</ReferenceToArgument> are a generic sequence, so the sequences of
+            the descendants of <ReferenceToOurType refuri="Item">Item</ReferenceToOurType> can be passed without a copy.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='names_are_non_empty',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Iterate over a generic sequence in a generator.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='some_special_item_has_level',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Narrow the items of a generic sequence in a generator.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='first_is_special',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Index a generic sequence, and narrow the item.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='nicknames_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that the nicknames of the <ReferenceToArgument refuri="items">items</ReferenceToArgument> are unique, if specified.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>This mirrors the body of <literal>ID_shorts_are_unique</literal> in aas-core-meta V3.2:
+            a local variable takes an optional property of an item of a generic sequence,
+            and the loop continues if it is None.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='levels_of_special_items_are_positive',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Narrow the loop variable over a generic sequence in a for-loop.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The loop variable is of the type parameter in Go, so the down-cast needs to
+            go through <literal>any(...)</literal>, and of the template parameter in C++.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='last_is_special',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Narrow an immutable local variable which holds an item of a generic sequence.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>In contrast to <ReferenceToVerificationFunction refuri="first_is_special">first_is_special</ReferenceToVerificationFunction>, the local variable is annotated, so
+            it is of the parent class instead of the type parameter. Hence, Go down-casts
+            it without <literal>any(...)</literal>, and C++ binds the item to a constant reference to
+            the shared pointer of the parent class.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='names_are_disjoint',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='other_items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Some_item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='shared_name',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Mix two generic sequences with an argument which is not generic.</paragraph>',
+        remarks=[
+          '<paragraph>The names must differ, except for the <ReferenceToArgument refuri="shared_name">shared_name</ReferenceToArgument>, which may repeat.</paragraph>',
+          textwrap.dedent("""\
+            <paragraph>Go declares two type parameters, and C++ two template parameters. The nested
+            generators iterate over two different generic sequences, so their variables
+            are of two different type parameters.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='aliased_names_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='optional_items',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Item',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Use the immutable aliases of the generic sequences.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>An immutable alias of the very same type shares the type annotation of
+            the aliased generic sequence, so it is a generic sequence itself. Go declares
+            the alias with the type parameter, C++ with the template parameter, while C#
+            and Java infer its type with <literal>var</literal>. The <literal>alias_of_alias</literal> aliases an alias,
+            and the <literal>optional_alias</literal> aliases an optional generic sequence.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='contains_some_item',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='some_item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Some_item',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Look up an instance of a descendant in a generic sequence.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>Go compares the instances as <literal>any</literal>'s, as the items are of the type parameter,
+            and C++ converts the member to the shared pointer of <ReferenceToOurType refuri="Item">Item</ReferenceToOurType> so that
+            the raw pointers are comparable for any template parameter.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='items_overlap',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='other_items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Some_item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Look up the items of a generic sequence in another generic sequence.</paragraph>',
+        remarks=[
+          '<paragraph>The member and the items are of two different type parameters.</paragraph>'],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='contains_special_item',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='special_item',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Special_item',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Special_item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Look up an instance in a sequence which is not generic.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The <ReferenceToOurType refuri="Special_item">Special_item</ReferenceToOurType> has no descendants, so the <ReferenceToArgument refuri="items">items</ReferenceToArgument> are not
+            a generic sequence, but Go still compares the instances as <literal>any</literal>'s.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='container_names_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='container',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Container',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Pass the local variables on to generic sequences.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The <literal>some_items</literal> is a read-only alias without an annotation, while
+            the <literal>all_some_items</literal> is an immutable local variable declared with
+            <literal>Final[...]</literal>. Both hold the sequences of <ReferenceToOurType refuri="Some_item">Some_item</ReferenceToOurType>, and are passed
+            on to the generic sequences of <ReferenceToOurType refuri="Item">Item</ReferenceToOurType>, required as well as optional.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='optional_names_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Item',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Pass an optional generic sequence on to a generic sequence.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='some_names_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='some_items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Some_item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='special_items',
+          type_annotation=OptionalTypeAnnotation(
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Special_item',
+                parsed=...),
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Pass the generic sequences of the descendants on.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The <ReferenceToArgument refuri="some_items">some_items</ReferenceToArgument> are passed on as a required and as an optional
+            sequence of the parent class, while the <ReferenceToArgument refuri="special_items">special_items</ReferenceToArgument> are passed on
+            as an optional sequence and, once narrowed, as a required sequence of the parent
+            class of the parent class.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='levels_are_positive',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='items',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Special_item',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that the levels are positive.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The <ReferenceToOurType refuri="Special_item">Special_item</ReferenceToOurType> has no descendants, so the <ReferenceToArgument refuri="items">items</ReferenceToArgument> are not
+            a generic sequence.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...)],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=DescriptionOfMetaModel(
+      summary='<paragraph>Test the variance of the containers passed as arguments.</paragraph>',
+      remarks=[
+        textwrap.dedent("""\
+          <paragraph>A read-only <literal>Sequence[...]</literal> argument of a verification function is generic if its
+          items are instances of a class with descendants, so that the sequences of
+          the descendants can be passed to it without a copy. The arguments of the methods
+          and the mutable <literal>List[...]</literal> arguments remain invariant.</paragraph>""")],
+      constraints_by_identifier=[],
+      parsed=...),
+    version='dummy',
+    xml_namespace='https://dummy.com'))

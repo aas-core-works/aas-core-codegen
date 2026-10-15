@@ -5,12 +5,17 @@
 // Do NOT edit or append.
 
 #include "dummy/common.hpp"
+#include "dummy/constants.hpp"
 #include "dummy/iteration.hpp"
 #include "dummy/pattern.hpp"
+#include "dummy/stringification.hpp"
 #include "dummy/types.hpp"
 
 #pragma warning(push, 0)
+#include <memory>
 #include <set>
+#include <type_traits>
+#include <vector>
 #pragma warning(pop)
 
 namespace dummy {
@@ -297,16 +302,26 @@ bool NarrowingAfterTheOnlyCompletingBranch(
 );
 
 /// \brief Check the narrowing after the `continue` and the early return in a loop.
+///
+/// \tparam ParentsT type of the items of \p parents, types::IParent or one of its descendants, so that the vectors of the descendants can be passed without a copy, as std::vector is invariant
+template<
+  typename ParentsT
+>
 bool ChildAsHaveTexts(
   const std::vector<
-    std::shared_ptr<types::IParent>
+    std::shared_ptr<ParentsT>
   >& parents
 );
 
 /// \brief Check the narrowing after the `continue` in a loop with a `break`.
+///
+/// \tparam ParentsT type of the items of \p parents, types::IParent or one of its descendants, so that the vectors of the descendants can be passed without a copy, as std::vector is invariant
+template<
+  typename ParentsT
+>
 bool TextsBeforeContainerAreShort(
   const std::vector<
-    std::shared_ptr<types::IParent>
+    std::shared_ptr<ParentsT>
   >& parents
 );
 
@@ -316,10 +331,15 @@ bool TextOrDefaultIsShort(
 );
 
 /// \brief Check the narrowing of a variable to a class by the assigned value.
+///
+/// \tparam ParentsT type of the items of \p parents, types::IParent or one of its descendants, so that the vectors of the descendants can be passed without a copy, as std::vector is invariant
+template<
+  typename ParentsT
+>
 bool LastChildAIsSmall(
   const std::shared_ptr<types::IParent>& parent,
   const std::vector<
-    std::shared_ptr<types::IParent>
+    std::shared_ptr<ParentsT>
   >& parents
 );
 
@@ -329,6 +349,88 @@ bool HasMarkerInTree(
 );
 
 // endregion Verification functions
+
+// region Definitions of generic verification functions
+
+template<
+  typename ParentsT
+>
+bool ChildAsHaveTexts(
+  const std::vector<
+    std::shared_ptr<ParentsT>
+  >& parents
+) {
+  static_assert(
+    std::is_base_of<types::IParent, ParentsT>::value,
+    "Expected the items of parents to be instances of types::IParent"
+  );
+  for (const std::shared_ptr<ParentsT>& parent : parents) {
+    if (!types::IsChildA(*parent)) {
+      continue;
+    }
+    if (!(std::dynamic_pointer_cast<types::IChildA>(parent)->optional_text().has_value())) {
+      return false;
+    }
+    if (common::LenStr((*(std::dynamic_pointer_cast<types::IChildA>(parent)->optional_text()))) < 1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template<
+  typename ParentsT
+>
+bool TextsBeforeContainerAreShort(
+  const std::vector<
+    std::shared_ptr<ParentsT>
+  >& parents
+) {
+  static_assert(
+    std::is_base_of<types::IParent, ParentsT>::value,
+    "Expected the items of parents to be instances of types::IParent"
+  );
+  int64_t total = 0;
+  for (const std::shared_ptr<ParentsT>& parent : parents) {
+    if (types::IsContainer(*parent)) {
+      break;
+    }
+    if (!(parent->optional_text().has_value())) {
+      continue;
+    }
+    total = (
+      total + static_cast<int64_t>(common::LenStr((*(parent->optional_text()))))
+    );
+  }
+  return total < 20;
+}
+
+template<
+  typename ParentsT
+>
+bool LastChildAIsSmall(
+  const std::shared_ptr<types::IParent>& parent,
+  const std::vector<
+    std::shared_ptr<ParentsT>
+  >& parents
+) {
+  static_assert(
+    std::is_base_of<types::IParent, ParentsT>::value,
+    "Expected the items of parents to be instances of types::IParent"
+  );
+  auto last = parent;
+  for (const std::shared_ptr<ParentsT>& other : parents) {
+    if (types::IsChildA(*other)) {
+      last = std::dynamic_pointer_cast<types::IChildA>(other);
+      if (std::dynamic_pointer_cast<types::IChildA>(last)->a_only() >= 1000) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// endregion Definitions of generic verification functions
 
 }  // namespace verification
 /**@}*/

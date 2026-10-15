@@ -33,9 +33,11 @@ import java.util.Optional;
 public class Verification {
   /**
    * Check an optional class declared with {@code None} and assigned in a loop.
+   *
+   * <p>The argument {@code parents} is declared with the wildcard {@code List<? extends IParent>} instead of the invariant {@code List<IParent>} so that the lists of the descendants of {@link IParent} can be passed without a copy.
    */
   public static Boolean firstChildAIsSmall(
-    List<IParent> parents) {
+    List<? extends IParent> parents) {
     Optional<IChildA> found = Optional.empty();
     for (var parent : parents) {
         if (parent instanceof IChildA) {
@@ -80,10 +82,12 @@ public class Verification {
 
   /**
    * Check a non-optional variable declared wider than its value.
+   *
+   * <p>The argument {@code parents} is declared with the wildcard {@code List<? extends IParent>} instead of the invariant {@code List<IParent>} so that the lists of the descendants of {@link IParent} can be passed without a copy.
    */
   public static Boolean lastChildBIsNotZero(
     IParent parent,
-    List<IParent> parents) {
+    List<? extends IParent> parents) {
     IParent last = parent;
     for (var other : parents) {
         last = other;
@@ -316,9 +320,9 @@ public class Verification {
     Optional<String> optionalText,
     IParent parent) {
     final long limit = 1000;
-    final String label = text;
-    final Optional<String> maybeText = optionalText;
-    final List<String> allTexts = texts;
+    final var label = text;
+    final var maybeText = optionalText;
+    final var allTexts = texts;
     Set<String> seen = new HashSet<String>();
     seen.add(text);
     final Set<String> reservedSeen = (
@@ -326,7 +330,7 @@ public class Verification {
     final Tuple2<String, Long> pair = new Tuple2<>(
       text,
       number);
-    final IParent base = parent;
+    final var base = parent;
     if (
         reservedSeen.size() > 0
         || StringHelpers.len(label) > limit

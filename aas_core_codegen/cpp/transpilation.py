@@ -465,6 +465,27 @@ class Transpiler(
         # While this class does not directly use it, the descendants of this class do!
         self._variable_name_set = set()  # type: Set[Identifier]
 
+    def _type_parameter_of(
+        self, type_annotation: intermediate_type_inference.TypeAnnotationUnion
+    ) -> Optional[Identifier]:
+        """
+        Determine the template parameter which stands for the ``type_annotation``.
+
+        Only the verification functions are templates, namely over the items of
+        the generic sequences, see :py:func:`intermediate.generic_sequence_item_class`.
+        The transpiler of the verification functions overrides this method.
+
+        We declare the loop and the generator variables over a generic sequence with
+        the template parameter so that the items are not converted to
+        temporary shared pointers of the parent class.
+
+        :param type_annotation: inferred type of a value
+        :return:
+            the template parameter, if the value is an item of a generic sequence,
+            and None otherwise
+        """
+        return None
+
     def _transform_enumeration_literal(
         self, enumeration_name: Identifier, literal_name: Identifier
     ) -> Stripped:
@@ -1207,6 +1228,52 @@ std::make_tuple(
         if isinstance(container_type, intermediate_type_inference.ListTypeAnnotation):
             member = self._as_int64_position(node.member, member)
 
+        # NOTE (mristin):
+        # The ``std::find`` compares the shared pointers by their raw pointers, so
+        # the classes of the items and of the member need to be related. This holds
+        # for the declared classes, as the type inference checks that one is
+        # a subclass of the other. However, the template parameter of a generic
+        # sequence, see :py:func:`intermediate.generic_sequence_item_class`, can be
+        # any descendant, *e.g.*, a sibling of the class of the member. Hence, we
+        # convert the member to the more general of the two declared classes.
+        member_type = self.type_map[node.member]
+        if (
+            isinstance(container_type, intermediate_type_inference.ListTypeAnnotation)
+            and isinstance(
+                container_type.items, intermediate_type_inference.OurTypeAnnotation
+            )
+            and isinstance(container_type.items.our_type, intermediate.Class)
+            and isinstance(member_type, intermediate_type_inference.OurTypeAnnotation)
+            and isinstance(member_type.our_type, intermediate.Class)
+            and (
+                self._type_parameter_of(container_type.items) is not None
+                or self._type_parameter_of(member_type) is not None
+            )
+        ):
+            general_type = (
+                container_type.items
+                if member_type.our_type.is_subclass_of(container_type.items.our_type)
+                else member_type
+            )
+
+            general_type_cpp, error_msg = generate_type(
+                type_annotation=intermediate_type_inference.OurTypeAnnotation(
+                    our_type=general_type.our_type
+                ),
+                types_namespace=self._types_namespace,
+            )
+            if error_msg is not None:
+                return None, Error(node.member.original_node, error_msg)
+
+            assert general_type_cpp is not None
+
+            member = Stripped(
+                f"""\
+{general_type_cpp}(
+{I}{indent_but_first_line(member, I)}
+)"""
+            )
+
         contains_function = cpp_naming.function_name(Identifier("contains"))
 
         return (
@@ -1693,6 +1760,49 @@ common::{function_name}(
                 return None, error
 
             assert function_name is not None
+
+            # NOTE (mristin):
+            # A transpiled verification function is a template over the items of
+            # its generic sequences, see
+            # :py:func:`intermediate.generic_sequence_item_class`. C++ deduces
+            # the template parameters without any implicit conversions, so we pass
+            # ``None`` to an optional generic sequence as a typed empty optional,
+            # and a required vector through ``common::make_optional``.
+            if isinstance(func_type.func, intermediate.TranspilableVerification):
+                for i, (arg_node, argument) in enumerate(
+                    zip(node.args, func_type.func.arguments)
+                ):
+                    if intermediate.generic_sequence_item_class(argument) is None:
+                        continue
+
+                    if not isinstance(
+                        argument.type_annotation, intermediate.OptionalTypeAnnotation
+                    ):
+                        continue
+
+                    if (
+                        isinstance(arg_node, parse_tree.Constant)
+                        and arg_node.value is None
+                    ):
+                        optional_type = cpp_common.generate_type(
+                            type_annotation=argument.type_annotation,
+                            types_namespace=self._types_namespace,
+                        )
+                        args[i] = Stripped(f"{optional_type}()")
+
+                    elif not isinstance(
+                        self.type_map[arg_node],
+                        intermediate_type_inference.OptionalTypeAnnotation,
+                    ):
+                        args[i] = Stripped(
+                            f"""\
+common::make_optional(
+{I}{indent_but_first_line(args[i], I)}
+)"""
+                        )
+
+                    else:
+                        pass
 
             if len(args) == 0:
                 return Stripped(f"{function_name}()"), None
@@ -2425,8 +2535,18 @@ common::{concat}(
             cpp_aliasing.Declaration.MUT_REF
         )
 
+        type_parameter = self._type_parameter_of(variable_type_annotation)
+
         variable_type_cpp: Optional[Stripped]
-        if self._declaration(node.generator) is cpp_aliasing.Declaration.COPY:
+        error_msg: Optional[str]
+        if type_parameter is not None:
+            variable_type_cpp = Stripped(f"std::shared_ptr<{type_parameter}>")
+            error_msg = None
+
+            if self._declaration(node.generator) is not cpp_aliasing.Declaration.COPY:
+                variable_type_cpp = Stripped(f"const {variable_type_cpp}&")
+
+        elif self._declaration(node.generator) is cpp_aliasing.Declaration.COPY:
             variable_type_cpp, error_msg = generate_type(
                 type_annotation=variable_type_annotation,
                 types_namespace=self._types_namespace,
@@ -2748,6 +2868,27 @@ common::{qualifier_function}<{variable_type_cpp}>(
                 return None, Error(node.annotation.original_node, error_msg)
 
             assert declared_type is not None
+
+            # NOTE (mristin):
+            # An immutable alias of a generic sequence shares its type annotation,
+            # see :py:meth:`intermediate_type_inference._Inferrer.transform_assignment`,
+            # so we declare the alias with the template parameter as well.
+            target_type_beneath = intermediate_type_inference.beneath_optional(
+                target_type
+            )
+            if isinstance(
+                target_type_beneath, intermediate_type_inference.ListTypeAnnotation
+            ):
+                type_parameter = self._type_parameter_of(target_type_beneath.items)
+                if type_parameter is not None:
+                    declared_type = Stripped(
+                        f"std::vector<std::shared_ptr<{type_parameter}> >"
+                    )
+
+                    if isinstance(
+                        target_type, intermediate_type_inference.OptionalTypeAnnotation
+                    ):
+                        declared_type = Stripped(f"common::optional<{declared_type} >")
 
             # NOTE (mristin):
             # A variable declared as ``Final[...]`` is neither re-assigned nor
@@ -3104,10 +3245,18 @@ return (
 
         header: Optional[str] = None
         if isinstance(node.generator, parse_tree.ForEach):
-            variable_type_cpp, error_msg = generate_type(
-                type_annotation=variable_type_annotation,
-                types_namespace=self._types_namespace,
-            )
+            type_parameter = self._type_parameter_of(variable_type_annotation)
+
+            variable_type_cpp: Optional[Stripped]
+            error_msg: Optional[str]
+            if type_parameter is not None:
+                variable_type_cpp = Stripped(f"std::shared_ptr<{type_parameter}>")
+                error_msg = None
+            else:
+                variable_type_cpp, error_msg = generate_type(
+                    type_annotation=variable_type_annotation,
+                    types_namespace=self._types_namespace,
+                )
             if error_msg is not None:
                 errors.append(Error(node.generator.variable.original_node, error_msg))
 
