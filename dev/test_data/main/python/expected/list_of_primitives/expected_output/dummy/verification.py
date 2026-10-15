@@ -111,6 +111,42 @@ def ints_are_unique(
     return True
 
 
+def contains_by_loop(
+    number: int,
+    numbers: Sequence[int]
+) -> bool:
+    """
+    Check whether :paramref:`number` is in :paramref:`numbers`, item by item.
+
+    Java boxes both :paramref:`number` and the items as ``Long``'s, so that ``==``
+    would compare their references. The test data looks up the numbers beyond -128
+    and 127 on purpose, as Java caches the boxed values in that range, and
+    the references would be equal by chance.
+    """
+    # pylint: disable=all
+    for other in numbers:
+        if other == number:
+            return True
+    return False
+
+
+def floats_are_unique(
+    numbers: Sequence[float]
+) -> bool:
+    """
+    Check that :paramref:`numbers` are unique by comparing them pair-wise.
+
+    Java boxes the items as ``Double``'s, so that ``==`` would compare their
+    references.
+    """
+    # pylint: disable=all
+    for i in range(0, len(numbers)):
+        for j in range(i + 1, len(numbers)):
+            if numbers[i] == numbers[j]:
+                return False
+    return True
+
+
 def is_separator(
     text: str
 ) -> bool:
@@ -230,6 +266,16 @@ class _Transformer(
         ):
             yield Error(
                 'Some strings must not be separators.'
+            )
+
+        if not (not contains_by_loop(-500, that.some_ints)):
+            yield Error(
+                'Some ints must not contain -500.'
+            )
+
+        if not floats_are_unique(that.some_floats):
+            yield Error(
+                'Some floats must be unique.'
             )
 
 

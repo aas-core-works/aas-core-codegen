@@ -107,7 +107,7 @@ public class Verification {
             return false;
         }
         wider = child;
-        return child.getAOnly() == childCopy.getAOnly()
+        return (long) child.getAOnly() == childCopy.getAOnly()
         && ((IChildA) wider).getAOnly() > -1000;
     }
     return true;

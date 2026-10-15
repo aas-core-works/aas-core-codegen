@@ -61,6 +61,39 @@ def ints_are_unique(numbers: Sequence[int]) -> bool:
 
 
 @verification
+def contains_by_loop(number: int, numbers: Sequence[int]) -> bool:
+    """
+    Check whether :paramref:`number` is in :paramref:`numbers`, item by item.
+
+    Java boxes both :paramref:`number` and the items as ``Long``'s, so that ``==``
+    would compare their references. The test data looks up the numbers beyond -128
+    and 127 on purpose, as Java caches the boxed values in that range, and
+    the references would be equal by chance.
+    """
+    for other in numbers:
+        if other == number:
+            return True
+
+    return False
+
+
+@verification
+def floats_are_unique(numbers: Sequence[float]) -> bool:
+    """
+    Check that :paramref:`numbers` are unique by comparing them pair-wise.
+
+    Java boxes the items as ``Double``'s, so that ``==`` would compare their
+    references.
+    """
+    for i in range(0, len(numbers)):
+        for j in range(i + 1, len(numbers)):
+            if numbers[i] == numbers[j]:
+                return False
+
+    return True
+
+
+@verification
 def is_separator(text: str) -> bool:
     """Check whether :paramref:`text` is one of the separators."""
     return text in [".", ",", ";"]
@@ -87,6 +120,14 @@ def contains_dot(text: str) -> bool:
     return "." in text
 
 
+@invariant(
+    lambda self: floats_are_unique(self.some_floats),
+    "Some floats must be unique.",
+)
+@invariant(
+    lambda self: not contains_by_loop(-500, self.some_ints),
+    "Some ints must not contain -500.",
+)
 @invariant(
     lambda self: all(not is_separator(text) for text in self.some_strings),
     "Some strings must not be separators.",

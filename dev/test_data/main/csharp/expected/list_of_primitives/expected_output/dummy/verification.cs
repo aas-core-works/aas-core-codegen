@@ -101,6 +101,54 @@ namespace dummy
         }  // public static bool IntsAreUnique
 
         /// <summary>
+        /// Check whether <paramref name="number" /> is in <paramref name="numbers" />, item by item.
+        /// </summary>
+        /// <remarks>
+        /// Java boxes both <paramref name="number" /> and the items as <c>Long</c>'s, so that <c>==</c>
+        /// would compare their references. The test data looks up the numbers beyond -128
+        /// and 127 on purpose, as Java caches the boxed values in that range, and
+        /// the references would be equal by chance.
+        /// </remarks>
+        public static bool ContainsByLoop(
+            long number,
+            List<long> numbers
+        )
+        {
+            foreach (var other in numbers)
+            {
+                if (other == number)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }  // public static bool ContainsByLoop
+
+        /// <summary>
+        /// Check that <paramref name="numbers" /> are unique by comparing them pair-wise.
+        /// </summary>
+        /// <remarks>
+        /// Java boxes the items as <c>Double</c>'s, so that <c>==</c> would compare their
+        /// references.
+        /// </remarks>
+        public static bool FloatsAreUnique(
+            List<double> numbers
+        )
+        {
+            for (int i = 0; i < numbers.Count; i++)
+            {
+                for (int j = i + 1; j < numbers.Count; j++)
+                {
+                    if (numbers[i] == numbers[j])
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }  // public static bool FloatsAreUnique
+
+        /// <summary>
         /// Check whether <paramref name="text" /> is one of the separators.
         /// </summary>
         public static bool IsSeparator(
@@ -247,6 +295,20 @@ namespace dummy
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Some strings must not be separators.");
+                }
+
+                if (!(!Verification.ContainsByLoop(-500, that.SomeInts)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some ints must not contain -500.");
+                }
+
+                if (!Verification.FloatsAreUnique(that.SomeFloats))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Some floats must be unique.");
                 }
             }
         }  // private class Transformer

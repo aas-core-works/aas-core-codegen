@@ -421,6 +421,41 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some ints must not contain -500.',
+          body=textwrap.dedent("""\
+            Not(
+              operand=FunctionCall(
+                name='contains_by_loop',
+                args=[
+                  Constant(
+                    value=-500,
+                    original_node=...),
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='some_ints',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Some floats must be unique.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='floats_are_unique',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='some_floats',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
@@ -552,6 +587,80 @@ SymbolTable(
       description=DescriptionOfSignature(
         summary='<paragraph>Check that <ReferenceToArgument refuri="numbers">numbers</ReferenceToArgument> are unique with a local list of the seen.</paragraph>',
         remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='contains_by_loop',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='number',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='INT',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...),
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='INT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check whether <ReferenceToArgument refuri="number">number</ReferenceToArgument> is in <ReferenceToArgument refuri="numbers">numbers</ReferenceToArgument>, item by item.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>Java boxes both <ReferenceToArgument refuri="number">number</ReferenceToArgument> and the items as <literal>Long</literal>'s, so that <literal>==</literal>
+            would compare their references. The test data looks up the numbers beyond -128
+            and 127 on purpose, as Java caches the boxed values in that range, and
+            the references would be equal by chance.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='floats_are_unique',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='numbers',
+          type_annotation=ListTypeAnnotation(
+            items=PrimitiveTypeAnnotation(
+              a_type='FLOAT',
+              parsed=...),
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that <ReferenceToArgument refuri="numbers">numbers</ReferenceToArgument> are unique by comparing them pair-wise.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>Java boxes the items as <literal>Double</literal>'s, so that <literal>==</literal> would compare their
+            references.</paragraph>""")],
         arguments_by_name=[],
         returns=None,
         parsed=...),

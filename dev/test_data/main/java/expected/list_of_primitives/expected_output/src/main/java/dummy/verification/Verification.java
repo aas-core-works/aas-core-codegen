@@ -37,7 +37,7 @@ public class Verification {
   public static Boolean isSmallPrime(
     Long number) {
     for (var prime : new java.util.ArrayList<Long>(java.util.List.of(2L, 3L, 5L, 7L))) {
-        if (prime == number) {
+        if ((long) prime == number) {
             return true;
         }
     }
@@ -82,6 +82,43 @@ public class Verification {
             return false;
         }
         seen.add(number);
+    }
+    return true;
+  }
+
+  /**
+   * Check whether {@code number} is in {@code numbers}, item by item.
+   *
+   * <p>Java boxes both {@code number} and the items as {@code Long}'s, so that {@code ==}
+   * would compare their references. The test data looks up the numbers beyond -128
+   * and 127 on purpose, as Java caches the boxed values in that range, and
+   * the references would be equal by chance.
+   */
+  public static Boolean containsByLoop(
+    Long number,
+    List<Long> numbers) {
+    for (var other : numbers) {
+        if ((long) other == number) {
+            return true;
+        }
+    }
+    return false;
+  }
+
+  /**
+   * Check that {@code numbers} are unique by comparing them pair-wise.
+   *
+   * <p>Java boxes the items as {@code Double}'s, so that {@code ==} would compare their
+   * references.
+   */
+  public static Boolean floatsAreUnique(
+    List<Double> numbers) {
+    for (int i = 0; i < numbers.size(); i++) {
+        for (int j = i + 1; j < numbers.size(); j++) {
+            if ((double) numbers.get(i) == numbers.get(j)) {
+                return false;
+            }
+        }
     }
     return true;
   }
@@ -220,6 +257,20 @@ public class Verification {
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "Some strings must not be separators.")));
+      }
+
+      if (!(!containsByLoop(-500L, that.getSomeInts()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some ints must not contain -500.")));
+      }
+
+      if (!floatsAreUnique(that.getSomeFloats())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Some floats must be unique.")));
       }
 
       return errorStream;

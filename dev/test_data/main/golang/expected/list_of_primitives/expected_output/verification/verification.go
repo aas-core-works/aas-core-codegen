@@ -100,6 +100,41 @@ func IntsAreUnique(
 	return true
 }
 
+// Check whether number is in numbers, item by item.
+//
+// Java boxes both number and the items as `Long`'s, so that `==`
+// would compare their references. The test data looks up the numbers beyond -128
+// and 127 on purpose, as Java caches the boxed values in that range, and
+// the references would be equal by chance.
+func ContainsByLoop(
+	number int64,
+	numbers []int64,
+) bool {
+	for _, other := range numbers {
+		if other == number {
+			return true
+		}
+	}
+	return false
+}
+
+// Check that numbers are unique by comparing them pair-wise.
+//
+// Java boxes the items as `Double`'s, so that `==` would compare their
+// references.
+func FloatsAreUnique(
+	numbers []float64,
+) bool {
+	for i := 0; i < len(numbers); i++ {
+		for j := i + 1; j < len(numbers); j++ {
+			if numbers[i] == numbers[j] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 // Check whether text is one of the separators.
 func IsSeparator(
 	text string,
@@ -289,6 +324,26 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"Some strings must not be separators.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(!ContainsByLoop(-500, that.SomeInts())) {
+		abort = onError(
+			newVerificationError(
+				"Some ints must not contain -500.",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !FloatsAreUnique(that.SomeFloats()) {
+		abort = onError(
+			newVerificationError(
+				"Some floats must be unique.",),
 		)
 		if abort {
 			return
