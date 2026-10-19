@@ -214,7 +214,7 @@ func constructMatchesMIMEType() *regexp.Regexp {
 	typE := token
 	subtype := token
 	ows := "[ \\t]*"
-	obsText := "[-ÿ]"
+	obsText := "[\\x{80}-\\x{ff}]"
 	qdText := ourcommon.Concat(
 		"([\\t !#-\\[\\]-~]|",
 		obsText,
@@ -584,7 +584,7 @@ func QualifierTypesAreUnique[Q ourtypes.IQualifier](
 }
 
 func constructMatchesXMLSerializableString() *regexp.Regexp {
-	pattern := "^[\t\n\r -\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$"
+	pattern := "^[\\x{9}\\x{a}\\x{d}\\x{20}-\\x{d7ff}\\x{e000}-\\x{fffd}\\x{10000}-\\x{10ffff}]*$"
 
 	return regexp.MustCompile(
 		pattern,
@@ -608,7 +608,7 @@ func MatchesXMLSerializableString(text string) bool {
 
 func constructMatchesXsAnyURI() *regexp.Regexp {
 	scheme := "[a-zA-Z][a-zA-Z0-9+\\-.]*"
-	ucschar := "[ -\ud7ff\uf900-\ufdcf\ufdf0-\uffef\U00010000-\U0001fffd\U00020000-\U0002fffd\U00030000-\U0003fffd\U00040000-\U0004fffd\U00050000-\U0005fffd\U00060000-\U0006fffd\U00070000-\U0007fffd\U00080000-\U0008fffd\U00090000-\U0009fffd\U000a0000-\U000afffd\U000b0000-\U000bfffd\U000c0000-\U000cfffd\U000d0000-\U000dfffd\U000e1000-\U000efffd]"
+	ucschar := "[\\x{a0}-\\x{d7ff}\\x{f900}-\\x{fdcf}\\x{fdf0}-\\x{ffef}\\x{10000}-\\x{1fffd}\\x{20000}-\\x{2fffd}\\x{30000}-\\x{3fffd}\\x{40000}-\\x{4fffd}\\x{50000}-\\x{5fffd}\\x{60000}-\\x{6fffd}\\x{70000}-\\x{7fffd}\\x{80000}-\\x{8fffd}\\x{90000}-\\x{9fffd}\\x{a0000}-\\x{afffd}\\x{b0000}-\\x{bfffd}\\x{c0000}-\\x{cfffd}\\x{d0000}-\\x{dfffd}\\x{e1000}-\\x{efffd}]"
 	iunreserved := ourcommon.Concat(
 		"([a-zA-Z0-9\\-._~]|",
 		ucschar,
@@ -799,7 +799,7 @@ func constructMatchesXsAnyURI() *regexp.Regexp {
 		ipathEmpty,
 		")",
 	)
-	iprivate := "[\ue000-\uf8ff\U000f0000-\U000ffffd\U00100000-\U0010fffd]"
+	iprivate := "[\\x{e000}-\\x{f8ff}\\x{f0000}-\\x{ffffd}\\x{100000}-\\x{10fffd}]"
 	iquery := ourcommon.Concat(
 		"(",
 		ipchar,
@@ -1853,7 +1853,7 @@ func MatchesXsNegativeInteger(text string) bool {
 }
 
 func constructMatchesXsString() *regexp.Regexp {
-	pattern := "^[\t\n\r -\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$"
+	pattern := "^[\\x{9}\\x{a}\\x{d}\\x{20}-\\x{d7ff}\\x{e000}-\\x{fffd}\\x{10000}-\\x{10ffff}]*$"
 
 	return regexp.MustCompile(
 		pattern,
