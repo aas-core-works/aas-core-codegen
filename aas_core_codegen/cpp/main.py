@@ -10,7 +10,10 @@ from aas_core_codegen.cpp import (
     lib as cpp_lib,
     tests as cpp_tests,
 )
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
@@ -48,6 +51,22 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr,
         )
         return 1
+
+    type_inference, inference_errors = intermediate_type_inference.infer(
+        symbol_table=verified_ir_table
+    )
+    if inference_errors is not None:
+        run.write_error_report(
+            message=f"Failed to infer the types in the meta-model {context.model_path}",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in inference_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
+
+    assert type_inference is not None
 
     # region Namespace
 
@@ -214,6 +233,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             src_dir / "types.cpp",
             lambda: cpp_lib.generate_types_implementation(
                 symbol_table=context.symbol_table,
+                type_inference=type_inference,
                 spec_impls=context.spec_impls,
                 library_namespace=library_namespace,
             ),
@@ -222,6 +242,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             include_dir / "verification.hpp",
             lambda: cpp_lib.generate_verification_header(
                 symbol_table=verified_ir_table,
+                type_inference=type_inference,
                 spec_impls=context.spec_impls,
                 library_namespace=library_namespace,
             ),
@@ -230,6 +251,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             src_dir / "verification.cpp",
             lambda: cpp_lib.generate_verification_implementation(
                 symbol_table=context.symbol_table,
+                type_inference=type_inference,
                 spec_impls=context.spec_impls,
                 library_namespace=library_namespace,
             ),

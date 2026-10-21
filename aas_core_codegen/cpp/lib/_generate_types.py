@@ -7,7 +7,6 @@ from typing import (
     Optional,
     Dict,
     List,
-    Mapping,
     Tuple,
     cast,
     Union,
@@ -1616,9 +1615,11 @@ class _MethodTranspiler(cpp_transpilation.Transpiler):
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_method_body(
     method: intermediate.UnderstoodMethod,
-    inference: intermediate_type_inference.InferenceOfFunction,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile the body of the ``method``."""
+    inference = type_inference.by_method[method]
+
     # NOTE (mristin):
     # We deliberately do not check the invariants of the instance after a method
     # call, as that would be too inefficient. The invariants are verified only in
@@ -1689,14 +1690,12 @@ def _generate_method_implementation(
     method: intermediate.MethodUnion,
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
-    inference_by_method: Mapping[
-        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
-    ],
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the implementation of the method.
 
-    ``inference_by_method`` holds the type inference of all the understood methods.
+    ``type_inference`` holds the type inference of all the understood methods.
     """
     body: Optional[Stripped]
 
@@ -1716,7 +1715,7 @@ def _generate_method_implementation(
 
     elif isinstance(method, intermediate.UnderstoodMethod):
         body, error = _transpile_method_body(
-            method=method, inference=inference_by_method[method]
+            method=method, type_inference=type_inference
         )
         if error is not None:
             return None, error
@@ -1778,14 +1777,12 @@ def _generate_method_implementation(
 def _generate_class_implementation(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
-    inference_by_method: Mapping[
-        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
-    ],
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """
     Generate the implementation blocks for the given class.
 
-    ``inference_by_method`` holds the type inference of all the understood methods.
+    ``type_inference`` holds the type inference of all the understood methods.
     """
     blocks = [
         _generate_constructor_implementation(cls=cls),
@@ -1802,7 +1799,7 @@ def _generate_class_implementation(
             method=method,
             cls=cls,
             spec_impls=spec_impls,
-            inference_by_method=inference_by_method,
+            type_inference=type_inference,
         )
         if error is not None:
             errors.append(
@@ -1936,19 +1933,11 @@ bool {function_name}(
 # fmt: on
 def generate_implementation(
     symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate implementation of the data structures representing the meta-model."""
-    (
-        inference_by_method,
-        inference_errors,
-    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
-    if inference_errors is not None:
-        return None, inference_errors
-
-    assert inference_by_method is not None
-
     namespace = Stripped(f"{library_namespace}::types")
 
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
@@ -1983,7 +1972,7 @@ def generate_implementation(
         cls_blocks, error = _generate_class_implementation(
             cls=concrete_cls,
             spec_impls=spec_impls,
-            inference_by_method=inference_by_method,
+            type_inference=type_inference,
         )
         if error is not None:
             errors.append(error)

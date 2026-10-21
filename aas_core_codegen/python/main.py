@@ -5,7 +5,10 @@ from typing import TextIO, Sequence, Callable, Tuple, Optional, List
 
 from aas_core_codegen import specific_implementations, run, intermediate, python
 from aas_core_codegen.common import Error
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 from aas_core_codegen.python import (
     common as python_common,
     lib as python_lib,
@@ -85,6 +88,22 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
+    type_inference, inference_errors = intermediate_type_inference.infer(
+        symbol_table=verified_ir_table
+    )
+    if inference_errors is not None:
+        run.write_error_report(
+            message=f"Failed to infer the types in the meta-model {context.model_path}",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in inference_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
+
+    assert type_inference is not None
+
     module_rel_path = pathlib.Path(qualified_module_name.replace(".", "/"))
     assert not module_rel_path.is_absolute()
 
@@ -131,6 +150,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             module_rel_path / "types.py",
             lambda: python_lib.generate_types(
                 symbol_table=verified_ir_table,
+                type_inference=type_inference,
                 qualified_module_name=qualified_module_name,
                 spec_impls=context.spec_impls,
             ),
@@ -139,6 +159,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             module_rel_path / "verification.py",
             lambda: python_lib.generate_verification(
                 symbol_table=verified_ir_table,
+                type_inference=type_inference,
                 qualified_module_name=qualified_module_name,
                 spec_impls=context.spec_impls,
             ),

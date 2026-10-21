@@ -434,27 +434,15 @@ class _TranspilableVerificationTranspiler(csharp_transpilation.Transpiler):
 def _transpile_transpilable_verification(
     verification: intermediate.TranspilableVerification,
     symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile a verification function."""
-    # fmt: off
-    type_inference, error = (
-        intermediate_type_inference.infer_for_verification(
-            verification=verification,
-            base_environment=environment
-        )
-    )
-    # fmt: on
-
-    if error is not None:
-        return None, error
-
-    assert type_inference is not None
+    inference = type_inference.by_verification[verification]
 
     transpiler = _TranspilableVerificationTranspiler(
-        type_map=type_inference.type_map,
-        environment=type_inference.environment_with_args,
-        downcast_map=type_inference.downcast_map,
+        type_map=inference.type_map,
+        environment=inference.environment_with_args,
+        downcast_map=inference.downcast_map,
         symbol_table=symbol_table,
         verification=verification,
     )
@@ -632,26 +620,14 @@ class _InvariantTranspiler(csharp_transpilation.Transpiler):
 def _transpile_invariant(
     invariant: intermediate.Invariant,
     symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
-    # fmt: off
-    inference, inference_error = (
-        intermediate_type_inference.infer_for_invariant(
-            invariant=invariant,
-            environment=environment
-        )
-    )
-    # fmt: on
-
-    if inference_error is not None:
-        return None, inference_error
-
-    assert inference is not None
+    inference = type_inference.by_invariant[invariant]
 
     transpiler = _InvariantTranspiler(
         type_map=inference.type_map,
-        environment=environment,
+        environment=inference.environment_with_self,
         downcast_map=inference.downcast_map,
         symbol_table=symbol_table,
     )
@@ -1067,7 +1043,7 @@ private static IEnumerable<Reporting.Error> {name}(
 def _generate_transform_for_class(
     cls: intermediate.ConcreteClass,
     symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the transform method to errors for the given concrete class."""
     errors = []  # type: List[Error]
@@ -1075,19 +1051,11 @@ def _generate_transform_for_class(
 
     name = csharp_naming.class_name(cls.name)
 
-    environment = intermediate_type_inference.MutableEnvironment(
-        parent=base_environment
-    )
-
-    assert environment.find(Identifier("self")) is None
-    environment.set(
-        identifier=Identifier("self"),
-        type_annotation=intermediate_type_inference.OurTypeAnnotation(our_type=cls),
-    )
-
     for invariant in cls.invariants:
         invariant_code, error = _transpile_invariant(
-            invariant=invariant, symbol_table=symbol_table, environment=environment
+            invariant=invariant,
+            symbol_table=symbol_table,
+            type_inference=type_inference,
         )
         if error is not None:
             errors.append(
@@ -1184,7 +1152,7 @@ public override IEnumerable<Reporting.Error> {transform_name}(
 
 def _generate_transformer(
     symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate a transformer to double-dispatch an instance to errors."""
     errors = []  # type: List[Error]
@@ -1207,7 +1175,7 @@ def _generate_transformer(
             block, cls_errors = _generate_transform_for_class(
                 cls=our_type,
                 symbol_table=symbol_table,
-                base_environment=base_environment,
+                type_inference=type_inference,
             )
             if cls_errors is not None:
                 errors.extend(cls_errors)
@@ -1270,27 +1238,17 @@ public static IEnumerable<Reporting.Error> Verify{name}(
 def _generate_verify_constrained_primitive(
     constrained_primitive: intermediate.ConstrainedPrimitive,
     symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the verify function for the constrained primitives."""
     errors = []  # type: List[Error]
     blocks = []  # type: List[Stripped]
 
-    environment = intermediate_type_inference.MutableEnvironment(
-        parent=base_environment
-    )
-
-    assert environment.find(Identifier("self")) is None
-    environment.set(
-        identifier=Identifier("self"),
-        type_annotation=intermediate_type_inference.OurTypeAnnotation(
-            our_type=constrained_primitive
-        ),
-    )
-
     for invariant in constrained_primitive.invariants:
         invariant_code, error = _transpile_invariant(
-            invariant=invariant, symbol_table=symbol_table, environment=environment
+            invariant=invariant,
+            symbol_table=symbol_table,
+            type_inference=type_inference,
         )
         if error is not None:
             errors.append(
@@ -1388,6 +1346,7 @@ public static IEnumerable<Reporting.Error> Verify(Our.IUnion that)
 # fmt: on
 def generate(
     symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     namespace: csharp_common.NamespaceIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -1429,10 +1388,6 @@ using System.Linq;  // can't alias"""
     verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    base_environment = intermediate_type_inference.populate_base_environment(
-        symbol_table=symbol_table
-    )
-
     for verification in symbol_table.verification_functions:
         if isinstance(verification, intermediate.ImplementationSpecificVerification):
             implementation_key = specific_implementations.ImplementationKey(
@@ -1466,7 +1421,7 @@ using System.Linq;  // can't alias"""
             implementation, error = _transpile_transpilable_verification(
                 verification=verification,
                 symbol_table=symbol_table,
-                environment=base_environment,
+                type_inference=type_inference,
             )
 
             if error is not None:
@@ -1491,7 +1446,7 @@ private static readonly Verification.Transformer _transformer = (
 
     transformer_block, transformer_errors = _generate_transformer(
         symbol_table=symbol_table,
-        base_environment=base_environment,
+        type_inference=type_inference,
     )
     if transformer_errors is not None:
         errors.extend(transformer_errors)
@@ -1530,7 +1485,7 @@ public static IEnumerable<Reporting.Error> Verify(Our.IClass that)
             ) = _generate_verify_constrained_primitive(
                 constrained_primitive=our_type,
                 symbol_table=symbol_table,
-                base_environment=base_environment,
+                type_inference=type_inference,
             )
 
             if constrained_primitive_errors is not None:

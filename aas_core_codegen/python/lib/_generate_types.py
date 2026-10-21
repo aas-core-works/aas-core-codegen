@@ -921,7 +921,7 @@ class _MethodTranspiler(python_transpilation.Transpiler):
 def _transpile_method(
     method: intermediate.UnderstoodMethod,
     cls: intermediate.ClassUnion,
-    inference: intermediate_type_inference.InferenceOfFunction,
+    type_inference: intermediate_type_inference.TypeInference,
     qualified_module_name: python_common.QualifiedModuleName,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile the ``method`` as a member of the class ``cls``."""
@@ -957,7 +957,9 @@ def _transpile_method(
     elif len(extra_remarks) > 0:
         docstring = python_description.docstring(Stripped("\n\n".join(extra_remarks)))
 
-    transpiler = _MethodTranspiler(inference=inference, method=method)
+    transpiler = _MethodTranspiler(
+        inference=type_inference.by_method[method], method=method
+    )
 
     body = []  # type: List[Stripped]
     for node in method.body:
@@ -1026,12 +1028,12 @@ def _generate_class(
     spec_impls: specific_implementations.SpecificImplementations,
     qualified_module_name: python_common.QualifiedModuleName,
     symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate Python code for the given concrete class ``cls``.
 
-    The ``base_environment`` is used to infer the types of the understood methods.
+    The ``type_inference`` gives the inferred types of the understood methods.
     """
     # region Collect blocks of the class body
 
@@ -1130,19 +1132,10 @@ def over_{prop_name}_or_empty(
             # NOTE (mristin):
             # Python inherits the methods, so we transpile each method only once,
             # in the class which specified it.
-            inference, inference_error = intermediate_type_inference.infer_for_method(
-                method=method, base_environment=base_environment
-            )
-            if inference_error is not None:
-                errors.append(inference_error)
-                continue
-
-            assert inference is not None
-
             method_code, method_error = _transpile_method(
                 method=method,
                 cls=cls,
-                inference=inference,
+                type_inference=type_inference,
                 qualified_module_name=qualified_module_name,
             )
             if method_error is not None:
@@ -1894,6 +1887,7 @@ JsonObject = Mapping[str, Any]"""
 # fmt: on
 def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     qualified_module_name: python_common.QualifiedModuleName,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -1903,10 +1897,6 @@ def generate(
     The ``qualified_module_name`` indicates the fully-qualified name of the base module.
     """
     errors = []  # type: List[Error]
-
-    base_environment = intermediate_type_inference.populate_base_environment(
-        symbol_table=symbol_table
-    )
 
     blocks = []  # type: List[Stripped]
 
@@ -2154,7 +2144,7 @@ class Class(abc.ABC):
                 spec_impls=spec_impls,
                 qualified_module_name=qualified_module_name,
                 symbol_table=symbol_table,
-                base_environment=base_environment,
+                type_inference=type_inference,
             )
             if error is None:
                 assert block is not None

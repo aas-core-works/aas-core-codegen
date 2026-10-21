@@ -433,27 +433,15 @@ class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
 def _generate_implementation_of_transpilable_verification(
     verification: intermediate.TranspilableVerification,
     symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile the verification to a function implementation."""
-    # fmt: off
-    type_inference, inference_error = (
-        intermediate_type_inference.infer_for_verification(
-            verification=verification,
-            base_environment=base_environment
-        )
-    )
-    # fmt: on
-
-    if inference_error is not None:
-        return None, inference_error
-
-    assert type_inference is not None
+    inference = type_inference.by_verification[verification]
 
     aliasing, aliasing_errors = cpp_aliasing.analyze(
         body=verification.parsed.body,
         arguments=verification.arguments,
-        type_map=type_inference.type_map,
+        type_map=inference.type_map,
         binds_self=False,
     )
     if aliasing_errors is not None:
@@ -467,9 +455,9 @@ def _generate_implementation_of_transpilable_verification(
     assert aliasing is not None
 
     optional_inferrer = cpp_optionaling.Inferrer(
-        environment=type_inference.environment_with_args,
-        type_map=type_inference.type_map,
-        downcast_map=type_inference.downcast_map,
+        environment=inference.environment_with_args,
+        type_map=inference.type_map,
+        downcast_map=inference.downcast_map,
     )
     for node in verification.parsed.body:
         _ = optional_inferrer.transform(node)
@@ -483,13 +471,13 @@ def _generate_implementation_of_transpilable_verification(
         )
 
     transpiler = _TranspilableVerificationTranspiler(
-        type_map=type_inference.type_map,
+        type_map=inference.type_map,
         is_optional_map=optional_inferrer.is_optional_map,
-        downcast_map=type_inference.downcast_map,
+        downcast_map=inference.downcast_map,
         is_optional_before_downcast_map=(
             optional_inferrer.is_optional_before_downcast_map
         ),
-        environment=type_inference.environment_with_args,
+        environment=inference.environment_with_args,
         symbol_table=symbol_table,
         verification=verification,
         aliasing=aliasing,
@@ -554,6 +542,7 @@ static_assert(
 # fmt: on
 def generate_header(
     symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -877,10 +866,6 @@ class RecursiveVerification : public IVerification {{
             Stripped("// region Definitions of generic verification functions")
         )
 
-        base_environment = intermediate_type_inference.populate_base_environment(
-            symbol_table=symbol_table
-        )
-
         for verification in public_generic_verifications:
             assert isinstance(verification, intermediate.TranspilableVerification)
 
@@ -894,7 +879,7 @@ class RecursiveVerification : public IVerification {{
             block, error = _generate_implementation_of_transpilable_verification(
                 verification=verification,
                 symbol_table=symbol_table,
-                base_environment=base_environment,
+                type_inference=type_inference,
             )
             if error is not None:
                 errors.append(error)
@@ -1189,22 +1174,11 @@ class _InvariantTranspiler(cpp_transpilation.Transpiler):
 def _transpile_invariant(
     invariant: intermediate.Invariant,
     symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into a C++ condition."""
-    # fmt: off
-    inference, inference_error = (
-        intermediate_type_inference.infer_for_invariant(
-            invariant=invariant,
-            environment=environment
-        )
-    )
-    # fmt: on
-
-    if inference_error is not None:
-        return None, inference_error
-
-    assert inference is not None
+    inference = type_inference.by_invariant[invariant]
+    environment = inference.environment_with_self
     type_map = inference.type_map
 
     optional_inferrer = cpp_optionaling.Inferrer(
@@ -3246,25 +3220,13 @@ enum class Shape : std::uint32_t {{
 def _generate_checks(
     our_type: Union[intermediate.ConstrainedPrimitive, intermediate.ConcreteClass],
     symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Tuple[List[Stripped], Stripped]], Optional[Error]]:
     """
     Generate a check function per invariant of ``our_type``.
 
     Return the functions, and the case of ``ChecksOf`` for ``our_type``.
     """
-    environment = intermediate_type_inference.MutableEnvironment(
-        parent=base_environment
-    )
-
-    assert environment.find(Identifier("self")) is None
-    environment.set(
-        identifier=Identifier("self"),
-        type_annotation=intermediate_type_inference.OurTypeAnnotation(
-            our_type=our_type
-        ),
-    )
-
     that_definition: Stripped
     if isinstance(our_type, intermediate.ConstrainedPrimitive):
         value_type = cpp_common.generate_primitive_type(our_type.constrainee)
@@ -3288,7 +3250,7 @@ const types::{interface_name}* that = (
         condition, error = _transpile_invariant(
             invariant=invariant,
             symbol_table=symbol_table,
-            environment=environment,
+            type_inference=type_inference,
         )
         if error is not None:
             errors.append(error)
@@ -3580,6 +3542,7 @@ def _is_used(function: str, code: str) -> bool:
 # fmt: on
 def generate_implementation(
     symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     spec_impls: specific_implementations.SpecificImplementations,
     library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -3589,10 +3552,6 @@ def generate_implementation(
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
     errors = []  # type: List[Error]
-
-    base_environment = intermediate_type_inference.populate_base_environment(
-        symbol_table=symbol_table
-    )
 
     uses_json = intermediate_uses.json_types(symbol_table)
 
@@ -3696,7 +3655,7 @@ def generate_implementation(
                 block, error = _generate_implementation_of_transpilable_verification(
                     verification=verification,
                     symbol_table=symbol_table,
-                    base_environment=base_environment,
+                    type_inference=type_inference,
                 )
 
                 if error is not None:
@@ -3782,7 +3741,7 @@ namespace {{
         checks, error = _generate_checks(
             our_type=our_type,
             symbol_table=symbol_table,
-            base_environment=base_environment,
+            type_inference=type_inference,
         )
         if error is not None:
             errors.append(error)

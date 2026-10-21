@@ -5,7 +5,10 @@ from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 
 from aas_core_codegen import run, intermediate, typescript
 from aas_core_codegen.common import Error
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 from aas_core_codegen.typescript import lib as typescript_lib, tests as typescript_tests
 
 
@@ -60,6 +63,22 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr,
         )
         return 1
+
+    type_inference, inference_errors = intermediate_type_inference.infer(
+        symbol_table=verified_ir_table
+    )
+    if inference_errors is not None:
+        run.write_error_report(
+            message=f"Failed to infer the types in the meta-model {context.model_path}",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in inference_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
+
+    assert type_inference is not None
 
     src_rel_path = pathlib.Path("src")
     assert not src_rel_path.is_absolute()
@@ -119,6 +138,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             src_rel_path / "types.ts",
             lambda: typescript_lib.generate_types(
                 symbol_table=verified_ir_table,
+                type_inference=type_inference,
                 spec_impls=context.spec_impls,
             ),
         ),
@@ -126,6 +146,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             src_rel_path / "verification.ts",
             lambda: typescript_lib.generate_verification(
                 symbol_table=verified_ir_table,
+                type_inference=type_inference,
                 spec_impls=context.spec_impls,
             ),
         ),

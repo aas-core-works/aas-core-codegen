@@ -4,6 +4,9 @@ import pathlib
 import unittest
 
 from aas_core_codegen import intermediate
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+)
 from aas_core_codegen.common import LinenoColumner, Error
 from aas_core_codegen.csharp import (
     common as csharp_common,
@@ -64,8 +67,22 @@ class Test_generation_against_recorded(unittest.TestCase):
                 )
             assert verified_symbol_table is not None
 
+            type_inference, inference_errors = intermediate_type_inference.infer(
+                symbol_table=verified_symbol_table
+            )
+            if inference_errors is not None:
+                joined_error = Error(
+                    None, "Inferring the types failed", inference_errors
+                )
+                raise AssertionError(
+                    f"Unexpected errors in inferring the types "
+                    f"for {model_pth}: {lineno_columner.error_message(joined_error)}"
+                )
+            assert type_inference is not None
+
             code, errors = csharp_lib.generate_types(
                 symbol_table=verified_symbol_table,
+                type_inference=type_inference,
                 namespace=csharp_common.NamespaceIdentifier("dummyNamespace"),
                 spec_impls=dict(),
             )

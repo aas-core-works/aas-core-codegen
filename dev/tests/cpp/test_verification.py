@@ -48,22 +48,16 @@ __xml_namespace__ = "https://dummy.com"
 
         symbol_table = tests_common.must_translate_source_to_intermediate(source=source)
 
-        base_environment = intermediate_type_inference.populate_base_environment(
+        type_inference, inference_errors = intermediate_type_inference.infer(
             symbol_table=symbol_table
         )
+        assert inference_errors is None, tests_common.most_underlying_messages(
+            inference_errors
+        )
+        assert type_inference is not None
 
         something_cls = symbol_table.must_find_concrete_class(
             name=Identifier("Something")
-        )
-
-        environment = intermediate_type_inference.MutableEnvironment(
-            parent=base_environment
-        )
-        environment.set(
-            identifier=Identifier("self"),
-            type_annotation=intermediate_type_inference.OurTypeAnnotation(
-                our_type=something_cls
-            ),
         )
 
         blocks = []  # type: List[Stripped]
@@ -72,7 +66,9 @@ __xml_namespace__ = "https://dummy.com"
                 condition_expr,
                 error,
             ) = cpp_lib_generate_verification._transpile_invariant(
-                invariant=invariant, symbol_table=symbol_table, environment=environment
+                invariant=invariant,
+                symbol_table=symbol_table,
+                type_inference=type_inference,
             )
             assert error is None, (
                 f"Unexpected generation error for an invariant: "
@@ -136,22 +132,16 @@ __xml_namespace__ = "https://dummy.com"
 
         symbol_table = tests_common.must_translate_source_to_intermediate(source=source)
 
-        base_environment = intermediate_type_inference.populate_base_environment(
+        type_inference, inference_errors = intermediate_type_inference.infer(
             symbol_table=symbol_table
         )
+        assert inference_errors is None, tests_common.most_underlying_messages(
+            inference_errors
+        )
+        assert type_inference is not None
 
         something_cls = symbol_table.must_find_concrete_class(
             name=Identifier("Something")
-        )
-
-        environment = intermediate_type_inference.MutableEnvironment(
-            parent=base_environment
-        )
-        environment.set(
-            identifier=Identifier("self"),
-            type_annotation=intermediate_type_inference.OurTypeAnnotation(
-                our_type=something_cls
-            ),
         )
 
         blocks = []  # type: List[Stripped]
@@ -160,7 +150,9 @@ __xml_namespace__ = "https://dummy.com"
                 condition_expr,
                 error,
             ) = cpp_lib_generate_verification._transpile_invariant(
-                invariant=invariant, symbol_table=symbol_table, environment=environment
+                invariant=invariant,
+                symbol_table=symbol_table,
+                type_inference=type_inference,
             )
             assert error is None, (
                 f"Unexpected generation error for an invariant: "

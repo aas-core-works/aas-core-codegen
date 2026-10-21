@@ -7956,52 +7956,12 @@ def infer_for_method(
     )
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def infer_for_methods(
-    symbol_table: _types.SymbolTable,
-) -> Tuple[
-    Optional[Mapping[_types.UnderstoodMethod, InferenceOfFunction]],
-    Optional[List[Error]],
-]:
-    """
-    Infer the types for all the understood methods of the ``symbol_table``.
-
-    We infer the types of a method only once, in the class which specified it.
-    The generators re-use the inference in all the concrete classes which repeat
-    the method.
-    """
-    base_environment = populate_base_environment(symbol_table=symbol_table)
-
-    errors = []  # type: List[Error]
-    inference_by_method = (
-        dict()
-    )  # type: MutableMapping[_types.UnderstoodMethod, InferenceOfFunction]
-
-    for cls in symbol_table.classes:
-        for method in cls.methods:
-            if method.specified_for is not cls or not isinstance(
-                method, _types.UnderstoodMethod
-            ):
-                continue
-
-            inference, error = infer_for_method(
-                method=method, base_environment=base_environment
-            )
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert inference is not None
-            inference_by_method[method] = inference
-
-    if len(errors) > 0:
-        return None, errors
-
-    return inference_by_method, None
-
-
 class InferenceOfInvariant:
     """Represent the result of type inference on the body of an invariant."""
+
+    #: Environment in which we inferred the invariant, where ``self`` refers to
+    #: the type which specified the invariant
+    environment_with_self: Final[Environment]
 
     #: Map of body nodes to types
     type_map: Final[Mapping[parse_tree.Node, "TypeAnnotationUnion"]]
@@ -8011,10 +7971,12 @@ class InferenceOfInvariant:
 
     def __init__(
         self,
+        environment_with_self: Environment,
         type_map: Mapping[parse_tree.Node, "TypeAnnotationUnion"],
         downcast_map: Mapping[parse_tree.Node, Downcast],
     ) -> None:
         """Initialize with the given values."""
+        self.environment_with_self = environment_with_self
         self.type_map = type_map
         self.downcast_map = downcast_map
 
@@ -8056,8 +8018,156 @@ def infer_for_invariant(
 
     return (
         InferenceOfInvariant(
+            environment_with_self=environment,
             type_map=type_inferrer.type_map,
             downcast_map=type_inferrer.downcast_map,
+        ),
+        None,
+    )
+
+
+class TypeInference:
+    """Represent the type inference of all the transpilable code of a meta-model."""
+
+    #: Environment of the constants, the verification functions and our types,
+    #: shared by all the transpilable code
+    base_environment: Final[Environment]
+
+    #: Inference of each invariant, in the type which specified it
+    by_invariant: Final[Mapping[_types.Invariant, InferenceOfInvariant]]
+
+    #: Inference of each transpilable verification function
+    by_verification: Final[
+        Mapping[_types.TranspilableVerification, InferenceOfFunction]
+    ]
+
+    #: Inference of each understood method, in the class which specified it
+    by_method: Final[Mapping[_types.UnderstoodMethod, InferenceOfFunction]]
+
+    def __init__(
+        self,
+        base_environment: Environment,
+        by_invariant: Mapping[_types.Invariant, InferenceOfInvariant],
+        by_verification: Mapping[_types.TranspilableVerification, InferenceOfFunction],
+        by_method: Mapping[_types.UnderstoodMethod, InferenceOfFunction],
+    ) -> None:
+        """Initialize with the given values."""
+        self.base_environment = base_environment
+        self.by_invariant = by_invariant
+        self.by_verification = by_verification
+        self.by_method = by_method
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def infer(
+    symbol_table: _types.SymbolTable,
+) -> Tuple[Optional[TypeInference], Optional[List[Error]]]:
+    """
+    Infer the types of all the transpilable code of the ``symbol_table``.
+
+    We infer the invariants, the transpilable verification functions and
+    the understood methods, each only once, in the type which specified it.
+    The generators of a target infer the types only once with this function, and
+    pass the result along the ``symbol_table``.
+    """
+    base_environment = populate_base_environment(symbol_table=symbol_table)
+
+    errors = []  # type: List[Error]
+
+    # NOTE (mristin):
+    # We infer the types of an invariant only once, in the type which specified it.
+    # The generators re-use the inference in all the types which inherit
+    # the invariant.
+    by_invariant = (
+        dict()
+    )  # type: MutableMapping[_types.Invariant, InferenceOfInvariant]
+
+    for our_type in symbol_table.our_types:
+        if not isinstance(
+            our_type,
+            (_types.ConstrainedPrimitive, _types.AbstractClass, _types.ConcreteClass),
+        ):
+            continue
+
+        environment_with_self = MutableEnvironment(parent=base_environment)
+        environment_with_self.set(
+            identifier=Identifier("self"),
+            type_annotation=OurTypeAnnotation(our_type=our_type),
+        )
+
+        for invariant in our_type.invariants:
+            if invariant.specified_for is not our_type:
+                continue
+
+            inference_of_invariant, error = infer_for_invariant(
+                invariant=invariant, environment=environment_with_self
+            )
+            if error is not None:
+                errors.append(
+                    Error(
+                        invariant.parsed.node,
+                        f"Failed to infer the types in the invariant "
+                        f"of {invariant.specified_for.name!r}",
+                        error.underlying,
+                    )
+                )
+                continue
+
+            assert inference_of_invariant is not None
+            by_invariant[invariant] = inference_of_invariant
+
+    by_verification = (
+        dict()
+    )  # type: MutableMapping[_types.TranspilableVerification, InferenceOfFunction]
+
+    for verification in symbol_table.verification_functions:
+        if not isinstance(verification, _types.TranspilableVerification):
+            continue
+
+        inference_of_verification, error = infer_for_verification(
+            verification=verification, base_environment=base_environment
+        )
+        if error is not None:
+            errors.append(error)
+            continue
+
+        assert inference_of_verification is not None
+        by_verification[verification] = inference_of_verification
+
+    # NOTE (mristin):
+    # We infer the types of a method only once, in the class which specified it.
+    # The generators re-use the inference in all the concrete classes which
+    # repeat the method.
+    by_method = (
+        dict()
+    )  # type: MutableMapping[_types.UnderstoodMethod, InferenceOfFunction]
+
+    for cls in symbol_table.classes:
+        for method in cls.methods:
+            if method.specified_for is not cls or not isinstance(
+                method, _types.UnderstoodMethod
+            ):
+                continue
+
+            inference_of_method, error = infer_for_method(
+                method=method, base_environment=base_environment
+            )
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert inference_of_method is not None
+            by_method[method] = inference_of_method
+
+    if len(errors) > 0:
+        return None, errors
+
+    return (
+        TypeInference(
+            base_environment=base_environment,
+            by_invariant=by_invariant,
+            by_verification=by_verification,
+            by_method=by_method,
         ),
         None,
     )
