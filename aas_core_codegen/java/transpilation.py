@@ -1014,6 +1014,15 @@ new java.util.ArrayList<{item_type}>(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_RSTRIP:
+                # NOTE (mristin):
+                # Java has no native ``rstrip`` with a set of characters. See
+                # ``StringHelpers.rstrip`` in the generated common package.
+                return (
+                    Stripped(f"StringHelpers.rstrip({instance}, {args[0]})"),
+                    None,
+                )
+
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 item, error = self._transform_as_collection_member(
                     node=node.args[0], collection_node=node.member.instance

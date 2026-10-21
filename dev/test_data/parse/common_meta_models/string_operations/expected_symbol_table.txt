@@ -136,6 +136,34 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
+          description='Other word must end neither with \U00010200 nor with 😁',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=MethodCall(
+                member=Member(
+                  instance=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='other_word',
+                    original_node=...),
+                  name='rstrip',
+                  original_node=...),
+                args=[
+                  Constant(
+                    value='\\U00010200😁',
+                    original_node=...)],
+                original_node=...),
+              op='EQ',
+              right=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='other_word',
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
           description='Amount must not be zero',
           body=textwrap.dedent("""\
             Comparison(
@@ -158,6 +186,20 @@ UnverifiedSymbolTable(
               right=Constant(
                 value='',
                 original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Amount must have at most two significant decimals',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='has_at_most_two_significant_decimals',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='amount',
+                  original_node=...)],
               original_node=...)"""),
           node=...),
         Invariant(
@@ -1261,6 +1303,109 @@ UnverifiedSymbolTable(
               op='LT',
               right=Constant(
                 value='�',
+                original_node=...),
+              original_node=...),
+            original_node=...)""")],
+      node=...,
+      arguments_by_name=...),
+    UnderstoodMethod(
+      name='has_at_most_two_significant_decimals',
+      verification=True,
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='amount',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      non_mutating=False,
+      body=[
+        textwrap.dedent("""\
+          Assignment(
+            target=Name(
+              identifier='position',
+              original_node=...),
+            value=MethodCall(
+              member=Member(
+                instance=Name(
+                  identifier='amount',
+                  original_node=...),
+                name='find',
+                original_node=...),
+              args=[
+                Constant(
+                  value='.',
+                  original_node=...)],
+              original_node=...),
+            annotation=None,
+            original_node=...)"""),
+        textwrap.dedent("""\
+          If(
+            branches=[
+              IfBranch(
+                condition=Comparison(
+                  left=Name(
+                    identifier='position',
+                    original_node=...),
+                  op='EQ',
+                  right=Constant(
+                    value=-1,
+                    original_node=...),
+                  original_node=...),
+                body=[
+                  Return(
+                    value=Constant(
+                      value=True,
+                      original_node=...),
+                    original_node=...)],
+                original_node=...)],
+            default=None,
+            original_node=...)"""),
+        textwrap.dedent("""\
+          Return(
+            value=Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  MethodCall(
+                    member=Member(
+                      instance=Slice(
+                        collection=Name(
+                          identifier='amount',
+                          original_node=...),
+                        start=Add(
+                          left=Name(
+                            identifier='position',
+                            original_node=...),
+                          right=Constant(
+                            value=1,
+                            original_node=...),
+                          original_node=...),
+                        end=None,
+                        original_node=...),
+                      name='rstrip',
+                      original_node=...),
+                    args=[
+                      Constant(
+                        value='0',
+                        original_node=...)],
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=2,
                 original_node=...),
               original_node=...),
             original_node=...)""")],

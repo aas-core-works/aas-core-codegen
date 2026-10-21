@@ -260,6 +260,40 @@ namespace dummy
             }
 
             /// <summary>
+            /// Check whether the character of <paramref name="width" /> UTF-16 code units
+            /// at <paramref name="offset" /> in <paramref name="text" /> is listed in
+            /// <paramref name="chars" />.
+            /// </summary>
+            /// <remarks>
+            /// We compare the whole characters (code points), and not the UTF-16 code
+            /// units, so that we never strip a half of a surrogate pair.
+            /// </remarks>
+            private static bool IsAmongCharacters(
+                string chars,
+                string text,
+                int offset,
+                int width
+            )
+            {
+                int charsOffset = 0;
+                while (charsOffset < chars.Length)
+                {
+                    int charsWidth = IsSurrogatePairAt(chars, charsOffset) ? 2 : 1;
+                    if (
+                        charsWidth == width
+                        && string.CompareOrdinal(chars, charsOffset, text, offset, width) == 0
+                    )
+                    {
+                        return true;
+                    }
+
+                    charsOffset += charsWidth;
+                }
+
+                return false;
+            }
+
+            /// <summary>
             /// Strip the longest prefix of <paramref name="text" /> which consists only
             /// of the characters listed in <paramref name="chars" />.
             /// </summary>
@@ -276,25 +310,7 @@ namespace dummy
                 while (offset < text.Length)
                 {
                     int width = IsSurrogatePairAt(text, offset) ? 2 : 1;
-
-                    bool found = false;
-                    int charsOffset = 0;
-                    while (charsOffset < chars.Length)
-                    {
-                        int charsWidth = IsSurrogatePairAt(chars, charsOffset) ? 2 : 1;
-                        if (
-                            charsWidth == width
-                            && string.CompareOrdinal(chars, charsOffset, text, offset, width) == 0
-                        )
-                        {
-                            found = true;
-                            break;
-                        }
-
-                        charsOffset += charsWidth;
-                    }
-
-                    if (!found)
+                    if (!IsAmongCharacters(chars, text, offset, width))
                     {
                         break;
                     }
@@ -303,6 +319,34 @@ namespace dummy
                 }
 
                 return text.Substring(offset);
+            }
+
+            /// <summary>
+            /// Strip the longest suffix of <paramref name="text" /> which consists only
+            /// of the characters listed in <paramref name="chars" />.
+            /// </summary>
+            /// <remarks>
+            /// We follow the Python implementation of <c>str.rstrip</c>, since Python is
+            /// the language of the meta-model specifications. Hence, we strip
+            /// the characters (code points), and not the UTF-16 code units. Otherwise,
+            /// we would strip a half of a surrogate pair, or even a whole character, if
+            /// the characters in <paramref name="chars" /> shared the surrogates with it.
+            /// </remarks>
+            public static string RStrip(string text, string chars)
+            {
+                int end = text.Length;
+                while (end > 0)
+                {
+                    int width = (end >= 2 && IsSurrogatePairAt(text, end - 2)) ? 2 : 1;
+                    if (!IsAmongCharacters(chars, text, end - width, width))
+                    {
+                        break;
+                    }
+
+                    end -= width;
+                }
+
+                return text.Substring(0, end);
             }
         }  // public static class StringHelpers
     }  // public static class Common

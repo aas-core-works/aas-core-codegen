@@ -638,6 +638,136 @@ namespace dummy.Tests
                     "a😀",
                     "a"));
         }  // void Test_lstrip_ASCII_before_a_character_beyond_ASCII
+
+        [Test, Description("'123000'.rstrip('0') gives '123': trailing zeros")]
+        public void Test_rstrip_trailing_zeros()
+        {
+            Assert.AreEqual(
+                "123",
+                Our.Common.StringHelpers.RStrip(
+                    "123000",
+                    "0"));
+        }  // void Test_rstrip_trailing_zeros
+
+        [Test, Description("'12+-+'.rstrip('+-') gives '12': any of the characters")]
+        public void Test_rstrip_any_of_the_characters()
+        {
+            Assert.AreEqual(
+                "12",
+                Our.Common.StringHelpers.RStrip(
+                    "12+-+",
+                    "+-"));
+        }  // void Test_rstrip_any_of_the_characters
+
+        [Test, Description("'2010'.rstrip('0') gives '201': only the trailing characters")]
+        public void Test_rstrip_only_the_trailing_characters()
+        {
+            Assert.AreEqual(
+                "201",
+                Our.Common.StringHelpers.RStrip(
+                    "2010",
+                    "0"));
+        }  // void Test_rstrip_only_the_trailing_characters
+
+        [Test, Description("''.rstrip('0') gives '': empty text")]
+        public void Test_rstrip_empty_text()
+        {
+            Assert.AreEqual(
+                "",
+                Our.Common.StringHelpers.RStrip(
+                    "",
+                    "0"));
+        }  // void Test_rstrip_empty_text
+
+        [Test, Description("'000'.rstrip('0') gives '': all the characters")]
+        public void Test_rstrip_all_the_characters()
+        {
+            Assert.AreEqual(
+                "",
+                Our.Common.StringHelpers.RStrip(
+                    "000",
+                    "0"));
+        }  // void Test_rstrip_all_the_characters
+
+        [Test, Description("'abc'.rstrip('') gives 'abc': empty characters")]
+        public void Test_rstrip_empty_characters()
+        {
+            Assert.AreEqual(
+                "abc",
+                Our.Common.StringHelpers.RStrip(
+                    "abc",
+                    ""));
+        }  // void Test_rstrip_empty_characters
+
+        [Test, Description("'abc'.rstrip('xyz') gives 'abc': characters not in the text")]
+        public void Test_rstrip_characters_not_in_the_text()
+        {
+            Assert.AreEqual(
+                "abc",
+                Our.Common.StringHelpers.RStrip(
+                    "abc",
+                    "xyz"));
+        }  // void Test_rstrip_characters_not_in_the_text
+
+        [Test, Description("'abc'.rstrip('cba') gives '': characters in any order")]
+        public void Test_rstrip_characters_in_any_order()
+        {
+            Assert.AreEqual(
+                "",
+                Our.Common.StringHelpers.RStrip(
+                    "abc",
+                    "cba"));
+        }  // void Test_rstrip_characters_in_any_order
+
+        [Test, Description("'x-éé'.rstrip('-é') gives 'x': character of two UTF-8 bytes")]
+        public void Test_rstrip_character_of_two_UTF_8_bytes()
+        {
+            Assert.AreEqual(
+                "x",
+                Our.Common.StringHelpers.RStrip(
+                    "x-éé",
+                    "-é"));
+        }  // void Test_rstrip_character_of_two_UTF_8_bytes
+
+        [Test, Description("'😀a😀😀'.rstrip('😀') gives '😀a': character beyond the Basic Multilingual Plane")]
+        public void Test_rstrip_character_beyond_the_Basic_Multilingual_Plane()
+        {
+            Assert.AreEqual(
+                "😀a",
+                Our.Common.StringHelpers.RStrip(
+                    "😀a😀😀",
+                    "😀"));
+        }  // void Test_rstrip_character_beyond_the_Basic_Multilingual_Plane
+
+        [Test, Description("'x😁'.rstrip('😀') gives 'x😁': character sharing the high surrogate")]
+        public void Test_rstrip_character_sharing_the_high_surrogate()
+        {
+            Assert.AreEqual(
+                "x😁",
+                Our.Common.StringHelpers.RStrip(
+                    "x😁",
+                    "😀"));
+        }  // void Test_rstrip_character_sharing_the_high_surrogate
+
+        [Test, Description("'x😀'.rstrip('\\U00010200😁') gives 'x😀': characters sharing the surrogates")]
+        public void Test_rstrip_characters_sharing_the_surrogates()
+        {
+            Assert.AreEqual(
+                "x😀",
+                Our.Common.StringHelpers.RStrip(
+                    "x😀",
+                    "𐈀😁"));
+        }  // void Test_rstrip_characters_sharing_the_surrogates
+
+        [Test, Description("'😀a'.rstrip('a') gives '😀': ASCII after a character beyond ASCII")]
+        public void Test_rstrip_ASCII_after_a_character_beyond_ASCII()
+        {
+            Assert.AreEqual(
+                "😀",
+                Our.Common.StringHelpers.RStrip(
+                    "😀a",
+                    "a"));
+        }  // void Test_rstrip_ASCII_after_a_character_beyond_ASCII
     }  // class TestStringHelpers
 }  // namespace dummy.Tests
 

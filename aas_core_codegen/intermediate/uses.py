@@ -285,15 +285,26 @@ def lstrip_call(type_inference: intermediate_type_inference.TypeInference) -> bo
     return _calls_builtin_method(type_inference, intermediate_type_inference.STR_LSTRIP)
 
 
+def rstrip_call(type_inference: intermediate_type_inference.TypeInference) -> bool:
+    """
+    Check whether any transpiled code calls ``str.rstrip``.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for ``rstrip``. We rely on the inferred
+    types, so a method of our class named ``rstrip`` does not count.
+    """
+    return _calls_builtin_method(type_inference, intermediate_type_inference.STR_RSTRIP)
+
+
 def string_operations(
     type_inference: intermediate_type_inference.TypeInference,
 ) -> bool:
     """
     Check whether any transpiled code might operate on strings.
 
-    The operations are ``len``, slicing, ``find``, ordering and ``lstrip``.
-    The targets use this check to generate the unit tests of the operations on
-    strings only if the meta-model needs them.
+    The operations are ``len``, slicing, ``find``, ordering, ``lstrip`` and
+    ``rstrip``. The targets use this check to generate the unit tests of
+    the operations on strings only if the meta-model needs them.
     """
     return (
         string_len_call(type_inference)
@@ -301,6 +312,7 @@ def string_operations(
         or string_find_call(type_inference)
         or string_ordering(type_inference)
         or lstrip_call(type_inference)
+        or rstrip_call(type_inference)
     )
 
 

@@ -213,6 +213,34 @@ public final class StringHelpers {
 
     return text.substring(offset);
   }
+
+  /**
+   * Strip the longest suffix of {@code text} which consists only of
+   * the characters listed in {@code chars}.
+   *
+   * <p>We follow the Python implementation of {@code str.rstrip}, since Python
+   * is the language of the meta-model specifications. Hence, we strip
+   * the characters (code points), and not the UTF-16 code units. For example,
+   * we do not strip the second half of a surrogate pair when {@code chars}
+   * contains another character with the same low surrogate.
+   *
+   * @param text to be stripped
+   * @param chars to be stripped from the end of {@code text}
+   * @return {@code text} without the stripped suffix
+   */
+  public static String rstrip(String text, String chars) {
+    int offset = text.length();
+    while (offset > 0) {
+      final int codePoint = text.codePointBefore(offset);
+      if (!containsCodePoint(chars, codePoint)) {
+        break;
+      }
+
+      offset -= Character.charCount(codePoint);
+    }
+
+    return text.substring(0, offset);
+  }
 }
 
 /*

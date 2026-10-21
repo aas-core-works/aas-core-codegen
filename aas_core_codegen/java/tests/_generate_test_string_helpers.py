@@ -152,6 +152,28 @@ public void {_method_name("Lstrip", lstrip_case.description)}() {{
                 )
             )
 
+    if intermediate_uses.rstrip_call(type_inference):
+        for rstrip_case in string_helper_cases.RSTRIP_CASES:
+            display_name = java_common.string_literal(
+                f"{rstrip_case.python_expression()} gives "
+                f"{rstrip_case.expected!r}: {rstrip_case.description}"
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+@Test
+@DisplayName({display_name})
+public void {_method_name("Rstrip", rstrip_case.description)}() {{
+{I}assertEquals(
+{II}{java_common.string_literal(rstrip_case.expected)},
+{II}StringHelpers.rstrip(
+{III}{java_common.string_literal(rstrip_case.text)},
+{III}{java_common.string_literal(rstrip_case.chars)}));
+}}"""
+                )
+            )
+
     blocks_joined = "\n\n".join(blocks)
 
     return [

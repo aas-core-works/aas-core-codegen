@@ -890,6 +890,17 @@ OurCommon.at(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_RSTRIP:
+                # NOTE (mristin):
+                # TypeScript has no native equivalent of the Python ``str.rstrip``
+                # with the given characters. See ``rstrip`` in the generated
+                # common module, which strips the characters (code points) instead
+                # of the UTF-16 code units.
+                return (
+                    Stripped(f"OurCommon.rstrip({instance}, {args[0]})"),
+                    None,
+                )
+
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 return Stripped(f"{instance}.add({args[0]})"), None
 

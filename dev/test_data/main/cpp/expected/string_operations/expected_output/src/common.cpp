@@ -14120,6 +14120,18 @@ size_t OffsetOf(const std::wstring& text, size_t position) {
 size_t CharacterSizeAt(const std::wstring& text, size_t offset) {
   return IsSurrogatePairAt(text, offset) ? 2 : 1;
 }
+
+/**
+ * Compute the size in wchar_t's of the character which ends at
+ * \p end_offset in \p text.
+ */
+size_t CharacterSizeBefore(const std::wstring& text, size_t end_offset) {
+  if (end_offset >= 2 && IsSurrogatePairAt(text, end_offset - 2)) {
+    return 2;
+  }
+
+  return 1;
+}
 #else
 /**
  * Count the characters of a text between \p start_offset and
@@ -14147,6 +14159,13 @@ size_t OffsetOf(const std::wstring&, size_t position) {
 size_t CharacterSizeAt(const std::wstring&, size_t) {
   return 1;
 }
+
+/**
+ * Compute the size in wchar_t's of a character in a text.
+ */
+size_t CharacterSizeBefore(const std::wstring&, size_t) {
+  return 1;
+}
 #endif
 
 /**
@@ -14168,6 +14187,35 @@ size_t ResolvePosition(int64_t position, size_t length) {
   }
 
   return position > signed_length ? length : static_cast<size_t>(position);
+}
+
+/**
+ * Check whether the character of \p size wchar_t's at \p offset in \p text
+ * is one of the \p chars.
+ *
+ * We compare the whole characters so that we never strip a half of
+ * a surrogate pair.
+ */
+bool IsAmongCharacters(
+  const std::wstring& text,
+  size_t offset,
+  size_t size,
+  const std::wstring& chars
+) {
+  size_t chars_offset = 0;
+  while (chars_offset < chars.size()) {
+    const size_t chars_size = CharacterSizeAt(chars, chars_offset);
+    if (
+      chars_size == size
+      && chars.compare(chars_offset, chars_size, text, offset, size) == 0
+    ) {
+      return true;
+    }
+
+    chars_offset += chars_size;
+  }
+
+  return false;
 }
 
 }  // namespace
@@ -14247,26 +14295,7 @@ std::wstring LStrip(
   size_t offset = 0;
   while (offset < text.size()) {
     const size_t size = CharacterSizeAt(text, offset);
-
-    // NOTE (mristin):
-    // We compare the whole characters so that we never strip a half of
-    // a surrogate pair.
-    bool stripped = false;
-    size_t chars_offset = 0;
-    while (chars_offset < chars.size()) {
-      const size_t chars_size = CharacterSizeAt(chars, chars_offset);
-      if (
-        chars_size == size
-        && chars.compare(chars_offset, chars_size, text, offset, size) == 0
-      ) {
-        stripped = true;
-        break;
-      }
-
-      chars_offset += chars_size;
-    }
-
-    if (!stripped) {
+    if (!IsAmongCharacters(text, offset, size, chars)) {
       break;
     }
 
@@ -14274,6 +14303,23 @@ std::wstring LStrip(
   }
 
   return text.substr(offset);
+}
+
+std::wstring RStrip(
+  const std::wstring& text,
+  const std::wstring& chars
+) {
+  size_t end_offset = text.size();
+  while (end_offset > 0) {
+    const size_t size = CharacterSizeBefore(text, end_offset);
+    if (!IsAmongCharacters(text, end_offset - size, size, chars)) {
+      break;
+    }
+
+    end_offset -= size;
+  }
+
+  return text.substr(0, end_offset);
 }
 
 namespace {

@@ -4346,7 +4346,7 @@ __xml_namespace__ = "https://dummy.com"
         self.expect_error(
             'self.text.upper() == "A"',
             "The member 'upper' is not supported on strings; we support only "
-            "the following methods: 'find', 'lstrip'",
+            "the following methods: 'find', 'lstrip', 'rstrip'",
         )
 
     def test_lstrip_and_int(self) -> None:
@@ -4359,6 +4359,16 @@ __xml_namespace__ = "https://dummy.com"
         self.assertEqual("lstrip", type_map["self.text.lstrip"])
         self.assertEqual("str", type_map["self.text.lstrip('+-').lstrip('0')"])
         self.assertEqual("int", type_map["int(self.text.lstrip('+-').lstrip('0'))"])
+
+    def test_rstrip(self) -> None:
+        type_map = Test_string_slicing_and_find.infer_type_map(
+            Test_string_slicing_and_find.source_with_invariant(
+                'self.text.lstrip("0").rstrip("0") != ""'
+            )
+        )
+
+        self.assertEqual("rstrip", type_map["self.text.lstrip('0').rstrip"])
+        self.assertEqual("str", type_map["self.text.lstrip('0').rstrip('0')"])
 
     def test_int_of_a_constrained_primitive(self) -> None:
         source = """\
@@ -4396,6 +4406,19 @@ __xml_namespace__ = "https://dummy.com"
         self.expect_error(
             'self.text.lstrip() == ""',
             "Expected 1 argument(s) to the built-in method 'lstrip', but got 0",
+        )
+
+    def test_rstrip_with_a_non_string_argument_fails(self) -> None:
+        self.expect_error(
+            'self.text.rstrip(1) == ""',
+            "Expected the stripped characters of ``rstrip`` to be a string, "
+            "but got: int",
+        )
+
+    def test_rstrip_with_no_arguments_fails(self) -> None:
+        self.expect_error(
+            'self.text.rstrip() == ""',
+            "Expected 1 argument(s) to the built-in method 'rstrip', but got 0",
         )
 
     def test_int_of_a_float_fails(self) -> None:

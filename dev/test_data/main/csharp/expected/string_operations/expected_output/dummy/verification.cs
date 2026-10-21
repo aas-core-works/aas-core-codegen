@@ -185,6 +185,22 @@ namespace dummy
         }  // public static bool WordSortsBeforeReplacementCharacter
 
         /// <summary>
+        /// Check <c>rstrip</c> on the fraction found with <c>find</c> and slicing.
+        /// </summary>
+        public static bool HasAtMostTwoSignificantDecimals(
+            string amount
+        )
+        {
+            long position = Common.StringHelpers.Find(amount, ".");
+            if (position == -1)
+            {
+                return true;
+            }
+            return (
+                Common.StringHelpers.Len(Common.StringHelpers.RStrip(Common.StringHelpers.Slice(amount, position + 1), "0")) <= 2);
+        }  // public static bool HasAtMostTwoSignificantDecimals
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -205,11 +221,27 @@ namespace dummy
             )
             {
                 if (!(
+                    Common.StringHelpers.RStrip(that.OtherWord, "𐈀😁") == that.OtherWord))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Other word must end neither with 𐈀 nor with 😁");
+                }
+
+                if (!(
                     Common.StringHelpers.LStrip(that.Amount, "0.") != ""))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Amount must not be zero");
+                }
+
+                if (!(
+                    Verification.HasAtMostTwoSignificantDecimals(that.Amount)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Amount must have at most two significant decimals");
                 }
 
                 if (!(

@@ -158,6 +158,7 @@ def _uses_string_helpers(
         or intermediate_uses.string_slicing(type_inference)
         or intermediate_uses.string_find_call(type_inference)
         or intermediate_uses.lstrip_call(type_inference)
+        or intermediate_uses.rstrip_call(type_inference)
     )
 
 
@@ -314,6 +315,29 @@ std::wstring LStrip(
             )
         )
 
+    if intermediate_uses.rstrip_call(type_inference):
+        result.append(
+            Stripped(
+                f"""\
+/**
+ * Strip the longest suffix of \\p text consisting of the \\p chars.
+ *
+ * We follow the Python implementation of `str.rstrip`, since Python is
+ * the language of the meta-model specifications. Hence, we strip
+ * the characters (code points), and never a half of a surrogate pair on
+ * the platforms where `wchar_t` is a UTF-16 code unit, such as Windows.
+ *
+ * \\param text to be stripped
+ * \\param chars to be stripped from the end of \\p text
+ * \\return \\p text without the stripped suffix
+ */
+std::wstring RStrip(
+{I}const std::wstring& text,
+{I}const std::wstring& chars
+);"""
+            )
+        )
+
     return result
 
 
@@ -330,11 +354,13 @@ def _generate_string_helper_definitions(
     uses_slicing = intermediate_uses.string_slicing(type_inference)
     uses_find = intermediate_uses.string_find_call(type_inference)
     uses_lstrip = intermediate_uses.lstrip_call(type_inference)
+    uses_rstrip = intermediate_uses.rstrip_call(type_inference)
 
     uses_len_str = (
         intermediate_uses.string_len_call(type_inference) or uses_slicing or uses_find
     )
     uses_offset_of = uses_slicing or uses_find
+    uses_strip = uses_lstrip or uses_rstrip
 
     # NOTE (mristin):
     # We count a lone surrogate as a character of its own, as Python does. We do
@@ -433,7 +459,7 @@ size_t OffsetOf(const std::wstring&, size_t position) {{
             )
         )
 
-    if uses_lstrip:
+    if uses_strip:
         utf16_helpers.append(
             Stripped(
                 f"""\
@@ -452,6 +478,35 @@ size_t CharacterSizeAt(const std::wstring& text, size_t offset) {{
  * Compute the size in wchar_t's of a character in a text.
  */
 size_t CharacterSizeAt(const std::wstring&, size_t) {{
+{I}return 1;
+}}"""
+            )
+        )
+
+    if uses_rstrip:
+        utf16_helpers.append(
+            Stripped(
+                f"""\
+/**
+ * Compute the size in wchar_t's of the character which ends at
+ * \\p end_offset in \\p text.
+ */
+size_t CharacterSizeBefore(const std::wstring& text, size_t end_offset) {{
+{I}if (end_offset >= 2 && IsSurrogatePairAt(text, end_offset - 2)) {{
+{II}return 2;
+{I}}}
+
+{I}return 1;
+}}"""
+            )
+        )
+        utf32_helpers.append(
+            Stripped(
+                f"""\
+/**
+ * Compute the size in wchar_t's of a character in a text.
+ */
+size_t CharacterSizeBefore(const std::wstring&, size_t) {{
 {I}return 1;
 }}"""
             )
@@ -482,6 +537,41 @@ size_t ResolvePosition(int64_t position, size_t length) {{
 {I}}}
 
 {I}return position > signed_length ? length : static_cast<size_t>(position);
+}}"""
+            )
+        )
+
+    if uses_strip:
+        other_helpers.append(
+            Stripped(
+                f"""\
+/**
+ * Check whether the character of \\p size wchar_t's at \\p offset in \\p text
+ * is one of the \\p chars.
+ *
+ * We compare the whole characters so that we never strip a half of
+ * a surrogate pair.
+ */
+bool IsAmongCharacters(
+{I}const std::wstring& text,
+{I}size_t offset,
+{I}size_t size,
+{I}const std::wstring& chars
+) {{
+{I}size_t chars_offset = 0;
+{I}while (chars_offset < chars.size()) {{
+{II}const size_t chars_size = CharacterSizeAt(chars, chars_offset);
+{II}if (
+{III}chars_size == size
+{III}&& chars.compare(chars_offset, chars_size, text, offset, size) == 0
+{II}) {{
+{III}return true;
+{II}}}
+
+{II}chars_offset += chars_size;
+{I}}}
+
+{I}return false;
 }}"""
             )
         )
@@ -629,26 +719,7 @@ std::wstring LStrip(
 {I}size_t offset = 0;
 {I}while (offset < text.size()) {{
 {II}const size_t size = CharacterSizeAt(text, offset);
-
-{II}// NOTE (mristin):
-{II}// We compare the whole characters so that we never strip a half of
-{II}// a surrogate pair.
-{II}bool stripped = false;
-{II}size_t chars_offset = 0;
-{II}while (chars_offset < chars.size()) {{
-{III}const size_t chars_size = CharacterSizeAt(chars, chars_offset);
-{III}if (
-{IIII}chars_size == size
-{IIII}&& chars.compare(chars_offset, chars_size, text, offset, size) == 0
-{III}) {{
-{IIII}stripped = true;
-{IIII}break;
-{III}}}
-
-{III}chars_offset += chars_size;
-{II}}}
-
-{II}if (!stripped) {{
+{II}if (!IsAmongCharacters(text, offset, size, chars)) {{
 {III}break;
 {II}}}
 
@@ -656,6 +727,29 @@ std::wstring LStrip(
 {I}}}
 
 {I}return text.substr(offset);
+}}"""
+            )
+        )
+
+    if uses_rstrip:
+        result.append(
+            Stripped(
+                f"""\
+std::wstring RStrip(
+{I}const std::wstring& text,
+{I}const std::wstring& chars
+) {{
+{I}size_t end_offset = text.size();
+{I}while (end_offset > 0) {{
+{II}const size_t size = CharacterSizeBefore(text, end_offset);
+{II}if (!IsAmongCharacters(text, end_offset - size, size, chars)) {{
+{III}break;
+{II}}}
+
+{II}end_offset -= size;
+{I}}}
+
+{I}return text.substr(0, end_offset);
 }}"""
             )
         )
@@ -1166,8 +1260,8 @@ std::unique_ptr<T> make_unique(
     # NOTE (mristin):
     # The string helpers need ``WCHAR_MAX`` to tell whether ``wchar_t`` is
     # a UTF-16 code unit. Hence, we include ``<cwchar>`` only for a meta-model
-    # which takes ``len`` of strings, slices them, or calls ``find`` or ``lstrip``
-    # on them.
+    # which takes ``len`` of strings, slices them, or calls ``find``, ``lstrip``
+    # or ``rstrip`` on them.
     #
     # The helpers for slicing and ``find`` take the positions as ``int64_t``'s,
     # and the transpiled code converts the result of ``LenStr`` to ``int64_t``.

@@ -65,10 +65,11 @@ def _generate_string_helpers(
     uses_slicing = intermediate_uses.string_slicing(type_inference)
     uses_find = intermediate_uses.string_find_call(type_inference)
     uses_lstrip = intermediate_uses.lstrip_call(type_inference)
+    uses_rstrip = intermediate_uses.rstrip_call(type_inference)
 
     members = []  # type: List[Stripped]
 
-    if uses_len or uses_slicing or uses_find or uses_lstrip:
+    if uses_len or uses_slicing or uses_find or uses_lstrip or uses_rstrip:
         members.append(
             Stripped(
                 f"""\
@@ -345,6 +346,46 @@ public static int CompareByCodePoints(string that, string other)
             ]
         )
 
+    if uses_lstrip or uses_rstrip:
+        members.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Check whether the character of <paramref name="width" /> UTF-16 code units
+/// at <paramref name="offset" /> in <paramref name="text" /> is listed in
+/// <paramref name="chars" />.
+/// </summary>
+/// <remarks>
+/// We compare the whole characters (code points), and not the UTF-16 code
+/// units, so that we never strip a half of a surrogate pair.
+/// </remarks>
+private static bool IsAmongCharacters(
+{I}string chars,
+{I}string text,
+{I}int offset,
+{I}int width
+)
+{{
+{I}int charsOffset = 0;
+{I}while (charsOffset < chars.Length)
+{I}{{
+{II}int charsWidth = IsSurrogatePairAt(chars, charsOffset) ? 2 : 1;
+{II}if (
+{III}charsWidth == width
+{III}&& string.CompareOrdinal(chars, charsOffset, text, offset, width) == 0
+{II})
+{II}{{
+{III}return true;
+{II}}}
+
+{II}charsOffset += charsWidth;
+{I}}}
+
+{I}return false;
+}}"""
+            )
+        )
+
     if uses_lstrip:
         members.append(
             Stripped(
@@ -366,25 +407,7 @@ public static string LStrip(string text, string chars)
 {I}while (offset < text.Length)
 {I}{{
 {II}int width = IsSurrogatePairAt(text, offset) ? 2 : 1;
-
-{II}bool found = false;
-{II}int charsOffset = 0;
-{II}while (charsOffset < chars.Length)
-{II}{{
-{III}int charsWidth = IsSurrogatePairAt(chars, charsOffset) ? 2 : 1;
-{III}if (
-{IIII}charsWidth == width
-{IIII}&& string.CompareOrdinal(chars, charsOffset, text, offset, width) == 0
-{III})
-{III}{{
-{IIII}found = true;
-{IIII}break;
-{III}}}
-
-{III}charsOffset += charsWidth;
-{II}}}
-
-{II}if (!found)
+{II}if (!IsAmongCharacters(chars, text, offset, width))
 {II}{{
 {III}break;
 {II}}}
@@ -393,6 +416,40 @@ public static string LStrip(string text, string chars)
 {I}}}
 
 {I}return text.Substring(offset);
+}}"""
+            )
+        )
+
+    if uses_rstrip:
+        members.append(
+            Stripped(
+                f"""\
+/// <summary>
+/// Strip the longest suffix of <paramref name="text" /> which consists only
+/// of the characters listed in <paramref name="chars" />.
+/// </summary>
+/// <remarks>
+/// We follow the Python implementation of <c>str.rstrip</c>, since Python is
+/// the language of the meta-model specifications. Hence, we strip
+/// the characters (code points), and not the UTF-16 code units. Otherwise,
+/// we would strip a half of a surrogate pair, or even a whole character, if
+/// the characters in <paramref name="chars" /> shared the surrogates with it.
+/// </remarks>
+public static string RStrip(string text, string chars)
+{{
+{I}int end = text.Length;
+{I}while (end > 0)
+{I}{{
+{II}int width = (end >= 2 && IsSurrogatePairAt(text, end - 2)) ? 2 : 1;
+{II}if (!IsAmongCharacters(chars, text, end - width, width))
+{II}{{
+{III}break;
+{II}}}
+
+{II}end -= width;
+{I}}}
+
+{I}return text.Substring(0, end);
 }}"""
             )
         )

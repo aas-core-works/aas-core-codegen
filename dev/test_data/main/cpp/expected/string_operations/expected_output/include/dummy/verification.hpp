@@ -272,6 +272,11 @@ bool WordSortsBeforeReplacementCharacter(
   const std::wstring& word
 );
 
+/// \brief Check `rstrip` on the fraction found with `find` and slicing.
+bool HasAtMostTwoSignificantDecimals(
+  const std::wstring& amount
+);
+
 // endregion Verification functions
 
 // region Verification of constrained primitives

@@ -1557,6 +1557,16 @@ common::{contains_function}(
                 None,
             )
 
+        elif kind is intermediate_type_inference.BuiltinMethodKind.STR_RSTRIP:
+            # NOTE (mristin):
+            # We do not use the native ``find_last_not_of`` as it strips
+            # the UTF-16 code units instead of the characters on Windows, unlike
+            # Python. See ``RStrip`` in the generated common module.
+            return (
+                Stripped(f"common::RStrip({instance}, {args[0]})"),
+                None,
+            )
+
         elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
             # NOTE (mristin):
             # The lengths are ``size_t``'s, so we convert them to our integers.
