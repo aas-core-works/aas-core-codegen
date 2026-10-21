@@ -3,6 +3,13 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.27rc3 (2026-10-21)
+======================
+We pre-release with the operations on strings needed for
+``date_time_utc_less`` in aas-core-meta, *i.e.*, the ordering of
+strings, ``str.rstrip``, ``str.startswith``, ``str.endswith`` and
+the string concatenation, which surfaced after 0.0.27rc2.
+
 0.0.27rc2 (2026-10-01)
 ======================
 We pre-release with the fixes needed for V3.2 of the AAS meta-model,
