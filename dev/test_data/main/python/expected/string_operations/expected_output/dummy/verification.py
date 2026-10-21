@@ -209,6 +209,19 @@ def word_sorts_before_replacement_character(
     return word < '�'
 
 
+def has_at_most_two_significant_decimals(
+    amount: str
+) -> bool:
+    """
+    Check ``rstrip`` on the fraction found with ``find`` and slicing.
+    """
+    # pylint: disable=all
+    position = amount.find('.')
+    if position == -1:
+        return True
+    return len(amount[position + 1:].rstrip('0')) <= 2
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -219,9 +232,19 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
+        if not (that.other_word.rstrip('𐈀😁') == that.other_word):
+            yield Error(
+                'Other word must end neither with 𐈀 nor with 😁'
+            )
+
         if not (that.amount.lstrip('0.') != ''):
             yield Error(
                 'Amount must not be zero'
+            )
+
+        if not has_at_most_two_significant_decimals(that.amount):
+            yield Error(
+                'Amount must have at most two significant decimals'
             )
 
         if not (that.word < 'zzz'):

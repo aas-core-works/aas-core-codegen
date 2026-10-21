@@ -10203,6 +10203,23 @@ std::wstring LStrip(
 );
 
 /**
+ * Strip the longest suffix of \p text consisting of the \p chars.
+ *
+ * We follow the Python implementation of `str.rstrip`, since Python is
+ * the language of the meta-model specifications. Hence, we strip
+ * the characters (code points), and never a half of a surrogate pair on
+ * the platforms where `wchar_t` is a UTF-16 code unit, such as Windows.
+ *
+ * \param text to be stripped
+ * \param chars to be stripped from the end of \p text
+ * \return \p text without the stripped suffix
+ */
+std::wstring RStrip(
+  const std::wstring& text,
+  const std::wstring& chars
+);
+
+/**
  * \brief Compare \p that text and \p other text code point by code point.
  *
  * We follow the Python implementation of the string comparison, since Python is

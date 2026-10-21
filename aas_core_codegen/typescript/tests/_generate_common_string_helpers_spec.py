@@ -118,6 +118,24 @@ test({name}, () => {{
     )
 
 
+def _generate_rstrip_test(case: string_helper_cases.RStripCase) -> Stripped:
+    """Generate the test of a single ``rstrip`` ``case``."""
+    name = typescript_common.string_literal(
+        f"{case.python_expression()} gives {case.expected!r}: {case.description}"
+    )
+
+    text = typescript_common.string_literal(case.text)
+    chars = typescript_common.string_literal(case.chars)
+    expected = typescript_common.string_literal(case.expected)
+
+    return Stripped(
+        f"""\
+test({name}, () => {{
+{I}expect(OurCommon.rstrip({text}, {chars})).toStrictEqual({expected});
+}});"""
+    )
+
+
 # fmt: off
 @require(
     lambda type_inference: intermediate_uses.string_operations(type_inference)
@@ -165,6 +183,10 @@ def generate(type_inference: intermediate_type_inference.TypeInference) -> str:
     if intermediate_uses.lstrip_call(type_inference):
         for lstrip_case in string_helper_cases.LSTRIP_CASES:
             blocks.append(_generate_lstrip_test(lstrip_case))
+
+    if intermediate_uses.rstrip_call(type_inference):
+        for rstrip_case in string_helper_cases.RSTRIP_CASES:
+            blocks.append(_generate_rstrip_test(rstrip_case))
 
     blocks.append(typescript_common.WARNING)
 

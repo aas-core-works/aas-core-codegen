@@ -1,5 +1,5 @@
 """
-Test the operations on strings: ``len``, slicing, ``find``, ordering and ``lstrip``.
+Test the operations on strings: ``len``, slicing, ``find``, ordering and stripping.
 
 The meta-model follows the Python semantics, where the strings consist of
 the characters (code points). Most other languages represent the strings as UTF-16
@@ -118,6 +118,16 @@ def word_sorts_before_replacement_character(word: str) -> bool:
     return word < "\ufffd"
 
 
+@verification
+def has_at_most_two_significant_decimals(amount: str) -> bool:
+    """Check ``rstrip`` on the fraction found with ``find`` and slicing."""
+    position = amount.find(".")
+    if position == -1:
+        return True
+
+    return len(amount[position + 1 :].rstrip("0")) <= 2
+
+
 @invariant(
     lambda self: date_before_time_is_long_enough(self.text),
     "Date before the time must have 10 characters",
@@ -167,8 +177,20 @@ def word_sorts_before_replacement_character(word: str) -> bool:
     "Word must sort before zzz",
 )
 @invariant(
+    lambda self: has_at_most_two_significant_decimals(self.amount),
+    "Amount must have at most two significant decimals",
+)
+@invariant(
     lambda self: self.amount.lstrip("0.") != "",
     "Amount must not be zero",
+)
+# NOTE (mristin):
+# The character "𐈀" (U+10200) shares the low surrogate (U+DE00) with "😀"
+# (U+1F600), and "😁" (U+1F601) shares the high surrogate (U+D83D) with it. Hence,
+# stripping the UTF-16 code units instead of the characters would strip "😀".
+@invariant(
+    lambda self: self.other_word.rstrip("𐈀😁") == self.other_word,
+    "Other word must end neither with 𐈀 nor with 😁",
 )
 class Something(DBC):
     text: str

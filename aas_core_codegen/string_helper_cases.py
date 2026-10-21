@@ -2,14 +2,15 @@
 Specify the operations on strings by example.
 
 The transpiled code follows the Python implementation of ``len``, the slicing,
-``str.find``, the comparison of strings and ``str.lstrip``, since Python is
-the language of the meta-model specifications. Hence, the lengths and
+``str.find``, the comparison of strings, ``str.lstrip`` and ``str.rstrip``, since
+Python is the language of the meta-model specifications. Hence, the lengths and
 the positions count the characters (code points), and not the UTF-16 code units or
 the UTF-8 bytes of the target, a negative position counts from the end of
 the string, the positions out of range are clamped to the string, and ``str.find``
 gives -1 for a start beyond the end of the string. The strings are ordered by
 their characters (code points), and not by their UTF-16 code units. Likewise,
-``str.lstrip`` strips the characters, and never a half of a surrogate pair.
+``str.lstrip`` and ``str.rstrip`` strip the characters, and never a half of
+a surrogate pair.
 
 The targets generate unit tests from these cases so that the users can inspect
 the behavior of the generated code. We compute the expected results with Python
@@ -171,6 +172,33 @@ class LStripCase:
         return f"{self.text!r}.lstrip({self.chars!r})"
 
 
+class RStripCase:
+    """Represent a case of ``text.rstrip(chars)``."""
+
+    #: Short description of what the case demonstrates
+    description: Final[str]
+
+    #: Text to be stripped
+    text: Final[str]
+
+    #: Characters to be stripped from the end of the text
+    chars: Final[str]
+
+    #: Expected stripped text, as given by Python
+    expected: Final[str]
+
+    def __init__(self, description: str, text: str, chars: str) -> None:
+        """Initialize with the given values, and compute the expected text."""
+        self.description = description
+        self.text = text
+        self.chars = chars
+        self.expected = text.rstrip(chars)
+
+    def python_expression(self) -> str:
+        """Render the case in Python notation, *e.g.*, for the names of the tests."""
+        return f"{self.text!r}.rstrip({self.chars!r})"
+
+
 # NOTE (mristin):
 # We include the characters beyond ASCII since the targets represent the strings
 # differently. The character "é" takes one UTF-16 code unit, but two UTF-8 bytes,
@@ -290,4 +318,20 @@ LSTRIP_CASES: Final[Sequence[LStripCase]] = (
     LStripCase("character sharing the high surrogate", "😁x", "😀"),
     LStripCase("characters sharing the surrogates", "😀x", "𐈀😁"),
     LStripCase("ASCII before a character beyond ASCII", "a😀", "a"),
+)
+
+RSTRIP_CASES: Final[Sequence[RStripCase]] = (
+    RStripCase("trailing zeros", "123000", "0"),
+    RStripCase("any of the characters", "12+-+", "+-"),
+    RStripCase("only the trailing characters", "2010", "0"),
+    RStripCase("empty text", "", "0"),
+    RStripCase("all the characters", "000", "0"),
+    RStripCase("empty characters", "abc", ""),
+    RStripCase("characters not in the text", "abc", "xyz"),
+    RStripCase("characters in any order", "abc", "cba"),
+    RStripCase("character of two UTF-8 bytes", "x-éé", "-é"),
+    RStripCase("character beyond the Basic Multilingual Plane", "😀a😀😀", "😀"),
+    RStripCase("character sharing the high surrogate", "x😁", "😀"),
+    RStripCase("characters sharing the surrogates", "x😀", "𐈀😁"),
+    RStripCase("ASCII after a character beyond ASCII", "😀a", "a"),
 )

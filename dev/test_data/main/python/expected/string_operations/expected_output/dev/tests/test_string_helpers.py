@@ -477,6 +477,110 @@ class Test_string_helpers(unittest.TestCase):
             )
         )
 
+    def test_rstrip_trailing_zeros(self) -> None:
+        self.assertEqual(
+            '123',
+            '123000'.rstrip(
+                '0'
+            )
+        )
+
+    def test_rstrip_any_of_the_characters(self) -> None:
+        self.assertEqual(
+            '12',
+            '12+-+'.rstrip(
+                '+-'
+            )
+        )
+
+    def test_rstrip_only_the_trailing_characters(self) -> None:
+        self.assertEqual(
+            '201',
+            '2010'.rstrip(
+                '0'
+            )
+        )
+
+    def test_rstrip_empty_text(self) -> None:
+        self.assertEqual(
+            '',
+            ''.rstrip(
+                '0'
+            )
+        )
+
+    def test_rstrip_all_the_characters(self) -> None:
+        self.assertEqual(
+            '',
+            '000'.rstrip(
+                '0'
+            )
+        )
+
+    def test_rstrip_empty_characters(self) -> None:
+        self.assertEqual(
+            'abc',
+            'abc'.rstrip(
+                ''
+            )
+        )
+
+    def test_rstrip_characters_not_in_the_text(self) -> None:
+        self.assertEqual(
+            'abc',
+            'abc'.rstrip(
+                'xyz'
+            )
+        )
+
+    def test_rstrip_characters_in_any_order(self) -> None:
+        self.assertEqual(
+            '',
+            'abc'.rstrip(
+                'cba'
+            )
+        )
+
+    def test_rstrip_character_of_two_utf_8_bytes(self) -> None:
+        self.assertEqual(
+            'x',
+            'x-éé'.rstrip(
+                '-é'
+            )
+        )
+
+    def test_rstrip_character_beyond_the_basic_multilingual_plane(self) -> None:
+        self.assertEqual(
+            '😀a',
+            '😀a😀😀'.rstrip(
+                '😀'
+            )
+        )
+
+    def test_rstrip_character_sharing_the_high_surrogate(self) -> None:
+        self.assertEqual(
+            'x😁',
+            'x😁'.rstrip(
+                '😀'
+            )
+        )
+
+    def test_rstrip_characters_sharing_the_surrogates(self) -> None:
+        self.assertEqual(
+            'x😀',
+            'x😀'.rstrip(
+                '𐈀😁'
+            )
+        )
+
+    def test_rstrip_ascii_after_a_character_beyond_ascii(self) -> None:
+        self.assertEqual(
+            '😀',
+            '😀a'.rstrip(
+                'a'
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

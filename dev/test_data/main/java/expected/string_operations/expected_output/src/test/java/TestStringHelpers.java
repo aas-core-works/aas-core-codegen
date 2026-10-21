@@ -579,6 +579,136 @@ public class TestStringHelpers {
         "a😀",
         "a"));
   }
+
+  @Test
+  @DisplayName("\'123000\'.rstrip(\'0\') gives \'123\': trailing zeros")
+  public void testRstripTrailingZeros() {
+    assertEquals(
+      "123",
+      StringHelpers.rstrip(
+        "123000",
+        "0"));
+  }
+
+  @Test
+  @DisplayName("\'12+-+\'.rstrip(\'+-\') gives \'12\': any of the characters")
+  public void testRstripAnyOfTheCharacters() {
+    assertEquals(
+      "12",
+      StringHelpers.rstrip(
+        "12+-+",
+        "+-"));
+  }
+
+  @Test
+  @DisplayName("\'2010\'.rstrip(\'0\') gives \'201\': only the trailing characters")
+  public void testRstripOnlyTheTrailingCharacters() {
+    assertEquals(
+      "201",
+      StringHelpers.rstrip(
+        "2010",
+        "0"));
+  }
+
+  @Test
+  @DisplayName("\'\'.rstrip(\'0\') gives \'\': empty text")
+  public void testRstripEmptyText() {
+    assertEquals(
+      "",
+      StringHelpers.rstrip(
+        "",
+        "0"));
+  }
+
+  @Test
+  @DisplayName("\'000\'.rstrip(\'0\') gives \'\': all the characters")
+  public void testRstripAllTheCharacters() {
+    assertEquals(
+      "",
+      StringHelpers.rstrip(
+        "000",
+        "0"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.rstrip(\'\') gives \'abc\': empty characters")
+  public void testRstripEmptyCharacters() {
+    assertEquals(
+      "abc",
+      StringHelpers.rstrip(
+        "abc",
+        ""));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.rstrip(\'xyz\') gives \'abc\': characters not in the text")
+  public void testRstripCharactersNotInTheText() {
+    assertEquals(
+      "abc",
+      StringHelpers.rstrip(
+        "abc",
+        "xyz"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.rstrip(\'cba\') gives \'\': characters in any order")
+  public void testRstripCharactersInAnyOrder() {
+    assertEquals(
+      "",
+      StringHelpers.rstrip(
+        "abc",
+        "cba"));
+  }
+
+  @Test
+  @DisplayName("\'x-éé\'.rstrip(\'-é\') gives \'x\': character of two UTF-8 bytes")
+  public void testRstripCharacterOfTwoUtf8Bytes() {
+    assertEquals(
+      "x",
+      StringHelpers.rstrip(
+        "x-éé",
+        "-é"));
+  }
+
+  @Test
+  @DisplayName("\'😀a😀😀\'.rstrip(\'😀\') gives \'😀a\': character beyond the Basic Multilingual Plane")
+  public void testRstripCharacterBeyondTheBasicMultilingualPlane() {
+    assertEquals(
+      "😀a",
+      StringHelpers.rstrip(
+        "😀a😀😀",
+        "😀"));
+  }
+
+  @Test
+  @DisplayName("\'x😁\'.rstrip(\'😀\') gives \'x😁\': character sharing the high surrogate")
+  public void testRstripCharacterSharingTheHighSurrogate() {
+    assertEquals(
+      "x😁",
+      StringHelpers.rstrip(
+        "x😁",
+        "😀"));
+  }
+
+  @Test
+  @DisplayName("\'x😀\'.rstrip(\'\\U00010200😁\') gives \'x😀\': characters sharing the surrogates")
+  public void testRstripCharactersSharingTheSurrogates() {
+    assertEquals(
+      "x😀",
+      StringHelpers.rstrip(
+        "x😀",
+        "𐈀😁"));
+  }
+
+  @Test
+  @DisplayName("\'😀a\'.rstrip(\'a\') gives \'😀\': ASCII after a character beyond ASCII")
+  public void testRstripAsciiAfterACharacterBeyondAscii() {
+    assertEquals(
+      "😀",
+      StringHelpers.rstrip(
+        "😀a",
+        "a"));
+  }
 } // class TestStringHelpers
 
 // package dummy.tests

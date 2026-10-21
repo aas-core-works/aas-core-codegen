@@ -978,6 +978,19 @@ new {list_type}
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_RSTRIP:
+                # NOTE (mristin):
+                # We do not use the native ``TrimEnd`` as it strips the UTF-16 code
+                # units instead of the characters, unlike Python. See
+                # ``StringHelpers.RStrip`` in the generated common class.
+                return (
+                    Stripped(
+                        f"{csharp_common.COMMON_CLASS}.StringHelpers.RStrip"
+                        f"({instance}, {args[0]})"
+                    ),
+                    None,
+                )
+
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 # NOTE (mristin):
                 # A set of value types does not hold nullables, so we unwrap

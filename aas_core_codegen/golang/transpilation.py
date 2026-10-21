@@ -1086,6 +1086,15 @@ strings.Contains(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_RSTRIP:
+                # NOTE (mristin):
+                # The native ``strings.TrimRight`` strips the characters (runes) as
+                # the Python ``str.rstrip`` does.
+                return (
+                    Stripped(f"strings.TrimRight({instance}, {args[0]})"),
+                    None,
+                )
+
             elif (
                 kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
                 or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE

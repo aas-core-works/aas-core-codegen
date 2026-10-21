@@ -174,6 +174,28 @@ TEST_CASE({name}) {{
                 )
             )
 
+    if intermediate_uses.rstrip_call(type_inference):
+        for rstrip_case in string_helper_cases.RSTRIP_CASES:
+            name = cpp_common.string_literal(
+                f"{rstrip_case.python_expression()} gives "
+                f"{rstrip_case.expected!r}: {rstrip_case.description}"
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+TEST_CASE({name}) {{
+{I}REQUIRE(
+{II}our::common::RStrip(
+{III}{cpp_common.wstring_literal(rstrip_case.text)},
+{III}{cpp_common.wstring_literal(rstrip_case.chars)}
+{II})
+{II}== {cpp_common.wstring_literal(rstrip_case.expected)}
+{I});
+}}"""
+                )
+            )
+
     blocks.append(cpp_common.WARNING)
 
     writer = io.StringIO()

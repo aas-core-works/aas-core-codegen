@@ -155,6 +155,19 @@ public class Verification {
   }
 
   /**
+   * Check {@code rstrip} on the fraction found with {@code find} and slicing.
+   */
+  public static Boolean hasAtMostTwoSignificantDecimals(
+    String amount) {
+    long position = StringHelpers.find(amount, ".");
+    if (position == -1) {
+        return true;
+    }
+    return (
+        StringHelpers.len(StringHelpers.rstrip(StringHelpers.slice(amount, position + 1), "0")) <= 2);
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -170,11 +183,26 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       if (!(
+        Objects.equals(StringHelpers.rstrip(that.getOtherWord(), "𐈀😁"), that.getOtherWord()))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Other word must end neither with 𐈀 nor with 😁")));
+      }
+
+      if (!(
         !Objects.equals(StringHelpers.lstrip(that.getAmount(), "0."), ""))) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
             "Amount must not be zero")));
+      }
+
+      if (!hasAtMostTwoSignificantDecimals(that.getAmount())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Amount must have at most two significant decimals")));
       }
 
       if (!(

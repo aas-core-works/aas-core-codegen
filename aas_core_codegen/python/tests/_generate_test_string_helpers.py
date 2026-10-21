@@ -43,9 +43,9 @@ def generate(
     Generate the unit tests for the operations on strings.
 
     The Python SDK uses the native ``len``, slicing, ``str.find``, comparison
-    operators and ``str.lstrip``, which serve as the reference for the other SDKs.
-    We still generate the tests so that the users can inspect the same cases in all
-    the SDKs.
+    operators, ``str.lstrip`` and ``str.rstrip``, which serve as the reference for
+    the other SDKs. We still generate the tests so that the users can inspect
+    the same cases in all the SDKs.
     """
     methods = []  # type: List[Stripped]
 
@@ -118,6 +118,22 @@ def {name}(self) -> None:
 {II}{python_common.string_literal(lstrip_case.expected)},
 {II}{python_common.string_literal(lstrip_case.text)}.lstrip(
 {III}{python_common.string_literal(lstrip_case.chars)}
+{II})
+{I})"""
+                )
+            )
+
+    if intermediate_uses.rstrip_call(type_inference):
+        for rstrip_case in string_helper_cases.RSTRIP_CASES:
+            name = _method_name("rstrip", rstrip_case.description)
+            methods.append(
+                Stripped(
+                    f"""\
+def {name}(self) -> None:
+{I}self.assertEqual(
+{II}{python_common.string_literal(rstrip_case.expected)},
+{II}{python_common.string_literal(rstrip_case.text)}.rstrip(
+{III}{python_common.string_literal(rstrip_case.chars)}
 {II})
 {I})"""
                 )

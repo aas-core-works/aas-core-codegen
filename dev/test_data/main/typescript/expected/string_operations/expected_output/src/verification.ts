@@ -343,6 +343,20 @@ export function wordSortsBeforeReplacementCharacter(
 }
 
 /**
+ * Check `rstrip` on the fraction found with `find` and slicing.
+ */
+export function hasAtMostTwoSignificantDecimals(
+  amount: string
+): boolean {
+  const position = OurCommon.findStr(amount, ".");
+  if (position == -1) {
+    return true;
+  }
+  return (
+    OurCommon.lenStr(OurCommon.rstrip(OurCommon.sliceStr(amount, position + 1), "0")) <= 2);
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -354,9 +368,23 @@ class Verifier
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!(
+      OurCommon.rstrip(that.otherWord, "𐈀😁") == that.otherWord
+    )) {
+      yield new VerificationError(
+        "Other word must end neither with 𐈀 nor with 😁"
+      )
+    }
+
     if (!(OurCommon.lstrip(that.amount, "0.") != "")) {
       yield new VerificationError(
         "Amount must not be zero"
+      )
+    }
+
+    if (!hasAtMostTwoSignificantDecimals(that.amount)) {
+      yield new VerificationError(
+        "Amount must have at most two significant decimals"
       )
     }
 

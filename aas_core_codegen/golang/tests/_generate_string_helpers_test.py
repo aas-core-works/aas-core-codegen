@@ -162,6 +162,30 @@ func {_function_name("LStrip", lstrip_case.description)}(t *testing.T) {{
                 )
             )
 
+    if intermediate_uses.rstrip_call(type_inference):
+        for rstrip_case in string_helper_cases.RSTRIP_CASES:
+            explanation = golang_common.string_literal(
+                f"Expected {rstrip_case.python_expression()} to give "
+                f"{rstrip_case.expected!r} ({rstrip_case.description}), but got %q"
+            )
+
+            # NOTE (mristin):
+            # We call the native function just as the transpiled code does.
+            test_blocks.append(
+                Stripped(
+                    f"""\
+func {_function_name("RStrip", rstrip_case.description)}(t *testing.T) {{
+{I}got := strings.TrimRight(
+{II}{golang_common.string_literal(rstrip_case.text)},
+{II}{golang_common.string_literal(rstrip_case.chars)},
+{I})
+{I}if got != {golang_common.string_literal(rstrip_case.expected)} {{
+{II}t.Errorf({explanation}, got)
+{I}}}
+}}"""
+                )
+            )
+
     # NOTE (mristin):
     # An unused import does not compile in Go, so we import only what the tests
     # name.

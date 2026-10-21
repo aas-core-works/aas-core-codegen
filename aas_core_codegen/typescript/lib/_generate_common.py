@@ -1040,9 +1040,9 @@ export function compareByCodePoints(that: string, other: string): number {{
             blocks.insert(len(blocks) - 1, block)
 
     # NOTE (mristin):
-    # We need a helper which follows the Python implementation of ``str.lstrip``,
-    # as TypeScript has no native equivalent which strips the given characters.
-    # The helper is generated only for a meta-model which calls ``lstrip``.
+    # We need helpers which follow the Python implementation of ``str.lstrip`` and
+    # ``str.rstrip``, as TypeScript has no native equivalents which strip the given
+    # characters. Each helper is generated only for a meta-model which calls it.
     if intermediate_uses.lstrip_call(type_inference):
         blocks.insert(
             len(blocks) - 1,
@@ -1078,6 +1078,48 @@ export function lstrip(text: string, chars: string): string {{
 {I}}}
 
 {I}return text.substring(offset);
+}}"""
+            ),
+        )
+
+    if intermediate_uses.rstrip_call(type_inference):
+        blocks.insert(
+            len(blocks) - 1,
+            Stripped(
+                f"""\
+/**
+ * Strip the longest suffix of `text` which consists only of the characters
+ * listed in `chars`.
+ *
+ * @remarks
+ * We follow the Python implementation of `str.rstrip`, since Python is
+ * the language of the meta-model specifications. Hence, we strip
+ * the characters (code points) rather than the UTF-16 code units, so that
+ * a character beyond the Basic Multilingual Plane is never split in half.
+ *
+ * @param text - to be stripped
+ * @param chars - to be stripped from the end of `text`
+ * @returns `text` without the stripped suffix
+ */
+export function rstrip(text: string, chars: string): string {{
+{I}// NOTE (mristin):
+{I}// A string is iterated over its characters (code points), not over its
+{I}// UTF-16 code units.
+{I}const charSet = new Set<string>(chars);
+
+{I}// NOTE (mristin):
+{I}// We keep the text up to the end of the last character which is not to be
+{I}// stripped.
+{I}let end = 0;
+{I}let offset = 0;
+{I}for (const character of text) {{
+{II}offset += character.length;
+{II}if (!charSet.has(character)) {{
+{III}end = offset;
+{II}}}
+{I}}}
+
+{I}return text.substring(0, end);
 }}"""
             ),
         )

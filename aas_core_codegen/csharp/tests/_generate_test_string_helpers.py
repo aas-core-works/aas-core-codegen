@@ -182,6 +182,30 @@ public void {method_name}()
                 )
             )
 
+    if intermediate_uses.rstrip_call(type_inference):
+        for rstrip_case in string_helper_cases.RSTRIP_CASES:
+            description = csharp_common.string_literal(
+                f"{rstrip_case.python_expression()} gives {rstrip_case.expected!r}: "
+                f"{rstrip_case.description}"
+            )
+
+            method_name = _method_name("rstrip", rstrip_case.description)
+
+            blocks.append(
+                Stripped(
+                    f"""\
+[Test, Description({description})]
+public void {method_name}()
+{{
+{I}Assert.AreEqual(
+{II}{csharp_common.string_literal(rstrip_case.expected)},
+{II}Our.Common.StringHelpers.RStrip(
+{III}{csharp_common.string_literal(rstrip_case.text)},
+{III}{csharp_common.string_literal(rstrip_case.chars)}));
+}}  // void {method_name}"""
+                )
+            )
+
     blocks_joined = "\n\n".join(blocks)
 
     return f"""\

@@ -156,6 +156,17 @@ func WordSortsBeforeReplacementCharacter(
 	return word < "\ufffd"
 }
 
+// Check `rstrip` on the fraction found with `find` and slicing.
+func HasAtMostTwoSignificantDecimals(
+	amount string,
+) bool {
+	position := ourcommon.FindStr(amount, ".", 0)
+	if position == -1 {
+		return true
+	}
+	return ourcommon.LenStr(strings.TrimRight(ourcommon.SliceStrFrom(amount, position + 1), "0")) <= 2
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -168,10 +179,31 @@ func VerifySomething(
 ) (abort bool) {
 	abort = false
 
+	if !(
+		strings.TrimRight(that.OtherWord(), "\U00010200\U0001f601") == that.OtherWord()) {
+		abort = onError(
+			newVerificationError(
+				"Other word must end neither with \U00010200 nor with \U0001f601",),
+		)
+		if abort {
+			return
+		}
+	}
+
 	if !(strings.TrimLeft(that.Amount(), "0.") != "") {
 		abort = onError(
 			newVerificationError(
 				"Amount must not be zero",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !HasAtMostTwoSignificantDecimals(that.Amount()) {
+		abort = onError(
+			newVerificationError(
+				"Amount must have at most two significant decimals",),
 		)
 		if abort {
 			return

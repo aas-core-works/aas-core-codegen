@@ -1,6 +1,6 @@
 // Package types provides the data structures corresponding to the meta-model.
 //
-// Test the operations on strings: `len`, slicing, `find`, ordering and `lstrip`.
+// Test the operations on strings: `len`, slicing, `find`, ordering and stripping.
 //
 // The meta-model follows the Python semantics, where the strings consist of
 // the characters (code points). Most other languages represent the strings as UTF-16

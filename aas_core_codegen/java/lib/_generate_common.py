@@ -17,8 +17,8 @@ from aas_core_codegen.java.common import (
 )
 
 
-#: Strip the characters from the start of a string as ``str.lstrip`` in Python
-_LSTRIP = Stripped(
+#: Check whether a string contains a character; shared by ``lstrip`` and ``rstrip``
+_CONTAINS_CODE_POINT = Stripped(
     f"""\
 /**
  * Check whether {{@code text}} contains the character {{@code codePoint}}.
@@ -39,8 +39,12 @@ private static boolean containsCodePoint(String text, int codePoint) {{
 {I}}}
 
 {I}return false;
-}}
+}}"""
+)
 
+#: Strip the characters from the start of a string as ``str.lstrip`` in Python
+_LSTRIP = Stripped(
+    f"""\
 /**
  * Strip the longest prefix of {{@code text}} which consists only of
  * the characters listed in {{@code chars}}.
@@ -67,6 +71,38 @@ public static String lstrip(String text, String chars) {{
 {I}}}
 
 {I}return text.substring(offset);
+}}"""
+)
+
+#: Strip the characters from the end of a string as ``str.rstrip`` in Python
+_RSTRIP = Stripped(
+    f"""\
+/**
+ * Strip the longest suffix of {{@code text}} which consists only of
+ * the characters listed in {{@code chars}}.
+ *
+ * <p>We follow the Python implementation of {{@code str.rstrip}}, since Python
+ * is the language of the meta-model specifications. Hence, we strip
+ * the characters (code points), and not the UTF-16 code units. For example,
+ * we do not strip the second half of a surrogate pair when {{@code chars}}
+ * contains another character with the same low surrogate.
+ *
+ * @param text to be stripped
+ * @param chars to be stripped from the end of {{@code text}}
+ * @return {{@code text}} without the stripped suffix
+ */
+public static String rstrip(String text, String chars) {{
+{I}int offset = text.length();
+{I}while (offset > 0) {{
+{II}final int codePoint = text.codePointBefore(offset);
+{II}if (!containsCodePoint(chars, codePoint)) {{
+{III}break;
+{II}}}
+
+{II}offset -= Character.charCount(codePoint);
+{I}}}
+
+{I}return text.substring(0, offset);
 }}"""
 )
 
@@ -154,6 +190,8 @@ def _generate_string_helpers(
     """
     uses_slicing = intermediate_uses.string_slicing(type_inference)
     uses_find = intermediate_uses.string_find_call(type_inference)
+    uses_lstrip = intermediate_uses.lstrip_call(type_inference)
+    uses_rstrip = intermediate_uses.rstrip_call(type_inference)
 
     methods = []  # type: List[Stripped]
 
@@ -348,8 +386,14 @@ public static int compareByCodePoints(String that, String other) {{
             )
         )
 
-    if intermediate_uses.lstrip_call(type_inference):
+    if uses_lstrip or uses_rstrip:
+        methods.append(_CONTAINS_CODE_POINT)
+
+    if uses_lstrip:
         methods.append(_LSTRIP)
+
+    if uses_rstrip:
+        methods.append(_RSTRIP)
 
     if intermediate_uses.int_call(symbol_table):
         methods.append(_PARSE_SAFE_INT)
@@ -653,7 +697,7 @@ def generate(
 
     The string helpers are generated only if the meta-model might take ``len`` of
     strings, slice them, compare them, sort them in set properties, or call
-    ``find``, ``lstrip`` or ``int`` on them.
+    ``find``, ``lstrip``, ``rstrip`` or ``int`` on them.
     """
     files = []  # type: List[java_common.JavaFile]
 

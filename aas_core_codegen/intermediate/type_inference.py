@@ -283,6 +283,7 @@ class BuiltinMethodKind(enum.Enum):
 
     STR_FIND = "str.find"
     STR_LSTRIP = "str.lstrip"
+    STR_RSTRIP = "str.rstrip"
     SET_ADD = "set.add"
     SET_INTERSECTION = "set.intersection"
     SET_DIFFERENCE = "set.difference"
@@ -421,10 +422,28 @@ STR_LSTRIP = BuiltinMethod(
 )
 
 
+#: Represent ``str.rstrip(chars)``.
+#:
+#: The result is the string without the longest suffix of the characters listed
+#: in ``chars``.
+#:
+#: The transpiled code follows the Python implementation of ``str.rstrip``, and
+#: strips the characters (code points). We do not support ``rstrip`` without
+#: an argument for the same reason as ``lstrip``.
+STR_RSTRIP = BuiltinMethod(
+    kind=BuiltinMethodKind.STR_RSTRIP,
+    name=Identifier("rstrip"),
+    returns=PrimitiveTypeAnnotation(PrimitiveType.STR),
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
 #: Map the names of the built-in methods on strings to their definitions
 STR_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
     STR_FIND.name: STR_FIND,
     STR_LSTRIP.name: STR_LSTRIP,
+    STR_RSTRIP.name: STR_RSTRIP,
 }
 
 
@@ -4216,7 +4235,10 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             if not success:
                 return None
 
-        elif method.kind is BuiltinMethodKind.STR_LSTRIP:
+        elif (
+            method.kind is BuiltinMethodKind.STR_LSTRIP
+            or method.kind is BuiltinMethodKind.STR_RSTRIP
+        ):
             if try_primitive_type(arg_types[0]) is not PrimitiveType.STR:
                 self.errors.append(
                     Error(

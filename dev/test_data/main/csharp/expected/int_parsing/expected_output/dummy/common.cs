@@ -149,6 +149,40 @@ namespace dummy
             }
 
             /// <summary>
+            /// Check whether the character of <paramref name="width" /> UTF-16 code units
+            /// at <paramref name="offset" /> in <paramref name="text" /> is listed in
+            /// <paramref name="chars" />.
+            /// </summary>
+            /// <remarks>
+            /// We compare the whole characters (code points), and not the UTF-16 code
+            /// units, so that we never strip a half of a surrogate pair.
+            /// </remarks>
+            private static bool IsAmongCharacters(
+                string chars,
+                string text,
+                int offset,
+                int width
+            )
+            {
+                int charsOffset = 0;
+                while (charsOffset < chars.Length)
+                {
+                    int charsWidth = IsSurrogatePairAt(chars, charsOffset) ? 2 : 1;
+                    if (
+                        charsWidth == width
+                        && string.CompareOrdinal(chars, charsOffset, text, offset, width) == 0
+                    )
+                    {
+                        return true;
+                    }
+
+                    charsOffset += charsWidth;
+                }
+
+                return false;
+            }
+
+            /// <summary>
             /// Strip the longest prefix of <paramref name="text" /> which consists only
             /// of the characters listed in <paramref name="chars" />.
             /// </summary>
@@ -165,25 +199,7 @@ namespace dummy
                 while (offset < text.Length)
                 {
                     int width = IsSurrogatePairAt(text, offset) ? 2 : 1;
-
-                    bool found = false;
-                    int charsOffset = 0;
-                    while (charsOffset < chars.Length)
-                    {
-                        int charsWidth = IsSurrogatePairAt(chars, charsOffset) ? 2 : 1;
-                        if (
-                            charsWidth == width
-                            && string.CompareOrdinal(chars, charsOffset, text, offset, width) == 0
-                        )
-                        {
-                            found = true;
-                            break;
-                        }
-
-                        charsOffset += charsWidth;
-                    }
-
-                    if (!found)
+                    if (!IsAmongCharacters(chars, text, offset, width))
                     {
                         break;
                     }
