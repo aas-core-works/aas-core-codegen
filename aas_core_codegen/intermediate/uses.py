@@ -296,15 +296,44 @@ def rstrip_call(type_inference: intermediate_type_inference.TypeInference) -> bo
     return _calls_builtin_method(type_inference, intermediate_type_inference.STR_RSTRIP)
 
 
+def startswith_call(
+    type_inference: intermediate_type_inference.TypeInference,
+) -> bool:
+    """
+    Check whether any transpiled code calls ``str.startswith``.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for ``startswith``.
+    """
+    return _calls_builtin_method(
+        type_inference, intermediate_type_inference.STR_STARTSWITH
+    )
+
+
+def endswith_call(
+    type_inference: intermediate_type_inference.TypeInference,
+) -> bool:
+    """
+    Check whether any transpiled code calls ``str.endswith``.
+
+    The generators use this function to decide whether they need to generate
+    the helper functions and the tests for ``endswith``.
+    """
+    return _calls_builtin_method(
+        type_inference, intermediate_type_inference.STR_ENDSWITH
+    )
+
+
 def string_operations(
     type_inference: intermediate_type_inference.TypeInference,
 ) -> bool:
     """
     Check whether any transpiled code might operate on strings.
 
-    The operations are ``len``, slicing, ``find``, ordering, ``lstrip`` and
-    ``rstrip``. The targets use this check to generate the unit tests of
-    the operations on strings only if the meta-model needs them.
+    The operations are ``len``, slicing, ``find``, ordering, ``lstrip``,
+    ``rstrip``, ``startswith`` and ``endswith``. The targets use this check to
+    generate the unit tests of the operations on strings only if the meta-model
+    needs them.
     """
     return (
         string_len_call(type_inference)
@@ -313,6 +342,8 @@ def string_operations(
         or string_ordering(type_inference)
         or lstrip_call(type_inference)
         or rstrip_call(type_inference)
+        or startswith_call(type_inference)
+        or endswith_call(type_inference)
     )
 
 

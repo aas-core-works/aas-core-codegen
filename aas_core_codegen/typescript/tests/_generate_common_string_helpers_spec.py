@@ -136,6 +136,42 @@ test({name}, () => {{
     )
 
 
+def _generate_startswith_test(case: string_helper_cases.StartsWithCase) -> Stripped:
+    """Generate the test of a single ``startswith`` ``case``."""
+    name = typescript_common.string_literal(
+        f"{case.python_expression()} gives {case.expected!r}: {case.description}"
+    )
+
+    text = typescript_common.string_literal(case.text)
+    prefix = typescript_common.string_literal(case.prefix)
+    expected = "true" if case.expected else "false"
+
+    return Stripped(
+        f"""\
+test({name}, () => {{
+{I}expect({text}.startsWith({prefix})).toStrictEqual({expected});
+}});"""
+    )
+
+
+def _generate_endswith_test(case: string_helper_cases.EndsWithCase) -> Stripped:
+    """Generate the test of a single ``endswith`` ``case``."""
+    name = typescript_common.string_literal(
+        f"{case.python_expression()} gives {case.expected!r}: {case.description}"
+    )
+
+    text = typescript_common.string_literal(case.text)
+    suffix = typescript_common.string_literal(case.suffix)
+    expected = "true" if case.expected else "false"
+
+    return Stripped(
+        f"""\
+test({name}, () => {{
+{I}expect({text}.endsWith({suffix})).toStrictEqual({expected});
+}});"""
+    )
+
+
 # fmt: off
 @require(
     lambda type_inference: intermediate_uses.string_operations(type_inference)
@@ -161,32 +197,50 @@ def generate(type_inference: intermediate_type_inference.TypeInference) -> str:
  */"""
         ),
         typescript_common.WARNING,
-        Stripped('import * as OurCommon from "../src/common";'),
     ]  # type: List[Stripped]
+
+    test_blocks = []  # type: List[Stripped]
 
     if intermediate_uses.string_len_call(type_inference):
         for len_case in string_helper_cases.LEN_CASES:
-            blocks.append(_generate_len_test(len_case))
+            test_blocks.append(_generate_len_test(len_case))
 
     if intermediate_uses.string_slicing(type_inference):
         for slice_case in string_helper_cases.SLICE_CASES:
-            blocks.append(_generate_slice_test(slice_case))
+            test_blocks.append(_generate_slice_test(slice_case))
 
     if intermediate_uses.string_find_call(type_inference):
         for find_case in string_helper_cases.FIND_CASES:
-            blocks.append(_generate_find_test(find_case))
+            test_blocks.append(_generate_find_test(find_case))
 
     if intermediate_uses.string_ordering(type_inference):
         for compare_case in string_helper_cases.COMPARE_CASES:
-            blocks.append(_generate_compare_test(compare_case))
+            test_blocks.append(_generate_compare_test(compare_case))
 
     if intermediate_uses.lstrip_call(type_inference):
         for lstrip_case in string_helper_cases.LSTRIP_CASES:
-            blocks.append(_generate_lstrip_test(lstrip_case))
+            test_blocks.append(_generate_lstrip_test(lstrip_case))
 
     if intermediate_uses.rstrip_call(type_inference):
         for rstrip_case in string_helper_cases.RSTRIP_CASES:
-            blocks.append(_generate_rstrip_test(rstrip_case))
+            test_blocks.append(_generate_rstrip_test(rstrip_case))
+
+    if intermediate_uses.startswith_call(type_inference):
+        for startswith_case in string_helper_cases.STARTSWITH_CASES:
+            test_blocks.append(_generate_startswith_test(startswith_case))
+
+    if intermediate_uses.endswith_call(type_inference):
+        for endswith_case in string_helper_cases.ENDSWITH_CASES:
+            test_blocks.append(_generate_endswith_test(endswith_case))
+
+    # NOTE (mristin):
+    # The native ``startsWith`` and ``endsWith`` need no helpers, so we import
+    # the common module only if the tests use it, as the linter refuses
+    # the unused imports.
+    if any("OurCommon." in test_block for test_block in test_blocks):
+        blocks.append(Stripped('import * as OurCommon from "../src/common";'))
+
+    blocks.extend(test_blocks)
 
     blocks.append(typescript_common.WARNING)
 

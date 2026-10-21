@@ -1567,6 +1567,24 @@ common::{contains_function}(
                 None,
             )
 
+        elif kind is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH:
+            # NOTE (mristin):
+            # C++11 has no native ``starts_with``. See ``StartsWith`` in
+            # the generated common module.
+            return (
+                Stripped(f"common::StartsWith({instance}, {args[0]})"),
+                None,
+            )
+
+        elif kind is intermediate_type_inference.BuiltinMethodKind.STR_ENDSWITH:
+            # NOTE (mristin):
+            # C++11 has no native ``ends_with``. See ``EndsWith`` in
+            # the generated common module.
+            return (
+                Stripped(f"common::EndsWith({instance}, {args[0]})"),
+                None,
+            )
+
         elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
             # NOTE (mristin):
             # The lengths are ``size_t``'s, so we convert them to our integers.

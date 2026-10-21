@@ -368,6 +368,18 @@ class Verifier
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!(!that.amount.startsWith("+"))) {
+      yield new VerificationError(
+        "Amount must not start with a plus"
+      )
+    }
+
+    if (!(!that.name.endsWith("!"))) {
+      yield new VerificationError(
+        "Name must not end with an exclamation mark"
+      )
+    }
+
     if (!(
       OurCommon.rstrip(that.otherWord, "𐈀😁") == that.otherWord
     )) {

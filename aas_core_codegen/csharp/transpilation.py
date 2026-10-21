@@ -991,6 +991,45 @@ new {list_type}
                     None,
                 )
 
+            elif (
+                kind is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH
+                or kind is intermediate_type_inference.BuiltinMethodKind.STR_ENDSWITH
+            ):
+                # NOTE (mristin):
+                # We pass ``Ordinal`` since the default overloads compare
+                # the strings culture-sensitively, and, *e.g.*, ignore the zero-width
+                # characters. The ordinal comparison of the UTF-16 code units gives
+                # the same result as the Python comparison of the characters (code
+                # points) unless the prefix or the suffix has a lone surrogate.
+                native_method = (
+                    "StartsWith"
+                    if kind
+                    is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH
+                    else "EndsWith"
+                )
+
+                receiver = (
+                    instance
+                    if isinstance(
+                        node.member.instance,
+                        (
+                            parse_tree.Name,
+                            parse_tree.Member,
+                            parse_tree.MethodCall,
+                            parse_tree.FunctionCall,
+                        ),
+                    )
+                    else Stripped(f"({instance})")
+                )
+
+                return (
+                    Stripped(
+                        f"{receiver}.{native_method}"
+                        f"({args[0]}, System.StringComparison.Ordinal)"
+                    ),
+                    None,
+                )
+
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 # NOTE (mristin):
                 # A set of value types does not hold nullables, so we unwrap

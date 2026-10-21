@@ -174,7 +174,70 @@ public void {_method_name("Rstrip", rstrip_case.description)}() {{
                 )
             )
 
+    if intermediate_uses.startswith_call(type_inference):
+        for startswith_case in string_helper_cases.STARTSWITH_CASES:
+            display_name = java_common.string_literal(
+                f"{startswith_case.python_expression()} gives "
+                f"{startswith_case.expected!r}: {startswith_case.description}"
+            )
+
+            assertion = "assertTrue" if startswith_case.expected else "assertFalse"
+
+            # NOTE (mristin):
+            # We call the native method just as the transpiled code does.
+            blocks.append(
+                Stripped(
+                    f"""\
+@Test
+@DisplayName({display_name})
+public void {_method_name("Startswith", startswith_case.description)}() {{
+{I}{assertion}(
+{II}{java_common.string_literal(startswith_case.text)}.startsWith(
+{III}{java_common.string_literal(startswith_case.prefix)}));
+}}"""
+                )
+            )
+
+    if intermediate_uses.endswith_call(type_inference):
+        for endswith_case in string_helper_cases.ENDSWITH_CASES:
+            display_name = java_common.string_literal(
+                f"{endswith_case.python_expression()} gives "
+                f"{endswith_case.expected!r}: {endswith_case.description}"
+            )
+
+            assertion = "assertTrue" if endswith_case.expected else "assertFalse"
+
+            # NOTE (mristin):
+            # We call the native method just as the transpiled code does.
+            blocks.append(
+                Stripped(
+                    f"""\
+@Test
+@DisplayName({display_name})
+public void {_method_name("Endswith", endswith_case.description)}() {{
+{I}{assertion}(
+{II}{java_common.string_literal(endswith_case.text)}.endsWith(
+{III}{java_common.string_literal(endswith_case.suffix)}));
+}}"""
+                )
+            )
+
     blocks_joined = "\n\n".join(blocks)
+
+    # NOTE (mristin):
+    # We import only what the tests use, since the common package has no
+    # ``StringHelpers`` if the meta-model only uses the native operations.
+    static_imports = [
+        f"import static org.junit.jupiter.api.Assertions.{assertion};"
+        for assertion in ("assertEquals", "assertFalse", "assertTrue")
+        if any(f"{assertion}(" in block for block in blocks)
+    ]
+
+    imports = static_imports + [""]
+    if any("StringHelpers." in block for block in blocks):
+        imports.append(f"import {package}.common.StringHelpers;")
+
+    imports_joined = "\n".join(imports)
 
     return [
         java_common.JavaFile(
@@ -184,9 +247,7 @@ public void {_method_name("Rstrip", rstrip_case.description)}() {{
 
 package {package}.tests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import {package}.common.StringHelpers;
+{imports_joined}
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

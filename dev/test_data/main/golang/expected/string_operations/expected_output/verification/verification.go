@@ -179,6 +179,26 @@ func VerifySomething(
 ) (abort bool) {
 	abort = false
 
+	if !(!strings.HasPrefix(that.Amount(), "+")) {
+		abort = onError(
+			newVerificationError(
+				"Amount must not start with a plus",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !(!strings.HasSuffix(that.Name(), "!")) {
+		abort = onError(
+			newVerificationError(
+				"Name must not end with an exclamation mark",),
+		)
+		if abort {
+			return
+		}
+	}
+
 	if !(
 		strings.TrimRight(that.OtherWord(), "\U00010200\U0001f601") == that.OtherWord()) {
 		abort = onError(

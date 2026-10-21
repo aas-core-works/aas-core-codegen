@@ -555,6 +555,8 @@ not (
         elif (
             kind is intermediate_type_inference.BuiltinMethodKind.STR_LSTRIP
             or kind is intermediate_type_inference.BuiltinMethodKind.STR_RSTRIP
+            or kind is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH
+            or kind is intermediate_type_inference.BuiltinMethodKind.STR_ENDSWITH
         ):
             if not isinstance(
                 node.member.instance,
@@ -569,8 +571,9 @@ not (
 
             # NOTE (mristin):
             # The other targets follow the semantics of the native Python
-            # ``str.lstrip`` and ``str.rstrip``, since Python is the language of
-            # the meta-model specifications.
+            # ``str.lstrip``, ``str.rstrip``, ``str.startswith`` and
+            # ``str.endswith``, since Python is the language of the meta-model
+            # specifications.
             return Stripped(f"{instance}.{method_type.method.name}({args[0]})"), None
 
         elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:

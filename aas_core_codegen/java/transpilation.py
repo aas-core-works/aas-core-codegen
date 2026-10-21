@@ -1023,6 +1023,34 @@ new java.util.ArrayList<{item_type}>(
                     None,
                 )
 
+            elif (
+                kind is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH
+                or kind is intermediate_type_inference.BuiltinMethodKind.STR_ENDSWITH
+            ):
+                if not isinstance(
+                    node.member.instance,
+                    (
+                        parse_tree.Name,
+                        parse_tree.Member,
+                        parse_tree.Slice,
+                        parse_tree.MethodCall,
+                    ),
+                ):
+                    instance = Stripped(f"({instance})")
+
+                # NOTE (mristin):
+                # The native ``startsWith`` and ``endsWith`` compare the UTF-16 code
+                # units, which gives the same result as comparing the characters
+                # (code points) in Python unless the prefix or the suffix has
+                # a lone surrogate at its boundary.
+                java_method = (
+                    "startsWith"
+                    if kind
+                    is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH
+                    else "endsWith"
+                )
+                return Stripped(f"{instance}.{java_method}({args[0]})"), None
+
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 item, error = self._transform_as_collection_member(
                     node=node.args[0], collection_node=node.member.instance

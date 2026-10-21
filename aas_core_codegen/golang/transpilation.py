@@ -1095,6 +1095,26 @@ strings.Contains(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH:
+                # NOTE (mristin):
+                # The native ``strings.HasPrefix`` compares the UTF-8 bytes, which
+                # gives the same result as the Python ``str.startswith`` for
+                # the well-formed strings.
+                return (
+                    Stripped(f"strings.HasPrefix({instance}, {args[0]})"),
+                    None,
+                )
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_ENDSWITH:
+                # NOTE (mristin):
+                # The native ``strings.HasSuffix`` compares the UTF-8 bytes, which
+                # gives the same result as the Python ``str.endswith`` for
+                # the well-formed strings.
+                return (
+                    Stripped(f"strings.HasSuffix({instance}, {args[0]})"),
+                    None,
+                )
+
             elif (
                 kind is intermediate_type_inference.BuiltinMethodKind.SET_INTERSECTION
                 or kind is intermediate_type_inference.BuiltinMethodKind.SET_DIFFERENCE

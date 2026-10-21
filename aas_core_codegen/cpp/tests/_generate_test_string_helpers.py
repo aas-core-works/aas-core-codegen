@@ -196,6 +196,52 @@ TEST_CASE({name}) {{
                 )
             )
 
+    if intermediate_uses.startswith_call(type_inference):
+        for startswith_case in string_helper_cases.STARTSWITH_CASES:
+            name = cpp_common.string_literal(
+                f"{startswith_case.python_expression()} gives "
+                f"{startswith_case.expected!r}: {startswith_case.description}"
+            )
+
+            assertion = "REQUIRE" if startswith_case.expected else "REQUIRE_FALSE"
+
+            blocks.append(
+                Stripped(
+                    f"""\
+TEST_CASE({name}) {{
+{I}{assertion}(
+{II}our::common::StartsWith(
+{III}{cpp_common.wstring_literal(startswith_case.text)},
+{III}{cpp_common.wstring_literal(startswith_case.prefix)}
+{II})
+{I});
+}}"""
+                )
+            )
+
+    if intermediate_uses.endswith_call(type_inference):
+        for endswith_case in string_helper_cases.ENDSWITH_CASES:
+            name = cpp_common.string_literal(
+                f"{endswith_case.python_expression()} gives "
+                f"{endswith_case.expected!r}: {endswith_case.description}"
+            )
+
+            assertion = "REQUIRE" if endswith_case.expected else "REQUIRE_FALSE"
+
+            blocks.append(
+                Stripped(
+                    f"""\
+TEST_CASE({name}) {{
+{I}{assertion}(
+{II}our::common::EndsWith(
+{III}{cpp_common.wstring_literal(endswith_case.text)},
+{III}{cpp_common.wstring_literal(endswith_case.suffix)}
+{II})
+{I});
+}}"""
+                )
+            )
+
     blocks.append(cpp_common.WARNING)
 
     writer = io.StringIO()

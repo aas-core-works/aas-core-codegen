@@ -224,7 +224,7 @@ bool Something_0(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
-  return common::RStrip(that->other_word(), L"\U00010200\U0001f601") == that->other_word();
+  return !common::StartsWith(that->amount(), L"+");
 }
 
 bool Something_1(
@@ -233,10 +233,28 @@ bool Something_1(
   const types::ISomething* that = (
     static_cast<const types::ISomething*>(value)
   );
-  return common::LStrip(that->amount(), L"0.") != L"";
+  return !common::EndsWith(that->name(), L"!");
 }
 
 bool Something_2(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::RStrip(that->other_word(), L"\U00010200\U0001f601") == that->other_word();
+}
+
+bool Something_3(
+  const void* value
+) {
+  const types::ISomething* that = (
+    static_cast<const types::ISomething*>(value)
+  );
+  return common::LStrip(that->amount(), L"0.") != L"";
+}
+
+bool Something_4(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -247,7 +265,7 @@ bool Something_2(
   );
 }
 
-bool Something_3(
+bool Something_5(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -256,7 +274,7 @@ bool Something_3(
   return common::CompareByCodePoints(that->word(), L"zzz") < 0;
 }
 
-bool Something_4(
+bool Something_6(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -267,7 +285,7 @@ bool Something_4(
   );
 }
 
-bool Something_5(
+bool Something_7(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -279,7 +297,7 @@ bool Something_5(
   );
 }
 
-bool Something_6(
+bool Something_8(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -290,7 +308,7 @@ bool Something_6(
   );
 }
 
-bool Something_7(
+bool Something_9(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -300,7 +318,7 @@ bool Something_7(
   || (common::SliceStr(that->text(), 0, 1) != L"X");
 }
 
-bool Something_8(
+bool Something_10(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -311,7 +329,7 @@ bool Something_8(
   );
 }
 
-bool Something_9(
+bool Something_11(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -322,7 +340,7 @@ bool Something_9(
   );
 }
 
-bool Something_10(
+bool Something_12(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -333,7 +351,7 @@ bool Something_10(
   );
 }
 
-bool Something_11(
+bool Something_13(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -344,7 +362,7 @@ bool Something_11(
   );
 }
 
-bool Something_12(
+bool Something_14(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -355,7 +373,7 @@ bool Something_12(
   );
 }
 
-bool Something_13(
+bool Something_15(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -366,7 +384,7 @@ bool Something_13(
   );
 }
 
-bool Something_14(
+bool Something_16(
   const void* value
 ) {
   const types::ISomething* that = (
@@ -395,62 +413,70 @@ const std::vector<Check>& ChecksOf(Shape shape) {
       static const std::vector<Check> checks = {
         {
           &Something_0,
-          L"Other word must end neither with \U00010200 nor with \U0001f601"
+          L"Amount must not start with a plus"
         },
         {
           &Something_1,
-          L"Amount must not be zero"
+          L"Name must not end with an exclamation mark"
         },
         {
           &Something_2,
-          L"Amount must have at most two significant decimals"
+          L"Other word must end neither with \U00010200 nor with \U0001f601"
         },
         {
           &Something_3,
-          L"Word must sort before zzz"
+          L"Amount must not be zero"
         },
         {
           &Something_4,
-          L"Other word must sort before the replacement character"
+          L"Amount must have at most two significant decimals"
         },
         {
           &Something_5,
-          L"Word must not sort after the other word"
+          L"Word must sort before zzz"
         },
         {
           &Something_6,
-          L"Word must be between A and z"
+          L"Other word must sort before the replacement character"
         },
         {
           &Something_7,
-          L"Text must not start with X"
+          L"Word must not sort after the other word"
         },
         {
           &Something_8,
-          L"Name must contain no space after the prefix"
+          L"Word must be between A and z"
         },
         {
           &Something_9,
-          L"Name must start with the prefix"
+          L"Text must not start with X"
         },
         {
           &Something_10,
-          L"Last character must not be Z"
+          L"Name must contain no space after the prefix"
         },
         {
           &Something_11,
-          L"Seconds must follow a colon"
+          L"Name must start with the prefix"
         },
         {
           &Something_12,
-          L"Month must be September"
+          L"Last character must not be Z"
         },
         {
           &Something_13,
-          L"Time after the date must have 8 characters"
+          L"Seconds must follow a colon"
         },
         {
           &Something_14,
+          L"Month must be September"
+        },
+        {
+          &Something_15,
+          L"Time after the date must have 8 characters"
+        },
+        {
+          &Something_16,
           L"Date before the time must have 10 characters"
         }
       };

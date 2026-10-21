@@ -724,9 +724,18 @@ def generate(
     """
     blocks = [_TUPLE_HELPERS]  # type: List[Stripped]
 
-    if intermediate_uses.string_operations(
-        type_inference
-    ) or intermediate_uses.sets_of_strings_in_properties(symbol_table):
+    # NOTE (mristin):
+    # We transpile ``startswith`` and ``endswith`` to the native methods, so they
+    # do not need the string helpers.
+    if (
+        intermediate_uses.string_len_call(type_inference)
+        or intermediate_uses.string_slicing(type_inference)
+        or intermediate_uses.string_find_call(type_inference)
+        or intermediate_uses.string_ordering(type_inference)
+        or intermediate_uses.lstrip_call(type_inference)
+        or intermediate_uses.rstrip_call(type_inference)
+        or intermediate_uses.sets_of_strings_in_properties(symbol_table)
+    ):
         blocks.append(_generate_string_helpers(symbol_table, type_inference))
 
     if intermediate_uses.set_properties(symbol_table):

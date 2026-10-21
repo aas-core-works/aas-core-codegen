@@ -697,12 +697,19 @@ def generate(
 
     The string helpers are generated only if the meta-model might take ``len`` of
     strings, slice them, compare them, sort them in set properties, or call
-    ``find``, ``lstrip``, ``rstrip`` or ``int`` on them.
+    ``find``, ``lstrip``, ``rstrip`` or ``int`` on them. We transpile
+    ``startswith`` and ``endswith`` to the native methods, so they do not need
+    the string helpers.
     """
     files = []  # type: List[java_common.JavaFile]
 
     if (
-        intermediate_uses.string_operations(type_inference)
+        intermediate_uses.string_len_call(type_inference)
+        or intermediate_uses.string_slicing(type_inference)
+        or intermediate_uses.string_find_call(type_inference)
+        or intermediate_uses.string_ordering(type_inference)
+        or intermediate_uses.lstrip_call(type_inference)
+        or intermediate_uses.rstrip_call(type_inference)
         or intermediate_uses.sets_of_strings_in_properties(symbol_table)
         or intermediate_uses.int_call(symbol_table)
     ):

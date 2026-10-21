@@ -1,5 +1,5 @@
 """
-Test the operations on strings: ``len``, slicing, ``find``, ordering and stripping.
+Test the operations on strings such as ``len``, slicing, ordering and stripping.
 
 The meta-model follows the Python semantics, where the strings consist of
 the characters (code points). Most other languages represent the strings as UTF-16
@@ -191,6 +191,14 @@ def has_at_most_two_significant_decimals(amount: str) -> bool:
 @invariant(
     lambda self: self.other_word.rstrip("𐈀😁") == self.other_word,
     "Other word must end neither with 𐈀 nor with 😁",
+)
+@invariant(
+    lambda self: not self.name.endswith("!"),
+    "Name must not end with an exclamation mark",
+)
+@invariant(
+    lambda self: not self.amount.startswith("+"),
+    "Amount must not start with a plus",
 )
 class Something(DBC):
     text: str
