@@ -604,6 +604,31 @@ OurCommon.at(
                 node.original_node, "Failed to transpile the comparison", errors
             )
 
+        # NOTE (mristin):
+        # TypeScript orders the strings by their UTF-16 code units, while Python
+        # orders them by their characters (code points), so we order the strings
+        # with our helpers. TypeScript does not order the booleans, so we convert
+        # them to numbers, where ``false`` comes before ``true`` as in Python.
+        if node.op not in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE):
+            primitive_type = intermediate_type_inference.try_primitive_type(
+                self.type_map[node.left]
+            )
+
+            if primitive_type is intermediate_type_inference.PrimitiveType.STR:
+                return (
+                    Stripped(
+                        f"OurCommon.compareByCodePoints({left}, {right}) "
+                        f"{comparator} 0"
+                    ),
+                    None,
+                )
+
+            if primitive_type is intermediate_type_inference.PrimitiveType.BOOL:
+                return (
+                    Stripped(f"Number({left}) {comparator} Number({right})"),
+                    None,
+                )
+
         no_parentheses_types = (
             parse_tree.Member,
             parse_tree.FunctionCall,

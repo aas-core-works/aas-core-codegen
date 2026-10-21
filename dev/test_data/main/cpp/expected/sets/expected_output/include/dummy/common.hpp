@@ -10231,14 +10231,29 @@ SetT Difference(
 }
 
 /**
+ * \brief Compare \p that text and \p other text code point by code point.
+ *
+ * We follow the Python implementation of the string comparison, since Python is
+ * the language of the meta-model specifications. The comparison of std::wstring
+ * compares the code units. Where wchar_t has 16 bits, as on Windows, the text is
+ * encoded in UTF-16, and the code units put the characters above U+FFFF, encoded
+ * as surrogate pairs, before the characters from U+E000 to U+FFFF. Hence we
+ * decode the code points and compare them instead, in the same way on all
+ * the platforms.
+ *
+ * \param that text to be compared
+ * \param other text to compare against
+ * \return -1 if \p that comes before \p other, 0 if they are equal, and 1
+ * otherwise
+ */
+int CompareByCodePoints(
+  const std::wstring& that,
+  const std::wstring& other
+);
+
+/**
  * \brief Check whether \p that text comes before \p other text,
  * comparing them code point by code point.
- *
- * The comparison of std::wstring compares the code units. Where wchar_t has
- * 16 bits, as on Windows, the text is encoded in UTF-16, and the code units put
- * the characters above U+FFFF, encoded as surrogate pairs, before
- * the characters from U+E000 to U+FFFF. Hence we decode the code points and
- * compare them instead, in the same way on all the platforms.
  *
  * We sort the items of the sets by the code points in the serialization so that
  * all the SDKs write the same order.

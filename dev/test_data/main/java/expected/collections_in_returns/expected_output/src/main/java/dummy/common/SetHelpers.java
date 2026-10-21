@@ -20,35 +20,6 @@ public final class SetHelpers {
   }
 
   /**
-   * Compare {@code that} and {@code other} by their code points.
-   *
-   * <p>{@link String#compareTo} compares the UTF-16 code units instead,
-   * which gives a different order for the characters outside the Basic
-   * Multilingual Plane.
-   *
-   * @param that text to be compared
-   * @param other text to compare against
-   * @return negative, zero or positive if {@code that} comes before, is equal to
-   * or comes after {@code other}, respectively
-   */
-  public static int compareByCodePoints(String that, String other) {
-    int i = 0;
-    int j = 0;
-    while (i < that.length() && j < other.length()) {
-      final int thatCodePoint = that.codePointAt(i);
-      final int otherCodePoint = other.codePointAt(j);
-      if (thatCodePoint != otherCodePoint) {
-        return Integer.compare(thatCodePoint, otherCodePoint);
-      }
-
-      i += Character.charCount(thatCodePoint);
-      j += Character.charCount(otherCodePoint);
-    }
-
-    return Integer.compare(that.length() - i, other.length() - j);
-  }
-
-  /**
    * Give the items of {@code that} in their natural order.
    *
    * <p>We use it for the booleans, where {@code false} comes before
@@ -73,7 +44,7 @@ public final class SetHelpers {
    */
   public static List<String> sortedByCodePoints(Set<String> that) {
     final List<String> result = new ArrayList<>(that);
-    result.sort(SetHelpers::compareByCodePoints);
+    result.sort(StringHelpers::compareByCodePoints);
     return result;
   }
 

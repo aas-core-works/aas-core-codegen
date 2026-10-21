@@ -134,6 +134,36 @@ public final class StringHelpers {
   public static long find(String text, String sub) {
     return find(text, sub, 0);
   }
+
+  /**
+   * Compare {@code that} and {@code other} by their code points.
+   *
+   * <p>We follow the Python implementation of the string comparison, since
+   * Python is the language of the meta-model specifications.
+   * {@link String#compareTo} compares the UTF-16 code units instead, which gives
+   * a different order for the characters outside the Basic Multilingual Plane.
+   *
+   * @param that text to be compared
+   * @param other text to compare against
+   * @return negative, zero or positive if {@code that} comes before, is equal to
+   * or comes after {@code other}, respectively
+   */
+  public static int compareByCodePoints(String that, String other) {
+    int i = 0;
+    int j = 0;
+    while (i < that.length() && j < other.length()) {
+      final int thatCodePoint = that.codePointAt(i);
+      final int otherCodePoint = other.codePointAt(j);
+      if (thatCodePoint != otherCodePoint) {
+        return Integer.compare(thatCodePoint, otherCodePoint);
+      }
+
+      i += Character.charCount(thatCodePoint);
+      j += Character.charCount(otherCodePoint);
+    }
+
+    return Integer.compare(that.length() - i, other.length() - j);
+  }
 }
 
 /*

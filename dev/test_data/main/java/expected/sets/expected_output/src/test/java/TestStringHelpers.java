@@ -12,13 +12,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test {@code len}, the slicing of strings and {@code find} as used in
- * the transpiled code.
+ * Test the operations on strings.
  *
- * <p>The transpiled code follows the Python implementation, since Python is
- * the language of the meta-model specifications. Hence, the lengths and
- * the positions count the characters (code points). The expected values have
- * been computed with Python, and all the SDKs test against the very same cases.
+ * <p>The operations follow the Python implementation, since Python is
+ * the language of the meta-model specifications. Hence, they work on
+ * the characters (code points) of the strings. The expected values have been
+ * computed with Python, and all the SDKs test against the very same cases.
  */
 public class TestStringHelpers {
   @Test

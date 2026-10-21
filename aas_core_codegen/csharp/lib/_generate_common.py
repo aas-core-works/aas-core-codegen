@@ -16,7 +16,10 @@ from aas_core_codegen.csharp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 
 
 _TUPLE_HELPERS: Final[Stripped] = Stripped(
@@ -37,9 +40,12 @@ public static class TupleHelpers
 )
 
 
-def _generate_string_helpers(symbol_table: intermediate.SymbolTable) -> Stripped:
+def _generate_string_helpers(
+    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
+) -> Stripped:
     """
-    Generate the helpers for ``len``, slicing strings, ``find`` and ``lstrip``.
+    Generate the helpers for ``len``, slicing, ``find``, comparing and ``lstrip``.
 
     The helpers follow the Python implementation, since Python is the language of
     the meta-model specifications. Hence, the lengths and the positions count
@@ -217,6 +223,90 @@ public static long Find(string text, string sub, long start = 0)
 {I}return theStart + CountCharacters(text, startOffset, offset);
 }}"""
             )
+        )
+
+    # NOTE (mristin):
+    # We also sort the items of the set properties of strings by their code points
+    # so that all the SDKs serialize them in the same order.
+    if intermediate_uses.string_ordering(
+        type_inference
+    ) or intermediate_uses.sets_of_strings_in_properties(symbol_table):
+        members.extend(
+            [
+                Stripped(
+                    f"""\
+/// <summary>
+/// Decode the code point at <paramref name="offset" /> in
+/// <paramref name="text" />.
+/// </summary>
+/// <remarks>
+/// A lone surrogate is decoded as a code point of its own.
+/// </remarks>
+private static int CodePointAt(string text, int offset)
+{{
+{I}return (
+{II}offset + 1 < text.Length
+{II}&& char.IsHighSurrogate(text[offset])
+{II}&& char.IsLowSurrogate(text[offset + 1])
+{I})
+{II}? char.ConvertToUtf32(text[offset], text[offset + 1])
+{II}: text[offset];
+}}"""
+                ),
+                Stripped(
+                    f"""\
+/// <summary>
+/// Compare <paramref name="that" /> and <paramref name="other" /> by their
+/// code points.
+/// </summary>
+/// <remarks>
+/// We follow the Python implementation of the string comparison, since Python is
+/// the language of the meta-model specifications. Unlike
+/// <see cref="string.CompareOrdinal(string, string)" />, which compares
+/// the UTF-16 code units, this comparison sorts the characters beyond
+/// the Basic Multilingual Plane after all the others.
+/// </remarks>
+/// <returns>
+/// -1 if <paramref name="that" /> comes before <paramref name="other" />,
+/// 0 if they are equal, and 1 otherwise
+/// </returns>
+public static int CompareByCodePoints(string that, string other)
+{{
+{I}int length = System.Math.Min(that.Length, other.Length);
+
+{I}int offset = 0;
+{I}while (offset < length && that[offset] == other[offset])
+{I}{{
+{II}offset++;
+{I}}}
+
+{I}if (offset == length)
+{I}{{
+{II}if (that.Length == other.Length)
+{II}{{
+{III}return 0;
+{II}}}
+
+{II}return that.Length < other.Length ? -1 : 1;
+{I}}}
+
+{I}// NOTE: We might have stopped in the middle of a surrogate pair.
+{I}if (
+{II}offset > 0
+{II}&& char.IsHighSurrogate(that[offset - 1])
+{II}&& (
+{III}char.IsLowSurrogate(that[offset])
+{III}|| char.IsLowSurrogate(other[offset])
+{II})
+{I})
+{I}{{
+{II}offset--;
+{I}}}
+
+{I}return CodePointAt(that, offset).CompareTo(CodePointAt(other, offset));
+}}"""
+                ),
+            ]
         )
 
     if intermediate_uses.lstrip_call(symbol_table):
@@ -423,74 +513,10 @@ def _generate_set_helpers(symbol_table: intermediate.SymbolTable) -> Stripped:
     The set properties are serialized sorted, in the same order in all the SDKs:
     ``false`` before ``true``, the integers numerically, and the strings and
     the serialized values of the enumeration literals by their code points.
-    The C# strings, however, compare by their UTF-16 code units, which sort
-    the characters beyond the Basic Multilingual Plane (surrogate pairs) before
-    the characters from U+E000 to U+FFFF.
+    The strings are sorted with ``StringHelpers.CompareByCodePoints``, since
+    the transpiled code compares them in the same way.
     """
-    members = [
-        Stripped(
-            f"""\
-/// <summary>
-/// Decode the code point at <paramref name="offset" /> in
-/// <paramref name="text" />.
-/// </summary>
-/// <remarks>
-/// A lone surrogate is decoded as a code point of its own.
-/// </remarks>
-private static int CodePointAt(string text, int offset)
-{{
-{I}return (
-{II}offset + 1 < text.Length
-{II}&& char.IsHighSurrogate(text[offset])
-{II}&& char.IsLowSurrogate(text[offset + 1])
-{I})
-{II}? char.ConvertToUtf32(text[offset], text[offset + 1])
-{II}: text[offset];
-}}"""
-        ),
-        Stripped(
-            f"""\
-/// <summary>
-/// Compare <paramref name="that" /> and <paramref name="other" /> by their
-/// code points.
-/// </summary>
-/// <remarks>
-/// Unlike <see cref="string.CompareOrdinal(string, string)" />, which compares
-/// the UTF-16 code units, this comparison sorts the characters beyond
-/// the Basic Multilingual Plane after all the others.
-/// </remarks>
-public static int CompareByCodePoints(string that, string other)
-{{
-{I}int length = System.Math.Min(that.Length, other.Length);
-
-{I}int offset = 0;
-{I}while (offset < length && that[offset] == other[offset])
-{I}{{
-{II}offset++;
-{I}}}
-
-{I}if (offset == length)
-{I}{{
-{II}return that.Length.CompareTo(other.Length);
-{I}}}
-
-{I}// NOTE: We might have stopped in the middle of a surrogate pair.
-{I}if (
-{II}offset > 0
-{II}&& char.IsHighSurrogate(that[offset - 1])
-{II}&& (
-{III}char.IsLowSurrogate(that[offset])
-{III}|| char.IsLowSurrogate(other[offset])
-{II})
-{I})
-{I}{{
-{II}offset--;
-{I}}}
-
-{I}return CodePointAt(that, offset).CompareTo(CodePointAt(other, offset));
-}}"""
-        ),
-    ]  # type: List[Stripped]
+    members = []  # type: List[Stripped]
 
     for enumeration in intermediate_uses.enumerations_in_set_properties(symbol_table):
         enum_name = csharp_naming.enum_name(enumeration.name)
@@ -592,6 +618,7 @@ public static class SetHelpers
 
 def generate(
     symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     namespace: csharp_common.NamespaceIdentifier,
 ) -> str:
     """
@@ -604,10 +631,13 @@ def generate(
     """
     blocks = [_TUPLE_HELPERS]  # type: List[Stripped]
 
-    if intermediate_uses.len_slicing_or_find(
-        symbol_table
-    ) or intermediate_uses.lstrip_call(symbol_table):
-        blocks.append(_generate_string_helpers(symbol_table))
+    if (
+        intermediate_uses.len_slicing_or_find(symbol_table)
+        or intermediate_uses.string_ordering(type_inference)
+        or intermediate_uses.sets_of_strings_in_properties(symbol_table)
+        or intermediate_uses.lstrip_call(symbol_table)
+    ):
+        blocks.append(_generate_string_helpers(symbol_table, type_inference))
 
     if intermediate_uses.set_properties(symbol_table):
         blocks.append(_generate_set_helpers(symbol_table))

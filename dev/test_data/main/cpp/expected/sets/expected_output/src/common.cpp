@@ -14258,7 +14258,7 @@ std::uint32_t DecodeCodePoint(const std::wstring& text, size_t& offset) {
 
 }  // namespace
 
-bool LessByCodePoints(
+int CompareByCodePoints(
   const std::wstring& that,
   const std::wstring& other
 ) {
@@ -14270,11 +14270,22 @@ bool LessByCodePoints(
     const std::uint32_t other_code_point = DecodeCodePoint(other, other_offset);
 
     if (that_code_point != other_code_point) {
-      return that_code_point < other_code_point;
+      return that_code_point < other_code_point ? -1 : 1;
     }
   }
 
-  return other_offset < other.size();
+  if (that_offset < that.size()) {
+    return 1;
+  }
+
+  return other_offset < other.size() ? -1 : 0;
+}
+
+bool LessByCodePoints(
+  const std::wstring& that,
+  const std::wstring& other
+) {
+  return CompareByCodePoints(that, other) < 0;
 }
 
 }  // namespace common

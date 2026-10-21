@@ -1,0 +1,1 @@
+We do not support the chained comparisons such as ``a < b < c``, as they are not available in all the target languages. Please split them with ``and``, *e.g.*, ``a < b and b < c``

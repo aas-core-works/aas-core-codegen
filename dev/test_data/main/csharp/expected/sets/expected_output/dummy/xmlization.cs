@@ -1439,7 +1439,7 @@ namespace dummy
                 WriteSet<string>(
                     WrapInElement(
                         Write_string, "v"),
-                    Common.SetHelpers.CompareByCodePoints));
+                    Common.StringHelpers.CompareByCodePoints));
 
             private static readonly ContentWriter<HashSet<long>> Write_SetOf_long = (
                 WriteSet<long>(

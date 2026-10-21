@@ -298,9 +298,7 @@ COMMON_CLASS: Final[Identifier] = Identifier("Common")
 # The names of the helpers generated per enumeration in ``SetHelpers`` start with
 # a prefix, ``RankOf`` and ``CompareByRankOf``, with which no fixed helper there
 # starts. Hence a generated name can never coincide with a fixed one, whatever
-# the name of the enumeration, and there are no confusing overloads. For example,
-# an enumeration ``Code_points`` gives ``CompareByRankOfCodePoints``, and not
-# an overload of the fixed ``CompareByCodePoints``.
+# the name of the enumeration, and there are no confusing overloads.
 
 
 def rank_of_enumeration_name(enumeration: intermediate.Enumeration) -> Identifier:
@@ -342,7 +340,7 @@ def set_items_comparison(items: intermediate.TypeAnnotationUnion) -> Stripped:
         return Stripped("System.Collections.Generic.Comparer<long>.Default.Compare")
 
     elif primitive_type is intermediate.PrimitiveType.STR:
-        return Stripped(f"{COMMON_CLASS}.SetHelpers.CompareByCodePoints")
+        return Stripped(f"{COMMON_CLASS}.StringHelpers.CompareByCodePoints")
 
     elif primitive_type is intermediate.PrimitiveType.FLOAT:
         raise AssertionError(

@@ -2328,6 +2328,16 @@ _COLLECTION_TYPE_ANNOTATIONS = (
     SetTypeAnnotation,
 )  # type: Final
 
+_ORDERED_PRIMITIVE_TYPES: Final[AbstractSet[Optional[PrimitiveType]]] = frozenset(
+    [
+        PrimitiveType.BOOL,
+        PrimitiveType.INT,
+        PrimitiveType.FLOAT,
+        PrimitiveType.STR,
+        PrimitiveType.LENGTH,
+    ]
+)
+
 
 def _holds_list_or_set(type_annotation: "TypeAnnotationUnion") -> bool:
     """Check whether a value of ``type_annotation`` is or contains a list or a set."""
@@ -3842,6 +3852,23 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                     node.original_node,
                     f"Expected the operands of the comparison to be of "
                     f"comparable types, but got: {left_type} and {right_type}",
+                )
+            )
+            return None
+
+        # NOTE (mristin):
+        # The targets order neither the enumerations, nor the instances of
+        # the classes, nor the byte arrays natively, so we refuse to order them.
+        if (
+            node.op not in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE)
+            and left_primitive_type not in _ORDERED_PRIMITIVE_TYPES
+        ):
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"We support the ordering comparisons only on the booleans, "
+                    f"the numbers and the strings, but got: {left_type} "
+                    f"and {right_type}",
                 )
             )
             return None

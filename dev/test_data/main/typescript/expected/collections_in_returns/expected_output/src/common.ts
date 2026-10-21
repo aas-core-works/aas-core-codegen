@@ -601,6 +601,81 @@ export function findStr(text: string, sub: string, start = 0): number {
 
 
 /**
+ * Decode the character (code point) of `text` which covers the UTF-16 offset
+ * `offset`.
+ *
+ * @remarks
+ * The offset might point to the low surrogate of a surrogate pair, in which
+ * case we decode the whole pair. We decode a lone surrogate as itself, as
+ * Python does.
+ *
+ * @param text - to be decoded
+ * @param offset - in UTF-16 code units
+ * @returns the character covering `offset`
+ */
+function codePointCovering(text: string, offset: number): number {
+  const codeUnit = text.charCodeAt(offset);
+
+  if (codeUnit >= 0xdc00 && codeUnit <= 0xdfff && offset > 0) {
+    const high = text.charCodeAt(offset - 1);
+    if (high >= 0xd800 && high <= 0xdbff) {
+      return (high - 0xd800) * 0x400 + (codeUnit - 0xdc00) + 0x10000;
+    }
+  }
+
+  if (codeUnit >= 0xd800 && codeUnit <= 0xdbff && offset + 1 < text.length) {
+    const low = text.charCodeAt(offset + 1);
+    if (low >= 0xdc00 && low <= 0xdfff) {
+      return (codeUnit - 0xd800) * 0x400 + (low - 0xdc00) + 0x10000;
+    }
+  }
+
+  return codeUnit;
+}
+
+
+/**
+ * Compare `that` and `other` by their characters (code points).
+ *
+ * @remarks
+ * We follow the Python implementation of the string comparison, since Python is
+ * the language of the meta-model specifications. Hence, we order the strings by
+ * their characters (code points), unlike the default sort and the native
+ * operators `<` and `>`, which order them by their UTF-16 code units, and put
+ * a character beyond the Basic Multilingual Plane, encoded as a surrogate pair,
+ * before the characters from U+E000 to U+FFFF.
+ *
+ * @param that - to be compared
+ * @param other - to be compared against
+ * @returns -1 if `that` comes before `other`, 0 if they are equal, and 1
+ * otherwise
+ */
+export function compareByCodePoints(that: string, other: string): number {
+  const length = Math.min(that.length, other.length);
+
+  let offset = 0;
+  while (
+    offset < length &&
+    that.charCodeAt(offset) === other.charCodeAt(offset)
+  ) {
+    offset++;
+  }
+
+  if (offset === length) {
+    if (that.length === other.length) {
+      return 0;
+    }
+
+    return that.length < other.length ? -1 : 1;
+  }
+
+  return codePointCovering(that, offset) < codePointCovering(other, offset)
+    ? -1
+    : 1;
+}
+
+
+/**
  * Compare `that` and `other` so that `false` comes before `true`.
  *
  * @param that - to be compared
@@ -627,52 +702,6 @@ export function compareBooleans(that: boolean, other: boolean): number {
  */
 export function compareNumbers(that: number, other: number): number {
   return that - other;
-}
-
-
-/**
- * Compare `that` and `other` by their code points.
- *
- * @remarks
- * The default sort and the operator `<` compare the UTF-16 code units instead,
- * which puts a character outside the Basic Multilingual Plane, encoded as
- * a surrogate pair in the range U+D800 to U+DFFF, before the characters
- * U+E000 to U+FFFF. We compare the first differing code units after shifting
- * the surrogates above all the other code units, which gives the order of
- * the code points without decoding them.
- *
- * @param that - to be compared
- * @param other - to be compared against
- * @returns negative, zero or positive, as `that` is before, equal to or
- * after `other`
- */
-export function compareByCodePoints(that: string, other: string): number {
-  const length = Math.min(that.length, other.length);
-  for (let i = 0; i < length; i++) {
-    const thatUnit = that.charCodeAt(i);
-    const otherUnit = other.charCodeAt(i);
-    if (thatUnit !== otherUnit) {
-      return shiftSurrogates(thatUnit) - shiftSurrogates(otherUnit);
-    }
-  }
-
-  return that.length - other.length;
-}
-
-/**
- * Shift the surrogate `unit` above all the other UTF-16 code units.
- *
- * @param unit - UTF-16 code unit
- * @returns key of `unit` in the order of the code points
- */
-function shiftSurrogates(unit: number): number {
-  if (unit >= 0xd800 && unit <= 0xdfff) {
-    return unit + 0x2000;
-  }
-  if (unit >= 0xe000) {
-    return unit - 0x800;
-  }
-  return unit;
 }
 
 

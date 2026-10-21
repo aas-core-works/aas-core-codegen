@@ -189,14 +189,7 @@ namespace dummy
 
                 return theStart + CountCharacters(text, startOffset, offset);
             }
-        }  // public static class StringHelpers
 
-        /// <summary>
-        /// Sort the items of the sets, so that they are serialized in the same order
-        /// in all the SDKs.
-        /// </summary>
-        public static class SetHelpers
-        {
             /// <summary>
             /// Decode the code point at <paramref name="offset" /> in
             /// <paramref name="text" />.
@@ -220,10 +213,16 @@ namespace dummy
             /// code points.
             /// </summary>
             /// <remarks>
-            /// Unlike <see cref="string.CompareOrdinal(string, string)" />, which compares
+            /// We follow the Python implementation of the string comparison, since Python is
+            /// the language of the meta-model specifications. Unlike
+            /// <see cref="string.CompareOrdinal(string, string)" />, which compares
             /// the UTF-16 code units, this comparison sorts the characters beyond
             /// the Basic Multilingual Plane after all the others.
             /// </remarks>
+            /// <returns>
+            /// -1 if <paramref name="that" /> comes before <paramref name="other" />,
+            /// 0 if they are equal, and 1 otherwise
+            /// </returns>
             public static int CompareByCodePoints(string that, string other)
             {
                 int length = System.Math.Min(that.Length, other.Length);
@@ -236,7 +235,12 @@ namespace dummy
 
                 if (offset == length)
                 {
-                    return that.Length.CompareTo(other.Length);
+                    if (that.Length == other.Length)
+                    {
+                        return 0;
+                    }
+
+                    return that.Length < other.Length ? -1 : 1;
                 }
 
                 // NOTE: We might have stopped in the middle of a surrogate pair.
@@ -254,7 +258,14 @@ namespace dummy
 
                 return CodePointAt(that, offset).CompareTo(CodePointAt(other, offset));
             }
+        }  // public static class StringHelpers
 
+        /// <summary>
+        /// Sort the items of the sets, so that they are serialized in the same order
+        /// in all the SDKs.
+        /// </summary>
+        public static class SetHelpers
+        {
             /// <summary>
             /// Rank <paramref name="literal" /> by its serialized value in code points.
             /// </summary>

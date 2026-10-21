@@ -50,16 +50,21 @@ class _Parse(abc.ABC):
 
 class _ParseComparison(_Parse):
     def matches(self, node: ast.AST) -> bool:
-        return (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and isinstance(node.ops[0], _AST_COMPARATORS)
-            and len(node.comparators) == 1
+        return isinstance(node, ast.Compare) and all(
+            isinstance(op, _AST_COMPARATORS) for op in node.ops
         )
 
     # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Compare)
+
+        if len(node.ops) != 1:
+            return None, Error(
+                node,
+                "We do not support the chained comparisons such as ``a < b < c``, "
+                "as they are not available in all the target languages. Please "
+                "split them with ``and``, *e.g.*, ``a < b and b < c``",
+            )
 
         left, error = ast_node_to_our_node(cast(ast.AST, node.left))
         if error is not None:

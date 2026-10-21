@@ -91,7 +91,12 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     ] = [
         (
             src_rel_path / "common.ts",
-            lambda: (typescript_lib.generate_common(context.symbol_table), None),
+            lambda: (
+                typescript_lib.generate_common(
+                    symbol_table=context.symbol_table, type_inference=type_inference
+                ),
+                None,
+            ),
         ),
         (
             src_rel_path / "constants.ts",
@@ -406,14 +411,18 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # The helpers for ``len``, slicing strings and ``find`` are only generated for
-    # a meta-model which uses them, and so are their tests.
-    if intermediate_uses.len_slicing_or_find(context.symbol_table):
+    # The helpers for ``len``, slicing, ``find`` and comparing strings are only
+    # generated for a meta-model which uses them, and so are their tests.
+    if intermediate_uses.len_slicing_or_find(
+        context.symbol_table
+    ) or intermediate_uses.string_ordering(type_inference):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 test_rel_path / "common.stringHelpers.spec.ts",
                 lambda: (
-                    typescript_tests.generate_common_string_helpers_spec(),
+                    typescript_tests.generate_common_string_helpers_spec(
+                        symbol_table=context.symbol_table, type_inference=type_inference
+                    ),
                     None,
                 ),
             ),

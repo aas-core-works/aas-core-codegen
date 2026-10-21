@@ -105,6 +105,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             lambda: (
                 cpp_lib.generate_common_header(
                     symbol_table=context.symbol_table,
+                    type_inference=type_inference,
                     library_namespace=library_namespace,
                 ),
                 None,
@@ -115,6 +116,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             lambda: (
                 cpp_lib.generate_common_implementation(
                     symbol_table=context.symbol_table,
+                    type_inference=type_inference,
                     library_namespace=library_namespace,
                 ),
                 None,
@@ -614,15 +616,19 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # The helpers for ``len``, slicing strings and ``find`` are only generated for
-    # a meta-model which uses them, and so are their tests.
-    if intermediate_uses.len_slicing_or_find(context.symbol_table):
+    # The helpers for ``len``, slicing, ``find`` and comparing strings are only
+    # generated for a meta-model which uses them, and so are their tests.
+    if intermediate_uses.len_slicing_or_find(
+        context.symbol_table
+    ) or intermediate_uses.string_ordering(type_inference):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 test_dir / "test_string_helpers.cpp",
                 lambda: (
                     cpp_tests.generate_test_string_helpers_implementation(
-                        library_namespace=library_namespace
+                        library_namespace=library_namespace,
+                        symbol_table=context.symbol_table,
+                        type_inference=type_inference,
                     ),
                     None,
                 ),

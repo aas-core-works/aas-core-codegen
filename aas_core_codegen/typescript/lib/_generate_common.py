@@ -9,7 +9,10 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
     Stripped,
 )
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 from aas_core_codegen.typescript import (
     common as typescript_common,
 )
@@ -158,53 +161,6 @@ export function compareNumbers(that: number, other: number): number {{
 {I}return that - other;
 }}"""
     ),
-    Stripped(
-        f"""\
-/**
- * Compare `that` and `other` by their code points.
- *
- * @remarks
- * The default sort and the operator `<` compare the UTF-16 code units instead,
- * which puts a character outside the Basic Multilingual Plane, encoded as
- * a surrogate pair in the range U+D800 to U+DFFF, before the characters
- * U+E000 to U+FFFF. We compare the first differing code units after shifting
- * the surrogates above all the other code units, which gives the order of
- * the code points without decoding them.
- *
- * @param that - to be compared
- * @param other - to be compared against
- * @returns negative, zero or positive, as `that` is before, equal to or
- * after `other`
- */
-export function compareByCodePoints(that: string, other: string): number {{
-{I}const length = Math.min(that.length, other.length);
-{I}for (let i = 0; i < length; i++) {{
-{II}const thatUnit = that.charCodeAt(i);
-{II}const otherUnit = other.charCodeAt(i);
-{II}if (thatUnit !== otherUnit) {{
-{III}return shiftSurrogates(thatUnit) - shiftSurrogates(otherUnit);
-{II}}}
-{I}}}
-
-{I}return that.length - other.length;
-}}
-
-/**
- * Shift the surrogate `unit` above all the other UTF-16 code units.
- *
- * @param unit - UTF-16 code unit
- * @returns key of `unit` in the order of the code points
- */
-function shiftSurrogates(unit: number): number {{
-{I}if (unit >= 0xd800 && unit <= 0xdfff) {{
-{II}return unit + 0x2000;
-{I}}}
-{I}if (unit >= 0xe000) {{
-{II}return unit - 0x800;
-{I}}}
-{I}return unit;
-}}"""
-    ),
 ]
 
 #: Parse a text as a safe integer; this is how we transpile the built-in ``int``.
@@ -282,7 +238,10 @@ export function parseSafeInt(text: string): number {{
     "Trailing newline mandatory for valid end-of-files"
 )
 # fmt: on
-def generate(symbol_table: intermediate.SymbolTable) -> str:
+def generate(
+    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
+) -> str:
     """Generate code of common functionality."""
     blocks = [
         Stripped(
@@ -922,6 +881,96 @@ export function findStr(text: string, sub: string, start = 0): number {{
 {I}}}
 
 {I}return theStart + countCharacters(text, startOffset, offset);
+}}"""
+            ),
+        ]
+
+    # NOTE (mristin):
+    # The TypeScript strings are ordered by their UTF-16 code units, while Python
+    # orders them by their characters (code points). The two orders differ for
+    # the characters beyond the Basic Multilingual Plane, whose surrogates come
+    # before the characters from U+E000 to U+FFFF. The helper is generated only for
+    # a meta-model which might order strings, or which sorts the items of the set
+    # properties of strings so that all the SDKs serialize them in the same order.
+    if intermediate_uses.string_ordering(
+        type_inference
+    ) or intermediate_uses.sets_of_strings_in_properties(symbol_table):
+        blocks[len(blocks) - 1 : len(blocks) - 1] = [
+            Stripped(
+                f"""\
+/**
+ * Decode the character (code point) of `text` which covers the UTF-16 offset
+ * `offset`.
+ *
+ * @remarks
+ * The offset might point to the low surrogate of a surrogate pair, in which
+ * case we decode the whole pair. We decode a lone surrogate as itself, as
+ * Python does.
+ *
+ * @param text - to be decoded
+ * @param offset - in UTF-16 code units
+ * @returns the character covering `offset`
+ */
+function codePointCovering(text: string, offset: number): number {{
+{I}const codeUnit = text.charCodeAt(offset);
+
+{I}if (codeUnit >= 0xdc00 && codeUnit <= 0xdfff && offset > 0) {{
+{II}const high = text.charCodeAt(offset - 1);
+{II}if (high >= 0xd800 && high <= 0xdbff) {{
+{III}return (high - 0xd800) * 0x400 + (codeUnit - 0xdc00) + 0x10000;
+{II}}}
+{I}}}
+
+{I}if (codeUnit >= 0xd800 && codeUnit <= 0xdbff && offset + 1 < text.length) {{
+{II}const low = text.charCodeAt(offset + 1);
+{II}if (low >= 0xdc00 && low <= 0xdfff) {{
+{III}return (codeUnit - 0xd800) * 0x400 + (low - 0xdc00) + 0x10000;
+{II}}}
+{I}}}
+
+{I}return codeUnit;
+}}"""
+            ),
+            Stripped(
+                f"""\
+/**
+ * Compare `that` and `other` by their characters (code points).
+ *
+ * @remarks
+ * We follow the Python implementation of the string comparison, since Python is
+ * the language of the meta-model specifications. Hence, we order the strings by
+ * their characters (code points), unlike the default sort and the native
+ * operators `<` and `>`, which order them by their UTF-16 code units, and put
+ * a character beyond the Basic Multilingual Plane, encoded as a surrogate pair,
+ * before the characters from U+E000 to U+FFFF.
+ *
+ * @param that - to be compared
+ * @param other - to be compared against
+ * @returns -1 if `that` comes before `other`, 0 if they are equal, and 1
+ * otherwise
+ */
+export function compareByCodePoints(that: string, other: string): number {{
+{I}const length = Math.min(that.length, other.length);
+
+{I}let offset = 0;
+{I}while (
+{II}offset < length &&
+{II}that.charCodeAt(offset) === other.charCodeAt(offset)
+{I}) {{
+{II}offset++;
+{I}}}
+
+{I}if (offset === length) {{
+{II}if (that.length === other.length) {{
+{III}return 0;
+{II}}}
+
+{II}return that.length < other.length ? -1 : 1;
+{I}}}
+
+{I}return codePointCovering(that, offset) < codePointCovering(other, offset)
+{II}? -1
+{II}: 1;
 }}"""
             ),
         ]

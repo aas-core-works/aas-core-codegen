@@ -1134,7 +1134,7 @@ namespace dummy
                 WriteSet<string>(
                     WrapInElement(
                         Write_string, "v"),
-                    Common.SetHelpers.CompareByCodePoints));
+                    Common.StringHelpers.CompareByCodePoints));
 
             private static readonly ContentWriter<
                 List<HashSet<string>>
