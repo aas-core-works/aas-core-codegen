@@ -2110,8 +2110,10 @@ type IClass interface {{
         import_lines.append(f'{I}"fmt"')
 
     # NOTE (mristin):
-    # We transpile ``str.lstrip`` and ``str.rstrip`` in the methods to
-    # ``strings.TrimLeft`` and ``strings.TrimRight``, respectively.
+    # We transpile ``str.lstrip``, ``str.rstrip``, ``str.startswith`` and
+    # ``str.endswith`` in the methods to ``strings.TrimLeft``,
+    # ``strings.TrimRight``, ``strings.HasPrefix`` and ``strings.HasSuffix``,
+    # respectively.
     if golang_common.names_package(blocks, "strings"):
         import_lines.append(f'{I}"strings"')
 

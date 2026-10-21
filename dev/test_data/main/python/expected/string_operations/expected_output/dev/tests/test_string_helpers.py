@@ -581,6 +581,146 @@ class Test_string_helpers(unittest.TestCase):
             )
         )
 
+    def test_startswith_prefix(self) -> None:
+        self.assertTrue(
+            'abc'.startswith(
+                'ab'
+            )
+        )
+
+    def test_startswith_not_a_prefix(self) -> None:
+        self.assertFalse(
+            'abc'.startswith(
+                'bc'
+            )
+        )
+
+    def test_startswith_empty_prefix(self) -> None:
+        self.assertTrue(
+            'abc'.startswith(
+                ''
+            )
+        )
+
+    def test_startswith_whole_text(self) -> None:
+        self.assertTrue(
+            'abc'.startswith(
+                'abc'
+            )
+        )
+
+    def test_startswith_prefix_longer_than_text(self) -> None:
+        self.assertFalse(
+            'ab'.startswith(
+                'abc'
+            )
+        )
+
+    def test_startswith_empty_prefix_of_empty_text(self) -> None:
+        self.assertTrue(
+            ''.startswith(
+                ''
+            )
+        )
+
+    def test_startswith_non_empty_prefix_of_empty_text(self) -> None:
+        self.assertFalse(
+            ''.startswith(
+                'a'
+            )
+        )
+
+    def test_startswith_character_of_two_utf_8_bytes(self) -> None:
+        self.assertTrue(
+            'éa'.startswith(
+                'é'
+            )
+        )
+
+    def test_startswith_character_beyond_the_basic_multilingual_plane(self) -> None:
+        self.assertTrue(
+            '😀a'.startswith(
+                '😀'
+            )
+        )
+
+    def test_startswith_character_sharing_the_high_surrogate(self) -> None:
+        self.assertFalse(
+            '😁x'.startswith(
+                '😀'
+            )
+        )
+
+    def test_endswith_suffix(self) -> None:
+        self.assertTrue(
+            'abc'.endswith(
+                'bc'
+            )
+        )
+
+    def test_endswith_not_a_suffix(self) -> None:
+        self.assertFalse(
+            'abc'.endswith(
+                'ab'
+            )
+        )
+
+    def test_endswith_empty_suffix(self) -> None:
+        self.assertTrue(
+            'abc'.endswith(
+                ''
+            )
+        )
+
+    def test_endswith_whole_text(self) -> None:
+        self.assertTrue(
+            'abc'.endswith(
+                'abc'
+            )
+        )
+
+    def test_endswith_suffix_longer_than_text(self) -> None:
+        self.assertFalse(
+            'bc'.endswith(
+                'abc'
+            )
+        )
+
+    def test_endswith_empty_suffix_of_empty_text(self) -> None:
+        self.assertTrue(
+            ''.endswith(
+                ''
+            )
+        )
+
+    def test_endswith_non_empty_suffix_of_empty_text(self) -> None:
+        self.assertFalse(
+            ''.endswith(
+                'a'
+            )
+        )
+
+    def test_endswith_character_of_two_utf_8_bytes(self) -> None:
+        self.assertTrue(
+            'aé'.endswith(
+                'é'
+            )
+        )
+
+    def test_endswith_character_beyond_the_basic_multilingual_plane(self) -> None:
+        self.assertTrue(
+            'a😀'.endswith(
+                '😀'
+            )
+        )
+
+    def test_endswith_character_sharing_the_high_surrogate(self) -> None:
+        self.assertFalse(
+            'x😁'.endswith(
+                '😀'
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

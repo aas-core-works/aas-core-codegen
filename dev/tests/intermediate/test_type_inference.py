@@ -4346,7 +4346,8 @@ __xml_namespace__ = "https://dummy.com"
         self.expect_error(
             'self.text.upper() == "A"',
             "The member 'upper' is not supported on strings; we support only "
-            "the following methods: 'find', 'lstrip', 'rstrip'",
+            "the following methods: 'endswith', 'find', 'lstrip', 'rstrip', "
+            "'startswith'",
         )
 
     def test_lstrip_and_int(self) -> None:
@@ -4419,6 +4420,49 @@ __xml_namespace__ = "https://dummy.com"
         self.expect_error(
             'self.text.rstrip() == ""',
             "Expected 1 argument(s) to the built-in method 'rstrip', but got 0",
+        )
+
+    def test_startswith_and_endswith(self) -> None:
+        type_map = Test_string_slicing_and_find.infer_type_map(
+            Test_string_slicing_and_find.source_with_invariant(
+                'self.text.startswith("a") and self.text.endswith("z")'
+            )
+        )
+
+        self.assertEqual("startswith", type_map["self.text.startswith"])
+        self.assertEqual("bool", type_map["self.text.startswith('a')"])
+        self.assertEqual("endswith", type_map["self.text.endswith"])
+        self.assertEqual("bool", type_map["self.text.endswith('z')"])
+
+    def test_startswith_with_a_non_string_argument_fails(self) -> None:
+        self.expect_error(
+            "self.text.startswith(1)",
+            "Expected the prefix of ``startswith`` to be a string, but got: int",
+        )
+
+    def test_startswith_with_a_tuple_fails(self) -> None:
+        self.expect_error(
+            'self.text.startswith(("a", "b"))',
+            "Expected the prefix of ``startswith`` to be a string, "
+            "but got: Tuple[str, str]",
+        )
+
+    def test_startswith_with_a_start_fails(self) -> None:
+        self.expect_error(
+            'self.text.startswith("a", 1)',
+            "Expected 1 argument(s) to the built-in method 'startswith', but got 2",
+        )
+
+    def test_endswith_with_a_non_string_argument_fails(self) -> None:
+        self.expect_error(
+            "self.text.endswith(1)",
+            "Expected the suffix of ``endswith`` to be a string, but got: int",
+        )
+
+    def test_endswith_with_no_arguments_fails(self) -> None:
+        self.expect_error(
+            "self.text.endswith()",
+            "Expected 1 argument(s) to the built-in method 'endswith', but got 0",
         )
 
     def test_int_of_a_float_fails(self) -> None:

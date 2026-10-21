@@ -182,6 +182,20 @@ public class Verification {
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
+      if (!(!that.getAmount().startsWith("+"))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Amount must not start with a plus")));
+      }
+
+      if (!(!that.getName().endsWith("!"))) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Name must not end with an exclamation mark")));
+      }
+
       if (!(
         Objects.equals(StringHelpers.rstrip(that.getOtherWord(), "𐈀😁"), that.getOtherWord()))) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,

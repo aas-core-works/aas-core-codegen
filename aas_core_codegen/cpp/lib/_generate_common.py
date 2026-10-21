@@ -961,6 +961,79 @@ SetT Difference(
 
 #: Declare the comparison of the strings by code points, to which we transpile
 #: the ordering comparisons of strings
+# NOTE (mristin):
+# C++11 has no ``std::wstring::starts_with`` nor ``ends_with``, which come only
+# with C++20. Hence, we generate the helpers ``StartsWith`` and ``EndsWith``.
+# We compare the ``wchar_t``'s, which gives the same result as comparing
+# the characters (code points) in Python unless the prefix or the suffix starts
+# or ends with a lone surrogate.
+
+#: Declaration of the helper to check the prefix of a text as ``str.startswith``
+_STARTS_WITH_DECLARATION: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * Check whether \\p text starts with \\p prefix.
+ *
+ * We follow the Python implementation of `str.startswith`, since Python is
+ * the language of the meta-model specifications.
+ *
+ * \\param text to be checked
+ * \\param prefix to be checked for
+ * \\return true if \\p text starts with \\p prefix
+ */
+bool StartsWith(
+{I}const std::wstring& text,
+{I}const std::wstring& prefix
+);"""
+)
+
+#: Declaration of the helper to check the suffix of a text as ``str.endswith``
+_ENDS_WITH_DECLARATION: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * Check whether \\p text ends with \\p suffix.
+ *
+ * We follow the Python implementation of `str.endswith`, since Python is
+ * the language of the meta-model specifications.
+ *
+ * \\param text to be checked
+ * \\param suffix to be checked for
+ * \\return true if \\p text ends with \\p suffix
+ */
+bool EndsWith(
+{I}const std::wstring& text,
+{I}const std::wstring& suffix
+);"""
+)
+
+#: Definition of the helper to check the prefix of a text as ``str.startswith``
+_STARTS_WITH_DEFINITION: Final[Stripped] = Stripped(
+    f"""\
+bool StartsWith(
+{I}const std::wstring& text,
+{I}const std::wstring& prefix
+) {{
+{I}return (
+{II}text.size() >= prefix.size()
+{II}&& text.compare(0, prefix.size(), prefix) == 0
+{I});
+}}"""
+)
+
+#: Definition of the helper to check the suffix of a text as ``str.endswith``
+_ENDS_WITH_DEFINITION: Final[Stripped] = Stripped(
+    f"""\
+bool EndsWith(
+{I}const std::wstring& text,
+{I}const std::wstring& suffix
+) {{
+{I}return (
+{II}text.size() >= suffix.size()
+{II}&& text.compare(text.size() - suffix.size(), suffix.size(), suffix) == 0
+{I});
+}}"""
+)
+
 _COMPARE_BY_CODE_POINTS_DECLARATION: Final[Stripped] = Stripped(
     f"""\
 /**
@@ -1587,6 +1660,16 @@ size_t LenTuple(const std::tuple<T...>&) {
                 else []
             ),
             *(
+                [_STARTS_WITH_DECLARATION]
+                if intermediate_uses.startswith_call(type_inference)
+                else []
+            ),
+            *(
+                [_ENDS_WITH_DECLARATION]
+                if intermediate_uses.endswith_call(type_inference)
+                else []
+            ),
+            *(
                 [_COMPARE_BY_CODE_POINTS_DECLARATION]
                 if intermediate_uses.string_ordering(type_inference)
                 or intermediate_uses.sets_of_strings_in_properties(symbol_table)
@@ -1877,6 +1960,16 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
         *(
             [PARSE_SAFE_INT_DEFINITION]
             if intermediate_uses.int_call(symbol_table)
+            else []
+        ),
+        *(
+            [_STARTS_WITH_DEFINITION]
+            if intermediate_uses.startswith_call(type_inference)
+            else []
+        ),
+        *(
+            [_ENDS_WITH_DEFINITION]
+            if intermediate_uses.endswith_call(type_inference)
             else []
         ),
         *(

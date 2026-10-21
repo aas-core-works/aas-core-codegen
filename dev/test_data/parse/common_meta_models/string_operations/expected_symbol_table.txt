@@ -136,6 +136,48 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
+          description='Amount must not start with a plus',
+          body=textwrap.dedent("""\
+            Not(
+              operand=MethodCall(
+                member=Member(
+                  instance=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='amount',
+                    original_node=...),
+                  name='startswith',
+                  original_node=...),
+                args=[
+                  Constant(
+                    value='+',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Name must not end with an exclamation mark',
+          body=textwrap.dedent("""\
+            Not(
+              operand=MethodCall(
+                member=Member(
+                  instance=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='name',
+                    original_node=...),
+                  name='endswith',
+                  original_node=...),
+                args=[
+                  Constant(
+                    value='!',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
           description='Other word must end neither with \U00010200 nor with 😁',
           body=textwrap.dedent("""\
             Comparison(

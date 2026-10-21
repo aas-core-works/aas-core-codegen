@@ -57,6 +57,16 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         if error is not None:
             return error
 
+        # NOTE (mristin):
+        # The built-in methods are bound to the strings, including the constrained
+        # primitives, and never optional.
+        if isinstance(
+            self._type_map[node],
+            intermediate_type_inference.BuiltinMethodTypeAnnotation,
+        ):
+            self.is_optional_map[node] = False
+            return None
+
         instance_type_anno = intermediate_type_inference.beneath_optional(
             self._type_map[node.instance]
         )

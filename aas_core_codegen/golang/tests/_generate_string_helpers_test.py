@@ -186,6 +186,56 @@ func {_function_name("RStrip", rstrip_case.description)}(t *testing.T) {{
                 )
             )
 
+    if intermediate_uses.startswith_call(type_inference):
+        for startswith_case in string_helper_cases.STARTSWITH_CASES:
+            explanation = golang_common.string_literal(
+                f"Expected {startswith_case.python_expression()} to give "
+                f"{startswith_case.expected!r} ({startswith_case.description}), "
+                f"but got %v"
+            )
+
+            # NOTE (mristin):
+            # We call the native function just as the transpiled code does.
+            test_blocks.append(
+                Stripped(
+                    f"""\
+func {_function_name("StartsWith", startswith_case.description)}(t *testing.T) {{
+{I}got := strings.HasPrefix(
+{II}{golang_common.string_literal(startswith_case.text)},
+{II}{golang_common.string_literal(startswith_case.prefix)},
+{I})
+{I}if got != {"true" if startswith_case.expected else "false"} {{
+{II}t.Errorf({explanation}, got)
+{I}}}
+}}"""
+                )
+            )
+
+    if intermediate_uses.endswith_call(type_inference):
+        for endswith_case in string_helper_cases.ENDSWITH_CASES:
+            explanation = golang_common.string_literal(
+                f"Expected {endswith_case.python_expression()} to give "
+                f"{endswith_case.expected!r} ({endswith_case.description}), "
+                f"but got %v"
+            )
+
+            # NOTE (mristin):
+            # We call the native function just as the transpiled code does.
+            test_blocks.append(
+                Stripped(
+                    f"""\
+func {_function_name("EndsWith", endswith_case.description)}(t *testing.T) {{
+{I}got := strings.HasSuffix(
+{II}{golang_common.string_literal(endswith_case.text)},
+{II}{golang_common.string_literal(endswith_case.suffix)},
+{I})
+{I}if got != {"true" if endswith_case.expected else "false"} {{
+{II}t.Errorf({explanation}, got)
+{I}}}
+}}"""
+                )
+            )
+
     # NOTE (mristin):
     # An unused import does not compile in Go, so we import only what the tests
     # name.

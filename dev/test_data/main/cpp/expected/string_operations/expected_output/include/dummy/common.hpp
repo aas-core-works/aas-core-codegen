@@ -10220,6 +10220,36 @@ std::wstring RStrip(
 );
 
 /**
+ * Check whether \p text starts with \p prefix.
+ *
+ * We follow the Python implementation of `str.startswith`, since Python is
+ * the language of the meta-model specifications.
+ *
+ * \param text to be checked
+ * \param prefix to be checked for
+ * \return true if \p text starts with \p prefix
+ */
+bool StartsWith(
+  const std::wstring& text,
+  const std::wstring& prefix
+);
+
+/**
+ * Check whether \p text ends with \p suffix.
+ *
+ * We follow the Python implementation of `str.endswith`, since Python is
+ * the language of the meta-model specifications.
+ *
+ * \param text to be checked
+ * \param suffix to be checked for
+ * \return true if \p text ends with \p suffix
+ */
+bool EndsWith(
+  const std::wstring& text,
+  const std::wstring& suffix
+);
+
+/**
  * \brief Compare \p that text and \p other text code point by code point.
  *
  * We follow the Python implementation of the string comparison, since Python is

@@ -2,15 +2,15 @@
 Specify the operations on strings by example.
 
 The transpiled code follows the Python implementation of ``len``, the slicing,
-``str.find``, the comparison of strings, ``str.lstrip`` and ``str.rstrip``, since
-Python is the language of the meta-model specifications. Hence, the lengths and
-the positions count the characters (code points), and not the UTF-16 code units or
-the UTF-8 bytes of the target, a negative position counts from the end of
-the string, the positions out of range are clamped to the string, and ``str.find``
-gives -1 for a start beyond the end of the string. The strings are ordered by
-their characters (code points), and not by their UTF-16 code units. Likewise,
-``str.lstrip`` and ``str.rstrip`` strip the characters, and never a half of
-a surrogate pair.
+``str.find``, the comparison of strings, ``str.lstrip``, ``str.rstrip``,
+``str.startswith`` and ``str.endswith``, since Python is the language of
+the meta-model specifications. Hence, the lengths and the positions count
+the characters (code points), and not the UTF-16 code units or the UTF-8 bytes of
+the target, a negative position counts from the end of the string, the positions
+out of range are clamped to the string, and ``str.find`` gives -1 for a start
+beyond the end of the string. The strings are ordered by their characters (code
+points), and not by their UTF-16 code units. Likewise, ``str.lstrip`` and
+``str.rstrip`` strip the characters, and never a half of a surrogate pair.
 
 The targets generate unit tests from these cases so that the users can inspect
 the behavior of the generated code. We compute the expected results with Python
@@ -199,6 +199,60 @@ class RStripCase:
         return f"{self.text!r}.rstrip({self.chars!r})"
 
 
+class StartsWithCase:
+    """Represent a case of ``text.startswith(prefix)``."""
+
+    #: Short description of what the case demonstrates
+    description: Final[str]
+
+    #: Text to be checked
+    text: Final[str]
+
+    #: Prefix to be checked for
+    prefix: Final[str]
+
+    #: Expected result, as given by Python
+    expected: Final[bool]
+
+    def __init__(self, description: str, text: str, prefix: str) -> None:
+        """Initialize with the given values, and compute the expected result."""
+        self.description = description
+        self.text = text
+        self.prefix = prefix
+        self.expected = text.startswith(prefix)
+
+    def python_expression(self) -> str:
+        """Render the case in Python notation, *e.g.*, for the names of the tests."""
+        return f"{self.text!r}.startswith({self.prefix!r})"
+
+
+class EndsWithCase:
+    """Represent a case of ``text.endswith(suffix)``."""
+
+    #: Short description of what the case demonstrates
+    description: Final[str]
+
+    #: Text to be checked
+    text: Final[str]
+
+    #: Suffix to be checked for
+    suffix: Final[str]
+
+    #: Expected result, as given by Python
+    expected: Final[bool]
+
+    def __init__(self, description: str, text: str, suffix: str) -> None:
+        """Initialize with the given values, and compute the expected result."""
+        self.description = description
+        self.text = text
+        self.suffix = suffix
+        self.expected = text.endswith(suffix)
+
+    def python_expression(self) -> str:
+        """Render the case in Python notation, *e.g.*, for the names of the tests."""
+        return f"{self.text!r}.endswith({self.suffix!r})"
+
+
 # NOTE (mristin):
 # We include the characters beyond ASCII since the targets represent the strings
 # differently. The character "é" takes one UTF-16 code unit, but two UTF-8 bytes,
@@ -334,4 +388,37 @@ RSTRIP_CASES: Final[Sequence[RStripCase]] = (
     RStripCase("character sharing the high surrogate", "x😁", "😀"),
     RStripCase("characters sharing the surrogates", "x😀", "𐈀😁"),
     RStripCase("ASCII after a character beyond ASCII", "😀a", "a"),
+)
+
+# NOTE (mristin):
+# The targets compare the prefixes and the suffixes ordinally, *i.e.*, by their
+# UTF-16 code units or UTF-8 bytes, which gives the same result as comparing
+# the characters for the strings without lone surrogates. We include
+# the characters sharing a surrogate so that the users can see that a half of
+# a character never matches.
+
+STARTSWITH_CASES: Final[Sequence[StartsWithCase]] = (
+    StartsWithCase("prefix", "abc", "ab"),
+    StartsWithCase("not a prefix", "abc", "bc"),
+    StartsWithCase("empty prefix", "abc", ""),
+    StartsWithCase("whole text", "abc", "abc"),
+    StartsWithCase("prefix longer than text", "ab", "abc"),
+    StartsWithCase("empty prefix of empty text", "", ""),
+    StartsWithCase("non-empty prefix of empty text", "", "a"),
+    StartsWithCase("character of two UTF-8 bytes", "éa", "é"),
+    StartsWithCase("character beyond the Basic Multilingual Plane", "😀a", "😀"),
+    StartsWithCase("character sharing the high surrogate", "😁x", "😀"),
+)
+
+ENDSWITH_CASES: Final[Sequence[EndsWithCase]] = (
+    EndsWithCase("suffix", "abc", "bc"),
+    EndsWithCase("not a suffix", "abc", "ab"),
+    EndsWithCase("empty suffix", "abc", ""),
+    EndsWithCase("whole text", "abc", "abc"),
+    EndsWithCase("suffix longer than text", "bc", "abc"),
+    EndsWithCase("empty suffix of empty text", "", ""),
+    EndsWithCase("non-empty suffix of empty text", "", "a"),
+    EndsWithCase("character of two UTF-8 bytes", "aé", "é"),
+    EndsWithCase("character beyond the Basic Multilingual Plane", "a😀", "😀"),
+    EndsWithCase("character sharing the high surrogate", "x😁", "😀"),
 )

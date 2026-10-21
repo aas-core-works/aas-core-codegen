@@ -768,6 +768,186 @@ namespace dummy.Tests
                     "😀a",
                     "a"));
         }  // void Test_rstrip_ASCII_after_a_character_beyond_ASCII
+
+        [Test, Description("'abc'.startswith('ab') gives True: prefix")]
+        public void Test_startswith_prefix()
+        {
+            Assert.IsTrue(
+                "abc".StartsWith(
+                    "ab",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_prefix
+
+        [Test, Description("'abc'.startswith('bc') gives False: not a prefix")]
+        public void Test_startswith_not_a_prefix()
+        {
+            Assert.IsFalse(
+                "abc".StartsWith(
+                    "bc",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_not_a_prefix
+
+        [Test, Description("'abc'.startswith('') gives True: empty prefix")]
+        public void Test_startswith_empty_prefix()
+        {
+            Assert.IsTrue(
+                "abc".StartsWith(
+                    "",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_empty_prefix
+
+        [Test, Description("'abc'.startswith('abc') gives True: whole text")]
+        public void Test_startswith_whole_text()
+        {
+            Assert.IsTrue(
+                "abc".StartsWith(
+                    "abc",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_whole_text
+
+        [Test, Description("'ab'.startswith('abc') gives False: prefix longer than text")]
+        public void Test_startswith_prefix_longer_than_text()
+        {
+            Assert.IsFalse(
+                "ab".StartsWith(
+                    "abc",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_prefix_longer_than_text
+
+        [Test, Description("''.startswith('') gives True: empty prefix of empty text")]
+        public void Test_startswith_empty_prefix_of_empty_text()
+        {
+            Assert.IsTrue(
+                "".StartsWith(
+                    "",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_empty_prefix_of_empty_text
+
+        [Test, Description("''.startswith('a') gives False: non-empty prefix of empty text")]
+        public void Test_startswith_non_empty_prefix_of_empty_text()
+        {
+            Assert.IsFalse(
+                "".StartsWith(
+                    "a",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_non_empty_prefix_of_empty_text
+
+        [Test, Description("'éa'.startswith('é') gives True: character of two UTF-8 bytes")]
+        public void Test_startswith_character_of_two_UTF_8_bytes()
+        {
+            Assert.IsTrue(
+                "éa".StartsWith(
+                    "é",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_character_of_two_UTF_8_bytes
+
+        [Test, Description("'😀a'.startswith('😀') gives True: character beyond the Basic Multilingual Plane")]
+        public void Test_startswith_character_beyond_the_Basic_Multilingual_Plane()
+        {
+            Assert.IsTrue(
+                "😀a".StartsWith(
+                    "😀",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_character_beyond_the_Basic_Multilingual_Plane
+
+        [Test, Description("'😁x'.startswith('😀') gives False: character sharing the high surrogate")]
+        public void Test_startswith_character_sharing_the_high_surrogate()
+        {
+            Assert.IsFalse(
+                "😁x".StartsWith(
+                    "😀",
+                    System.StringComparison.Ordinal));
+        }  // void Test_startswith_character_sharing_the_high_surrogate
+
+        [Test, Description("'abc'.endswith('bc') gives True: suffix")]
+        public void Test_endswith_suffix()
+        {
+            Assert.IsTrue(
+                "abc".EndsWith(
+                    "bc",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_suffix
+
+        [Test, Description("'abc'.endswith('ab') gives False: not a suffix")]
+        public void Test_endswith_not_a_suffix()
+        {
+            Assert.IsFalse(
+                "abc".EndsWith(
+                    "ab",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_not_a_suffix
+
+        [Test, Description("'abc'.endswith('') gives True: empty suffix")]
+        public void Test_endswith_empty_suffix()
+        {
+            Assert.IsTrue(
+                "abc".EndsWith(
+                    "",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_empty_suffix
+
+        [Test, Description("'abc'.endswith('abc') gives True: whole text")]
+        public void Test_endswith_whole_text()
+        {
+            Assert.IsTrue(
+                "abc".EndsWith(
+                    "abc",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_whole_text
+
+        [Test, Description("'bc'.endswith('abc') gives False: suffix longer than text")]
+        public void Test_endswith_suffix_longer_than_text()
+        {
+            Assert.IsFalse(
+                "bc".EndsWith(
+                    "abc",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_suffix_longer_than_text
+
+        [Test, Description("''.endswith('') gives True: empty suffix of empty text")]
+        public void Test_endswith_empty_suffix_of_empty_text()
+        {
+            Assert.IsTrue(
+                "".EndsWith(
+                    "",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_empty_suffix_of_empty_text
+
+        [Test, Description("''.endswith('a') gives False: non-empty suffix of empty text")]
+        public void Test_endswith_non_empty_suffix_of_empty_text()
+        {
+            Assert.IsFalse(
+                "".EndsWith(
+                    "a",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_non_empty_suffix_of_empty_text
+
+        [Test, Description("'aé'.endswith('é') gives True: character of two UTF-8 bytes")]
+        public void Test_endswith_character_of_two_UTF_8_bytes()
+        {
+            Assert.IsTrue(
+                "aé".EndsWith(
+                    "é",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_character_of_two_UTF_8_bytes
+
+        [Test, Description("'a😀'.endswith('😀') gives True: character beyond the Basic Multilingual Plane")]
+        public void Test_endswith_character_beyond_the_Basic_Multilingual_Plane()
+        {
+            Assert.IsTrue(
+                "a😀".EndsWith(
+                    "😀",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_character_beyond_the_Basic_Multilingual_Plane
+
+        [Test, Description("'x😁'.endswith('😀') gives False: character sharing the high surrogate")]
+        public void Test_endswith_character_sharing_the_high_surrogate()
+        {
+            Assert.IsFalse(
+                "x😁".EndsWith(
+                    "😀",
+                    System.StringComparison.Ordinal));
+        }  // void Test_endswith_character_sharing_the_high_surrogate
     }  // class TestStringHelpers
 }  // namespace dummy.Tests
 

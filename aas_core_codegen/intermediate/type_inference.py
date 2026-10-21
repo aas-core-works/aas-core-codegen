@@ -284,6 +284,8 @@ class BuiltinMethodKind(enum.Enum):
     STR_FIND = "str.find"
     STR_LSTRIP = "str.lstrip"
     STR_RSTRIP = "str.rstrip"
+    STR_STARTSWITH = "str.startswith"
+    STR_ENDSWITH = "str.endswith"
     SET_ADD = "set.add"
     SET_INTERSECTION = "set.intersection"
     SET_DIFFERENCE = "set.difference"
@@ -439,11 +441,42 @@ STR_RSTRIP = BuiltinMethod(
 )
 
 
+#: Represent ``str.startswith(prefix)``.
+#:
+#: The transpiled code follows the Python implementation of ``str.startswith``.
+#: The targets compare the strings ordinally, which gives the same result as
+#: comparing the characters (code points) unless ``prefix`` ends with a lone
+#: surrogate. We support neither a tuple of prefixes nor the ``start`` and
+#: the ``end``, as we have no use case for them at the moment.
+STR_STARTSWITH = BuiltinMethod(
+    kind=BuiltinMethodKind.STR_STARTSWITH,
+    name=Identifier("startswith"),
+    returns=PrimitiveTypeAnnotation(PrimitiveType.BOOL),
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
+#: Represent ``str.endswith(suffix)``.
+#:
+#: The transpiled code follows the Python implementation of ``str.endswith``,
+#: with the same restrictions as ``startswith``.
+STR_ENDSWITH = BuiltinMethod(
+    kind=BuiltinMethodKind.STR_ENDSWITH,
+    name=Identifier("endswith"),
+    returns=PrimitiveTypeAnnotation(PrimitiveType.BOOL),
+    min_arg_count=1,
+    max_arg_count=1,
+)
+
+
 #: Map the names of the built-in methods on strings to their definitions
 STR_METHODS_BY_NAME: Mapping[Identifier, BuiltinMethod] = {
     STR_FIND.name: STR_FIND,
     STR_LSTRIP.name: STR_LSTRIP,
     STR_RSTRIP.name: STR_RSTRIP,
+    STR_STARTSWITH.name: STR_STARTSWITH,
+    STR_ENDSWITH.name: STR_ENDSWITH,
 }
 
 
@@ -4245,6 +4278,28 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                         node.args[0].original_node,
                         f"Expected the stripped characters of ``{method.name}`` "
                         f"to be a string, but got: {arg_types[0]}",
+                    )
+                )
+                return None
+
+        elif method.kind is BuiltinMethodKind.STR_STARTSWITH:
+            if try_primitive_type(arg_types[0]) is not PrimitiveType.STR:
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the prefix of ``startswith`` to be a string, "
+                        f"but got: {arg_types[0]}",
+                    )
+                )
+                return None
+
+        elif method.kind is BuiltinMethodKind.STR_ENDSWITH:
+            if try_primitive_type(arg_types[0]) is not PrimitiveType.STR:
+                self.errors.append(
+                    Error(
+                        node.args[0].original_node,
+                        f"Expected the suffix of ``endswith`` to be a string, "
+                        f"but got: {arg_types[0]}",
                     )
                 )
                 return None

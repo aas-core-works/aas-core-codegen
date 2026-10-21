@@ -206,6 +206,54 @@ public void {method_name}()
                 )
             )
 
+    if intermediate_uses.startswith_call(type_inference):
+        for startswith_case in string_helper_cases.STARTSWITH_CASES:
+            description = csharp_common.string_literal(
+                f"{startswith_case.python_expression()} gives "
+                f"{startswith_case.expected!r}: {startswith_case.description}"
+            )
+
+            method_name = _method_name("startswith", startswith_case.description)
+            assertion = "IsTrue" if startswith_case.expected else "IsFalse"
+
+            blocks.append(
+                Stripped(
+                    f"""\
+[Test, Description({description})]
+public void {method_name}()
+{{
+{I}Assert.{assertion}(
+{II}{csharp_common.string_literal(startswith_case.text)}.StartsWith(
+{III}{csharp_common.string_literal(startswith_case.prefix)},
+{III}System.StringComparison.Ordinal));
+}}  // void {method_name}"""
+                )
+            )
+
+    if intermediate_uses.endswith_call(type_inference):
+        for endswith_case in string_helper_cases.ENDSWITH_CASES:
+            description = csharp_common.string_literal(
+                f"{endswith_case.python_expression()} gives "
+                f"{endswith_case.expected!r}: {endswith_case.description}"
+            )
+
+            method_name = _method_name("endswith", endswith_case.description)
+            assertion = "IsTrue" if endswith_case.expected else "IsFalse"
+
+            blocks.append(
+                Stripped(
+                    f"""\
+[Test, Description({description})]
+public void {method_name}()
+{{
+{I}Assert.{assertion}(
+{II}{csharp_common.string_literal(endswith_case.text)}.EndsWith(
+{III}{csharp_common.string_literal(endswith_case.suffix)},
+{III}System.StringComparison.Ordinal));
+}}  // void {method_name}"""
+                )
+            )
+
     blocks_joined = "\n\n".join(blocks)
 
     return f"""\

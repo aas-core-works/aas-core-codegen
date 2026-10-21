@@ -199,6 +199,50 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Amount must not start with a plus',
+          body=textwrap.dedent("""\
+            Not(
+              operand=MethodCall(
+                member=Member(
+                  instance=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='amount',
+                    original_node=...),
+                  name='startswith',
+                  original_node=...),
+                args=[
+                  Constant(
+                    value='+',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Name must not end with an exclamation mark',
+          body=textwrap.dedent("""\
+            Not(
+              operand=MethodCall(
+                member=Member(
+                  instance=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='name',
+                    original_node=...),
+                  name='endswith',
+                  original_node=...),
+                args=[
+                  Constant(
+                    value='!',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
           description='Other word must end neither with \U00010200 nor with 😁',
           body=textwrap.dedent("""\
             Comparison(
@@ -820,7 +864,7 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=DescriptionOfMetaModel(
-      summary='<paragraph>Test the operations on strings: <literal>len</literal>, slicing, <literal>find</literal>, ordering and stripping.</paragraph>',
+      summary='<paragraph>Test the operations on strings such as <literal>len</literal>, slicing, ordering and stripping.</paragraph>',
       remarks=[
         textwrap.dedent("""\
           <paragraph>The meta-model follows the Python semantics, where the strings consist of

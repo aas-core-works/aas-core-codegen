@@ -232,6 +232,16 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
+        if not (not that.amount.startswith('+')):
+            yield Error(
+                'Amount must not start with a plus'
+            )
+
+        if not (not that.name.endswith('!')):
+            yield Error(
+                'Name must not end with an exclamation mark'
+            )
+
         if not (that.other_word.rstrip('𐈀😁') == that.other_word):
             yield Error(
                 'Other word must end neither with 𐈀 nor with 😁'

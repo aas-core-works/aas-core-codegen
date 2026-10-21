@@ -14322,6 +14322,26 @@ std::wstring RStrip(
   return text.substr(0, end_offset);
 }
 
+bool StartsWith(
+  const std::wstring& text,
+  const std::wstring& prefix
+) {
+  return (
+    text.size() >= prefix.size()
+    && text.compare(0, prefix.size(), prefix) == 0
+  );
+}
+
+bool EndsWith(
+  const std::wstring& text,
+  const std::wstring& suffix
+) {
+  return (
+    text.size() >= suffix.size()
+    && text.compare(text.size() - suffix.size(), suffix.size(), suffix) == 0
+  );
+}
+
 namespace {
 
 /**

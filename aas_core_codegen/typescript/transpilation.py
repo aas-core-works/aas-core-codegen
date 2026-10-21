@@ -901,6 +901,20 @@ OurCommon.at(
                     None,
                 )
 
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_STARTSWITH:
+                # NOTE (mristin):
+                # The native ``startsWith`` compares the UTF-16 code units, which
+                # gives the same result as the Python ``str.startswith`` unless
+                # the prefix ends with a lone surrogate.
+                return Stripped(f"{instance}.startsWith({args[0]})"), None
+
+            elif kind is intermediate_type_inference.BuiltinMethodKind.STR_ENDSWITH:
+                # NOTE (mristin):
+                # The native ``endsWith`` compares the UTF-16 code units, which
+                # gives the same result as the Python ``str.endswith`` unless
+                # the suffix starts with a lone surrogate.
+                return Stripped(f"{instance}.endsWith({args[0]})"), None
+
             elif kind is intermediate_type_inference.BuiltinMethodKind.SET_ADD:
                 return Stripped(f"{instance}.add({args[0]})"), None
 

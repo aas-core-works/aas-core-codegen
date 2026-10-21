@@ -221,6 +221,22 @@ namespace dummy
             )
             {
                 if (!(
+                    !that.Amount.StartsWith("+", System.StringComparison.Ordinal)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Amount must not start with a plus");
+                }
+
+                if (!(
+                    !that.Name.EndsWith("!", System.StringComparison.Ordinal)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Name must not end with an exclamation mark");
+                }
+
+                if (!(
                     Common.StringHelpers.RStrip(that.OtherWord, "𐈀😁") == that.OtherWord))
                 {
                     yield return new Reporting.Error(

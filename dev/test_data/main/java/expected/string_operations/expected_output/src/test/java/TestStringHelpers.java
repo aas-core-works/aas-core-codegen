@@ -6,6 +6,8 @@
 package dummy.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dummy.common.StringHelpers;
 import org.junit.jupiter.api.DisplayName;
@@ -708,6 +710,166 @@ public class TestStringHelpers {
       StringHelpers.rstrip(
         "😀a",
         "a"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.startswith(\'ab\') gives True: prefix")
+  public void testStartswithPrefix() {
+    assertTrue(
+      "abc".startsWith(
+        "ab"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.startswith(\'bc\') gives False: not a prefix")
+  public void testStartswithNotAPrefix() {
+    assertFalse(
+      "abc".startsWith(
+        "bc"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.startswith(\'\') gives True: empty prefix")
+  public void testStartswithEmptyPrefix() {
+    assertTrue(
+      "abc".startsWith(
+        ""));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.startswith(\'abc\') gives True: whole text")
+  public void testStartswithWholeText() {
+    assertTrue(
+      "abc".startsWith(
+        "abc"));
+  }
+
+  @Test
+  @DisplayName("\'ab\'.startswith(\'abc\') gives False: prefix longer than text")
+  public void testStartswithPrefixLongerThanText() {
+    assertFalse(
+      "ab".startsWith(
+        "abc"));
+  }
+
+  @Test
+  @DisplayName("\'\'.startswith(\'\') gives True: empty prefix of empty text")
+  public void testStartswithEmptyPrefixOfEmptyText() {
+    assertTrue(
+      "".startsWith(
+        ""));
+  }
+
+  @Test
+  @DisplayName("\'\'.startswith(\'a\') gives False: non-empty prefix of empty text")
+  public void testStartswithNonEmptyPrefixOfEmptyText() {
+    assertFalse(
+      "".startsWith(
+        "a"));
+  }
+
+  @Test
+  @DisplayName("\'éa\'.startswith(\'é\') gives True: character of two UTF-8 bytes")
+  public void testStartswithCharacterOfTwoUtf8Bytes() {
+    assertTrue(
+      "éa".startsWith(
+        "é"));
+  }
+
+  @Test
+  @DisplayName("\'😀a\'.startswith(\'😀\') gives True: character beyond the Basic Multilingual Plane")
+  public void testStartswithCharacterBeyondTheBasicMultilingualPlane() {
+    assertTrue(
+      "😀a".startsWith(
+        "😀"));
+  }
+
+  @Test
+  @DisplayName("\'😁x\'.startswith(\'😀\') gives False: character sharing the high surrogate")
+  public void testStartswithCharacterSharingTheHighSurrogate() {
+    assertFalse(
+      "😁x".startsWith(
+        "😀"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.endswith(\'bc\') gives True: suffix")
+  public void testEndswithSuffix() {
+    assertTrue(
+      "abc".endsWith(
+        "bc"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.endswith(\'ab\') gives False: not a suffix")
+  public void testEndswithNotASuffix() {
+    assertFalse(
+      "abc".endsWith(
+        "ab"));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.endswith(\'\') gives True: empty suffix")
+  public void testEndswithEmptySuffix() {
+    assertTrue(
+      "abc".endsWith(
+        ""));
+  }
+
+  @Test
+  @DisplayName("\'abc\'.endswith(\'abc\') gives True: whole text")
+  public void testEndswithWholeText() {
+    assertTrue(
+      "abc".endsWith(
+        "abc"));
+  }
+
+  @Test
+  @DisplayName("\'bc\'.endswith(\'abc\') gives False: suffix longer than text")
+  public void testEndswithSuffixLongerThanText() {
+    assertFalse(
+      "bc".endsWith(
+        "abc"));
+  }
+
+  @Test
+  @DisplayName("\'\'.endswith(\'\') gives True: empty suffix of empty text")
+  public void testEndswithEmptySuffixOfEmptyText() {
+    assertTrue(
+      "".endsWith(
+        ""));
+  }
+
+  @Test
+  @DisplayName("\'\'.endswith(\'a\') gives False: non-empty suffix of empty text")
+  public void testEndswithNonEmptySuffixOfEmptyText() {
+    assertFalse(
+      "".endsWith(
+        "a"));
+  }
+
+  @Test
+  @DisplayName("\'aé\'.endswith(\'é\') gives True: character of two UTF-8 bytes")
+  public void testEndswithCharacterOfTwoUtf8Bytes() {
+    assertTrue(
+      "aé".endsWith(
+        "é"));
+  }
+
+  @Test
+  @DisplayName("\'a😀\'.endswith(\'😀\') gives True: character beyond the Basic Multilingual Plane")
+  public void testEndswithCharacterBeyondTheBasicMultilingualPlane() {
+    assertTrue(
+      "a😀".endsWith(
+        "😀"));
+  }
+
+  @Test
+  @DisplayName("\'x😁\'.endswith(\'😀\') gives False: character sharing the high surrogate")
+  public void testEndswithCharacterSharingTheHighSurrogate() {
+    assertFalse(
+      "x😁".endsWith(
+        "😀"));
   }
 } // class TestStringHelpers
 
