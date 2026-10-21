@@ -6,7 +6,10 @@ from typing import TextIO, Sequence, Tuple, Callable, Optional, List
 from aas_core_codegen import run, intermediate, specific_implementations, golang
 from aas_core_codegen.common import Stripped, Error
 from aas_core_codegen.golang import lib as golang_lib, tests as golang_tests
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
@@ -57,6 +60,22 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             stderr=stderr,
         )
         return 1
+
+    type_inference, inference_errors = intermediate_type_inference.infer(
+        symbol_table=verified_ir_table
+    )
+    if inference_errors is not None:
+        run.write_error_report(
+            message=f"Failed to infer the types in the meta-model {context.model_path}",
+            errors=[
+                context.lineno_columner.error_message(error)
+                for error in inference_errors
+            ],
+            stderr=stderr,
+        )
+        return 1
+
+    assert type_inference is not None
 
     # region Repo URL
 
@@ -114,6 +133,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             base_rel_path / "types/types.go",
             lambda: golang_lib.generate_types(
                 symbol_table=verified_ir_table,
+                type_inference=type_inference,
                 spec_impls=context.spec_impls,
                 repo_url=repo_url,
             ),
@@ -122,6 +142,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
             base_rel_path / "verification/verification.go",
             lambda: golang_lib.generate_verification(
                 symbol_table=verified_ir_table,
+                type_inference=type_inference,
                 spec_impls=context.spec_impls,
                 repo_url=repo_url,
             ),

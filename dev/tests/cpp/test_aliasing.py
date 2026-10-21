@@ -52,9 +52,13 @@ class Test_unfaithful_aliasing_fails(unittest.TestCase):
         assert error is None, tests_common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        base_environment = intermediate_type_inference.populate_base_environment(
+        type_inference, inference_errors = intermediate_type_inference.infer(
             symbol_table=symbol_table
         )
+        assert inference_errors is None, tests_common.most_underlying_messages(
+            inference_errors
+        )
+        assert type_inference is not None
 
         verification_func = symbol_table.verification_functions_by_name[
             Identifier("some_func")
@@ -67,7 +71,7 @@ class Test_unfaithful_aliasing_fails(unittest.TestCase):
             ._generate_implementation_of_transpilable_verification(
                 verification=verification_func,
                 symbol_table=symbol_table,
-                base_environment=base_environment,
+                type_inference=type_inference,
             )
         )
         # fmt: on

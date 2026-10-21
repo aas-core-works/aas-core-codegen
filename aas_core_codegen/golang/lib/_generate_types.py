@@ -1428,7 +1428,7 @@ class _MethodTranspiler(golang_transpilation.Transpiler):
 def _transpile_method(
     method: intermediate.UnderstoodMethod,
     cls: intermediate.ConcreteClass,
-    inference: intermediate_type_inference.InferenceOfFunction,
+    type_inference: intermediate_type_inference.TypeInference,
     receiver: Identifier,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile the ``method`` as a method of the struct of ``cls``."""
@@ -1438,6 +1438,8 @@ def _transpile_method(
     # the verification package, on the explicit request of the user. We note that
     # in the documentation of the mutating methods, see
     # :py:func:`_generate_comment_for_method`.
+
+    inference = type_inference.by_method[method]
 
     pointer_inferrer = golang_pointering.Inferrer(
         environment=inference.environment_with_args,
@@ -1528,14 +1530,12 @@ func ({receiver} *{struct_name}) {method_name}(
 def _generate_struct_methods(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
-    inference_by_method: Mapping[
-        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
-    ],
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """
     Generate the Golang methods for the struct corresponding to ``cls``.
 
-    ``inference_by_method`` holds the type inference of all the understood methods.
+    ``type_inference`` holds the type inference of all the understood methods.
     """
     methods = []  # type: List[Stripped]
 
@@ -1632,7 +1632,7 @@ func ({receiver} *{struct_name}) {model_type_getter}(
             method_code, method_error = _transpile_method(
                 method=method,
                 cls=cls,
-                inference=inference_by_method[method],
+                type_inference=type_inference,
                 receiver=receiver,
             )
             if method_error is not None:
@@ -1926,19 +1926,11 @@ _IMPORT_PLACEHOLDER = Stripped("")
 # fmt: on
 def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     spec_impls: specific_implementations.SpecificImplementations,
     repo_url: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code of the data structures representing the meta-model."""
-    (
-        inference_by_method,
-        inference_errors,
-    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
-    if inference_errors is not None:
-        return None, inference_errors
-
-    assert inference_by_method is not None
-
     errors = []  # type: List[Error]
 
     common_url_literal = golang_common.string_literal(f"{repo_url}/common")
@@ -2068,7 +2060,7 @@ type IClass interface {{
                 methods, error = _generate_struct_methods(
                     cls=our_type,
                     spec_impls=spec_impls,
-                    inference_by_method=inference_by_method,
+                    type_inference=type_inference,
                 )
                 if error is not None:
                     errors.append(error)

@@ -1394,7 +1394,7 @@ class _MethodTranspiler(typescript_transpilation.Transpiler):
 def _transpile_method(
     method: intermediate.UnderstoodMethod,
     cls: intermediate.ConcreteClass,
-    inference: intermediate_type_inference.InferenceOfFunction,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile the ``method`` as a member of the concrete class ``cls``."""
     # NOTE (mristin):
@@ -1404,7 +1404,9 @@ def _transpile_method(
     # in the documentation of the mutating methods, see
     # :py:func:`_generate_comment_for_method`.
 
-    transpiler = _MethodTranspiler(inference=inference, method=method)
+    transpiler = _MethodTranspiler(
+        inference=type_inference.by_method[method], method=method
+    )
 
     body = []  # type: List[Stripped]
     for node in method.body:
@@ -1485,9 +1487,7 @@ def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
     concrete_cls_index: int,
-    inference_by_method: Mapping[
-        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
-    ],
+    type_inference: intermediate_type_inference.TypeInference,
     descendable: bool,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
@@ -1496,7 +1496,7 @@ def _generate_class(
     ``concrete_cls_index`` refers to the number of the concrete class in
     the ``concrete_classes`` of the symbol table.
 
-    ``inference_by_method`` holds the type inference of all the understood methods.
+    ``type_inference`` holds the type inference of all the understood methods.
 
     ``descendable`` indicates that the descent function has been generated for
     ``cls``, see :py:func:`_generate_descend_function`.
@@ -1615,7 +1615,7 @@ def _generate_class(
             blocks.append(implementation)
         elif isinstance(method, intermediate.UnderstoodMethod):
             method_code, method_error = _transpile_method(
-                method=method, cls=cls, inference=inference_by_method[method]
+                method=method, cls=cls, type_inference=type_inference
             )
             if method_error is not None:
                 errors.append(method_error)
@@ -2555,6 +2555,7 @@ export type JsonObject = { [key: string]: JsonValue };"""
 # fmt: on
 def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate code of the data structures representing the meta-model."""
@@ -2655,15 +2656,6 @@ export abstract class Class {{
         concrete_cls: i for i, concrete_cls in enumerate(symbol_table.concrete_classes)
     }
 
-    (
-        inference_by_method,
-        inference_errors,
-    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
-    if inference_errors is not None:
-        return None, inference_errors
-
-    assert inference_by_method is not None
-
     for our_type in symbol_table.our_types:
         if isinstance(our_type, intermediate.Enumeration):
             block, error = _generate_enum(enum=our_type)
@@ -2699,7 +2691,7 @@ export abstract class Class {{
                     cls=our_type,
                     spec_impls=spec_impls,
                     concrete_cls_index=concrete_class_to_index[our_type],
-                    inference_by_method=inference_by_method,
+                    type_inference=type_inference,
                     descendable=descend_function is not None,
                 )
                 if error is not None:

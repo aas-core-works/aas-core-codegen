@@ -1127,7 +1127,7 @@ class _MethodTranspiler(csharp_transpilation.Transpiler):
 def _transpile_method(
     method: intermediate.UnderstoodMethod,
     cls: intermediate.ConcreteClass,
-    inference: intermediate_type_inference.InferenceOfFunction,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile the ``method`` as a member of the concrete class ``cls``."""
     # NOTE (mristin):
@@ -1137,7 +1137,9 @@ def _transpile_method(
     # the documentation of the mutating methods, see
     # :py:func:`_generate_comment_for_method`.
 
-    transpiler = _MethodTranspiler(inference=inference, method=method)
+    transpiler = _MethodTranspiler(
+        inference=type_inference.by_method[method], method=method
+    )
 
     body = []  # type: List[Stripped]
     for node in method.body:
@@ -1217,14 +1219,12 @@ def _transpile_method(
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
-    inference_by_method: Mapping[
-        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
-    ],
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate code for the given concrete class ``cls``.
 
-    ``inference_by_method`` holds the type inference of all the understood methods.
+    ``type_inference`` holds the type inference of all the understood methods.
     """
     # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
@@ -1321,7 +1321,7 @@ public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
             blocks.append(implementation)
         elif isinstance(method, intermediate.UnderstoodMethod):
             method_code, method_error = _transpile_method(
-                method=method, cls=cls, inference=inference_by_method[method]
+                method=method, cls=cls, type_inference=type_inference
             )
             if method_error is not None:
                 errors.append(method_error)
@@ -1670,6 +1670,7 @@ public class {name} : IUnion<{name}>
 # fmt: on
 def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     namespace: csharp_common.NamespaceIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
@@ -1678,15 +1679,6 @@ def generate(
 
     The ``namespace`` defines the base C# namespace of the generated code.
     """
-    (
-        inference_by_method,
-        inference_errors,
-    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
-    if inference_errors is not None:
-        return None, inference_errors
-
-    assert inference_by_method is not None
-
     code_blocks = [
         Stripped(
             f"""\
@@ -1825,7 +1817,7 @@ public interface IUnion<T> : IUnion where T : IUnion<T>
                 code, error = _generate_class(
                     cls=our_type,
                     spec_impls=spec_impls,
-                    inference_by_method=inference_by_method,
+                    type_inference=type_inference,
                 )
                 if error is not None:
                     errors.append(
@@ -1909,7 +1901,9 @@ internal static class Descent
     # NOTE (mristin):
     # The transpiled methods might use LINQ, *e.g.*, for ``any`` and ``all``.
     using_linq = (
-        "\nusing System.Linq;  // can't alias" if len(inference_by_method) > 0 else ""
+        "\nusing System.Linq;  // can't alias"
+        if len(type_inference.by_method) > 0
+        else ""
     )
 
     using_directives.append(

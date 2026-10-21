@@ -1367,7 +1367,7 @@ class _MethodTranspiler(java_transpilation.Transpiler):
 def _transpile_method(
     method: intermediate.UnderstoodMethod,
     cls: intermediate.ConcreteClass,
-    inference: intermediate_type_inference.InferenceOfFunction,
+    type_inference: intermediate_type_inference.TypeInference,
     package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
@@ -1375,6 +1375,8 @@ def _transpile_method(
 
     The ``package`` defines the root Java package.
     """
+    inference = type_inference.by_method[method]
+
     # NOTE (mristin):
     # We deliberately do not check the invariants of the instance after a method
     # call, as that would be too inefficient. The invariants are verified only in
@@ -1485,16 +1487,14 @@ def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
     package: java_common.PackageIdentifier,
-    inference_by_method: Mapping[
-        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
-    ],
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the class ``cls``.
 
     The ``package`` defines the root Java package.
 
-    ``inference_by_method`` holds the type inference of all the understood methods.
+    ``type_inference`` holds the type inference of all the understood methods.
     """
     # Code blocks to be later joined by double newlines and indented once
 
@@ -1696,7 +1696,7 @@ public Iterable<{items_type}> {method_name}() {{
             method_code, method_error = _transpile_method(
                 method=method,
                 cls=cls,
-                inference=inference_by_method[method],
+                type_inference=type_inference,
                 package=package,
             )
             if method_error is not None:
@@ -2349,16 +2349,14 @@ def _generate_structure(
     our_type: intermediate.OurType,
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
-    inference_by_method: Mapping[
-        intermediate.UnderstoodMethod, intermediate_type_inference.InferenceOfFunction
-    ],
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[Error]]:
     """
     Generate a single structure.
 
     The ``package`` defines the root Java package.
 
-    ``inference_by_method`` holds the type inference of all the understood methods.
+    ``type_inference`` holds the type inference of all the understood methods.
     """
     assert isinstance(
         our_type,
@@ -2427,7 +2425,7 @@ def _generate_structure(
                 cls=our_type,
                 spec_impls=spec_impls,
                 package=package,
-                inference_by_method=inference_by_method,
+                type_inference=type_inference,
             )
             if error is not None:
                 return None, Error(
@@ -2497,22 +2495,13 @@ def _generate_structure(
 # fmt: on
 def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
     Generate code of the data structures representing the meta-model.
     """
-
-    (
-        inference_by_method,
-        inference_errors,
-    ) = intermediate_type_inference.infer_for_methods(symbol_table=symbol_table)
-    if inference_errors is not None:
-        return None, inference_errors
-
-    assert inference_by_method is not None
-
     files = []  # type: List[java_common.JavaFile]
     errors = []  # type: List[Error]
 
@@ -2538,7 +2527,7 @@ def generate(
             our_type=our_type,
             package=package,
             spec_impls=spec_impls,
-            inference_by_method=inference_by_method,
+            type_inference=type_inference,
         )
 
         if new_files is not None:

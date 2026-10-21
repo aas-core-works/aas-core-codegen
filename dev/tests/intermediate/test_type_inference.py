@@ -3184,9 +3184,7 @@ __xml_namespace__ = "https://dummy.com"
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        _, errors = intermediate_type_inference.infer_for_methods(
-            symbol_table=symbol_table
-        )
+        _, errors = intermediate_type_inference.infer(symbol_table=symbol_table)
         assert errors is None, tests.common.most_underlying_messages(errors)
 
 
@@ -6092,16 +6090,14 @@ __xml_namespace__ = "https://dummy.com"
 
     @staticmethod
     def infer(source: str) -> List[str]:
-        """Infer the types of all the methods, and return the error messages."""
+        """Infer the types in the meta-model, and return the error messages."""
         symbol_table, error = tests.common.translate_source_to_intermediate(
             source=source
         )
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        _, errors = intermediate_type_inference.infer_for_methods(
-            symbol_table=symbol_table
-        )
+        _, errors = intermediate_type_inference.infer(symbol_table=symbol_table)
 
         if errors is None:
             return []
