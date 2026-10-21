@@ -952,7 +952,6 @@ def _read_something_as_sequence(
     )
 
     the_text: Optional[str] = values.get('text')
-    the_name: Optional[str] = values.get('name')
     the_flag: Optional[bool] = values.get('flag')
     the_other_flag: Optional[bool] = values.get('otherFlag')
     the_count: Optional[int] = values.get('count')
@@ -961,11 +960,6 @@ def _read_something_as_sequence(
     if the_text is None:
         raise DeserializationException(
             "The required property 'text' is missing"
-        )
-
-    if the_name is None:
-        raise DeserializationException(
-            "The required property 'name' is missing"
         )
 
     if the_flag is None:
@@ -990,7 +984,6 @@ def _read_something_as_sequence(
 
     return our_types.Something(
         the_text,
-        the_name,
         the_flag,
         the_other_flag,
         the_count,
@@ -1068,7 +1061,6 @@ _READERS_FOR_SOMETHING: Mapping[
     _ContentReader[Any]
 ] = {
     'text': read_str_from_element_text,
-    'name': read_str_from_element_text,
     'flag': _read_bool_from_element_text,
     'otherFlag': _read_bool_from_element_text,
     'count': _read_int_from_element_text,
@@ -1315,7 +1307,6 @@ def _write_something_as_element(
     try:
         serializer.writer.write_start_element(name)
         _write_str_as_element('text', 'text', that.text, serializer)
-        _write_str_as_element('name', 'name', that.name, serializer)
         _write_bool_as_element('flag', 'flag', that.flag, serializer)
         _write_bool_as_element('otherFlag', 'other_flag', that.other_flag, serializer)
         _write_int_as_element('count', 'count', that.count, serializer)

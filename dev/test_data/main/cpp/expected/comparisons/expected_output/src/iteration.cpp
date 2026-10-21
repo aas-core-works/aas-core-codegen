@@ -24,8 +24,6 @@ std::wstring PropertyToWstring(
       return L"count";
     case Property::kFlag:
       return L"flag";
-    case Property::kName:
-      return L"name";
     case Property::kOtherFlag:
       return L"other_flag";
     case Property::kRatio:

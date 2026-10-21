@@ -86,6 +86,83 @@ class TestRoundTrips(unittest.TestCase):
             # endregion
 
 
+class TestLexicalForms(unittest.TestCase):
+    """Test the lexical forms which a recorded example can not hold."""
+
+    def _read_with(self, xml_name: str, text: str) -> our_types.Something:
+        """Read a recorded example with the content of ``xml_name`` put to ``text``."""
+        paths = sorted(
+            (
+                tests.common.TEST_DATA_DIR
+                / "Xml"
+                / "Expected"
+                / 'something'
+            ).glob("**/*.xml")
+        )
+        self.assertGreater(
+            len(paths),
+            0,
+            f"Expected at least one recorded example of something, but got none",
+        )
+
+        original = paths[0].read_text(encoding="utf-8")
+
+        start = original.index(f"<{xml_name}>") + len(xml_name) + 2
+        end = original.index(f"</{xml_name}>")
+
+        return our_xmlization.something_from_str(
+            original[:start] + text + original[end:]
+        )
+
+    def test_ratio_read_from_1e400(self) -> None:
+        instance = self._read_with('ratio', '1e400')
+        self.assertEqual(math.inf, instance.ratio)
+
+    def test_ratio_read_from_minus_1e400(self) -> None:
+        instance = self._read_with('ratio', '-1e400')
+        self.assertEqual(-math.inf, instance.ratio)
+
+    def test_ratio_read_from_1eminus_400(self) -> None:
+        instance = self._read_with('ratio', '1e-400')
+        self.assertEqual(0.0, instance.ratio)
+
+    def test_ratio_read_from_inf(self) -> None:
+        instance = self._read_with('ratio', 'INF')
+        self.assertEqual(math.inf, instance.ratio)
+
+    def test_ratio_read_from_plus_inf(self) -> None:
+        instance = self._read_with('ratio', '+INF')
+        self.assertEqual(math.inf, instance.ratio)
+
+    def test_ratio_read_from_minus_inf(self) -> None:
+        instance = self._read_with('ratio', '-INF')
+        self.assertEqual(-math.inf, instance.ratio)
+
+    def test_flag_read_from_1(self) -> None:
+        instance = self._read_with('flag', '1')
+        self.assertIs(True, instance.flag)
+
+    def test_flag_read_from_0(self) -> None:
+        instance = self._read_with('flag', '0')
+        self.assertIs(False, instance.flag)
+
+    def test_flag_read_from_true(self) -> None:
+        instance = self._read_with('flag', 'true')
+        self.assertIs(True, instance.flag)
+
+    def test_flag_read_from_false(self) -> None:
+        instance = self._read_with('flag', 'false')
+        self.assertIs(False, instance.flag)
+
+    def test_count_read_from_many_leading_zeros(self) -> None:
+        instance = self._read_with('count', "-" + "0" * 5000 + "42")
+        self.assertEqual(-42, instance.count)
+
+    def test_count_read_from_many_digits_fails(self) -> None:
+        with self.assertRaises(our_xmlization.DeserializationException):
+            self._read_with('count', "1" + "0" * 5000)
+
+
 class TestDuplicateProperty(unittest.TestCase):
     """Test that a property given more than once is refused."""
 

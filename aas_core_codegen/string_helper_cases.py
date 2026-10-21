@@ -1,14 +1,15 @@
 """
-Specify ``len``, the slicing, ``str.find`` and the comparison of strings by example.
+Specify the operations on strings by example.
 
 The transpiled code follows the Python implementation of ``len``, the slicing,
-``str.find`` and the comparison of strings, since Python is the language of
-the meta-model specifications. Hence, the lengths and the positions count
-the characters (code points), and not the UTF-16 code units or the UTF-8 bytes of
-the target, a negative position counts from the end of the string, the positions
-out of range are clamped to the string, and ``str.find`` gives -1 for a start
-beyond the end of the string. The strings are ordered by their characters (code
-points), and not by their UTF-16 code units.
+``str.find``, the comparison of strings and ``str.lstrip``, since Python is
+the language of the meta-model specifications. Hence, the lengths and
+the positions count the characters (code points), and not the UTF-16 code units or
+the UTF-8 bytes of the target, a negative position counts from the end of
+the string, the positions out of range are clamped to the string, and ``str.find``
+gives -1 for a start beyond the end of the string. The strings are ordered by
+their characters (code points), and not by their UTF-16 code units. Likewise,
+``str.lstrip`` strips the characters, and never a half of a surrogate pair.
 
 The targets generate unit tests from these cases so that the users can inspect
 the behavior of the generated code. We compute the expected results with Python
@@ -143,6 +144,33 @@ class CompareCase:
         return f"compare({self.left!r}, {self.right!r})"
 
 
+class LStripCase:
+    """Represent a case of ``text.lstrip(chars)``."""
+
+    #: Short description of what the case demonstrates
+    description: Final[str]
+
+    #: Text to be stripped
+    text: Final[str]
+
+    #: Characters to be stripped from the start of the text
+    chars: Final[str]
+
+    #: Expected stripped text, as given by Python
+    expected: Final[str]
+
+    def __init__(self, description: str, text: str, chars: str) -> None:
+        """Initialize with the given values, and compute the expected text."""
+        self.description = description
+        self.text = text
+        self.chars = chars
+        self.expected = text.lstrip(chars)
+
+    def python_expression(self) -> str:
+        """Render the case in Python notation, *e.g.*, for the names of the tests."""
+        return f"{self.text!r}.lstrip({self.chars!r})"
+
+
 # NOTE (mristin):
 # We include the characters beyond ASCII since the targets represent the strings
 # differently. The character "é" takes one UTF-16 code unit, but two UTF-8 bytes,
@@ -238,4 +266,28 @@ COMPARE_CASES: Sequence[CompareCase] = (
         "😀",
         "\U0001d11e",
     ),
+)
+
+# NOTE (mristin):
+# The emojis lie beyond the Basic Multilingual Plane, so they are encoded as two
+# UTF-16 code units. The emojis "😀" (U+1F600) and "😁" (U+1F601) share the high
+# surrogate (U+D83D), while "😀" and "𐈀" (U+10200) share the low surrogate
+# (U+DE00). An implementation which strips the UTF-16 code units instead of
+# the characters would strip a half of "😁" when told to strip "😀", or strip "😀"
+# when told to strip "𐈀" and "😁".
+
+LSTRIP_CASES: Final[Sequence[LStripCase]] = (
+    LStripCase("leading zeros", "000123", "0"),
+    LStripCase("any of the characters", "+-+12", "+-"),
+    LStripCase("only the leading characters", "0102", "0"),
+    LStripCase("empty text", "", "0"),
+    LStripCase("all the characters", "000", "0"),
+    LStripCase("empty characters", "abc", ""),
+    LStripCase("characters not in the text", "abc", "xyz"),
+    LStripCase("characters in any order", "abc", "cba"),
+    LStripCase("character of two UTF-8 bytes", "éé-x", "-é"),
+    LStripCase("character beyond the Basic Multilingual Plane", "😀😀a😀", "😀"),
+    LStripCase("character sharing the high surrogate", "😁x", "😀"),
+    LStripCase("characters sharing the surrogates", "😀x", "𐈀😁"),
+    LStripCase("ASCII before a character beyond ASCII", "a😀", "a"),
 )

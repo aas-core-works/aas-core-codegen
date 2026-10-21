@@ -31,7 +31,6 @@ public class TestCopying {
 
       return (
         that.getText().equals(casted.getText())
-        && that.getName().equals(casted.getName())
         && that.getFlag().equals(casted.getFlag())
         && that.getOtherFlag().equals(casted.getOtherFlag())
         && that.getCount().equals(casted.getCount())
@@ -46,7 +45,6 @@ public class TestCopying {
     Something other) {
     return (
       that.getText().equals(other.getText())
-      && that.getName().equals(other.getName())
       && that.getFlag().equals(other.getFlag())
       && that.getOtherFlag().equals(other.getOtherFlag())
       && that.getCount().equals(other.getCount())

@@ -48,7 +48,6 @@ namespace dummy.Tests
 
                 return (
                     that.Text == casted.Text
-                    && that.Name == casted.Name
                     && that.Flag == casted.Flag
                     && that.OtherFlag == casted.OtherFlag
                     && that.Count == casted.Count
@@ -65,7 +64,6 @@ namespace dummy.Tests
         {
             return (
                 that.Text == other.Text
-                && that.Name == other.Name
                 && that.Flag == other.Flag
                 && that.OtherFlag == other.OtherFlag
                 && that.Count == other.Count

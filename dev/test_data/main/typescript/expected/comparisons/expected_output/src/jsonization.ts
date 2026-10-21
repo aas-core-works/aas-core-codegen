@@ -543,7 +543,6 @@ function parsePropertiesOfSomething(
   DeserializationError
 > {
   let theText: string | null = null;
-  let theName: string | null = null;
   let theFlag: boolean | null = null;
   let theOtherFlag: boolean | null = null;
   let theCount: number | null = null;
@@ -560,15 +559,6 @@ function parsePropertiesOfSomething(
         );
         propertyError = parsed.error;
         theText = parsed.value;
-        break;
-      }
-
-      case "name": {
-        const parsed = stringFromJsonable(
-          jsonableValue
-        );
-        propertyError = parsed.error;
-        theName = parsed.value;
         break;
       }
 
@@ -639,14 +629,6 @@ function parsePropertiesOfSomething(
     );
   }
 
-  if (theName === null) {
-    return newDeserializationError<
-      OurTypes.Something
-    >(
-      "The required property 'name' is missing"
-    );
-  }
-
   if (theFlag === null) {
     return newDeserializationError<
       OurTypes.Something
@@ -685,7 +667,6 @@ function parsePropertiesOfSomething(
   >(
     new OurTypes.Something(
       theText,
-      theName,
       theFlag,
       theOtherFlag,
       theCount,
@@ -838,10 +819,6 @@ function serializeSomething(
     prop = "text";
     jsonable["text"] =
       that.text;
-
-    prop = "name";
-    jsonable["name"] =
-      that.name;
 
     prop = "flag";
     jsonable["flag"] =

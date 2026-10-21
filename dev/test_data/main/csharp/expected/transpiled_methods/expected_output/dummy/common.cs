@@ -72,6 +72,19 @@ namespace dummy
             }
 
             /// <summary>
+            /// Count the characters (code points) of <paramref name="text" />.
+            /// </summary>
+            /// <remarks>
+            /// We follow the Python implementation of <c>len</c>, since Python is
+            /// the language of the meta-model specifications. Hence, a character beyond
+            /// the Basic Multilingual Plane counts as one, unlike in <c>text.Length</c>.
+            /// </remarks>
+            public static int Len(string text)
+            {
+                return CountCharacters(text, 0, text.Length);
+            }
+
+            /// <summary>
             /// Compute the UTF-16 offset of the character at <paramref name="position" />
             /// in <paramref name="text" />.
             /// </summary>
@@ -105,19 +118,6 @@ namespace dummy
             }
 
             /// <summary>
-            /// Count the characters (code points) of <paramref name="text" />.
-            /// </summary>
-            /// <remarks>
-            /// We follow the Python implementation of <c>len</c>, since Python is
-            /// the language of the meta-model specifications. Hence, a character beyond
-            /// the Basic Multilingual Plane counts as one, unlike in <c>text.Length</c>.
-            /// </remarks>
-            public static int Len(string text)
-            {
-                return CountCharacters(text, 0, text.Length);
-            }
-
-            /// <summary>
             /// Slice <paramref name="text" /> from <paramref name="start" /> up to
             /// <paramref name="end" />, exclusive.
             /// </summary>
@@ -146,48 +146,6 @@ namespace dummy
                 int startOffset = OffsetOf(text, theStart);
                 int endOffset = OffsetOf(text, theEnd);
                 return text.Substring(startOffset, endOffset - startOffset);
-            }
-
-            /// <summary>
-            /// Find the first <paramref name="sub" /> in <paramref name="text" /> from
-            /// <paramref name="start" /> on.
-            /// </summary>
-            /// <remarks>
-            /// We follow the Python implementation of <c>str.find</c>, since Python is
-            /// the language of the meta-model specifications. Hence, the positions count
-            /// the characters (code points), a negative <paramref name="start" /> counts
-            /// from the end, and a <paramref name="start" /> beyond the end of
-            /// <paramref name="text" /> gives -1. We compare the strings ordinally.
-            /// </remarks>
-            /// <returns>
-            /// The position of <paramref name="sub" /> in <paramref name="text" />,
-            /// or -1 if not found
-            /// </returns>
-            public static long Find(string text, string sub, long start = 0)
-            {
-                int length = Len(text);
-                long theStart = start < 0
-                    ? System.Math.Max(start + length, 0)
-                    : start;
-
-                if (theStart > length)
-                {
-                    return -1;
-                }
-
-                int startOffset = OffsetOf(text, (int)theStart);
-                int offset = text.IndexOf(
-                    sub,
-                    startOffset,
-                    System.StringComparison.Ordinal
-                );
-
-                if (offset == -1)
-                {
-                    return -1;
-                }
-
-                return theStart + CountCharacters(text, startOffset, offset);
             }
         }  // public static class StringHelpers
 

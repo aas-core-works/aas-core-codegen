@@ -4221,8 +4221,8 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 self.errors.append(
                     Error(
                         node.args[0].original_node,
-                        f"Expected the stripped characters of ``lstrip`` to be "
-                        f"a string, but got: {arg_types[0]}",
+                        f"Expected the stripped characters of ``{method.name}`` "
+                        f"to be a string, but got: {arg_types[0]}",
                     )
                 )
                 return None

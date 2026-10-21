@@ -41,16 +41,6 @@ public class EnhancedSomething<EnhancementT>
   }
 
   @Override
-  public String getName() {
-    return instance.getName();
-  }
-
-  @Override
-  public void setName(String name) {
-    instance.setName(name);
-  }
-
-  @Override
   public Boolean getFlag() {
     return instance.getFlag();
   }

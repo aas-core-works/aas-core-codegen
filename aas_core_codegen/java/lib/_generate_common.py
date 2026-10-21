@@ -149,11 +149,163 @@ def _generate_string_helpers(
     the negative positions from the end. We also accept the positions as
     ``long``'s, since our integers are ``long``'s in Java.
 
-    The helpers for comparing strings, ``lstrip`` and ``int`` are generated only if
-    the meta-model uses them. We also compare the strings to sort the items of
-    the set properties of strings.
+    Each helper is generated only if the meta-model uses the respective operation.
+    We also compare the strings to sort the items of the set properties of strings.
     """
-    extra_methods = []  # type: List[Stripped]
+    uses_slicing = intermediate_uses.string_slicing(type_inference)
+    uses_find = intermediate_uses.string_find_call(type_inference)
+
+    methods = []  # type: List[Stripped]
+
+    if uses_slicing:
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Resolve {{@code position}} in a string of {{@code length}} as Python does
+ * in slicing.
+ *
+ * <p>A negative position counts from the end, and the positions out of range
+ * are clamped to the string.
+ *
+ * @param position to be resolved
+ * @param length of the string
+ * @return the resolved position within {{@code [0, length]}}
+ */
+private static int resolvePosition(long position, int length) {{
+{I}if (position < 0) {{
+{II}return (int) Math.max(position + length, 0);
+{I}}}
+
+{I}return (int) Math.min(position, length);
+}}"""
+            )
+        )
+
+    # NOTE (mristin):
+    # The slicing and ``find`` measure the text with ``len``.
+    if intermediate_uses.string_len_call(type_inference) or uses_slicing or uses_find:
+        methods.append(
+            Stripped(
+                f"""\
+/**
+ * Count the characters (code points) of {{@code text}}.
+ *
+ * <p>We follow the Python implementation of {{@code len}}, since Python is
+ * the language of the meta-model specifications. Hence, a character beyond
+ * the Basic Multilingual Plane counts as one, unlike in {{@code text.length()}}.
+ *
+ * @param text to be measured
+ * @return the number of characters
+ */
+public static int len(String text) {{
+{I}return text.codePointCount(0, text.length());
+}}"""
+            )
+        )
+
+    if uses_slicing:
+        methods.extend(
+            [
+                Stripped(
+                    f"""\
+/**
+ * Slice {{@code text}} from {{@code start}} up to {{@code end}}, exclusive.
+ *
+ * <p>We follow the Python implementation of slicing, since Python is
+ * the language of the meta-model specifications. Hence, the positions count
+ * the characters (code points), a negative position counts from the end,
+ * the positions out of range are clamped to the string, and the slice is empty
+ * if {{@code start}} is not before {{@code end}}.
+ *
+ * @param text to be sliced
+ * @param start of the slice, inclusive
+ * @param end of the slice, exclusive
+ * @return the slice
+ */
+public static String slice(String text, long start, long end) {{
+{I}final int length = len(text);
+{I}final int theStart = resolvePosition(start, length);
+{I}final int theEnd = resolvePosition(end, length);
+
+{I}if (theStart >= theEnd) {{
+{II}return "";
+{I}}}
+
+{I}final int startOffset = text.offsetByCodePoints(0, theStart);
+{I}final int endOffset = text.offsetByCodePoints(startOffset, theEnd - theStart);
+{I}return text.substring(startOffset, endOffset);
+}}"""
+                ),
+                Stripped(
+                    f"""\
+/**
+ * Slice {{@code text}} from {{@code start}} up to its end.
+ *
+ * <p>See {{@link #slice(String, long, long)}} for the semantics.
+ *
+ * @param text to be sliced
+ * @param start of the slice, inclusive
+ * @return the slice
+ */
+public static String slice(String text, long start) {{
+{I}return slice(text, start, Long.MAX_VALUE);
+}}"""
+                ),
+            ]
+        )
+
+    if uses_find:
+        methods.extend(
+            [
+                Stripped(
+                    f"""\
+/**
+ * Find the first {{@code sub}} in {{@code text}} from {{@code start}} on.
+ *
+ * <p>We follow the Python implementation of {{@code str.find}}, since Python
+ * is the language of the meta-model specifications. Hence, the positions count
+ * the characters (code points), a negative {{@code start}} counts from the end,
+ * and a {{@code start}} beyond the end of {{@code text}} gives -1.
+ *
+ * @param text to be searched in
+ * @param sub to be searched for
+ * @param start of the search
+ * @return the position of {{@code sub}} in {{@code text}}, or -1 if not found
+ */
+public static long find(String text, String sub, long start) {{
+{I}final int length = len(text);
+{I}final long theStart = start < 0 ? Math.max(start + length, 0) : start;
+{I}if (theStart > length) {{
+{II}return -1;
+{I}}}
+
+{I}final int startOffset = text.offsetByCodePoints(0, (int) theStart);
+{I}final int offset = text.indexOf(sub, startOffset);
+{I}if (offset == -1) {{
+{II}return -1;
+{I}}}
+
+{I}return theStart + text.codePointCount(startOffset, offset);
+}}"""
+                ),
+                Stripped(
+                    f"""\
+/**
+ * Find the first {{@code sub}} in {{@code text}}.
+ *
+ * <p>See {{@link #find(String, String, long)}} for the semantics.
+ *
+ * @param text to be searched in
+ * @param sub to be searched for
+ * @return the position of {{@code sub}} in {{@code text}}, or -1 if not found
+ */
+public static long find(String text, String sub) {{
+{I}return find(text, sub, 0);
+}}"""
+                ),
+            ]
+        )
 
     # NOTE (mristin):
     # We also sort the items of the set properties of strings by their code points
@@ -161,7 +313,7 @@ def _generate_string_helpers(
     if intermediate_uses.string_ordering(
         type_inference
     ) or intermediate_uses.sets_of_strings_in_properties(symbol_table):
-        extra_methods.append(
+        methods.append(
             Stripped(
                 f"""\
 /**
@@ -196,18 +348,13 @@ public static int compareByCodePoints(String that, String other) {{
             )
         )
 
-    if intermediate_uses.lstrip_call(symbol_table):
-        extra_methods.append(_LSTRIP)
+    if intermediate_uses.lstrip_call(type_inference):
+        methods.append(_LSTRIP)
 
     if intermediate_uses.int_call(symbol_table):
-        extra_methods.append(_PARSE_SAFE_INT)
+        methods.append(_PARSE_SAFE_INT)
 
-    extra_methods_joined = "".join(
-        f"""
-
-{I}{indent_but_first_line(method, I)}"""
-        for method in extra_methods
-    )
+    methods_joined = "\n\n".join(methods)
 
     # NOTE (mristin):
     # The native ``codePointCount`` and ``offsetByCodePoints`` count a lone
@@ -230,121 +377,7 @@ public final class StringHelpers {{
 {II}// Prevent instantiation
 {I}}}
 
-{I}/**
-{I} * Resolve {{@code position}} in a string of {{@code length}} as Python does
-{I} * in slicing.
-{I} *
-{I} * <p>A negative position counts from the end, and the positions out of range
-{I} * are clamped to the string.
-{I} *
-{I} * @param position to be resolved
-{I} * @param length of the string
-{I} * @return the resolved position within {{@code [0, length]}}
-{I} */
-{I}private static int resolvePosition(long position, int length) {{
-{II}if (position < 0) {{
-{III}return (int) Math.max(position + length, 0);
-{II}}}
-
-{II}return (int) Math.min(position, length);
-{I}}}
-
-{I}/**
-{I} * Count the characters (code points) of {{@code text}}.
-{I} *
-{I} * <p>We follow the Python implementation of {{@code len}}, since Python is
-{I} * the language of the meta-model specifications. Hence, a character beyond
-{I} * the Basic Multilingual Plane counts as one, unlike in {{@code text.length()}}.
-{I} *
-{I} * @param text to be measured
-{I} * @return the number of characters
-{I} */
-{I}public static int len(String text) {{
-{II}return text.codePointCount(0, text.length());
-{I}}}
-
-{I}/**
-{I} * Slice {{@code text}} from {{@code start}} up to {{@code end}}, exclusive.
-{I} *
-{I} * <p>We follow the Python implementation of slicing, since Python is
-{I} * the language of the meta-model specifications. Hence, the positions count
-{I} * the characters (code points), a negative position counts from the end,
-{I} * the positions out of range are clamped to the string, and the slice is empty
-{I} * if {{@code start}} is not before {{@code end}}.
-{I} *
-{I} * @param text to be sliced
-{I} * @param start of the slice, inclusive
-{I} * @param end of the slice, exclusive
-{I} * @return the slice
-{I} */
-{I}public static String slice(String text, long start, long end) {{
-{II}final int length = len(text);
-{II}final int theStart = resolvePosition(start, length);
-{II}final int theEnd = resolvePosition(end, length);
-
-{II}if (theStart >= theEnd) {{
-{III}return "";
-{II}}}
-
-{II}final int startOffset = text.offsetByCodePoints(0, theStart);
-{II}final int endOffset = text.offsetByCodePoints(startOffset, theEnd - theStart);
-{II}return text.substring(startOffset, endOffset);
-{I}}}
-
-{I}/**
-{I} * Slice {{@code text}} from {{@code start}} up to its end.
-{I} *
-{I} * <p>See {{@link #slice(String, long, long)}} for the semantics.
-{I} *
-{I} * @param text to be sliced
-{I} * @param start of the slice, inclusive
-{I} * @return the slice
-{I} */
-{I}public static String slice(String text, long start) {{
-{II}return slice(text, start, Long.MAX_VALUE);
-{I}}}
-
-{I}/**
-{I} * Find the first {{@code sub}} in {{@code text}} from {{@code start}} on.
-{I} *
-{I} * <p>We follow the Python implementation of {{@code str.find}}, since Python
-{I} * is the language of the meta-model specifications. Hence, the positions count
-{I} * the characters (code points), a negative {{@code start}} counts from the end,
-{I} * and a {{@code start}} beyond the end of {{@code text}} gives -1.
-{I} *
-{I} * @param text to be searched in
-{I} * @param sub to be searched for
-{I} * @param start of the search
-{I} * @return the position of {{@code sub}} in {{@code text}}, or -1 if not found
-{I} */
-{I}public static long find(String text, String sub, long start) {{
-{II}final int length = len(text);
-{II}final long theStart = start < 0 ? Math.max(start + length, 0) : start;
-{II}if (theStart > length) {{
-{III}return -1;
-{II}}}
-
-{II}final int startOffset = text.offsetByCodePoints(0, (int) theStart);
-{II}final int offset = text.indexOf(sub, startOffset);
-{II}if (offset == -1) {{
-{III}return -1;
-{II}}}
-
-{II}return theStart + text.codePointCount(startOffset, offset);
-{I}}}
-
-{I}/**
-{I} * Find the first {{@code sub}} in {{@code text}}.
-{I} *
-{I} * <p>See {{@link #find(String, String, long)}} for the semantics.
-{I} *
-{I} * @param text to be searched in
-{I} * @param sub to be searched for
-{I} * @return the position of {{@code sub}} in {{@code text}}, or -1 if not found
-{I} */
-{I}public static long find(String text, String sub) {{
-{II}return find(text, sub, 0);
-{I}}}{extra_methods_joined}
+{I}{indent_but_first_line(methods_joined, I)}
 }}"""
     )
 
@@ -625,10 +658,8 @@ def generate(
     files = []  # type: List[java_common.JavaFile]
 
     if (
-        intermediate_uses.len_slicing_or_find(symbol_table)
-        or intermediate_uses.string_ordering(type_inference)
+        intermediate_uses.string_operations(type_inference)
         or intermediate_uses.sets_of_strings_in_properties(symbol_table)
-        or intermediate_uses.lstrip_call(symbol_table)
         or intermediate_uses.int_call(symbol_table)
     ):
         files.append(

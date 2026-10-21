@@ -191,7 +191,6 @@ public class Jsonization {
         }
 
         String theText = null;
-        String theName = null;
         Boolean theFlag = null;
         Boolean theOtherFlag = null;
         Long theCount = null;
@@ -209,14 +208,6 @@ public class Jsonization {
                 return prependName(parsed, key);
               }
               theText = parsed.getResult();
-              break;
-            }
-            case "name": {
-              final Reporting.Result<? extends String> parsed = tryStringFrom(value);
-              if (parsed.isError()) {
-                return prependName(parsed, key);
-              }
-              theName = parsed.getResult();
               break;
             }
             case "flag": {
@@ -260,10 +251,6 @@ public class Jsonization {
           return missingRequiredProperty("text");
         }
 
-        if (theName == null) {
-          return missingRequiredProperty("name");
-        }
-
         if (theFlag == null) {
           return missingRequiredProperty("flag");
         }
@@ -282,7 +269,6 @@ public class Jsonization {
 
         return Reporting.Result.success(new Something(
           theText,
-          theName,
           theFlag,
           theOtherFlag,
           theCount,
@@ -542,8 +528,6 @@ public class Jsonization {
         final ObjectNode result = JsonNodeFactory.instance.objectNode();
 
         setProperty(result, "text", "getText()", that.getText(), _Transformer::stringToJsonNode);
-
-        setProperty(result, "name", "getName()", that.getName(), _Transformer::stringToJsonNode);
 
         setProperty(result, "flag", "getFlag()", that.getFlag(), _Transformer::boolToJsonNode);
 

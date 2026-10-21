@@ -260,7 +260,6 @@ namespace dummy
                 }
 
                 string? theText = null;
-                string? theName = null;
                 bool? theFlag = null;
                 bool? theOtherFlag = null;
                 long? theCount = null;
@@ -272,10 +271,6 @@ namespace dummy
                     {
                         case "text":
                             theText = StringFrom(
-                                keyValue.Value, out error);
-                            break;
-                        case "name":
-                            theName = StringFrom(
                                 keyValue.Value, out error);
                             break;
                         case "flag":
@@ -316,13 +311,6 @@ namespace dummy
                     return default!;
                 }
 
-                if (theName == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"name\" is missing");
-                    return default!;
-                }
-
                 if (theFlag == null)
                 {
                     error = new Reporting.Error(
@@ -353,9 +341,6 @@ namespace dummy
 
                 return new Our.Something(
                     theText
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theFlag
@@ -614,8 +599,6 @@ namespace dummy
                 var result = new Nodes.JsonObject();
 
                 SetProperty(result, "text", "Text", that.Text, Serialize_string);
-
-                SetProperty(result, "name", "Name", that.Name, Serialize_string);
 
                 SetProperty(result, "flag", "Flag", that.Flag, Serialize_bool);
 

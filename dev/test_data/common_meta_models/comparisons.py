@@ -1,43 +1,12 @@
 """
-Test the comparisons of strings, booleans, integers, floats and lengths.
+Test the comparisons of booleans, integers, floats and lengths.
 
-The meta-model follows the Python semantics, where the strings are ordered by
-their characters (code points), and ``False`` is smaller than ``True``. Most other
-languages order the strings by their UTF-16 code units, which differs from
-the order of the characters beyond the Basic Multilingual Plane. Some of
-the invariants are chosen such that the test data distinguishes the two orders.
+The meta-model follows the Python semantics, where ``False`` is smaller than
+``True``. We test the ordering of strings in ``string_operations.py`` together
+with the other operations on strings.
 """
 
 from icontract import DBC, invariant
-
-
-@invariant(lambda self: len(self) > 0, "At least one character")
-class Non_empty_string(str, DBC):
-    pass
-
-
-@verification
-def text_is_between_bounds(text: str) -> bool:
-    """Check the ordering of a string with the literals on both sides."""
-    return "A" <= text and text < "z"
-
-
-@verification
-def name_is_not_after_text(name: Non_empty_string, text: str) -> bool:
-    """Check the ordering of a constrained primitive with a string."""
-    return not (name > text) and text >= name
-
-
-@verification
-def text_sorts_before_replacement_character(text: str) -> bool:
-    """
-    Check the ordering of a string with a character from U+E000 to U+FFFF.
-
-    A character beyond the Basic Multilingual Plane such as "😀" (U+1F600) sorts
-    after the replacement character (U+FFFD), but its UTF-16 code units (U+D83D and
-    U+DE00) sort before it.
-    """
-    return text < "�"
 
 
 @verification
@@ -71,18 +40,6 @@ def text_fits_into_count(text: str, count: int) -> bool:
 
 
 @invariant(
-    lambda self: text_is_between_bounds(self.name),
-    "Name must be between A and z",
-)
-@invariant(
-    lambda self: name_is_not_after_text(self.name, self.text),
-    "Name must not sort after the text",
-)
-@invariant(
-    lambda self: text_sorts_before_replacement_character(self.text),
-    "Text must sort before the replacement character",
-)
-@invariant(
     lambda self: flags_are_ordered(self.flag, self.other_flag),
     "Flag implies the other flag",
 )
@@ -99,12 +56,11 @@ def text_fits_into_count(text: str, count: int) -> bool:
     "Text must have at most count characters",
 )
 @invariant(
-    lambda self: self.name < "zzz" and self.flag <= self.other_flag,
-    "Name must sort before zzz and flag must imply the other flag",
+    lambda self: self.flag <= self.other_flag and len(self.text) < 1000,
+    "Flag must imply the other flag and text must be shorter than 1000",
 )
 class Something(DBC):
     text: str
-    name: Non_empty_string
     flag: bool
     other_flag: bool
     count: int
@@ -113,14 +69,12 @@ class Something(DBC):
     def __init__(
         self,
         text: str,
-        name: Non_empty_string,
         flag: bool,
         other_flag: bool,
         count: int,
         ratio: float,
     ) -> None:
         self.text = text
-        self.name = name
         self.flag = flag
         self.other_flag = other_flag
         self.count = count

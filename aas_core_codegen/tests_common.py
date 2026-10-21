@@ -143,35 +143,6 @@ for _float_argument, _float_expected in ABS_FLOAT_CASES:
 # endregion
 
 
-# region Strings
-
-#: Cases for ``str.lstrip`` as ``(text, chars, expected)``.
-#:
-#: The emojis lie outside the Basic Multilingual Plane, so they are encoded as two
-#: code units in UTF-16. Mind the two emojis 😀 (U+1F600) and 😁 (U+1F601) which
-#: share the high surrogate. An implementation which strips the UTF-16 code units
-#: instead of the characters would strip half of 😁 when told to strip 😀.
-LSTRIP_CASES: Final[Sequence[Tuple[str, str, str]]] = [
-    (text, chars, text.lstrip(chars))
-    for text, chars in (
-        ("000123", "0"),
-        ("+-+12", "+-"),
-        ("0102", "0"),
-        ("", "0"),
-        ("000", "0"),
-        ("abc", ""),
-        ("abc", "xyz"),
-        ("abc", "cba"),
-        ("éé-x", "-é"),
-        ("😀😀a😀", "😀"),
-        ("😁x", "😀"),
-        ("a😀", "a"),
-    )
-]
-
-# endregion
-
-
 # region Parsing integers
 
 # NOTE (mristin):

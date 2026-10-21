@@ -616,18 +616,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # The helpers for ``len``, slicing, ``find`` and comparing strings are only
-    # generated for a meta-model which uses them, and so are their tests.
-    if intermediate_uses.len_slicing_or_find(
-        context.symbol_table
-    ) or intermediate_uses.string_ordering(type_inference):
+    # The helpers for the operations on strings are only generated for
+    # a meta-model which uses them, and so are their tests.
+    if intermediate_uses.string_operations(type_inference):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 test_dir / "test_string_helpers.cpp",
                 lambda: (
                     cpp_tests.generate_test_string_helpers_implementation(
                         library_namespace=library_namespace,
-                        symbol_table=context.symbol_table,
                         type_inference=type_inference,
                     ),
                     None,
@@ -655,16 +652,14 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them, as we
-    # generate the helper functions only in that case.
-    if intermediate_uses.lstrip_call(
-        context.symbol_table
-    ) or intermediate_uses.int_call(context.symbol_table):
+    # We test ``int`` only if the meta-model uses it, as we generate the helper
+    # function only in that case.
+    if intermediate_uses.int_call(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
-                test_dir / "test_lstrip_and_int.cpp",
+                test_dir / "test_parse_int.cpp",
                 lambda: (
-                    cpp_tests.generate_test_lstrip_and_int_implementation(
+                    cpp_tests.generate_test_parse_int_implementation(
                         symbol_table=context.symbol_table,
                         library_namespace=library_namespace,
                     ),

@@ -337,19 +337,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     # NOTE (mristin):
     # The helpers for ``len``, slicing strings and ``find`` are only generated for
     # a meta-model which uses them, and so are their tests. We also test
-    # the native comparison of strings so that the users can inspect the same
-    # cases in all the SDKs.
-    if intermediate_uses.len_slicing_or_find(
-        context.symbol_table
-    ) or intermediate_uses.string_ordering(type_inference):
+    # the native comparison and stripping of strings so that the users can inspect
+    # the same cases in all the SDKs.
+    if intermediate_uses.string_operations(type_inference):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 base_rel_path / "common/string_helpers_test/string_helpers_test.go",
                 lambda: (
                     golang_tests.generate_string_helpers_test(
-                        repo_url=repo_url,
-                        symbol_table=context.symbol_table,
-                        type_inference=type_inference,
+                        repo_url=repo_url, type_inference=type_inference
                     ),
                     None,
                 ),
@@ -375,16 +371,14 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them, as we
-    # generate the helper function for ``int`` only in that case.
-    if intermediate_uses.lstrip_call(
-        context.symbol_table
-    ) or intermediate_uses.int_call(context.symbol_table):
+    # We test ``int`` only if the meta-model uses it, as we generate its helper
+    # function only in that case.
+    if intermediate_uses.int_call(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
-                base_rel_path / "common/lstrip_and_int_test/lstrip_and_int_test.go",
+                base_rel_path / "common/parse_int_test/parse_int_test.go",
                 lambda: (
-                    golang_tests.generate_lstrip_and_int_test(
+                    golang_tests.generate_parse_int_test(
                         symbol_table=verified_ir_table, repo_url=repo_url
                     ),
                     None,

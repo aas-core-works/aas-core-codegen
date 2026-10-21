@@ -359,7 +359,6 @@ namespace dummy
                 error = null;
 
                 string? theText = null;
-                string? theName = null;
                 bool? theFlag = null;
                 bool? theOtherFlag = null;
                 long? theCount = null;
@@ -391,15 +390,6 @@ namespace dummy
                                     break;
                                 }
                                 theText = Read_string(
-                                    reader, isEmptyProperty, out error);
-                                break;
-                            case "name":
-                                if (theName != null)
-                                {
-                                    error = DuplicatePropertyError(elementName);
-                                    break;
-                                }
-                                theName = Read_string(
                                     reader, isEmptyProperty, out error);
                                 break;
                             case "flag":
@@ -484,14 +474,6 @@ namespace dummy
                     return default!;
                 }
 
-                if (theName == null)
-                {
-                    error = new Reporting.Error(
-                        "The required property Name has not been given " +
-                        "in the XML representation of an instance of class Something");
-                    return default!;
-                }
-
                 if (theFlag == null)
                 {
                     error = new Reporting.Error(
@@ -526,9 +508,6 @@ namespace dummy
 
                 return new Our.Something(
                     theText
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
-                    theName
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theFlag
@@ -757,9 +736,6 @@ namespace dummy
             {
                 WriteProperty(
                     "text", "Text", that.Text, writer, Write_string);
-
-                WriteProperty(
-                    "name", "Name", that.Name, writer, Write_string);
 
                 WriteProperty(
                     "flag", "Flag", that.Flag, writer, Write_bool);

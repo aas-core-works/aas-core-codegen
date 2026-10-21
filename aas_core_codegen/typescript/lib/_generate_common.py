@@ -1,7 +1,7 @@
 """Generate code of common functionality."""
 
 import io
-from typing import Final, Sequence
+from typing import Final, List, Sequence
 
 from icontract import ensure
 
@@ -712,15 +712,25 @@ export function base64UrlDecode(text: string): Either<Uint8Array, string> {{
     # ``substring`` swaps the positions and does not count the negative ones from
     # the end, and ``indexOf`` does not count a negative start from the end either.
     # We need helpers which follow the Python implementation of ``len``, slicing
-    # and ``str.find``. The helpers are generated only for a meta-model which
-    # might take ``len`` of strings, slice them or call ``find`` on them.
+    # and ``str.find``. Each helper is generated only for a meta-model which
+    # takes ``len`` of strings, slices them or calls ``find`` on them, respectively.
     #
     # We count a lone surrogate as a character of its own, as Python does. We do
     # not check whether ``indexOf`` matches in the middle of a surrogate pair, as
     # that could only happen if the searched text started or ended with a lone
     # surrogate.
-    if intermediate_uses.len_slicing_or_find(symbol_table):
-        blocks[len(blocks) - 1 : len(blocks) - 1] = [
+    uses_len = intermediate_uses.string_len_call(type_inference)
+    uses_slicing = intermediate_uses.string_slicing(type_inference)
+    uses_find = intermediate_uses.string_find_call(type_inference)
+
+    # NOTE (mristin):
+    # ``sliceStr`` and ``findStr`` rely on ``lenStr`` and on the low-level helpers.
+    uses_any = uses_len or uses_slicing or uses_find
+
+    string_helpers = []  # type: List[Stripped]
+
+    if uses_any:
+        string_helpers.append(
             Stripped(
                 f"""\
 /**
@@ -739,7 +749,11 @@ function isSurrogatePairAt(text: string, offset: number): boolean {{
 {I}const low = text.charCodeAt(offset + 1);
 {I}return high >= 0xd800 && high <= 0xdbff && low >= 0xdc00 && low <= 0xdfff;
 }}"""
-            ),
+            )
+        )
+
+    if uses_any:
+        string_helpers.append(
             Stripped(
                 f"""\
 /**
@@ -765,7 +779,11 @@ function countCharacters(
 
 {I}return count;
 }}"""
-            ),
+            )
+        )
+
+    if uses_slicing or uses_find:
+        string_helpers.append(
             Stripped(
                 f"""\
 /**
@@ -783,7 +801,11 @@ function offsetOf(text: string, position: number): number {{
 
 {I}return offset;
 }}"""
-            ),
+            )
+        )
+
+    if uses_slicing:
+        string_helpers.append(
             Stripped(
                 f"""\
 /**
@@ -804,7 +826,11 @@ function resolvePosition(position: number, length: number): number {{
 
 {I}return Math.min(position, length);
 }}"""
-            ),
+            )
+        )
+
+    if uses_any:
+        string_helpers.append(
             Stripped(
                 f"""\
 /**
@@ -821,7 +847,11 @@ function resolvePosition(position: number, length: number): number {{
 export function lenStr(text: string): number {{
 {I}return countCharacters(text, 0, text.length);
 }}"""
-            ),
+            )
+        )
+
+    if uses_slicing:
+        string_helpers.append(
             Stripped(
                 f"""\
 /**
@@ -850,7 +880,11 @@ export function sliceStr(text: string, start: number, end?: number): string {{
 
 {I}return text.substring(offsetOf(text, theStart), offsetOf(text, theEnd));
 }}"""
-            ),
+            )
+        )
+
+    if uses_find:
+        string_helpers.append(
             Stripped(
                 f"""\
 /**
@@ -882,8 +916,10 @@ export function findStr(text: string, sub: string, start = 0): number {{
 
 {I}return theStart + countCharacters(text, startOffset, offset);
 }}"""
-            ),
-        ]
+            )
+        )
+
+    blocks[len(blocks) - 1 : len(blocks) - 1] = string_helpers
 
     # NOTE (mristin):
     # The TypeScript strings are ordered by their UTF-16 code units, while Python
@@ -1007,7 +1043,7 @@ export function compareByCodePoints(that: string, other: string): number {{
     # We need a helper which follows the Python implementation of ``str.lstrip``,
     # as TypeScript has no native equivalent which strips the given characters.
     # The helper is generated only for a meta-model which calls ``lstrip``.
-    if intermediate_uses.lstrip_call(symbol_table):
+    if intermediate_uses.lstrip_call(type_inference):
         blocks.insert(
             len(blocks) - 1,
             Stripped(

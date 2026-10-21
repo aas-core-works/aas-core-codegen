@@ -1,18 +1,18 @@
-"""Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
+"""Generate the unit tests for the helpers of the operations on strings."""
 
 import re
 from typing import List
 
 from icontract import require
 
-from aas_core_codegen import intermediate, string_helper_cases
+from aas_core_codegen import string_helper_cases
 from aas_core_codegen.common import Stripped, indent_but_first_line
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
     uses as intermediate_uses,
 )
 from aas_core_codegen.java import common as java_common
-from aas_core_codegen.java.common import INDENT as I, INDENT2 as II
+from aas_core_codegen.java.common import INDENT as I, INDENT2 as II, INDENT3 as III
 
 
 def _method_name(prefix: str, description: str) -> str:
@@ -21,21 +21,15 @@ def _method_name(prefix: str, description: str) -> str:
     return f"test{prefix}" + "".join(word.capitalize() for word in words if word)
 
 
-@require(
-    lambda symbol_table, type_inference: intermediate_uses.len_slicing_or_find(
-        symbol_table
-    )
-    or intermediate_uses.string_ordering(type_inference)
-)
+@require(lambda type_inference: intermediate_uses.string_operations(type_inference))
 def generate(
     package: java_common.PackageIdentifier,
-    symbol_table: intermediate.SymbolTable,
     type_inference: intermediate_type_inference.TypeInference,
 ) -> List[java_common.JavaFile]:
-    """Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
+    """Generate the unit tests for the helpers of the operations on strings."""
     blocks = []  # type: List[Stripped]
 
-    if intermediate_uses.len_slicing_or_find(symbol_table):
+    if intermediate_uses.string_len_call(type_inference):
         for len_case in string_helper_cases.LEN_CASES:
             display_name = java_common.string_literal(
                 f"{len_case.python_expression()} gives {len_case.expected}: "
@@ -55,6 +49,7 @@ public void {_method_name("Len", len_case.description)}() {{
                 )
             )
 
+    if intermediate_uses.string_slicing(type_inference):
         for slice_case in string_helper_cases.SLICE_CASES:
             display_name = java_common.string_literal(
                 f"{slice_case.python_expression()} gives {slice_case.expected!r}: "
@@ -83,6 +78,7 @@ public void {_method_name("Slice", slice_case.description)}() {{
                 )
             )
 
+    if intermediate_uses.string_find_call(type_inference):
         for find_case in string_helper_cases.FIND_CASES:
             display_name = java_common.string_literal(
                 f"{find_case.python_expression()} gives {find_case.expected}: "
@@ -130,6 +126,28 @@ public void {_method_name("Compare", compare_case.description)}() {{
 {I}assertEquals(
 {II}{compare_case.expected},
 {II}Integer.signum(StringHelpers.compareByCodePoints({left}, {right})));
+}}"""
+                )
+            )
+
+    if intermediate_uses.lstrip_call(type_inference):
+        for lstrip_case in string_helper_cases.LSTRIP_CASES:
+            display_name = java_common.string_literal(
+                f"{lstrip_case.python_expression()} gives "
+                f"{lstrip_case.expected!r}: {lstrip_case.description}"
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+@Test
+@DisplayName({display_name})
+public void {_method_name("Lstrip", lstrip_case.description)}() {{
+{I}assertEquals(
+{II}{java_common.string_literal(lstrip_case.expected)},
+{II}StringHelpers.lstrip(
+{III}{java_common.string_literal(lstrip_case.text)},
+{III}{java_common.string_literal(lstrip_case.chars)}));
 }}"""
                 )
             )

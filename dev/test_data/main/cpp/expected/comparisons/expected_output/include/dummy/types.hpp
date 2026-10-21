@@ -66,14 +66,6 @@ class ISomething
     std::wstring value
   ) = 0;
 
-  virtual const std::wstring& name() const = 0;
-
-  virtual std::wstring& mutable_name() = 0;
-
-  virtual void set_name(
-    std::wstring value
-  ) = 0;
-
   virtual bool flag() const = 0;
 
   virtual bool& mutable_flag() = 0;
@@ -118,7 +110,6 @@ class Something
  public:
   Something(
     std::wstring text,
-    std::wstring name,
     bool flag,
     bool other_flag,
     int64_t count,
@@ -134,18 +125,6 @@ class Something
   std::wstring& mutable_text() override;
 
   void set_text(
-    std::wstring value
-  ) override;
-
-  // endregion
-
-  // region Get and set name_
-
-  const std::wstring& name() const override;
-
-  std::wstring& mutable_name() override;
-
-  void set_name(
     std::wstring value
   ) override;
 
@@ -203,8 +182,6 @@ class Something
 
  private:
   std::wstring text_;
-
-  std::wstring name_;
 
   bool flag_;
 

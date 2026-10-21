@@ -210,7 +210,6 @@ function parseSomethingFromSequence(
   cursor: XmlCursor
 ): OurCommon.Either<OurTypes.Something, DeserializationError> {
   let theText: string | null = null;
-  let theName: string | null = null;
   let theFlag: boolean | null = null;
   let theOtherFlag: boolean | null = null;
   let theCount: number | null = null;
@@ -249,22 +248,6 @@ function parseSomethingFromSequence(
         );
         propertyError = parsed.error;
         theText = parsed.value;
-        break;
-      }
-
-      case "name": {
-        if (theName !== null) {
-          propertyError = duplicatePropertyError(propertyLocalName);
-          break;
-        }
-
-        const parsed = parseElementContent(
-          cursor,
-          propertyLocalName,
-          parse_str
-        );
-        propertyError = parsed.error;
-        theName = parsed.value;
         break;
       }
 
@@ -357,12 +340,6 @@ function parseSomethingFromSequence(
     );
   }
 
-  if (theName === null) {
-    return newDeserializationError<OurTypes.Something>(
-      "The required property 'name' is missing"
-    );
-  }
-
   if (theFlag === null) {
     return newDeserializationError<OurTypes.Something>(
       "The required property 'flag' is missing"
@@ -389,7 +366,6 @@ function parseSomethingFromSequence(
 
   const instance = new OurTypes.Something(
     theText,
-    theName,
     theFlag,
     theOtherFlag,
     theCount,
@@ -415,12 +391,6 @@ function writeSomethingAsSequence(
     parts,
     "text",
     that.text,
-    write_str
-  );
-  writeProperty(
-    parts,
-    "name",
-    that.name,
     write_str
   );
   writeProperty(

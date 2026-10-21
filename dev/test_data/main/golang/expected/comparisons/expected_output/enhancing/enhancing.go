@@ -50,17 +50,6 @@ func (es *enhancedSomething[E]) SetText(
 	es.instance.SetText(value)
 }
 
-func (es *enhancedSomething[E]) Name(
-) string {
-	return es.instance.Name()
-}
-
-func (es *enhancedSomething[E]) SetName(
-	value string,
-) {
-	es.instance.SetName(value)
-}
-
 func (es *enhancedSomething[E]) Flag(
 ) bool {
 	return es.instance.Flag()

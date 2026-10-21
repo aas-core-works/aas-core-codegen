@@ -10152,39 +10152,6 @@ std::wstring SliceStr(
   int64_t start
 );
 
-/**
- * Find the first \p sub in \p text.
- *
- * See the other overload for the semantics.
- *
- * \param text to be searched in
- * \param sub to be searched for
- * \return the position of \p sub in \p text, or -1 if not found
- */
-int64_t FindStr(
-  const std::wstring& text,
-  const std::wstring& sub
-);
-
-/**
- * Find the first \p sub in \p text from \p start on.
- *
- * We follow the Python implementation of `str.find`, since Python is
- * the language of the meta-model specifications. Hence, the positions count
- * the characters (code points), a negative \p start counts from the end, and
- * a \p start beyond the end of \p text gives -1.
- *
- * \param text to be searched in
- * \param sub to be searched for
- * \param start of the search
- * \return the position of \p sub in \p text, or -1 if not found
- */
-int64_t FindStr(
-  const std::wstring& text,
-  const std::wstring& sub,
-  int64_t start
-);
-
 }  // namespace common
 /**@}*/
 

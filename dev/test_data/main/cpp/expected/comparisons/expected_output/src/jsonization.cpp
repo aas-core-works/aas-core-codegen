@@ -700,7 +700,6 @@ namespace properties {
 
 enum class OfSomething : std::uint32_t {
   kText,
-  kName,
   kFlag,
   kOtherFlag,
   kCount,
@@ -714,10 +713,6 @@ const std::unordered_map<
   {
     "text",
     OfSomething::kText
-  },
-  {
-    "name",
-    OfSomething::kName
   },
   {
     "flag",
@@ -960,8 +955,6 @@ std::pair<
 ) {
   common::optional<std::wstring> the_text;
 
-  common::optional<std::wstring> the_name;
-
   common::optional<bool> the_flag;
 
   common::optional<bool> the_other_flag;
@@ -983,11 +976,6 @@ std::pair<
           case properties::OfSomething::kText:
             return ParseInto(
               the_text,
-              DeserializeWstring(value)
-            );
-          case properties::OfSomething::kName:
-            return ParseInto(
-              the_name,
               DeserializeWstring(value)
             );
           case properties::OfSomething::kFlag:
@@ -1036,14 +1024,6 @@ std::pair<
     );
   }
 
-  if (!the_name.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<types::ISomething>
-    >(
-      L"The required property name is missing"
-    );
-  }
-
   if (!the_flag.has_value()) {
     return NoInstanceAndDeserializationErrorWithCause<
       std::shared_ptr<types::ISomething>
@@ -1085,7 +1065,6 @@ std::pair<
       // upcast.
       new types::Something(
         std::move(*the_text),
-        std::move(*the_name),
         std::move(*the_flag),
         std::move(*the_other_flag),
         std::move(*the_count),
@@ -1596,10 +1575,6 @@ std::pair<
 
   result["text"] = SerializeWstring(
     that.text()
-  );
-
-  result["name"] = SerializeWstring(
-    that.name()
   );
 
   result["flag"] = SerializeBool(

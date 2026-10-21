@@ -1,11 +1,9 @@
 """
-Test the comparisons of strings, booleans, integers, floats and lengths.
+Test the comparisons of booleans, integers, floats and lengths.
 
-The meta-model follows the Python semantics, where the strings are ordered by
-their characters (code points), and ``False`` is smaller than ``True``. Most other
-languages order the strings by their UTF-16 code units, which differs from
-the order of the characters beyond the Basic Multilingual Plane. Some of
-the invariants are chosen such that the test data distinguishes the two orders.
+The meta-model follows the Python semantics, where ``False`` is smaller than
+``True``. We test the ordering of strings in ``string_operations.py`` together
+with the other operations on strings.
 """
 
 
@@ -103,8 +101,6 @@ class Something(Class):
 
     text: str
 
-    name: str
-
     flag: bool
 
     other_flag: bool
@@ -179,7 +175,6 @@ class Something(Class):
     def __init__(
             self,
             text: str,
-            name: str,
             flag: bool,
             other_flag: bool,
             count: int,
@@ -187,7 +182,6 @@ class Something(Class):
     ) -> None:
         """Initialize with the given values."""
         self.text = text
-        self.name = name
         self.flag = flag
         self.other_flag = other_flag
         self.count = count

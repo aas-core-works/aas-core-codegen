@@ -1,35 +1,6 @@
 UnverifiedSymbolTable(
   our_types=[
     ConcreteClass(
-      name='Non_empty_string',
-      inheritances=[
-        'str'],
-      properties=[],
-      methods=[],
-      invariants=[
-        Invariant(
-          description='At least one character',
-          body=textwrap.dedent("""\
-            Comparison(
-              left=FunctionCall(
-                name='len',
-                args=[
-                  Name(
-                    identifier='self',
-                    original_node=...)],
-                original_node=...),
-              op='GT',
-              right=Constant(
-                value=0,
-                original_node=...),
-              original_node=...)"""),
-          node=...)],
-      serialization=None,
-      description=None,
-      node=...,
-      properties_by_name=...,
-      methods_by_name=...),
-    ConcreteClass(
       name='Something',
       inheritances=[],
       properties=[
@@ -37,15 +8,6 @@ UnverifiedSymbolTable(
           name='text',
           type_annotation=AtomicTypeAnnotation(
             identifier='str',
-            node=...),
-          description=None,
-          json_name=None,
-          xml_name=None,
-          node=...),
-        Property(
-          name='name',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Non_empty_string',
             node=...),
           description=None,
           json_name=None,
@@ -106,13 +68,6 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='name',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Non_empty_string',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='flag',
               type_annotation=AtomicTypeAnnotation(
                 identifier='bool',
@@ -152,22 +107,10 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Name must sort before zzz and flag must imply the other flag',
+          description='Flag must imply the other flag and text must be shorter than 1000',
           body=textwrap.dedent("""\
             And(
               values=[
-                Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='name',
-                    original_node=...),
-                  op='LT',
-                  right=Constant(
-                    value='zzz',
-                    original_node=...),
-                  original_node=...),
                 Comparison(
                   left=Member(
                     instance=Name(
@@ -181,6 +124,22 @@ UnverifiedSymbolTable(
                       identifier='self',
                       original_node=...),
                     name='other_flag',
+                    original_node=...),
+                  original_node=...),
+                Comparison(
+                  left=FunctionCall(
+                    name='len',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='text',
+                        original_node=...)],
+                    original_node=...),
+                  op='LT',
+                  right=Constant(
+                    value=1000,
                     original_node=...),
                   original_node=...)],
               original_node=...)"""),
@@ -252,54 +211,6 @@ UnverifiedSymbolTable(
                   name='other_flag',
                   original_node=...)],
               original_node=...)"""),
-          node=...),
-        Invariant(
-          description='Text must sort before the replacement character',
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='text_sorts_before_replacement_character',
-              args=[
-                Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='text',
-                  original_node=...)],
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description='Name must not sort after the text',
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='name_is_not_after_text',
-              args=[
-                Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='name',
-                  original_node=...),
-                Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='text',
-                  original_node=...)],
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description='Name must be between A and z',
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='text_is_between_bounds',
-              args=[
-                Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='name',
-                  original_node=...)],
-              original_node=...)"""),
           node=...)],
       serialization=None,
       description=None,
@@ -309,153 +220,6 @@ UnverifiedSymbolTable(
   named_unions=[],
   constants=[],
   verification_functions=[
-    UnderstoodMethod(
-      name='text_is_between_bounds',
-      verification=True,
-      visibility='PUBLIC',
-      arguments=[
-        Argument(
-          name='text',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='str',
-            node=...),
-          default=None,
-          node=...)],
-      returns=AtomicTypeAnnotation(
-        identifier='bool',
-        node=...),
-      description=Description(
-        document=...,
-        node=...),
-      contracts=Contracts(
-        preconditions=[],
-        snapshots=[],
-        postconditions=[]),
-      non_mutating=False,
-      body=[
-        textwrap.dedent("""\
-          Return(
-            value=And(
-              values=[
-                Comparison(
-                  left=Constant(
-                    value='A',
-                    original_node=...),
-                  op='LE',
-                  right=Name(
-                    identifier='text',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Name(
-                    identifier='text',
-                    original_node=...),
-                  op='LT',
-                  right=Constant(
-                    value='z',
-                    original_node=...),
-                  original_node=...)],
-              original_node=...),
-            original_node=...)""")],
-      node=...,
-      arguments_by_name=...),
-    UnderstoodMethod(
-      name='name_is_not_after_text',
-      verification=True,
-      visibility='PUBLIC',
-      arguments=[
-        Argument(
-          name='name',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Non_empty_string',
-            node=...),
-          default=None,
-          node=...),
-        Argument(
-          name='text',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='str',
-            node=...),
-          default=None,
-          node=...)],
-      returns=AtomicTypeAnnotation(
-        identifier='bool',
-        node=...),
-      description=Description(
-        document=...,
-        node=...),
-      contracts=Contracts(
-        preconditions=[],
-        snapshots=[],
-        postconditions=[]),
-      non_mutating=False,
-      body=[
-        textwrap.dedent("""\
-          Return(
-            value=And(
-              values=[
-                Not(
-                  operand=Comparison(
-                    left=Name(
-                      identifier='name',
-                      original_node=...),
-                    op='GT',
-                    right=Name(
-                      identifier='text',
-                      original_node=...),
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=Name(
-                    identifier='text',
-                    original_node=...),
-                  op='GE',
-                  right=Name(
-                    identifier='name',
-                    original_node=...),
-                  original_node=...)],
-              original_node=...),
-            original_node=...)""")],
-      node=...,
-      arguments_by_name=...),
-    UnderstoodMethod(
-      name='text_sorts_before_replacement_character',
-      verification=True,
-      visibility='PUBLIC',
-      arguments=[
-        Argument(
-          name='text',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='str',
-            node=...),
-          default=None,
-          node=...)],
-      returns=AtomicTypeAnnotation(
-        identifier='bool',
-        node=...),
-      description=Description(
-        document=...,
-        node=...),
-      contracts=Contracts(
-        preconditions=[],
-        snapshots=[],
-        postconditions=[]),
-      non_mutating=False,
-      body=[
-        textwrap.dedent("""\
-          Return(
-            value=Comparison(
-              left=Name(
-                identifier='text',
-                original_node=...),
-              op='LT',
-              right=Constant(
-                value='�',
-                original_node=...),
-              original_node=...),
-            original_node=...)""")],
-      node=...,
-      arguments_by_name=...),
     UnderstoodMethod(
       name='flags_are_ordered',
       verification=True,

@@ -45,7 +45,7 @@ def _generate_string_helpers(
     type_inference: intermediate_type_inference.TypeInference,
 ) -> Stripped:
     """
-    Generate the helpers for ``len``, slicing, ``find``, comparing and ``lstrip``.
+    Generate the helpers for the operations on strings.
 
     The helpers follow the Python implementation, since Python is the language of
     the meta-model specifications. Hence, the lengths and the positions count
@@ -61,9 +61,17 @@ def _generate_string_helpers(
     # not check whether ``IndexOf`` matches in the middle of a surrogate pair, as
     # that could only happen if the searched text started or ended with a lone
     # surrogate.
-    members = [
-        Stripped(
-            f"""\
+    uses_len = intermediate_uses.string_len_call(type_inference)
+    uses_slicing = intermediate_uses.string_slicing(type_inference)
+    uses_find = intermediate_uses.string_find_call(type_inference)
+    uses_lstrip = intermediate_uses.lstrip_call(type_inference)
+
+    members = []  # type: List[Stripped]
+
+    if uses_len or uses_slicing or uses_find or uses_lstrip:
+        members.append(
+            Stripped(
+                f"""\
 /// <summary>
 /// Check whether a surrogate pair starts at <paramref name="offset" />
 /// in <paramref name="text" />.
@@ -76,13 +84,16 @@ private static bool IsSurrogatePairAt(string text, int offset)
 {II}&& char.IsLowSurrogate(text[offset + 1])
 {I});
 }}"""
+            )
         )
-    ]  # type: List[Stripped]
 
-    if intermediate_uses.len_slicing_or_find(symbol_table):
-        members.append(
-            Stripped(
-                f"""\
+    # NOTE (mristin):
+    # ``Slice`` and ``Find`` measure the text with ``Len``.
+    if uses_len or uses_slicing or uses_find:
+        members.extend(
+            [
+                Stripped(
+                    f"""\
 /// <summary>
 /// Count the characters of <paramref name="text" /> between the UTF-16
 /// offsets <paramref name="startOffset" /> and <paramref name="endOffset" />.
@@ -102,8 +113,30 @@ private static int CountCharacters(
 {I}}}
 
 {I}return count;
-}}
+}}"""
+                ),
+                Stripped(
+                    f"""\
+/// <summary>
+/// Count the characters (code points) of <paramref name="text" />.
+/// </summary>
+/// <remarks>
+/// We follow the Python implementation of <c>len</c>, since Python is
+/// the language of the meta-model specifications. Hence, a character beyond
+/// the Basic Multilingual Plane counts as one, unlike in <c>text.Length</c>.
+/// </remarks>
+public static int Len(string text)
+{{
+{I}return CountCharacters(text, 0, text.Length);
+}}"""
+                ),
+            ]
+        )
 
+    if uses_slicing or uses_find:
+        members.append(
+            Stripped(
+                f"""\
 /// <summary>
 /// Compute the UTF-16 offset of the character at <paramref name="position" />
 /// in <paramref name="text" />.
@@ -117,8 +150,15 @@ private static int OffsetOf(string text, int position)
 {I}}}
 
 {I}return offset;
-}}
+}}"""
+            )
+        )
 
+    if uses_slicing:
+        members.extend(
+            [
+                Stripped(
+                    f"""\
 /// <summary>
 /// Resolve <paramref name="position" /> in a string of
 /// <paramref name="length" /> as Python does in slicing.
@@ -135,21 +175,10 @@ private static int ResolvePosition(long position, int length)
 {I}}}
 
 {I}return (int)System.Math.Min(position, length);
-}}
-
-/// <summary>
-/// Count the characters (code points) of <paramref name="text" />.
-/// </summary>
-/// <remarks>
-/// We follow the Python implementation of <c>len</c>, since Python is
-/// the language of the meta-model specifications. Hence, a character beyond
-/// the Basic Multilingual Plane counts as one, unlike in <c>text.Length</c>.
-/// </remarks>
-public static int Len(string text)
-{{
-{I}return CountCharacters(text, 0, text.Length);
-}}
-
+}}"""
+                ),
+                Stripped(
+                    f"""\
 /// <summary>
 /// Slice <paramref name="text" /> from <paramref name="start" /> up to
 /// <paramref name="end" />, exclusive.
@@ -179,8 +208,15 @@ public static string Slice(string text, long start, long? end = null)
 {I}int startOffset = OffsetOf(text, theStart);
 {I}int endOffset = OffsetOf(text, theEnd);
 {I}return text.Substring(startOffset, endOffset - startOffset);
-}}
+}}"""
+                ),
+            ]
+        )
 
+    if uses_find:
+        members.append(
+            Stripped(
+                f"""\
 /// <summary>
 /// Find the first <paramref name="sub" /> in <paramref name="text" /> from
 /// <paramref name="start" /> on.
@@ -309,7 +345,7 @@ public static int CompareByCodePoints(string that, string other)
             ]
         )
 
-    if intermediate_uses.lstrip_call(symbol_table):
+    if uses_lstrip:
         members.append(
             Stripped(
                 f"""\
@@ -631,12 +667,9 @@ def generate(
     """
     blocks = [_TUPLE_HELPERS]  # type: List[Stripped]
 
-    if (
-        intermediate_uses.len_slicing_or_find(symbol_table)
-        or intermediate_uses.string_ordering(type_inference)
-        or intermediate_uses.sets_of_strings_in_properties(symbol_table)
-        or intermediate_uses.lstrip_call(symbol_table)
-    ):
+    if intermediate_uses.string_operations(
+        type_inference
+    ) or intermediate_uses.sets_of_strings_in_properties(symbol_table):
         blocks.append(_generate_string_helpers(symbol_table, type_inference))
 
     if intermediate_uses.set_properties(symbol_table):
