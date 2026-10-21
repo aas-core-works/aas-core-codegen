@@ -167,6 +167,18 @@ func HasAtMostTwoSignificantDecimals(
 	return ourcommon.LenStr(strings.TrimRight(ourcommon.SliceStrFrom(amount, position + 1), "0")) <= 2
 }
 
+// Check the concatenation assigned to the variables.
+//
+// We concatenate two literals on purpose, since C++ can not add two string
+// literals natively.
+func NameWithExtensionIsShort(
+	name string,
+) bool {
+	extension := "." + "txt"
+	path := name + extension
+	return ourcommon.LenStr(path) <= 12
+}
+
 // Verify `that` instance of [ourtypes.ISomething].
 //
 // You have to supply the callback `onError` to iterate over the errors.
@@ -178,6 +190,27 @@ func VerifySomething(
 	onError func(*VerificationError) bool,
 ) (abort bool) {
 	abort = false
+
+	if !(
+		ourcommon.LenStr(that.OtherWord() + "\U0001f600") <= 3) {
+		abort = onError(
+			newVerificationError(
+				"Other word with an emoji must have at most three characters",),
+		)
+		if abort {
+			return
+		}
+	}
+
+	if !NameWithExtensionIsShort(that.Name()) {
+		abort = onError(
+			newVerificationError(
+				"Name with the extension must have at most 12 characters",),
+		)
+		if abort {
+			return
+		}
+	}
 
 	if !(!strings.HasPrefix(that.Amount(), "+")) {
 		abort = onError(

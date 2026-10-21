@@ -199,6 +199,47 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Other word with an emoji must have at most three characters',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Add(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='other_word',
+                      original_node=...),
+                    right=Constant(
+                      value='😀',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=3,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
+          description='Name with the extension must have at most 12 characters',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='name_with_extension_is_short',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='name',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Something',
+          parsed=...),
+        Invariant(
           description='Amount must not start with a plus',
           body=textwrap.dedent("""\
             Not(
@@ -860,11 +901,41 @@ SymbolTable(
         snapshots=[],
         postconditions=[]),
       parsed=...,
+      arguments_by_name=...),
+    TranspilableVerification(
+      name='name_with_extension_is_short',
+      visibility='PUBLIC',
+      arguments=[
+        Argument(
+          name='name',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Non_empty_string',
+            parsed=...),
+          default=None,
+          mutable=False,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check the concatenation assigned to the variables.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>We concatenate two literals on purpose, since C++ can not add two string
+            literals natively.</paragraph>""")],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
       arguments_by_name=...)],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=DescriptionOfMetaModel(
-      summary='<paragraph>Test the operations on strings such as <literal>len</literal>, slicing, ordering and stripping.</paragraph>',
+      summary='<paragraph>Test the operations on strings such as <literal>len</literal>, slicing, concatenation and ordering.</paragraph>',
       remarks=[
         textwrap.dedent("""\
           <paragraph>The meta-model follows the Python semantics, where the strings consist of

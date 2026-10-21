@@ -5286,6 +5286,42 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
             return None
 
         # NOTE (mristin):
+        # The constrained primitives behave like their constrainees in arithmetic.
+        left_a_type = try_primitive_type(left_type)
+        right_a_type = try_primitive_type(right_type)
+
+        # NOTE (mristin):
+        # The addition of two strings is their concatenation. We do not allow
+        # mixing the strings with the other types, as the target languages convert
+        # the other operand to a string differently, or not at all.
+        if isinstance(node, parse_tree.Add) and (
+            left_a_type is PrimitiveType.STR or right_a_type is PrimitiveType.STR
+        ):
+            if left_a_type is not PrimitiveType.STR:
+                self.errors.append(
+                    Error(
+                        node.left.original_node,
+                        f"The concatenation is only defined on two strings, "
+                        f"but got as a left operand: {left_type}",
+                    )
+                )
+                return None
+
+            if right_a_type is not PrimitiveType.STR:
+                self.errors.append(
+                    Error(
+                        node.right.original_node,
+                        f"The concatenation is only defined on two strings, "
+                        f"but got as a right operand: {right_type}",
+                    )
+                )
+                return None
+
+            result = PrimitiveTypeAnnotation(a_type=PrimitiveType.STR)
+            self.type_map[node] = result
+            return result
+
+        # NOTE (mristin):
         # We do not support the modulo on floating-point numbers as the native
         # operators and functions differ considerably among the target languages,
         # and we have no use case for it at the moment.
@@ -5301,11 +5337,6 @@ class _Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]
                 PrimitiveType.LENGTH,
             )
             allowed_operand_description = "integer and floating-point numbers"
-
-        # NOTE (mristin):
-        # The constrained primitives behave like their constrainees in arithmetic.
-        left_a_type = try_primitive_type(left_type)
-        right_a_type = try_primitive_type(right_type)
 
         if left_a_type not in allowed_operand_types:
             self.errors.append(

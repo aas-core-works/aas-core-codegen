@@ -357,6 +357,22 @@ export function hasAtMostTwoSignificantDecimals(
 }
 
 /**
+ * Check the concatenation assigned to the variables.
+ *
+ * @remarks
+ *
+ * We concatenate two literals on purpose, since C++ can not add two string
+ * literals natively.
+ */
+export function nameWithExtensionIsShort(
+  name: string
+): boolean {
+  const extension = "." + "txt";
+  const path = name + extension;
+  return OurCommon.lenStr(path) <= 12;
+}
+
+/**
  * Verify an instance of the model recursively or non-recursively (depending on the context).
  */
 class Verifier
@@ -368,6 +384,18 @@ class Verifier
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!(OurCommon.lenStr(that.otherWord + "😀") <= 3)) {
+      yield new VerificationError(
+        "Other word with an emoji must have at most three characters"
+      )
+    }
+
+    if (!nameWithExtensionIsShort(that.name)) {
+      yield new VerificationError(
+        "Name with the extension must have at most 12 characters"
+      )
+    }
+
     if (!(!that.amount.startsWith("+"))) {
       yield new VerificationError(
         "Amount must not start with a plus"

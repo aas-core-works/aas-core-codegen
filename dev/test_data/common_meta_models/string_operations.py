@@ -1,5 +1,5 @@
 """
-Test the operations on strings such as ``len``, slicing, ordering and stripping.
+Test the operations on strings such as ``len``, slicing, concatenation and ordering.
 
 The meta-model follows the Python semantics, where the strings consist of
 the characters (code points). Most other languages represent the strings as UTF-16
@@ -128,6 +128,19 @@ def has_at_most_two_significant_decimals(amount: str) -> bool:
     return len(amount[position + 1 :].rstrip("0")) <= 2
 
 
+@verification
+def name_with_extension_is_short(name: Non_empty_string) -> bool:
+    """
+    Check the concatenation assigned to the variables.
+
+    We concatenate two literals on purpose, since C++ can not add two string
+    literals natively.
+    """
+    extension = "." + "txt"
+    path = name + extension
+    return len(path) <= 12
+
+
 @invariant(
     lambda self: date_before_time_is_long_enough(self.text),
     "Date before the time must have 10 characters",
@@ -199,6 +212,14 @@ def has_at_most_two_significant_decimals(amount: str) -> bool:
 @invariant(
     lambda self: not self.amount.startswith("+"),
     "Amount must not start with a plus",
+)
+@invariant(
+    lambda self: name_with_extension_is_short(self.name),
+    "Name with the extension must have at most 12 characters",
+)
+@invariant(
+    lambda self: len(self.other_word + "😀") <= 3,
+    "Other word with an emoji must have at most three characters",
 )
 class Something(DBC):
     text: str

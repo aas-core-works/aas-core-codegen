@@ -4465,6 +4465,63 @@ __xml_namespace__ = "https://dummy.com"
             "Expected 1 argument(s) to the built-in method 'endswith', but got 0",
         )
 
+    def test_concatenation(self) -> None:
+        type_map = Test_string_slicing_and_find.infer_type_map(
+            Test_string_slicing_and_find.source_with_invariant(
+                'len(self.text + "a" + ("b" + "c")) > 0'
+            )
+        )
+
+        self.assertEqual("str", type_map["self.text + 'a'"])
+        self.assertEqual("str", type_map["'b' + 'c'"])
+        self.assertEqual("str", type_map["self.text + 'a' + ('b' + 'c')"])
+
+    def test_concatenation_of_a_constrained_primitive(self) -> None:
+        source = """\
+@invariant(lambda self: len(self) > 0, "Dummy constraint")
+class Non_empty_string(str, DBC):
+    pass
+
+
+@invariant(
+    lambda self: len(self.text + "a") > 0,
+    "Dummy invariant description"
+)
+class Something(DBC):
+    text: Non_empty_string
+
+    def __init__(self, text: Non_empty_string) -> None:
+        self.text = text
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+        type_map = Test_string_slicing_and_find.infer_type_map(source)
+
+        self.assertEqual("str", type_map["self.text + 'a'"])
+
+    def test_concatenation_with_an_integer_fails(self) -> None:
+        self.expect_error(
+            "len(self.text + 1) > 0",
+            "The concatenation is only defined on two strings, "
+            "but got as a right operand: int",
+        )
+
+    def test_concatenation_with_an_integer_on_the_left_fails(self) -> None:
+        self.expect_error(
+            "len(1 + self.text) > 0",
+            "The concatenation is only defined on two strings, "
+            "but got as a left operand: int",
+        )
+
+    def test_subtraction_of_strings_fails(self) -> None:
+        self.expect_error(
+            "self.text - 1 > 0",
+            "The subtraction is only defined on integer and floating-point numbers, "
+            "but got as a left operand: str",
+        )
+
     def test_int_of_a_float_fails(self) -> None:
         self.expect_error(
             "int(self.text) > 0",

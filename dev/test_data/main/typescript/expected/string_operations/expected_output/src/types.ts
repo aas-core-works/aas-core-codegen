@@ -1,5 +1,5 @@
 /**
- * Test the operations on strings such as `len`, slicing, ordering and stripping.
+ * Test the operations on strings such as `len`, slicing, concatenation and ordering.
  *
  * @remarks
  * The meta-model follows the Python semantics, where the strings consist of

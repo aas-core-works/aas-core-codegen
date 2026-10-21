@@ -980,6 +980,23 @@ OurCommon.at(
 
         assert collection is not None
 
+        collection_type = intermediate_type_inference.beneath_optional(
+            self.type_map[node]
+        )
+
+        primitive_type = intermediate_type_inference.try_primitive_type(collection_type)
+
+        if primitive_type is intermediate_type_inference.PrimitiveType.STR:
+            # NOTE (mristin):
+            # We do not use the native ``length`` as it counts the UTF-16 code units
+            # instead of the characters, unlike Python. See ``lenStr`` in
+            # the generated common module. As the string is passed as an argument,
+            # it needs no parentheses.
+            return Stripped(f"OurCommon.lenStr({collection})"), None
+
+        # NOTE (mristin):
+        # We access the ``length`` as a member, so we need to parenthesize
+        # the compound expressions.
         if not isinstance(
             node,
             (
@@ -995,20 +1012,7 @@ OurCommon.at(
         ):
             collection = Stripped(f"({collection})")
 
-        collection_type = intermediate_type_inference.beneath_optional(
-            self.type_map[node]
-        )
-
-        primitive_type = intermediate_type_inference.try_primitive_type(collection_type)
-
-        if primitive_type is intermediate_type_inference.PrimitiveType.STR:
-            # NOTE (mristin):
-            # We do not use the native ``length`` as it counts the UTF-16 code units
-            # instead of the characters, unlike Python. See ``lenStr`` in
-            # the generated common module.
-            return Stripped(f"OurCommon.lenStr({collection})"), None
-
-        elif primitive_type is intermediate_type_inference.PrimitiveType.BYTEARRAY:
+        if primitive_type is intermediate_type_inference.PrimitiveType.BYTEARRAY:
             return Stripped(f"{collection}.length"), None
 
         elif isinstance(
