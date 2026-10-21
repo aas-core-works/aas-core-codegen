@@ -375,6 +375,22 @@ func SetDifference[K comparable](
 	return result
 }
 
+// Compare `that` and `other`, where false comes before true as in Python.
+//
+// Return -1 if `that` comes before `other`, 0 if they are equal, and 1
+// otherwise.
+func CompareBools(that bool, other bool) int {
+	if that == other {
+		return 0
+	}
+
+	if other {
+		return -1
+	}
+
+	return 1
+}
+
 // Collect the items of the set into a slice, sorted by `less`.
 //
 // The set is represented as a map to empty structs. A nil set gives
@@ -406,7 +422,7 @@ func SortedKeys[K comparable](
 
 // Check whether `that` comes before `other`, where false comes before true.
 func LessBool(that bool, other bool) bool {
-	return !that && other
+	return CompareBools(that, other) < 0
 }
 
 // Check whether `that` comes before `other`.

@@ -1057,6 +1057,24 @@ std::make_tuple(
             )
 
         # NOTE (mristin):
+        # The operators ``<``, ``<=``, ``>`` and ``>=`` order ``std::wstring``'s by
+        # their ``wchar_t``'s, which are UTF-16 code units on Windows, while Python
+        # orders the strings by their characters (code points). Hence, we order
+        # the strings with our helpers on all the platforms. The booleans are ordered
+        # natively, where ``false`` comes before ``true`` as in Python.
+        if node.op not in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE,) and (
+            intermediate_type_inference.try_primitive_type(self.type_map[node.left])
+            is intermediate_type_inference.PrimitiveType.STR
+        ):
+            return (
+                Stripped(
+                    f"{cpp_common.COMMON_NAMESPACE}::CompareByCodePoints("
+                    f"{left}, {right}) {comparator} 0"
+                ),
+                None,
+            )
+
+        # NOTE (mristin):
         # The modulo is transpiled either to a function call or to the native
         # operator ``%``, and the arithmetic negation to the unary ``-``. Both bind
         # stronger than the comparison operators in C++.

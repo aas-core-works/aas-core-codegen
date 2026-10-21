@@ -634,6 +634,66 @@ new {list_type}
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         comparator = Transpiler._CSHARP_COMPARISON_MAP[node.op]
 
+        # NOTE (mristin):
+        # C# orders neither the strings nor the booleans with the operators ``<``,
+        # ``<=``, ``>`` and ``>=``. Moreover, ``string.CompareOrdinal`` would order
+        # the strings by their UTF-16 code units, while Python orders them by their
+        # characters (code points). Hence, we order the strings with our helpers,
+        # and the booleans with ``CompareTo``, where ``false`` comes before ``true``
+        # as in Python.
+        primitive_type = intermediate_type_inference.try_primitive_type(
+            self.type_map[node.left]
+        )
+        if node.op not in (
+            parse_tree.Comparator.EQ,
+            parse_tree.Comparator.NE,
+        ) and primitive_type in (
+            intermediate_type_inference.PrimitiveType.STR,
+            intermediate_type_inference.PrimitiveType.BOOL,
+        ):
+            ordering_errors = []  # type: List[Error]
+
+            ordered_left, error = self._transform_and_unwrap_narrowed_nullable_value(
+                node.left
+            )
+            if error is not None:
+                ordering_errors.append(error)
+
+            ordered_right, error = self._transform_and_unwrap_narrowed_nullable_value(
+                node.right
+            )
+            if error is not None:
+                ordering_errors.append(error)
+
+            if len(ordering_errors) > 0:
+                return None, Error(
+                    node.original_node,
+                    "Failed to transpile the comparison",
+                    ordering_errors,
+                )
+
+            assert ordered_left is not None
+            assert ordered_right is not None
+
+            if primitive_type is intermediate_type_inference.PrimitiveType.STR:
+                return (
+                    Stripped(
+                        f"{csharp_common.COMMON_CLASS}.StringHelpers.CompareByCodePoints("
+                        f"{ordered_left}, {ordered_right}) {comparator} 0"
+                    ),
+                    None,
+                )
+
+            if not isinstance(
+                node.left, (parse_tree.Member, parse_tree.Name, parse_tree.Constant)
+            ):
+                ordered_left = Stripped(f"({ordered_left})")
+
+            return (
+                Stripped(f"{ordered_left}.CompareTo({ordered_right}) {comparator} 0"),
+                None,
+            )
+
         errors = []
 
         left, error = self.transform(node.left)

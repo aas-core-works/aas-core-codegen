@@ -97,7 +97,12 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     ] = [
         (
             base_rel_path / "common/common.go",
-            lambda: (golang_lib.generate_common(context.symbol_table), None),
+            lambda: (
+                golang_lib.generate_common(
+                    symbol_table=context.symbol_table, type_inference=type_inference
+                ),
+                None,
+            ),
         ),
         (
             base_rel_path / "constants/constants.go",
@@ -331,13 +336,21 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # NOTE (mristin):
     # The helpers for ``len``, slicing strings and ``find`` are only generated for
-    # a meta-model which uses them, and so are their tests.
-    if intermediate_uses.len_slicing_or_find(context.symbol_table):
+    # a meta-model which uses them, and so are their tests. We also test
+    # the native comparison of strings so that the users can inspect the same
+    # cases in all the SDKs.
+    if intermediate_uses.len_slicing_or_find(
+        context.symbol_table
+    ) or intermediate_uses.string_ordering(type_inference):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 base_rel_path / "common/string_helpers_test/string_helpers_test.go",
                 lambda: (
-                    golang_tests.generate_string_helpers_test(repo_url=repo_url),
+                    golang_tests.generate_string_helpers_test(
+                        repo_url=repo_url,
+                        symbol_table=context.symbol_table,
+                        type_inference=type_inference,
+                    ),
                     None,
                 ),
             ),

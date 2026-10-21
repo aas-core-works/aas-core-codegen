@@ -4,7 +4,10 @@ from typing import List, Sequence
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, Stripped, indent_but_first_line
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 from aas_core_codegen.java import common as java_common, naming as java_naming
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -130,10 +133,12 @@ public static long parseSafeInt(String text) {{
 
 
 def _generate_string_helpers(
-    package: java_common.PackageIdentifier, symbol_table: intermediate.SymbolTable
+    package: java_common.PackageIdentifier,
+    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> Stripped:
     """
-    Generate the helpers for ``len``, slicing strings, ``find``, ``lstrip`` and ``int``.
+    Generate the helpers for the operations on strings in the transpiled code.
 
     The helpers follow the Python implementation, since Python is the language of
     the meta-model specifications. Hence, the lengths and the positions count
@@ -144,10 +149,53 @@ def _generate_string_helpers(
     the negative positions from the end. We also accept the positions as
     ``long``'s, since our integers are ``long``'s in Java.
 
-    The helpers for ``lstrip`` and ``int`` are generated only if the meta-model
-    uses them.
+    The helpers for comparing strings, ``lstrip`` and ``int`` are generated only if
+    the meta-model uses them. We also compare the strings to sort the items of
+    the set properties of strings.
     """
     extra_methods = []  # type: List[Stripped]
+
+    # NOTE (mristin):
+    # We also sort the items of the set properties of strings by their code points
+    # so that all the SDKs serialize them in the same order.
+    if intermediate_uses.string_ordering(
+        type_inference
+    ) or intermediate_uses.sets_of_strings_in_properties(symbol_table):
+        extra_methods.append(
+            Stripped(
+                f"""\
+/**
+ * Compare {{@code that}} and {{@code other}} by their code points.
+ *
+ * <p>We follow the Python implementation of the string comparison, since
+ * Python is the language of the meta-model specifications.
+ * {{@link String#compareTo}} compares the UTF-16 code units instead, which gives
+ * a different order for the characters outside the Basic Multilingual Plane.
+ *
+ * @param that text to be compared
+ * @param other text to compare against
+ * @return negative, zero or positive if {{@code that}} comes before, is equal to
+ * or comes after {{@code other}}, respectively
+ */
+public static int compareByCodePoints(String that, String other) {{
+{I}int i = 0;
+{I}int j = 0;
+{I}while (i < that.length() && j < other.length()) {{
+{II}final int thatCodePoint = that.codePointAt(i);
+{II}final int otherCodePoint = other.codePointAt(j);
+{II}if (thatCodePoint != otherCodePoint) {{
+{III}return Integer.compare(thatCodePoint, otherCodePoint);
+{II}}}
+
+{II}i += Character.charCount(thatCodePoint);
+{II}j += Character.charCount(otherCodePoint);
+{I}}}
+
+{I}return Integer.compare(that.length() - i, other.length() - j);
+}}"""
+            )
+        )
+
     if intermediate_uses.lstrip_call(symbol_table):
         extra_methods.append(_LSTRIP)
 
@@ -314,6 +362,7 @@ def _generate_set_helpers(
     package: java_common.PackageIdentifier,
     with_operations: bool,
     with_sorting: bool,
+    with_sorting_of_strings: bool,
     ranked_enumerations: Sequence[intermediate.Enumeration],
 ) -> Stripped:
     """
@@ -325,9 +374,10 @@ def _generate_set_helpers(
 
     The set properties are serialized as sorted arrays, and the items are
     verified in the sorted order. The order must be the same in all the targets,
-    so the strings are compared by their code points, and not by their UTF-16
-    code units as :py:meth:`String.compareTo` does. We generate the sorting
-    only ``with_sorting``.
+    so the strings are compared by their code points with
+    ``StringHelpers.compareByCodePoints``, and not by their UTF-16 code units as
+    :py:meth:`String.compareTo` does. We generate the sorting only
+    ``with_sorting``, and the sorting of strings only ``with_sorting_of_strings``.
 
     The literals of the ``ranked_enumerations`` are sorted by the code points of
     their serialized values. We rank them here, at the generation time, so that
@@ -381,40 +431,6 @@ public static <T> Set<T> difference(Set<T> that, Set<T> other) {{
             Stripped(
                 f"""\
 /**
- * Compare {{@code that}} and {{@code other}} by their code points.
- *
- * <p>{{@link String#compareTo}} compares the UTF-16 code units instead,
- * which gives a different order for the characters outside the Basic
- * Multilingual Plane.
- *
- * @param that text to be compared
- * @param other text to compare against
- * @return negative, zero or positive if {{@code that}} comes before, is equal to
- * or comes after {{@code other}}, respectively
- */
-public static int compareByCodePoints(String that, String other) {{
-{I}int i = 0;
-{I}int j = 0;
-{I}while (i < that.length() && j < other.length()) {{
-{II}final int thatCodePoint = that.codePointAt(i);
-{II}final int otherCodePoint = other.codePointAt(j);
-{II}if (thatCodePoint != otherCodePoint) {{
-{III}return Integer.compare(thatCodePoint, otherCodePoint);
-{II}}}
-
-{II}i += Character.charCount(thatCodePoint);
-{II}j += Character.charCount(otherCodePoint);
-{I}}}
-
-{I}return Integer.compare(that.length() - i, other.length() - j);
-}}"""
-            )
-        )
-
-        methods.append(
-            Stripped(
-                f"""\
-/**
  * Give the items of {{@code that}} in their natural order.
  *
  * <p>We use it for the booleans, where {{@code false}} comes before
@@ -433,6 +449,7 @@ public static <T extends Comparable<? super T>> List<T> sorted(
             )
         )
 
+    if with_sorting_of_strings:
         methods.append(
             Stripped(
                 f"""\
@@ -444,12 +461,13 @@ public static <T extends Comparable<? super T>> List<T> sorted(
  */
 public static List<String> sortedByCodePoints(Set<String> that) {{
 {I}final List<String> result = new ArrayList<>(that);
-{I}result.sort(SetHelpers::compareByCodePoints);
+{I}result.sort(StringHelpers::compareByCodePoints);
 {I}return result;
 }}"""
             )
         )
 
+    if with_sorting:
         methods.append(
             Stripped(
                 f"""\
@@ -591,6 +609,7 @@ public final class SetHelpers {{
 def generate(
     package: java_common.PackageIdentifier,
     symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> List[java_common.JavaFile]:
     """
     Generate code shared across the generated Java packages.
@@ -600,19 +619,22 @@ def generate(
     infrastructure, and not meta-model-derived types.
 
     The string helpers are generated only if the meta-model might take ``len`` of
-    strings, slice them, or call ``find``, ``lstrip`` or ``int`` on them.
+    strings, slice them, compare them, sort them in set properties, or call
+    ``find``, ``lstrip`` or ``int`` on them.
     """
     files = []  # type: List[java_common.JavaFile]
 
     if (
         intermediate_uses.len_slicing_or_find(symbol_table)
+        or intermediate_uses.string_ordering(type_inference)
+        or intermediate_uses.sets_of_strings_in_properties(symbol_table)
         or intermediate_uses.lstrip_call(symbol_table)
         or intermediate_uses.int_call(symbol_table)
     ):
         files.append(
             java_common.JavaFile(
                 "StringHelpers.java",
-                f"{_generate_string_helpers(package, symbol_table)}\n",
+                f"{_generate_string_helpers(package, symbol_table, type_inference)}\n",
             )
         )
 
@@ -623,6 +645,9 @@ def generate(
             package=package,
             with_operations=with_operations,
             with_sorting=with_sorting,
+            with_sorting_of_strings=intermediate_uses.sets_of_strings_in_properties(
+                symbol_table
+            ),
             ranked_enumerations=intermediate_uses.enumerations_in_set_properties(
                 symbol_table
             ),

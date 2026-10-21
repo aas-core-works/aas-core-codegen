@@ -21,7 +21,10 @@ from aas_core_codegen.golang.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
 )
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 
 
 def _generate_tuple_struct(arity: int) -> Stripped:
@@ -151,7 +154,7 @@ func SortedKeys[K comparable](
         f"""\
 // Check whether `that` comes before `other`, where false comes before true.
 func LessBool(that bool, other bool) bool {{
-{I}return !that && other
+{I}return CompareBools(that, other) < 0
 }}"""
     ),
     Stripped(
@@ -316,7 +319,10 @@ func {golang_transpilation.PARSE_SAFE_INT_FUNCTION_NAME}(text string) int64 {{
     "Trailing newline mandatory for valid end-of-files"
 )
 # fmt: on
-def generate(symbol_table: intermediate.SymbolTable) -> str:
+def generate(
+    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
+) -> str:
     """Generate code of common functionality."""
     # NOTE (mristin):
     # An unused import does not compile in Go, so we import only what the helpers
@@ -629,6 +635,34 @@ func FindStr(text string, sub string, start int64) int64 {{
 
     if intermediate_uses.set_operations(symbol_table):
         blocks.extend(SET_OPERATIONS)
+
+    # NOTE (mristin):
+    # Go does not order the booleans natively, so we transpile their ordering
+    # comparisons to this helper. We also sort the booleans in the set properties
+    # with it, see ``LessBool``.
+    if intermediate_uses.bool_ordering(
+        type_inference
+    ) or intermediate_uses.set_properties(symbol_table):
+        blocks.append(
+            Stripped(
+                f"""\
+// Compare `that` and `other`, where false comes before true as in Python.
+//
+// Return -1 if `that` comes before `other`, 0 if they are equal, and 1
+// otherwise.
+func CompareBools(that bool, other bool) int {{
+{I}if that == other {{
+{II}return 0
+{I}}}
+
+{I}if other {{
+{II}return -1
+{I}}}
+
+{I}return 1
+}}"""
+            )
+        )
 
     if intermediate_uses.set_properties(symbol_table):
         blocks.extend(SORTED_KEYS)

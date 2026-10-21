@@ -8,9 +8,13 @@ Import this module as ``intermediate_uses`` so that the checks read naturally,
 *e.g.*, ``intermediate_uses.modulo(symbol_table)``.
 """
 
+import itertools
 from typing import Iterator, List, Sequence, Set, Union
 
-from aas_core_codegen.intermediate import _types
+from aas_core_codegen.intermediate import (
+    _types,
+    type_inference as intermediate_type_inference,
+)
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -131,6 +135,70 @@ def modulo(symbol_table: _types.SymbolTable) -> bool:
         isinstance(node, parse_tree.Mod)
         for node in _over_transpilable_nodes(symbol_table)
     )
+
+
+def _orders(
+    type_inference: intermediate_type_inference.TypeInference,
+    primitive_type: intermediate_type_inference.PrimitiveType,
+) -> bool:
+    """
+    Check whether any transpiled code orders two values of ``primitive_type``.
+
+    We look for the comparisons ``<``, ``<=``, ``>`` and ``>=``. The operands of
+    a comparison share the primitive type, so we only check the left one.
+    """
+    roots_and_type_maps = itertools.chain(
+        (
+            ([invariant.body], inference.type_map)
+            for invariant, inference in type_inference.by_invariant.items()
+        ),
+        (
+            (verification.parsed.body, inference.type_map)
+            for verification, inference in type_inference.by_verification.items()
+        ),
+        (
+            (method.body, inference.type_map)
+            for method, inference in type_inference.by_method.items()
+        ),
+    )
+
+    for roots, type_map in roots_and_type_maps:
+        for root in roots:
+            for node in parse_tree.over_nodes(root):
+                if (
+                    isinstance(node, parse_tree.Comparison)
+                    and node.op
+                    not in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE)
+                    and intermediate_type_inference.try_primitive_type(
+                        type_map[node.left]
+                    )
+                    is primitive_type
+                ):
+                    return True
+
+    return False
+
+
+def string_ordering(type_inference: intermediate_type_inference.TypeInference) -> bool:
+    """
+    Check whether any transpiled code orders two strings.
+
+    The targets use this check to generate the helper for comparing the strings
+    only if the meta-model needs it. The helper orders the strings by their
+    characters (code points) as Python does, since Python is the language of
+    the meta-model specifications.
+    """
+    return _orders(type_inference, intermediate_type_inference.PrimitiveType.STR)
+
+
+def bool_ordering(type_inference: intermediate_type_inference.TypeInference) -> bool:
+    """
+    Check whether any transpiled code orders two booleans.
+
+    The targets which do not order the booleans natively use this check to
+    generate their helper only if the meta-model needs it.
+    """
+    return _orders(type_inference, intermediate_type_inference.PrimitiveType.BOOL)
 
 
 def assert_statements_in(

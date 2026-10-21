@@ -10,15 +10,13 @@ using NUnit.Framework;  // can't alias
 namespace AasCore.Aas3_0.Tests
 {
     /// <summary>
-    /// Test <c>len</c>, the slicing of strings and <c>find</c> as used in
-    /// the transpiled code.
+    /// Test the operations on strings.
     /// </summary>
     /// <remarks>
-    /// The transpiled code follows the Python implementation, since Python is
-    /// the language of the meta-model specifications. Hence, the lengths and
-    /// the positions count the characters (code points). The expected values have
-    /// been computed with Python, and all the SDKs test against the very same
-    /// cases.
+    /// The operations follow the Python implementation, since Python is
+    /// the language of the meta-model specifications. Hence, they work on
+    /// the characters (code points) of the strings. The expected values have been
+    /// computed with Python, and all the SDKs test against the very same cases.
     /// </remarks>
     public class TestStringHelpers
     {

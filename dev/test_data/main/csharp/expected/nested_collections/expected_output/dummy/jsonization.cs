@@ -1523,7 +1523,7 @@ namespace dummy
             private static readonly Serializer<HashSet<string>> Serialize_SetOf_string = (
                 SerializeSet<string>(
                     ToJsonValue,
-                    Common.SetHelpers.CompareByCodePoints));
+                    Common.StringHelpers.CompareByCodePoints));
 
             private static readonly Serializer<
                 (long, HashSet<string>)

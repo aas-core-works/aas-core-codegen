@@ -1129,6 +1129,132 @@ __xml_namespace__ = "https://dummy.com"
             ),
         )
 
+    def test_ordering_of_strings_and_booleans(self) -> None:
+        source = """\
+@invariant(lambda self: len(self) > 0, "At least one character")
+class Non_empty_string(str, DBC):
+    pass
+
+
+@verification
+def some_func(
+    text: str, name: Non_empty_string, flag: bool, other_flag: bool
+) -> bool:
+    return "a" < text and name >= text and flag <= other_flag and flag > False
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.execute(source=source)
+
+    def test_ordering_of_enumerations_fails(self) -> None:
+        source = """\
+class Kind(Enum):
+    Alpha = "alpha"
+    Beta = "beta"
+
+
+@verification
+def some_func(kind: Kind) -> bool:
+    return kind < Kind.Beta
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "We support the ordering comparisons only on the booleans, "
+                "the numbers and the strings, but got: Kind and Kind"
+            ),
+        )
+
+    def test_ordering_of_instances_fails(self) -> None:
+        source = """\
+class Something:
+    some_property: int
+
+    def __init__(self, some_property: int) -> None:
+        self.some_property = some_property
+
+
+@verification
+def some_func(that: Something, other: Something) -> bool:
+    return that >= other
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "We support the ordering comparisons only on the booleans, "
+                "the numbers and the strings, but got: Something and Something"
+            ),
+        )
+
+    def test_ordering_of_bytearrays_fails(self) -> None:
+        source = """\
+@verification
+def some_func(that: bytearray, other: bytearray) -> bool:
+    return that > other
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "We support the ordering comparisons only on the booleans, "
+                "the numbers and the strings, but got: bytearray and bytearray"
+            ),
+        )
+
+    def test_ordering_of_str_with_bool_fails(self) -> None:
+        source = """\
+@verification
+def some_func(text: str, flag: bool) -> bool:
+    return text < flag
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the operands of the comparison to be of comparable "
+                "types, but got: str and bool"
+            ),
+        )
+
+    def test_ordering_of_optional_str_fails(self) -> None:
+        source = """\
+@verification
+def some_func(text: Optional[str]) -> bool:
+    return text < "z"
+
+
+__version__ = "dummy"
+__xml_namespace__ = "https://dummy.com"
+"""
+
+        self.expect_type_inference_to_fail(
+            source=source,
+            expected_joined_message=(
+                "Expected the left operand to be a non-None, but got: Optional[str]"
+            ),
+        )
+
     def test_modulo_negation_and_abs(self) -> None:
         source = """\
 @invariant(lambda self: self % 2 == 0, "Even")

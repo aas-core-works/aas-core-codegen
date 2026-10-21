@@ -356,13 +356,20 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # The tests of ``len``, slicing strings and ``find`` are only relevant for
-    # a meta-model which uses them.
-    if intermediate_uses.len_slicing_or_find(context.symbol_table):
+    # The tests of ``len``, slicing, ``find`` and comparing strings are only
+    # relevant for a meta-model which uses them.
+    if intermediate_uses.len_slicing_or_find(
+        context.symbol_table
+    ) or intermediate_uses.string_ordering(type_inference):
         rel_paths_generators = list(rel_paths_generators) + [
             (
-                tests_rel_path / "test_len_slicing_and_find.py",
-                lambda: (python_tests.generate_test_len_slicing_and_find(), None),
+                tests_rel_path / "test_string_helpers.py",
+                lambda: (
+                    python_tests.generate_test_string_helpers(
+                        symbol_table=context.symbol_table, type_inference=type_inference
+                    ),
+                    None,
+                ),
             ),
         ]
 

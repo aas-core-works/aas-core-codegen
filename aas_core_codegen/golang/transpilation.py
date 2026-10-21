@@ -716,6 +716,23 @@ len(
             )
 
         # NOTE (mristin):
+        # Go does not order the booleans, so we compare them with our helper, where
+        # ``false`` comes before ``true`` as in Python. We need no helper for
+        # the strings, as Go orders them by their UTF-8 bytes, which gives the same
+        # order as the characters (code points) in Python.
+        if node.op not in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE,) and (
+            intermediate_type_inference.try_primitive_type(self.type_map[node.left])
+            is intermediate_type_inference.PrimitiveType.BOOL
+        ):
+            return (
+                Stripped(
+                    f"{golang_common.COMMON_PACKAGE}.CompareBools({left}, {right}) "
+                    f"{comparator} 0"
+                ),
+                None,
+            )
+
+        # NOTE (mristin):
         # The modulo is transpiled either as a function call or as the native
         # operator ``%``, and the negation as the unary ``-``. Both bind stronger
         # than the comparison in Go, so they need no parentheses.

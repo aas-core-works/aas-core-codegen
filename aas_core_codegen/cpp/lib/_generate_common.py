@@ -22,7 +22,10 @@ from aas_core_codegen.cpp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
 )
-from aas_core_codegen.intermediate import uses as intermediate_uses
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+    uses as intermediate_uses,
+)
 
 
 def _generate_concatenate_definitions_for_2_parts_and_above() -> List[Stripped]:
@@ -746,6 +749,32 @@ SetT Difference(
 ]
 
 
+#: Declare the comparison of the strings by code points, to which we transpile
+#: the ordering comparisons of strings
+_COMPARE_BY_CODE_POINTS_DECLARATION: Final[Stripped] = Stripped(
+    f"""\
+/**
+ * \\brief Compare \\p that text and \\p other text code point by code point.
+ *
+ * We follow the Python implementation of the string comparison, since Python is
+ * the language of the meta-model specifications. The comparison of std::wstring
+ * compares the code units. Where wchar_t has 16 bits, as on Windows, the text is
+ * encoded in UTF-16, and the code units put the characters above U+FFFF, encoded
+ * as surrogate pairs, before the characters from U+E000 to U+FFFF. Hence we
+ * decode the code points and compare them instead, in the same way on all
+ * the platforms.
+ *
+ * \\param that text to be compared
+ * \\param other text to compare against
+ * \\return -1 if \\p that comes before \\p other, 0 if they are equal, and 1
+ * otherwise
+ */
+int CompareByCodePoints(
+{I}const std::wstring& that,
+{I}const std::wstring& other
+);"""
+)
+
 #: Declare the comparison of the strings by code points, by which we sort
 #: the items of the set properties
 _LESS_BY_CODE_POINTS_DECLARATION: Final[Stripped] = Stripped(
@@ -753,12 +782,6 @@ _LESS_BY_CODE_POINTS_DECLARATION: Final[Stripped] = Stripped(
 /**
  * \\brief Check whether \\p that text comes before \\p other text,
  * comparing them code point by code point.
- *
- * The comparison of std::wstring compares the code units. Where wchar_t has
- * 16 bits, as on Windows, the text is encoded in UTF-16, and the code units put
- * the characters above U+FFFF, encoded as surrogate pairs, before
- * the characters from U+E000 to U+FFFF. Hence we decode the code points and
- * compare them instead, in the same way on all the platforms.
  *
  * We sort the items of the sets by the code points in the serialization so that
  * all the SDKs write the same order.
@@ -773,9 +796,9 @@ bool LessByCodePoints(
 );"""
 )
 
-#: Define the comparison of the strings by code points, by which we sort
-#: the items of the set properties
-_LESS_BY_CODE_POINTS_DEFINITION: Final[Stripped] = Stripped(
+#: Define the comparison of the strings by code points, to which we transpile
+#: the ordering comparisons of strings
+_COMPARE_BY_CODE_POINTS_DEFINITION: Final[Stripped] = Stripped(
     f"""\
 namespace {{
 
@@ -809,7 +832,7 @@ std::uint32_t DecodeCodePoint(const std::wstring& text, size_t& offset) {{
 
 }}  // namespace
 
-bool LessByCodePoints(
+int CompareByCodePoints(
 {I}const std::wstring& that,
 {I}const std::wstring& other
 ) {{
@@ -821,11 +844,27 @@ bool LessByCodePoints(
 {II}const std::uint32_t other_code_point = DecodeCodePoint(other, other_offset);
 
 {II}if (that_code_point != other_code_point) {{
-{III}return that_code_point < other_code_point;
+{III}return that_code_point < other_code_point ? -1 : 1;
 {II}}}
 {I}}}
 
-{I}return other_offset < other.size();
+{I}if (that_offset < that.size()) {{
+{II}return 1;
+{I}}}
+
+{I}return other_offset < other.size() ? -1 : 0;
+}}"""
+)
+
+#: Define the comparison of the strings by code points, by which we sort
+#: the items of the set properties
+_LESS_BY_CODE_POINTS_DEFINITION: Final[Stripped] = Stripped(
+    f"""\
+bool LessByCodePoints(
+{I}const std::wstring& that,
+{I}const std::wstring& other
+) {{
+{I}return CompareByCodePoints(that, other) < 0;
 }}"""
 )
 
@@ -897,7 +936,9 @@ std::vector<const typename SetT::value_type*> SortedPointers(
 )
 # fmt: on
 def generate_header(
-    symbol_table: intermediate.SymbolTable, library_namespace: Stripped
+    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
+    library_namespace: Stripped,
 ) -> str:
     """Generate header of common functionality."""
     namespace = Stripped(f"{library_namespace}")
@@ -1334,6 +1375,12 @@ size_t LenTuple(const std::tuple<T...>&) {
                 else []
             ),
             *(
+                [_COMPARE_BY_CODE_POINTS_DECLARATION]
+                if intermediate_uses.string_ordering(type_inference)
+                or intermediate_uses.sets_of_strings_in_properties(symbol_table)
+                else []
+            ),
+            *(
                 [_LESS_BY_CODE_POINTS_DECLARATION]
                 if intermediate_uses.sets_of_strings_in_properties(symbol_table)
                 else []
@@ -1375,7 +1422,9 @@ size_t LenTuple(const std::tuple<T...>&) {
 )
 # fmt: on
 def generate_implementation(
-    symbol_table: intermediate.SymbolTable, library_namespace: Stripped
+    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
+    library_namespace: Stripped,
 ) -> str:
     """Generate implementation of common functionality."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.COMMON_NAMESPACE}")
@@ -1389,8 +1438,10 @@ def generate_implementation(
         std_includes.append("#include <stdexcept>")
 
     # NOTE (mristin):
-    # ``LessByCodePoints`` needs ``std::uint32_t``.
-    if intermediate_uses.sets_of_strings_in_properties(symbol_table):
+    # ``CompareByCodePoints`` needs ``std::uint32_t``.
+    if intermediate_uses.string_ordering(
+        type_inference
+    ) or intermediate_uses.sets_of_strings_in_properties(symbol_table):
         std_includes.append("#include <cstdint>")
 
     std_includes_joined = "\n".join(std_includes)
@@ -1617,6 +1668,12 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
         *(
             [PARSE_SAFE_INT_DEFINITION]
             if intermediate_uses.int_call(symbol_table)
+            else []
+        ),
+        *(
+            [_COMPARE_BY_CODE_POINTS_DEFINITION]
+            if intermediate_uses.string_ordering(type_inference)
+            or intermediate_uses.sets_of_strings_in_properties(symbol_table)
             else []
         ),
         *(

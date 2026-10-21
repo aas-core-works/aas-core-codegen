@@ -750,7 +750,7 @@ namespace dummy
             foreach (
                 var item in Common.SetHelpers.Sorted(
                     that,
-                    Common.SetHelpers.CompareByCodePoints))
+                    Common.StringHelpers.CompareByCodePoints))
             {
                 foreach (var error in Verification.VerifyCode(item))
                 {
