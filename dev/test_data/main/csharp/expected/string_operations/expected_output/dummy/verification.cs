@@ -201,6 +201,22 @@ namespace dummy
         }  // public static bool HasAtMostTwoSignificantDecimals
 
         /// <summary>
+        /// Check the concatenation assigned to the variables.
+        /// </summary>
+        /// <remarks>
+        /// We concatenate two literals on purpose, since C++ can not add two string
+        /// literals natively.
+        /// </remarks>
+        public static bool NameWithExtensionIsShort(
+            string name
+        )
+        {
+            var extension = "." + "txt";
+            var path = name + extension;
+            return Common.StringHelpers.Len(path) <= 12;
+        }  // public static bool NameWithExtensionIsShort
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -220,6 +236,21 @@ namespace dummy
                 Our.ISomething that
             )
             {
+                if (!(
+                    Common.StringHelpers.Len(that.OtherWord + "😀") <= 3))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Other word with an emoji must have at most three characters");
+                }
+
+                if (!Verification.NameWithExtensionIsShort(that.Name))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Name with the extension must have at most 12 characters");
+                }
+
                 if (!(
                     !that.Amount.StartsWith("+", System.StringComparison.Ordinal)))
                 {

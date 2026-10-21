@@ -168,6 +168,19 @@ public class Verification {
   }
 
   /**
+   * Check the concatenation assigned to the variables.
+   *
+   * <p>We concatenate two literals on purpose, since C++ can not add two string
+   * literals natively.
+   */
+  public static Boolean nameWithExtensionIsShort(
+    String name) {
+    var extension = "." + "txt";
+    var path = name + extension;
+    return StringHelpers.len(path) <= 12;
+  }
+
+  /**
    * Hash allowed enum values for efficient validation of enums.
    */
   private static class _EnumValueSet {
@@ -181,6 +194,20 @@ public class Verification {
     public Stream<Reporting.Error> transformSomething(
       ISomething that) {
       Stream<Reporting.Error> errorStream = Stream.empty();
+
+      if (!(StringHelpers.len(that.getOtherWord() + "😀") <= 3)) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Other word with an emoji must have at most three characters")));
+      }
+
+      if (!nameWithExtensionIsShort(that.getName())) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(new Reporting.Error(
+            "Invariant violated:\n" +
+            "Name with the extension must have at most 12 characters")));
+      }
 
       if (!(!that.getAmount().startsWith("+"))) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,

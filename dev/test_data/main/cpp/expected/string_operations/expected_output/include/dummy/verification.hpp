@@ -277,6 +277,14 @@ bool HasAtMostTwoSignificantDecimals(
   const std::wstring& amount
 );
 
+/// \brief Check the concatenation assigned to the variables.
+///
+/// We concatenate two literals on purpose, since C++ can not add two string
+/// literals natively.
+bool NameWithExtensionIsShort(
+  const std::wstring& name
+);
+
 // endregion Verification functions
 
 // region Verification of constrained primitives

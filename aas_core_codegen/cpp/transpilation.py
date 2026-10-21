@@ -2254,6 +2254,31 @@ common::make_optional(
             parse_tree.Any,
         )
 
+        if (
+            isinstance(node, parse_tree.Add)
+            and intermediate_type_inference.try_primitive_type(self.type_map[node])
+            is intermediate_type_inference.PrimitiveType.STR
+        ):
+            # NOTE (mristin):
+            # C++ can not add two string literals, as they are pointers, so we
+            # convert the left one to ``std::wstring``. A single literal can be
+            # added to a ``std::wstring`` natively.
+            if isinstance(node.left, parse_tree.Constant) and isinstance(
+                node.right, parse_tree.Constant
+            ):
+                left = Stripped(f"std::wstring({left})")
+            elif not isinstance(
+                node.left, (parse_tree.Constant, *no_parentheses_types_in_this_context)
+            ):
+                left = Stripped(f"({left})")
+
+            if not isinstance(
+                node.right, (parse_tree.Constant, *no_parentheses_types_in_this_context)
+            ):
+                right = Stripped(f"({right})")
+
+            return Stripped(f"{left} + {right}"), None
+
         # NOTE (mristin):
         # The lengths are unsigned ``size_t``'s in C++, while the other integers are
         # ``int64_t``'s. C++ would compute the mix of the two as unsigned, so that

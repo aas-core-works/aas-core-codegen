@@ -222,6 +222,21 @@ def has_at_most_two_significant_decimals(
     return len(amount[position + 1:].rstrip('0')) <= 2
 
 
+def name_with_extension_is_short(
+    name: str
+) -> bool:
+    """
+    Check the concatenation assigned to the variables.
+
+    We concatenate two literals on purpose, since C++ can not add two string
+    literals natively.
+    """
+    # pylint: disable=all
+    extension = '.' + 'txt'
+    path = name + extension
+    return len(path) <= 12
+
+
 class _Transformer(
         our_types.AbstractTransformer[
             Iterator[Error]
@@ -232,6 +247,16 @@ class _Transformer(
             self,
             that: our_types.Something
     ) -> Iterator[Error]:
+        if not (len(that.other_word + '😀') <= 3):
+            yield Error(
+                'Other word with an emoji must have at most three characters'
+            )
+
+        if not name_with_extension_is_short(that.name):
+            yield Error(
+                'Name with the extension must have at most 12 characters'
+            )
+
         if not (not that.amount.startswith('+')):
             yield Error(
                 'Amount must not start with a plus'
