@@ -32,45 +32,6 @@ namespace dummy
     public static class Verification
     {
         /// <summary>
-        /// Check the ordering of a string with the literals on both sides.
-        /// </summary>
-        public static bool TextIsBetweenBounds(
-            string text
-        )
-        {
-            return Common.StringHelpers.CompareByCodePoints("A", text) <= 0
-            && Common.StringHelpers.CompareByCodePoints(text, "z") < 0;
-        }  // public static bool TextIsBetweenBounds
-
-        /// <summary>
-        /// Check the ordering of a constrained primitive with a string.
-        /// </summary>
-        public static bool NameIsNotAfterText(
-            string name,
-            string text
-        )
-        {
-            return (!(Common.StringHelpers.CompareByCodePoints(name, text) > 0))
-            && Common.StringHelpers.CompareByCodePoints(text, name) >= 0;
-        }  // public static bool NameIsNotAfterText
-
-        /// <summary>
-        /// Check the ordering of a string with a character from U+E000 to U+FFFF.
-        /// </summary>
-        /// <remarks>
-        /// A character beyond the Basic Multilingual Plane such as "😀" (U+1F600) sorts
-        /// after the replacement character (U+FFFD), but its UTF-16 code units (U+D83D and
-        /// U+DE00) sort before it.
-        /// </remarks>
-        public static bool TextSortsBeforeReplacementCharacter(
-            string text
-        )
-        {
-            return (
-                Common.StringHelpers.CompareByCodePoints(text, "�") < 0);
-        }  // public static bool TextSortsBeforeReplacementCharacter
-
-        /// <summary>
         /// Check all the ordering comparisons of booleans, where <c>False &lt; True</c>.
         /// </summary>
         public static bool FlagsAreOrdered(
@@ -148,12 +109,13 @@ namespace dummy
             )
             {
                 if (!(
-                    Common.StringHelpers.CompareByCodePoints(that.Name, "zzz") < 0
-                    && that.Flag.CompareTo(that.OtherFlag) <= 0))
+                    that.Flag.CompareTo(that.OtherFlag) <= 0
+                    && Common.StringHelpers.Len(that.Text) < 1000))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Name must sort before zzz and flag must imply the other flag");
+                        "Flag must imply the other flag and text must be shorter " +
+                        "than 1000");
                 }
 
                 if (!(
@@ -185,36 +147,6 @@ namespace dummy
                         "Invariant violated:\n" +
                         "Flag implies the other flag");
                 }
-
-                if (!(
-                    Verification.TextSortsBeforeReplacementCharacter(that.Text)))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Text must sort before the replacement character");
-                }
-
-                if (!(
-                    Verification.NameIsNotAfterText(that.Name, that.Text)))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Name must not sort after the text");
-                }
-
-                if (!Verification.TextIsBetweenBounds(that.Name))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Name must be between A and z");
-                }
-
-                foreach (var error in Verification.VerifyNonEmptyString(that.Name))
-                {
-                    error.PrependSegment(
-                        new Reporting.NameSegment("name"));
-                    yield return error;
-                }
             }
         }  // private class Transformer
 
@@ -229,20 +161,6 @@ namespace dummy
             foreach (var error in _transformer.Transform(that))
             {
                 yield return error;
-            }
-        }
-
-        /// <summary>
-        /// Verify the constraints of <paramref name="that" />.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyNonEmptyString (
-            string that)
-        {
-            if (!(Common.StringHelpers.Len(that) > 0))
-            {
-                yield return new Reporting.Error(
-                    "Invariant violated:\n" +
-                    "At least one character");
             }
         }
     }  // public static class Verification

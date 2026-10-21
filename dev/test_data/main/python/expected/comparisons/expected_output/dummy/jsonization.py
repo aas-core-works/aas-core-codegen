@@ -394,7 +394,6 @@ def something_from_jsonable(
     mapping = _as_mapping(jsonable)
 
     the_text: Optional[str] = None
-    the_name: Optional[str] = None
     the_flag: Optional[bool] = None
     the_other_flag: Optional[bool] = None
     the_count: Optional[int] = None
@@ -406,8 +405,6 @@ def something_from_jsonable(
         for key, jsonable_value in mapping.items():
             if key == 'text':
                 the_text = _str_from_jsonable(jsonable_value)
-            elif key == 'name':
-                the_name = _str_from_jsonable(jsonable_value)
             elif key == 'flag':
                 the_flag = _bool_from_jsonable(jsonable_value)
             elif key == 'otherFlag':
@@ -435,11 +432,6 @@ def something_from_jsonable(
             "The required property 'text' is missing"
         )
 
-    if the_name is None:
-        raise DeserializationException(
-            "The required property 'name' is missing"
-        )
-
     if the_flag is None:
         raise DeserializationException(
             "The required property 'flag' is missing"
@@ -462,7 +454,6 @@ def something_from_jsonable(
 
     return our_types.Something(
         the_text,
-        the_name,
         the_flag,
         the_other_flag,
         the_count,
@@ -581,11 +572,6 @@ def _something_to_jsonable(
         jsonable['text'] = that.text
     except SerializationException as exception:
         exception._prepend_property('text')
-        raise
-    try:
-        jsonable['name'] = that.name
-    except SerializationException as exception:
-        exception._prepend_property('name')
         raise
     try:
         jsonable['flag'] = that.flag

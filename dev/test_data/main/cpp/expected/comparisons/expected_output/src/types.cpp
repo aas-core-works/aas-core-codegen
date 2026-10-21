@@ -11,15 +11,12 @@ namespace types {
 
 Something::Something(
   std::wstring text,
-  std::wstring name,
   bool flag,
   bool other_flag,
   int64_t count,
   double ratio
 ) {
   text_ = std::move(text);
-
-  name_ = std::move(name);
 
   flag_ = flag;
 
@@ -46,20 +43,6 @@ void Something::set_text(
   std::wstring value
 ) {
   text_ = value;
-}
-
-const std::wstring& Something::name() const {
-  return name_;
-}
-
-std::wstring& Something::mutable_name() {
-  return name_;
-}
-
-void Something::set_name(
-  std::wstring value
-) {
-  name_ = value;
 }
 
 bool Something::flag() const {

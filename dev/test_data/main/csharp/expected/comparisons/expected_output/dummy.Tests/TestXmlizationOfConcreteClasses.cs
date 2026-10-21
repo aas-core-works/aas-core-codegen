@@ -298,6 +298,162 @@ namespace dummy.Tests
                 }
             }
         }  // public void Test_Something_verification_fail
+
+        /// <summary>
+        /// Read the first recorded example of Something with the content of
+        /// the element <paramref name="xmlName" /> replaced by
+        /// <paramref name="text" />.
+        /// </summary>
+        private static Our.Something ReadWith(string xmlName, string text)
+        {
+            var paths = Directory.GetFiles(
+                Path.Combine(
+                    Our.Tests.Common.TestDataDir,
+                    "Xml",
+                    "Expected",
+                    "something"
+                ),
+                "*.xml",
+                System.IO.SearchOption.AllDirectories).ToList();
+            paths.Sort();
+
+            Assert.IsNotEmpty(
+                paths,
+                $"Expected at least one recorded example of something, but got none");
+
+            string original = System.IO.File.ReadAllText(paths[0]);
+
+            int start = original.IndexOf($"<{xmlName}>") + xmlName.Length + 2;
+            int end = original.IndexOf($"</{xmlName}>");
+
+            string patched =
+                original.Substring(0, start) + text + original.Substring(end);
+
+            using var xmlReader = System.Xml.XmlReader.Create(
+                new System.IO.StringReader(patched));
+
+            return Our.Xmlization.Deserialize.SomethingFrom(xmlReader);
+        }
+
+        [Test]
+        public void TestRatioReadFrom1e400()
+        {
+            var instance = ReadWith(
+                "ratio",
+                "1e400");
+
+            Assert.AreEqual(
+                System.Double.PositiveInfinity,
+                instance.Ratio);
+        }  // public void TestRatioReadFrom1e400
+
+        [Test]
+        public void TestRatioReadFromMinus1e400()
+        {
+            var instance = ReadWith(
+                "ratio",
+                "-1e400");
+
+            Assert.AreEqual(
+                System.Double.NegativeInfinity,
+                instance.Ratio);
+        }  // public void TestRatioReadFromMinus1e400
+
+        [Test]
+        public void TestRatioReadFrom1eminus400()
+        {
+            var instance = ReadWith(
+                "ratio",
+                "1e-400");
+
+            Assert.AreEqual(
+                0.0,
+                instance.Ratio);
+        }  // public void TestRatioReadFrom1eminus400
+
+        [Test]
+        public void TestRatioReadFromInf()
+        {
+            var instance = ReadWith(
+                "ratio",
+                "INF");
+
+            Assert.AreEqual(
+                System.Double.PositiveInfinity,
+                instance.Ratio);
+        }  // public void TestRatioReadFromInf
+
+        [Test]
+        public void TestRatioReadFromPlusInf()
+        {
+            var instance = ReadWith(
+                "ratio",
+                "+INF");
+
+            Assert.AreEqual(
+                System.Double.PositiveInfinity,
+                instance.Ratio);
+        }  // public void TestRatioReadFromPlusInf
+
+        [Test]
+        public void TestRatioReadFromMinusInf()
+        {
+            var instance = ReadWith(
+                "ratio",
+                "-INF");
+
+            Assert.AreEqual(
+                System.Double.NegativeInfinity,
+                instance.Ratio);
+        }  // public void TestRatioReadFromMinusInf
+
+        [Test]
+        public void TestFlagReadFrom1()
+        {
+            var instance = ReadWith(
+                "flag",
+                "1");
+
+            Assert.AreEqual(
+                true,
+                instance.Flag);
+        }  // public void TestFlagReadFrom1
+
+        [Test]
+        public void TestFlagReadFrom0()
+        {
+            var instance = ReadWith(
+                "flag",
+                "0");
+
+            Assert.AreEqual(
+                false,
+                instance.Flag);
+        }  // public void TestFlagReadFrom0
+
+        [Test]
+        public void TestFlagReadFromTrue()
+        {
+            var instance = ReadWith(
+                "flag",
+                "true");
+
+            Assert.AreEqual(
+                true,
+                instance.Flag);
+        }  // public void TestFlagReadFromTrue
+
+        [Test]
+        public void TestFlagReadFromFalse()
+        {
+            var instance = ReadWith(
+                "flag",
+                "false");
+
+            Assert.AreEqual(
+                false,
+                instance.Flag);
+        }  // public void TestFlagReadFromFalse
     }  // class TestXmlizationOfConcreteClasses
 }  // namespace dummy.Tests
 

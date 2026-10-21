@@ -30,37 +30,6 @@ import dummy.visitation.AbstractTransformer;
 
 public class Verification {
   /**
-   * Check the ordering of a string with the literals on both sides.
-   */
-  public static Boolean textIsBetweenBounds(
-    String text) {
-    return StringHelpers.compareByCodePoints("A", text) <= 0
-    && StringHelpers.compareByCodePoints(text, "z") < 0;
-  }
-
-  /**
-   * Check the ordering of a constrained primitive with a string.
-   */
-  public static Boolean nameIsNotAfterText(
-    String name,
-    String text) {
-    return (!(StringHelpers.compareByCodePoints(name, text) > 0))
-    && StringHelpers.compareByCodePoints(text, name) >= 0;
-  }
-
-  /**
-   * Check the ordering of a string with a character from U+E000 to U+FFFF.
-   *
-   * <p>A character beyond the Basic Multilingual Plane such as "😀" (U+1F600) sorts
-   * after the replacement character (U+FFFD), but its UTF-16 code units (U+D83D and
-   * U+DE00) sort before it.
-   */
-  public static Boolean textSortsBeforeReplacementCharacter(
-    String text) {
-    return StringHelpers.compareByCodePoints(text, "�") < 0;
-  }
-
-  /**
    * Check all the ordering comparisons of booleans, where {@code False < True}.
    */
   public static Boolean flagsAreOrdered(
@@ -125,12 +94,13 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       if (!(
-        StringHelpers.compareByCodePoints(that.getName(), "zzz") < 0
-        && Boolean.compare(that.getFlag(), that.getOtherFlag()) <= 0)) {
+        Boolean.compare(that.getFlag(), that.getOtherFlag()) <= 0
+        && StringHelpers.len(that.getText()) < 1000)) {
         errorStream = Stream.<Reporting.Error>concat(errorStream,
           Stream.of(new Reporting.Error(
             "Invariant violated:\n" +
-            "Name must sort before zzz and flag must imply the other flag")));
+            "Flag must imply the other flag and text must be shorter " +
+            "than 1000")));
       }
 
       if (!textFitsIntoCount(that.getText(), that.getCount())) {
@@ -161,37 +131,6 @@ public class Verification {
             "Invariant violated:\n" +
             "Flag implies the other flag")));
       }
-
-      if (!(
-        textSortsBeforeReplacementCharacter(that.getText()))) {
-        errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Stream.of(new Reporting.Error(
-            "Invariant violated:\n" +
-            "Text must sort before the replacement character")));
-      }
-
-      if (!nameIsNotAfterText(that.getName(), that.getText())) {
-        errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Stream.of(new Reporting.Error(
-            "Invariant violated:\n" +
-            "Name must not sort after the text")));
-      }
-
-      if (!textIsBetweenBounds(that.getName())) {
-        errorStream = Stream.<Reporting.Error>concat(errorStream,
-          Stream.of(new Reporting.Error(
-            "Invariant violated:\n" +
-            "Name must be between A and z")));
-      }
-
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getName())
-          .flatMap(Verification::verifyNonEmptyString)
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("name"));
-              return error;
-            }));
 
       return errorStream;
     }
@@ -241,23 +180,6 @@ public class Verification {
    */
   public static Iterable<Reporting.Error> verify(IClass that) {
     return new _ValidationErrorIterable(that);
-  }
-
-  /**
-   * Verify the constraints of {@code that}.
-   */
-  public static Stream<Reporting.Error> verifyNonEmptyString (
-    String that) {
-    Stream<Reporting.Error> errorStream = Stream.empty();
-
-    if (!(StringHelpers.len(that) > 0)) {
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(new Reporting.Error(
-          "Invariant violated:\n" +
-          "At least one character")));
-    }
-
-    return errorStream;
   }
 
   private static class _Pair<A, B> {

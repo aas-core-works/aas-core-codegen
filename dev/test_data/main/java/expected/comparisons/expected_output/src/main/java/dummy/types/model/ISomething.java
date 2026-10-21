@@ -18,10 +18,6 @@ public interface ISomething extends IClass {
 
   void setText(String text);
 
-  String getName();
-
-  void setName(String name);
-
   Boolean getFlag();
 
   void setFlag(Boolean flag);

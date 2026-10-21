@@ -356,17 +356,15 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # The tests of ``len``, slicing, ``find`` and comparing strings are only
-    # relevant for a meta-model which uses them.
-    if intermediate_uses.len_slicing_or_find(
-        context.symbol_table
-    ) or intermediate_uses.string_ordering(type_inference):
+    # The tests of the operations on strings are only relevant for a meta-model
+    # which uses them.
+    if intermediate_uses.string_operations(type_inference):
         rel_paths_generators = list(rel_paths_generators) + [
             (
                 tests_rel_path / "test_string_helpers.py",
                 lambda: (
                     python_tests.generate_test_string_helpers(
-                        symbol_table=context.symbol_table, type_inference=type_inference
+                        type_inference=type_inference
                     ),
                     None,
                 ),
@@ -392,16 +390,14 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         ]
 
     # NOTE (mristin):
-    # We test ``str.lstrip`` and ``int`` only if the meta-model uses them so that
-    # the other SDKs, which need helper functions, test the very same cases.
-    if intermediate_uses.lstrip_call(
-        context.symbol_table
-    ) or intermediate_uses.int_call(context.symbol_table):
+    # We test ``int`` only if the meta-model uses it so that the other SDKs, which
+    # need helper functions, test the very same cases.
+    if intermediate_uses.int_call(context.symbol_table):
         rel_paths_generators = list(rel_paths_generators) + [
             (
-                tests_rel_path / "test_lstrip_and_int.py",
+                tests_rel_path / "test_parse_int.py",
                 lambda: (
-                    python_tests.generate_test_lstrip_and_int(
+                    python_tests.generate_test_parse_int(
                         symbol_table=context.symbol_table,
                         qualified_module_name=qualified_module_name,
                     ),

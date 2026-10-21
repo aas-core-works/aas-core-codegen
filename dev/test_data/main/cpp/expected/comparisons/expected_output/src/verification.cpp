@@ -39,35 +39,6 @@ Error::Error(
 
 // region Verification functions
 
-bool TextIsBetweenBounds(
-  const std::wstring& text
-) {
-  return (
-    (
-      common::CompareByCodePoints(L"A", text) <= 0
-      && common::CompareByCodePoints(text, L"z") < 0
-    )
-  );
-}
-
-bool NameIsNotAfterText(
-  const std::wstring& name,
-  const std::wstring& text
-) {
-  return (
-    (
-      (!(common::CompareByCodePoints(name, text) > 0))
-      && common::CompareByCodePoints(text, name) >= 0
-    )
-  );
-}
-
-bool TextSortsBeforeReplacementCharacter(
-  const std::wstring& text
-) {
-  return common::CompareByCodePoints(text, L"\ufffd") < 0;
-}
-
 bool FlagsAreOrdered(
   bool flag,
   bool other_flag
@@ -137,8 +108,7 @@ namespace {
  * A shape tells which checks apply to a value, see \ref ChecksOf.
  */
 enum class Shape : std::uint32_t {
-  kNonEmptyString = 0,
-  kSomething = 1
+  kSomething = 0
 };  // enum class Shape
 
 /**
@@ -160,13 +130,6 @@ struct Check {
 
 // region Checks
 
-bool NonEmptyString_0(
-  const void* value
-) {
-  const std::wstring& that = *static_cast<const std::wstring*>(value);
-  return common::LenStr(that) > 0;
-}
-
 bool Something_0(
   const void* value
 ) {
@@ -174,8 +137,8 @@ bool Something_0(
     static_cast<const types::ISomething*>(value)
   );
   return (
-    common::CompareByCodePoints(that->name(), L"zzz") < 0
-    && that->flag() <= that->other_flag()
+    that->flag() <= that->other_flag()
+    && common::LenStr(that->text()) < 1000
   );
 }
 
@@ -225,59 +188,17 @@ bool Something_4(
   );
 }
 
-bool Something_5(
-  const void* value
-) {
-  const types::ISomething* that = (
-    static_cast<const types::ISomething*>(value)
-  );
-  return verification::TextSortsBeforeReplacementCharacter(
-    that->text()
-  );
-}
-
-bool Something_6(
-  const void* value
-) {
-  const types::ISomething* that = (
-    static_cast<const types::ISomething*>(value)
-  );
-  return verification::NameIsNotAfterText(
-    that->name(),
-    that->text()
-  );
-}
-
-bool Something_7(
-  const void* value
-) {
-  const types::ISomething* that = (
-    static_cast<const types::ISomething*>(value)
-  );
-  return verification::TextIsBetweenBounds(
-    that->name()
-  );
-}
-
 /**
  * Give out the checks of the values of the \p shape.
  */
 const std::vector<Check>& ChecksOf(Shape shape) {
   switch (shape) {
-    case Shape::kNonEmptyString: {
-      static const std::vector<Check> checks = {
-        {
-          &NonEmptyString_0,
-          L"At least one character"
-        }
-      };
-      return checks;
-    }
     case Shape::kSomething: {
       static const std::vector<Check> checks = {
         {
           &Something_0,
-          L"Name must sort before zzz and flag must imply the other flag"
+          L"Flag must imply the other flag and text must be shorter "
+          L"than 1000"
         },
         {
           &Something_1,
@@ -294,18 +215,6 @@ const std::vector<Check>& ChecksOf(Shape shape) {
         {
           &Something_4,
           L"Flag implies the other flag"
-        },
-        {
-          &Something_5,
-          L"Text must sort before the replacement character"
-        },
-        {
-          &Something_6,
-          L"Name must not sort after the text"
-        },
-        {
-          &Something_7,
-          L"Name must be between A and z"
         }
       };
       return checks;
@@ -493,187 +402,11 @@ std::unique_ptr<IIterator> One(
   return common::make_unique<OneIterator>(value, shape);
 }
 
-/**
- * \brief Iterate over the values of the children, one child after another.
- *
- * A child is started only once the previous child is done.
- */
-class ChainIterator : public IIterator {
- public:
-  explicit ChainIterator(
-    std::vector<std::unique_ptr<IIterator> > children
-  ) :
-    children_(std::move(children)),
-    active_(0) {
-    // Intentionally empty.
-  }
-
-  ChainIterator(const ChainIterator& other) :
-    active_(other.active_) {
-    children_.reserve(other.children_.size());
-    for (const std::unique_ptr<IIterator>& child : other.children_) {
-      children_.emplace_back(child->Clone());
-    }
-  }
-
-  void Start() override {
-    active_ = 0;
-    if (!children_.empty()) {
-      children_[0]->Start();
-    }
-    SkipDoneChildren();
-  }
-
-  void Next() override {
-    children_[active_]->Next();
-    SkipDoneChildren();
-  }
-
-  bool Done() const override {
-    return active_ >= children_.size();
-  }
-
-  const void* Value() const override {
-    return children_[active_]->Value();
-  }
-
-  Shape ShapeOf() const override {
-    return children_[active_]->ShapeOf();
-  }
-
-  void AppendToPath(iteration::Path& path) const override {
-    children_[active_]->AppendToPath(path);
-  }
-
-  std::unique_ptr<IIterator> Clone() const override {
-    return common::make_unique<ChainIterator>(*this);
-  }
-
- private:
-  std::vector<std::unique_ptr<IIterator> > children_;
-
-  /**
-   * Index of the child we currently iterate over
-   */
-  std::size_t active_;
-
-  /**
-   * Move on to the next children, and start them, until one is not done.
-   */
-  void SkipDoneChildren() {
-    while (active_ < children_.size() && children_[active_]->Done()) {
-      ++active_;
-      if (active_ < children_.size()) {
-        children_[active_]->Start();
-      }
-    }
-  }
-};  // class ChainIterator
-
-void CollectChildren(
-  std::vector<std::unique_ptr<IIterator> >&
-) {
-  // Intentionally empty, as there are no more children to collect.
-}
-
-template<typename... Rest>
-void CollectChildren(
-  std::vector<std::unique_ptr<IIterator> >& children,
-  std::unique_ptr<IIterator> first,
-  Rest... rest
-) {
-  children.emplace_back(std::move(first));
-  CollectChildren(children, std::move(rest)...);
-}
-
-// NOTE (mristin):
-// We can not use an initializer list here, as we can not move the unique pointers
-// out of it.
-template<typename... Children>
-std::unique_ptr<IIterator> Chain(
-  Children... children
-) {
-  std::vector<std::unique_ptr<IIterator> > collected;
-  collected.reserve(sizeof...(Children));
-  CollectChildren(collected, std::move(children)...);
-
-  return common::make_unique<ChainIterator>(std::move(collected));
-}
-
-/**
- * Iterate over the values of the \p child, which lives in a property.
- */
-class InPropertyIterator : public IIterator {
- public:
-  InPropertyIterator(
-    iteration::Property property,
-    std::unique_ptr<IIterator> child
-  ) :
-    property_(property),
-    child_(std::move(child)) {
-    // Intentionally empty.
-  }
-
-  InPropertyIterator(const InPropertyIterator& other) :
-    property_(other.property_),
-    child_(other.child_->Clone()) {
-    // Intentionally empty.
-  }
-
-  void Start() override {
-    child_->Start();
-  }
-
-  void Next() override {
-    child_->Next();
-  }
-
-  bool Done() const override {
-    return child_->Done();
-  }
-
-  const void* Value() const override {
-    return child_->Value();
-  }
-
-  Shape ShapeOf() const override {
-    return child_->ShapeOf();
-  }
-
-  void AppendToPath(iteration::Path& path) const override {
-    path.segments.emplace_back(
-      common::make_unique<iteration::PropertySegment>(property_)
-    );
-    child_->AppendToPath(path);
-  }
-
-  std::unique_ptr<IIterator> Clone() const override {
-    return common::make_unique<InPropertyIterator>(*this);
-  }
-
- private:
-  iteration::Property property_;
-  std::unique_ptr<IIterator> child_;
-};  // class InPropertyIterator
-
-std::unique_ptr<IIterator> InProperty(
-  iteration::Property property,
-  std::unique_ptr<IIterator> child
-) {
-  return common::make_unique<InPropertyIterator>(property, std::move(child));
-}
-
 std::unique_ptr<IIterator> Over_Something(
   const types::ISomething& that,
   bool
 ) {
-  return Chain(
-    One(&that, Shape::kSomething),
-    InProperty(
-      iteration::Property::kName,
-      One(&that.name(), Shape::kNonEmptyString)
-    )
-  );
+  return One(&that, Shape::kSomething);
 }
 
 /**
@@ -903,47 +636,9 @@ const Iterator& PastLastError() {
   return iterator;
 }
 
-/**
- * Verify the values given by the iterator, which we restart on every \ref begin.
- */
-class ValuesVerification : public IVerification {
- public:
-  explicit ValuesVerification(
-    std::unique_ptr<IIterator> values
-  ) :
-    values_(std::move(values)) {
-    // Intentionally empty.
-  }
-
-  Iterator begin() const override {
-    return IterateErrors(values_->Clone());
-  }
-
-  const Iterator& end() const override {
-    return PastLastError();
-  }
-
-  ~ValuesVerification() override = default;
-
- private:
-  std::unique_ptr<IIterator> values_;
-};  // class ValuesVerification
-
 // endregion Iteration over the errors
 
 }  // namespace
-
-// region Verification of constrained primitives
-
-std::unique_ptr<IVerification> VerifyNonEmptyString(
-  const std::wstring& that
-) {
-  return common::make_unique<ValuesVerification>(
-    One(&that, Shape::kNonEmptyString)
-  );
-}
-
-// endregion Verification of constrained primitives
 
 // region NonRecursiveVerification
 

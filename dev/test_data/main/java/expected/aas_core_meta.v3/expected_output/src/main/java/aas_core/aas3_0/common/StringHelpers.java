@@ -20,25 +20,6 @@ public final class StringHelpers {
   }
 
   /**
-   * Resolve {@code position} in a string of {@code length} as Python does
-   * in slicing.
-   *
-   * <p>A negative position counts from the end, and the positions out of range
-   * are clamped to the string.
-   *
-   * @param position to be resolved
-   * @param length of the string
-   * @return the resolved position within {@code [0, length]}
-   */
-  private static int resolvePosition(long position, int length) {
-    if (position < 0) {
-      return (int) Math.max(position + length, 0);
-    }
-
-    return (int) Math.min(position, length);
-  }
-
-  /**
    * Count the characters (code points) of {@code text}.
    *
    * <p>We follow the Python implementation of {@code len}, since Python is
@@ -50,89 +31,6 @@ public final class StringHelpers {
    */
   public static int len(String text) {
     return text.codePointCount(0, text.length());
-  }
-
-  /**
-   * Slice {@code text} from {@code start} up to {@code end}, exclusive.
-   *
-   * <p>We follow the Python implementation of slicing, since Python is
-   * the language of the meta-model specifications. Hence, the positions count
-   * the characters (code points), a negative position counts from the end,
-   * the positions out of range are clamped to the string, and the slice is empty
-   * if {@code start} is not before {@code end}.
-   *
-   * @param text to be sliced
-   * @param start of the slice, inclusive
-   * @param end of the slice, exclusive
-   * @return the slice
-   */
-  public static String slice(String text, long start, long end) {
-    final int length = len(text);
-    final int theStart = resolvePosition(start, length);
-    final int theEnd = resolvePosition(end, length);
-
-    if (theStart >= theEnd) {
-      return "";
-    }
-
-    final int startOffset = text.offsetByCodePoints(0, theStart);
-    final int endOffset = text.offsetByCodePoints(startOffset, theEnd - theStart);
-    return text.substring(startOffset, endOffset);
-  }
-
-  /**
-   * Slice {@code text} from {@code start} up to its end.
-   *
-   * <p>See {@link #slice(String, long, long)} for the semantics.
-   *
-   * @param text to be sliced
-   * @param start of the slice, inclusive
-   * @return the slice
-   */
-  public static String slice(String text, long start) {
-    return slice(text, start, Long.MAX_VALUE);
-  }
-
-  /**
-   * Find the first {@code sub} in {@code text} from {@code start} on.
-   *
-   * <p>We follow the Python implementation of {@code str.find}, since Python
-   * is the language of the meta-model specifications. Hence, the positions count
-   * the characters (code points), a negative {@code start} counts from the end,
-   * and a {@code start} beyond the end of {@code text} gives -1.
-   *
-   * @param text to be searched in
-   * @param sub to be searched for
-   * @param start of the search
-   * @return the position of {@code sub} in {@code text}, or -1 if not found
-   */
-  public static long find(String text, String sub, long start) {
-    final int length = len(text);
-    final long theStart = start < 0 ? Math.max(start + length, 0) : start;
-    if (theStart > length) {
-      return -1;
-    }
-
-    final int startOffset = text.offsetByCodePoints(0, (int) theStart);
-    final int offset = text.indexOf(sub, startOffset);
-    if (offset == -1) {
-      return -1;
-    }
-
-    return theStart + text.codePointCount(startOffset, offset);
-  }
-
-  /**
-   * Find the first {@code sub} in {@code text}.
-   *
-   * <p>See {@link #find(String, String, long)} for the semantics.
-   *
-   * @param text to be searched in
-   * @param sub to be searched for
-   * @return the position of {@code sub} in {@code text}, or -1 if not found
-   */
-  public static long find(String text, String sub) {
-    return find(text, sub, 0);
   }
 }
 

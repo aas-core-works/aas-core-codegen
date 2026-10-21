@@ -14188,43 +14188,6 @@ std::wstring SliceStr(
   );
 }
 
-int64_t FindStr(
-  const std::wstring& text,
-  const std::wstring& sub
-) {
-  return FindStr(text, sub, 0);
-}
-
-int64_t FindStr(
-  const std::wstring& text,
-  const std::wstring& sub,
-  int64_t start
-) {
-  const int64_t length = static_cast<int64_t>(LenStr(text));
-
-  int64_t the_start = start;
-  if (the_start < 0) {
-    the_start += length;
-    if (the_start < 0) {
-      the_start = 0;
-    }
-  }
-
-  if (the_start > length) {
-    return -1;
-  }
-
-  const size_t start_offset = OffsetOf(text, static_cast<size_t>(the_start));
-  const size_t offset = text.find(sub, start_offset);
-  if (offset == std::wstring::npos) {
-    return -1;
-  }
-
-  return the_start + static_cast<int64_t>(
-    CountCharacters(text, start_offset, offset)
-  );
-}
-
 }  // namespace common
 }  // namespace dummy
 

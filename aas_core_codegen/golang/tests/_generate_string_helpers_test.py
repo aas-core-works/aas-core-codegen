@@ -1,4 +1,4 @@
-"""Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
+"""Generate the unit tests for the operations on strings."""
 
 import io
 import re
@@ -6,7 +6,7 @@ from typing import List
 
 from icontract import ensure, require
 
-from aas_core_codegen import intermediate, string_helper_cases
+from aas_core_codegen import string_helper_cases
 from aas_core_codegen.common import Stripped
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
@@ -24,9 +24,7 @@ def _function_name(prefix: str, description: str) -> str:
 
 # fmt: off
 @require(
-    lambda symbol_table, type_inference:
-    intermediate_uses.len_slicing_or_find(symbol_table)
-    or intermediate_uses.string_ordering(type_inference)
+    lambda type_inference: intermediate_uses.string_operations(type_inference)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -35,45 +33,12 @@ def _function_name(prefix: str, description: str) -> str:
 # fmt: on
 def generate(
     repo_url: Stripped,
-    symbol_table: intermediate.SymbolTable,
     type_inference: intermediate_type_inference.TypeInference,
 ) -> str:
-    """Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
-    uses_len_slicing_or_find = intermediate_uses.len_slicing_or_find(symbol_table)
-    uses_comparisons = intermediate_uses.string_ordering(type_inference)
+    """Generate the unit tests for the operations on strings."""
+    test_blocks = []  # type: List[Stripped]
 
-    imports = []  # type: List[str]
-    if uses_comparisons:
-        imports.append('"strings"')
-
-    imports.append('"testing"')
-
-    if uses_len_slicing_or_find:
-        imports.append(f'ourcommon "{repo_url}/common"')
-
-    imports_joined = "\n".join(f"{I}{an_import}" for an_import in imports)
-
-    blocks = [
-        Stripped(
-            """\
-// Test the operations on strings.
-//
-// The operations follow the Python implementation, since Python is
-// the language of the meta-model specifications. Hence, they work on
-// the characters (code points) of the strings. The expected values have been
-// computed with Python, and all the SDKs test against the very same cases.
-package common_string_helpers_test"""
-        ),
-        golang_common.WARNING,
-        Stripped(
-            f"""\
-import (
-{imports_joined}
-)"""
-        ),
-    ]  # type: List[Stripped]
-
-    if uses_len_slicing_or_find:
+    if intermediate_uses.string_len_call(type_inference):
         for len_case in string_helper_cases.LEN_CASES:
             explanation = golang_common.string_literal(
                 f"Expected {len_case.python_expression()} to give "
@@ -82,7 +47,7 @@ import (
 
             # NOTE (mristin):
             # We call the helper just as the transpiled code does.
-            blocks.append(
+            test_blocks.append(
                 Stripped(
                     f"""\
 func {_function_name("Len", len_case.description)}(t *testing.T) {{
@@ -94,6 +59,7 @@ func {_function_name("Len", len_case.description)}(t *testing.T) {{
                 )
             )
 
+    if intermediate_uses.string_slicing(type_inference):
         for slice_case in string_helper_cases.SLICE_CASES:
             text = golang_common.string_literal(slice_case.text)
             start = "0" if slice_case.start is None else str(slice_case.start)
@@ -111,7 +77,7 @@ func {_function_name("Len", len_case.description)}(t *testing.T) {{
                 f"{slice_case.expected!r} ({slice_case.description}), but got %q"
             )
 
-            blocks.append(
+            test_blocks.append(
                 Stripped(
                     f"""\
 func {_function_name("Slice", slice_case.description)}(t *testing.T) {{
@@ -123,6 +89,7 @@ func {_function_name("Slice", slice_case.description)}(t *testing.T) {{
                 )
             )
 
+    if intermediate_uses.string_find_call(type_inference):
         for find_case in string_helper_cases.FIND_CASES:
             text = golang_common.string_literal(find_case.text)
             sub = golang_common.string_literal(find_case.sub)
@@ -137,7 +104,7 @@ func {_function_name("Slice", slice_case.description)}(t *testing.T) {{
                 f"{find_case.expected} ({find_case.description}), but got %d"
             )
 
-            blocks.append(
+            test_blocks.append(
                 Stripped(
                     f"""\
 func {_function_name("Find", find_case.description)}(t *testing.T) {{
@@ -149,7 +116,7 @@ func {_function_name("Find", find_case.description)}(t *testing.T) {{
                 )
             )
 
-    if uses_comparisons:
+    if intermediate_uses.string_ordering(type_inference):
         for compare_case in string_helper_cases.COMPARE_CASES:
             left = golang_common.string_literal(compare_case.left)
             right = golang_common.string_literal(compare_case.right)
@@ -159,7 +126,7 @@ func {_function_name("Find", find_case.description)}(t *testing.T) {{
                 f"{compare_case.expected} ({compare_case.description}), but got %d"
             )
 
-            blocks.append(
+            test_blocks.append(
                 Stripped(
                     f"""\
 func {_function_name("Compare", compare_case.description)}(t *testing.T) {{
@@ -171,7 +138,65 @@ func {_function_name("Compare", compare_case.description)}(t *testing.T) {{
                 )
             )
 
-    blocks.append(golang_common.WARNING)
+    if intermediate_uses.lstrip_call(type_inference):
+        for lstrip_case in string_helper_cases.LSTRIP_CASES:
+            explanation = golang_common.string_literal(
+                f"Expected {lstrip_case.python_expression()} to give "
+                f"{lstrip_case.expected!r} ({lstrip_case.description}), but got %q"
+            )
+
+            # NOTE (mristin):
+            # We call the native function just as the transpiled code does.
+            test_blocks.append(
+                Stripped(
+                    f"""\
+func {_function_name("LStrip", lstrip_case.description)}(t *testing.T) {{
+{I}got := strings.TrimLeft(
+{II}{golang_common.string_literal(lstrip_case.text)},
+{II}{golang_common.string_literal(lstrip_case.chars)},
+{I})
+{I}if got != {golang_common.string_literal(lstrip_case.expected)} {{
+{II}t.Errorf({explanation}, got)
+{I}}}
+}}"""
+                )
+            )
+
+    # NOTE (mristin):
+    # An unused import does not compile in Go, so we import only what the tests
+    # name.
+    import_lines = []  # type: List[str]
+    if golang_common.names_package(test_blocks, "strings"):
+        import_lines.append(f'{I}"strings"')
+
+    import_lines.append(f'{I}"testing"')
+
+    if golang_common.names_package(test_blocks, "ourcommon"):
+        import_lines.append(f'{I}ourcommon "{repo_url}/common"')
+
+    import_lines_joined = "\n".join(import_lines)
+
+    blocks = [
+        Stripped(
+            """\
+// Test the operations on strings.
+//
+// The operations follow the Python implementation, since Python is
+// the language of the meta-model specifications. Hence, they work on
+// the characters (code points) of the strings. The expected values have been
+// computed with Python, and all the SDKs test against the very same cases.
+package common_string_helpers_test"""
+        ),
+        golang_common.WARNING,
+        Stripped(
+            f"""\
+import (
+{import_lines_joined}
+)"""
+        ),
+        *test_blocks,
+        golang_common.WARNING,
+    ]  # type: List[Stripped]
 
     writer = io.StringIO()
     for i, block in enumerate(blocks):

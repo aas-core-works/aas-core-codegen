@@ -300,7 +300,6 @@ public class Xmlization {
       XMLEventReader reader,
       boolean isEmptySequence) {
       String theText = null;
-      String theName = null;
       Boolean theFlag = null;
       Boolean theOtherFlag = null;
       Long theCount = null;
@@ -331,21 +330,6 @@ public class Xmlization {
                 valueError = value.getError();
               } else {
                 theText = value.getResult();
-              }
-              break;
-            }
-            case "name": {
-              if (theName != null) {
-                valueError = duplicatePropertyError(elementName);
-                break;
-              }
-
-              final Reporting.Result<String> value =
-                readTextAs_string(reader, isEmptyProperty);
-              if (value.isError()) {
-                valueError = value.getError();
-              } else {
-                theName = value.getResult();
               }
               break;
             }
@@ -437,10 +421,6 @@ public class Xmlization {
         return missingRequiredProperty("text", "Something");
       }
 
-      if (theName == null) {
-        return missingRequiredProperty("name", "Something");
-      }
-
       if (theFlag == null) {
         return missingRequiredProperty("flag", "Something");
       }
@@ -459,7 +439,6 @@ public class Xmlization {
 
       return Reporting.Result.success(new Something(
         theText,
-        theName,
         theFlag,
         theOtherFlag,
         theCount,
@@ -599,13 +578,6 @@ public class Xmlization {
         "text",
         "getText()",
         that.getText(),
-        writer,
-        XmlCommon::writeStringifiedContent);
-
-      writeProperty(
-        "name",
-        "getName()",
-        that.getName(),
         writer,
         XmlCommon::writeStringifiedContent);
 

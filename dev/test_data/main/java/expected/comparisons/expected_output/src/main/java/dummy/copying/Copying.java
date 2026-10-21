@@ -57,7 +57,6 @@ public class Copying
         ) {
             return new Something(
                 that.getText(),
-                that.getName(),
                 that.getFlag(),
                 that.getOtherFlag(),
                 that.getCount(),
@@ -73,7 +72,6 @@ public class Copying
         ) {
             return new Something(
                 that.getText(),
-                that.getName(),
                 that.getFlag(),
                 that.getOtherFlag(),
                 that.getCount(),

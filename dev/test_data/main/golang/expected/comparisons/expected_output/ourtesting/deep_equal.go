@@ -21,12 +21,6 @@ func deepEqualSomething(
 		return false
 	}
 
-	thatName := that.Name()
-	otherName := other.Name()
-	if thatName != otherName {
-		return false
-	}
-
 	thatFlag := that.Flag()
 	otherFlag := other.Flag()
 	if thatFlag != otherFlag {

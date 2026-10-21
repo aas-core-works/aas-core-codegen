@@ -3,13 +3,6 @@
   <xs:group name="something">
     <xs:sequence>
       <xs:element name="text" type="xs:string"/>
-      <xs:element name="name">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:element>
       <xs:element name="flag" type="xs:boolean"/>
       <xs:element name="otherFlag" type="xs:boolean"/>
       <xs:element name="count" type="xs:long"/>

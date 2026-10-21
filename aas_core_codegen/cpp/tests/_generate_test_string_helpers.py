@@ -1,11 +1,11 @@
-"""Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
+"""Generate the unit tests for the helpers of the operations on strings."""
 
 import io
 from typing import List
 
 from icontract import ensure, require
 
-from aas_core_codegen import intermediate, string_helper_cases
+from aas_core_codegen import string_helper_cases
 from aas_core_codegen.common import Stripped
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
@@ -15,14 +15,13 @@ from aas_core_codegen.cpp import common as cpp_common
 from aas_core_codegen.cpp.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
 )
 
 
 # fmt: off
 @require(
-    lambda symbol_table, type_inference:
-    intermediate_uses.len_slicing_or_find(symbol_table)
-    or intermediate_uses.string_ordering(type_inference)
+    lambda type_inference: intermediate_uses.string_operations(type_inference)
 )
 @ensure(
     lambda result:
@@ -32,10 +31,9 @@ from aas_core_codegen.cpp.common import (
 # fmt: on
 def generate_implementation(
     library_namespace: Stripped,
-    symbol_table: intermediate.SymbolTable,
     type_inference: intermediate_type_inference.TypeInference,
 ) -> str:
-    """Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
+    """Generate the unit tests for the helpers of the operations on strings."""
     include_prefix_path = cpp_common.generate_include_prefix_path(library_namespace)
 
     blocks = [
@@ -59,7 +57,7 @@ def generate_implementation(
         Stripped(f"namespace our = {library_namespace};"),
     ]  # type: List[Stripped]
 
-    if intermediate_uses.len_slicing_or_find(symbol_table):
+    if intermediate_uses.string_len_call(type_inference):
         for len_case in string_helper_cases.LEN_CASES:
             name = cpp_common.string_literal(
                 f"{len_case.python_expression()} gives {len_case.expected}: "
@@ -78,6 +76,7 @@ TEST_CASE({name}) {{
                 )
             )
 
+    if intermediate_uses.string_slicing(type_inference):
         for slice_case in string_helper_cases.SLICE_CASES:
             name = cpp_common.string_literal(
                 f"{slice_case.python_expression()} gives {slice_case.expected!r}: "
@@ -105,6 +104,7 @@ TEST_CASE({name}) {{
                 )
             )
 
+    if intermediate_uses.string_find_call(type_inference):
         for find_case in string_helper_cases.FIND_CASES:
             name = cpp_common.string_literal(
                 f"{find_case.python_expression()} gives {find_case.expected}: "
@@ -147,6 +147,28 @@ TEST_CASE({name}) {{
 {I}REQUIRE(
 {II}our::common::CompareByCodePoints({left}, {right})
 {II}== {compare_case.expected}
+{I});
+}}"""
+                )
+            )
+
+    if intermediate_uses.lstrip_call(type_inference):
+        for lstrip_case in string_helper_cases.LSTRIP_CASES:
+            name = cpp_common.string_literal(
+                f"{lstrip_case.python_expression()} gives "
+                f"{lstrip_case.expected!r}: {lstrip_case.description}"
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+TEST_CASE({name}) {{
+{I}REQUIRE(
+{II}our::common::LStrip(
+{III}{cpp_common.wstring_literal(lstrip_case.text)},
+{III}{cpp_common.wstring_literal(lstrip_case.chars)}
+{II})
+{II}== {cpp_common.wstring_literal(lstrip_case.expected)}
 {I});
 }}"""
                 )

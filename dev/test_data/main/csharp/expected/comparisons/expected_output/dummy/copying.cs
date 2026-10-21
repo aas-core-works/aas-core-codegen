@@ -53,7 +53,6 @@ namespace dummy
             {
                 return new Our.Something(
                     that.Text,
-                    that.Name,
                     that.Flag,
                     that.OtherFlag,
                     that.Count,
@@ -69,7 +68,6 @@ namespace dummy
             {
                 return new Our.Something(
                     that.Text,
-                    that.Name,
                     that.Flag,
                     that.OtherFlag,
                     that.Count,

@@ -49,12 +49,6 @@ namespace dummy
                 set => _instance.Text = value;
             }
 
-            public string Name
-            {
-                get => _instance.Name;
-                set => _instance.Name = value;
-            }
-
             public bool Flag
             {
                 get => _instance.Flag;

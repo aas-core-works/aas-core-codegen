@@ -45,34 +45,6 @@ func (ve *VerificationError) PathString() string {
 	return ourreporting.ToGolangPath(ve.Path)
 }
 
-// Check the ordering of a string with the literals on both sides.
-func TextIsBetweenBounds(
-	text string,
-) bool {
-	return "A" <= text &&
-		text < "z"
-}
-
-// Check the ordering of a constrained primitive with a string.
-func NameIsNotAfterText(
-	name string,
-	text string,
-) bool {
-	return (!(name > text)) &&
-		text >= name
-}
-
-// Check the ordering of a string with a character from U+E000 to U+FFFF.
-//
-// A character beyond the Basic Multilingual Plane such as "😀" (U+1F600) sorts
-// after the replacement character (U+FFFD), but its UTF-16 code units (U+D83D and
-// U+DE00) sort before it.
-func TextSortsBeforeReplacementCharacter(
-	text string,
-) bool {
-	return text < "\ufffd"
-}
-
 // Check all the ordering comparisons of booleans, where `False < True`.
 func FlagsAreOrdered(
 	flag bool,
@@ -129,11 +101,13 @@ func VerifySomething(
 	abort = false
 
 	if !(
-		that.Name() < "zzz" &&
-		ourcommon.CompareBools(that.Flag(), that.OtherFlag()) <= 0) {
+		ourcommon.CompareBools(that.Flag(), that.OtherFlag()) <= 0 &&
+		ourcommon.LenStr(that.Text()) < 1000) {
 		abort = onError(
 			newVerificationError(
-				"Name must sort before zzz and flag must imply the other flag",),
+				"Flag must imply the other flag and text must be shorter " +
+				"than 1000",
+			),
 		)
 		if abort {
 			return
@@ -174,76 +148,6 @@ func VerifySomething(
 		abort = onError(
 			newVerificationError(
 				"Flag implies the other flag",),
-		)
-		if abort {
-			return
-		}
-	}
-
-	if !TextSortsBeforeReplacementCharacter(that.Text()) {
-		abort = onError(
-			newVerificationError(
-				"Text must sort before the replacement character",),
-		)
-		if abort {
-			return
-		}
-	}
-
-	if !NameIsNotAfterText(that.Name(), that.Text()) {
-		abort = onError(
-			newVerificationError(
-				"Name must not sort after the text",),
-		)
-		if abort {
-			return
-		}
-	}
-
-	if !TextIsBetweenBounds(that.Name()) {
-		abort = onError(
-			newVerificationError(
-				"Name must be between A and z",),
-		)
-		if abort {
-			return
-		}
-	}
-
-	abort = VerifyNonEmptyString(
-		that.Name(),
-		func(err *VerificationError) bool {
-			err.Path.PrependName(
-				&ourreporting.NameSegment{
-					Name: "Name",
-				},
-			)
-			return onError(err)
-		},
-	)
-	if abort {
-		return
-	}
-
-	return
-}
-
-// Verify the constraints of `that` value.
-//
-// You have to supply the callback `onError` to iterate over the errors.
-// If `onError` returns abort `true`, this function will abort
-// further verification as well, and return abort `true`. Otherwise,
-// abort `false` is returned.
-func VerifyNonEmptyString(
-	that string,
-	onError func(*VerificationError) bool,
-) (abort bool) {
-	abort = false
-
-	if !(ourcommon.LenStr(that) > 0) {
-		abort = onError(
-			newVerificationError(
-				"At least one character",),
 		)
 		if abort {
 			return

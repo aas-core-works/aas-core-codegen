@@ -92,48 +92,6 @@ public final class StringHelpers {
   public static String slice(String text, long start) {
     return slice(text, start, Long.MAX_VALUE);
   }
-
-  /**
-   * Find the first {@code sub} in {@code text} from {@code start} on.
-   *
-   * <p>We follow the Python implementation of {@code str.find}, since Python
-   * is the language of the meta-model specifications. Hence, the positions count
-   * the characters (code points), a negative {@code start} counts from the end,
-   * and a {@code start} beyond the end of {@code text} gives -1.
-   *
-   * @param text to be searched in
-   * @param sub to be searched for
-   * @param start of the search
-   * @return the position of {@code sub} in {@code text}, or -1 if not found
-   */
-  public static long find(String text, String sub, long start) {
-    final int length = len(text);
-    final long theStart = start < 0 ? Math.max(start + length, 0) : start;
-    if (theStart > length) {
-      return -1;
-    }
-
-    final int startOffset = text.offsetByCodePoints(0, (int) theStart);
-    final int offset = text.indexOf(sub, startOffset);
-    if (offset == -1) {
-      return -1;
-    }
-
-    return theStart + text.codePointCount(startOffset, offset);
-  }
-
-  /**
-   * Find the first {@code sub} in {@code text}.
-   *
-   * <p>See {@link #find(String, String, long)} for the semantics.
-   *
-   * @param text to be searched in
-   * @param sub to be searched for
-   * @return the position of {@code sub} in {@code text}, or -1 if not found
-   */
-  public static long find(String text, String sub) {
-    return find(text, sub, 0);
-  }
 }
 
 /*

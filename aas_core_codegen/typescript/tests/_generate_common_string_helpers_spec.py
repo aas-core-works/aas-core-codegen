@@ -1,11 +1,11 @@
-"""Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
+"""Generate the unit tests for the helpers of the operations on strings."""
 
 import io
 from typing import List
 
 from icontract import ensure, require
 
-from aas_core_codegen import intermediate, string_helper_cases
+from aas_core_codegen import string_helper_cases
 from aas_core_codegen.common import Stripped
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
@@ -100,22 +100,35 @@ test({name}, () => {{
     )
 
 
+def _generate_lstrip_test(case: string_helper_cases.LStripCase) -> Stripped:
+    """Generate the test of a single ``lstrip`` ``case``."""
+    name = typescript_common.string_literal(
+        f"{case.python_expression()} gives {case.expected!r}: {case.description}"
+    )
+
+    text = typescript_common.string_literal(case.text)
+    chars = typescript_common.string_literal(case.chars)
+    expected = typescript_common.string_literal(case.expected)
+
+    return Stripped(
+        f"""\
+test({name}, () => {{
+{I}expect(OurCommon.lstrip({text}, {chars})).toStrictEqual({expected});
+}});"""
+    )
+
+
 # fmt: off
 @require(
-    lambda symbol_table, type_inference:
-    intermediate_uses.len_slicing_or_find(symbol_table)
-    or intermediate_uses.string_ordering(type_inference)
+    lambda type_inference: intermediate_uses.string_operations(type_inference)
 )
 @ensure(
     lambda result: result.endswith('\n'),
     "Trailing newline mandatory for valid end-of-files"
 )
 # fmt: on
-def generate(
-    symbol_table: intermediate.SymbolTable,
-    type_inference: intermediate_type_inference.TypeInference,
-) -> str:
-    """Generate the unit tests for the helpers of ``len``, slicing, ``find`` and comparing."""
+def generate(type_inference: intermediate_type_inference.TypeInference) -> str:
+    """Generate the unit tests for the helpers of the operations on strings."""
     blocks = [
         Stripped(
             """\
@@ -133,19 +146,25 @@ def generate(
         Stripped('import * as OurCommon from "../src/common";'),
     ]  # type: List[Stripped]
 
-    if intermediate_uses.len_slicing_or_find(symbol_table):
+    if intermediate_uses.string_len_call(type_inference):
         for len_case in string_helper_cases.LEN_CASES:
             blocks.append(_generate_len_test(len_case))
 
+    if intermediate_uses.string_slicing(type_inference):
         for slice_case in string_helper_cases.SLICE_CASES:
             blocks.append(_generate_slice_test(slice_case))
 
+    if intermediate_uses.string_find_call(type_inference):
         for find_case in string_helper_cases.FIND_CASES:
             blocks.append(_generate_find_test(find_case))
 
     if intermediate_uses.string_ordering(type_inference):
         for compare_case in string_helper_cases.COMPARE_CASES:
             blocks.append(_generate_compare_test(compare_case))
+
+    if intermediate_uses.lstrip_call(type_inference):
+        for lstrip_case in string_helper_cases.LSTRIP_CASES:
+            blocks.append(_generate_lstrip_test(lstrip_case))
 
     blocks.append(typescript_common.WARNING)
 

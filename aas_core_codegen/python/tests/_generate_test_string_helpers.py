@@ -1,4 +1,4 @@
-"""Generate the unit tests for ``len``, slicing, ``find`` and comparing strings."""
+"""Generate the unit tests for the operations on strings."""
 
 import io
 import re
@@ -6,7 +6,7 @@ from typing import List
 
 from icontract import ensure, require
 
-from aas_core_codegen import intermediate, string_helper_cases
+from aas_core_codegen import string_helper_cases
 from aas_core_codegen.common import Stripped, indent_but_first_line
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
@@ -16,6 +16,7 @@ from aas_core_codegen.python import common as python_common
 from aas_core_codegen.python.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
 )
 
 
@@ -28,9 +29,7 @@ def _method_name(prefix: str, description: str) -> str:
 
 # fmt: off
 @require(
-    lambda symbol_table, type_inference:
-    intermediate_uses.len_slicing_or_find(symbol_table)
-    or intermediate_uses.string_ordering(type_inference)
+    lambda type_inference: intermediate_uses.string_operations(type_inference)
 )
 @ensure(
     lambda result: result.endswith('\n'),
@@ -38,22 +37,19 @@ def _method_name(prefix: str, description: str) -> str:
 )
 # fmt: on
 def generate(
-    symbol_table: intermediate.SymbolTable,
     type_inference: intermediate_type_inference.TypeInference,
 ) -> str:
     """
-    Generate the unit tests for ``len``, slicing, ``find`` and comparing strings.
+    Generate the unit tests for the operations on strings.
 
-    The Python SDK uses the native ``len``, slicing, ``str.find`` and comparison
-    operators, which serve as the reference for the other SDKs. We still generate
-    the tests so that the users can inspect the same cases in all the SDKs.
+    The Python SDK uses the native ``len``, slicing, ``str.find``, comparison
+    operators and ``str.lstrip``, which serve as the reference for the other SDKs.
+    We still generate the tests so that the users can inspect the same cases in all
+    the SDKs.
     """
-    uses_len_slicing_or_find = intermediate_uses.len_slicing_or_find(symbol_table)
-    uses_string_ordering = intermediate_uses.string_ordering(type_inference)
-
     methods = []  # type: List[Stripped]
 
-    if uses_len_slicing_or_find:
+    if intermediate_uses.string_len_call(type_inference):
         for len_case in string_helper_cases.LEN_CASES:
             name = _method_name("len", len_case.description)
             methods.append(
@@ -67,6 +63,7 @@ def {name}(self) -> None:
                 )
             )
 
+    if intermediate_uses.string_slicing(type_inference):
         for slice_case in string_helper_cases.SLICE_CASES:
             name = _method_name("slice", slice_case.description)
             methods.append(
@@ -80,6 +77,7 @@ def {name}(self) -> None:
                 )
             )
 
+    if intermediate_uses.string_find_call(type_inference):
         for find_case in string_helper_cases.FIND_CASES:
             name = _method_name("find", find_case.description)
             methods.append(
@@ -93,7 +91,7 @@ def {name}(self) -> None:
                 )
             )
 
-    if uses_string_ordering:
+    if intermediate_uses.string_ordering(type_inference):
         for compare_case in string_helper_cases.COMPARE_CASES:
             name = _method_name("compare", compare_case.description)
             left = python_common.string_literal(compare_case.left)
@@ -105,6 +103,22 @@ def {name}(self) -> None:
 {I}self.assertEqual(
 {II}{compare_case.expected},
 {II}({left} > {right}) - ({left} < {right})
+{I})"""
+                )
+            )
+
+    if intermediate_uses.lstrip_call(type_inference):
+        for lstrip_case in string_helper_cases.LSTRIP_CASES:
+            name = _method_name("lstrip", lstrip_case.description)
+            methods.append(
+                Stripped(
+                    f"""\
+def {name}(self) -> None:
+{I}self.assertEqual(
+{II}{python_common.string_literal(lstrip_case.expected)},
+{II}{python_common.string_literal(lstrip_case.text)}.lstrip(
+{III}{python_common.string_literal(lstrip_case.chars)}
+{II})
 {I})"""
                 )
             )

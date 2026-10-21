@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 	"encoding/xml"
+	"math"
 	ourtesting "github.com/dummy-works/dummy/ourtesting"
 	ourtypes "github.com/dummy-works/dummy/types"
 	ourxmlization "github.com/dummy-works/dummy/xmlization"
@@ -197,6 +198,200 @@ func TestDuplicatePropertyFails(t *testing.T) {
 				"but got none",
 			"text",
 		)
+	}
+}
+
+// Read the first recorded example of ISomething with the content of
+// the element `xmlName` replaced by `text`.
+func readSomethingWith(
+	t *testing.T,
+	xmlName string,
+	text string,
+) ourtypes.ISomething {
+	pths := ourtesting.FindFilesBySuffixRecursively(
+		filepath.Join(
+			ourtesting.TestDataDir,
+			"Xml",
+			"Expected",
+			"something",
+		),
+		".xml",
+	)
+	sort.Strings(pths)
+
+	if len(pths) == 0 {
+		t.Fatalf(
+			"Expected at least one recorded example of %s, but got none",
+			"something",
+		)
+	}
+
+	bb, err := os.ReadFile(pths[0])
+	if err != nil {
+		t.Fatalf("Failed to read the file %s: %s", pths[0], err.Error())
+	}
+
+	original := string(bb)
+
+	start := strings.Index(original, "<"+xmlName+">") + len(xmlName) + 2
+	end := strings.Index(original, "</"+xmlName+">")
+
+	patched := original[:start] + text + original[end:]
+
+	decoder := xml.NewDecoder(strings.NewReader(patched))
+	deserialized, deseriaErr := ourxmlization.Unmarshal(decoder)
+	if deseriaErr != nil {
+		t.Fatalf(
+			"Expected no de-serialization error on %v, but got: %s",
+			patched, deseriaErr.Error(),
+		)
+	}
+
+	instance, ok := deserialized.(ourtypes.ISomething)
+	if !ok {
+		t.Fatalf("Expected an instance of ISomething, but got %T", deserialized)
+	}
+
+	return instance
+}
+
+func TestRatioReadFrom1e400(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"ratio",
+		"1e400",
+	)
+
+	got := instance.Ratio()
+	expected := math.Inf(1)
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestRatioReadFromMinus1e400(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"ratio",
+		"-1e400",
+	)
+
+	got := instance.Ratio()
+	expected := math.Inf(-1)
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestRatioReadFrom1eminus400(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"ratio",
+		"1e-400",
+	)
+
+	got := instance.Ratio()
+	expected := 0.0
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestRatioReadFromINF(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"ratio",
+		"INF",
+	)
+
+	got := instance.Ratio()
+	expected := math.Inf(1)
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestRatioReadFromPlusINF(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"ratio",
+		"+INF",
+	)
+
+	got := instance.Ratio()
+	expected := math.Inf(1)
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestRatioReadFromMinusINF(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"ratio",
+		"-INF",
+	)
+
+	got := instance.Ratio()
+	expected := math.Inf(-1)
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestFlagReadFrom1(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"flag",
+		"1",
+	)
+
+	got := instance.Flag()
+	expected := true
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestFlagReadFrom0(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"flag",
+		"0",
+	)
+
+	got := instance.Flag()
+	expected := false
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestFlagReadFromTrue(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"flag",
+		"true",
+	)
+
+	got := instance.Flag()
+	expected := true
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
+	}
+}
+
+func TestFlagReadFromFalse(t *testing.T) {
+	instance := readSomethingWith(
+		t,
+		"flag",
+		"false",
+	)
+
+	got := instance.Flag()
+	expected := false
+	if got != expected {
+		t.Fatalf("Expected %v, but got %v", expected, got)
 	}
 }
 

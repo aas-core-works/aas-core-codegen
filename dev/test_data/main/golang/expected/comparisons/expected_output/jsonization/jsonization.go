@@ -424,14 +424,12 @@ func somethingFromMapWithoutDispatch(
 	err error,
 ) {
 	var theText string
-	var theName string
 	var theFlag bool
 	var theOtherFlag bool
 	var theCount int64
 	var theRatio float64
 
 	foundText := false
-	foundName := false
 	foundFlag := false
 	foundOtherFlag := false
 	foundCount := false
@@ -442,10 +440,6 @@ func somethingFromMapWithoutDispatch(
 		case "text":
 			theText, err = stringFromJsonable(v)
 			foundText = true
-
-		case "name":
-			theName, err = stringFromJsonable(v)
-			foundName = true
 
 		case "flag":
 			theFlag, err = boolFromJsonable(v)
@@ -486,13 +480,6 @@ func somethingFromMapWithoutDispatch(
 		return
 	}
 
-	if !foundName {
-		err = newDeserializationError(
-			"The required property 'name' is missing",
-		)
-		return
-	}
-
 	if !foundFlag {
 		err = newDeserializationError(
 			"The required property 'flag' is missing",
@@ -523,7 +510,6 @@ func somethingFromMapWithoutDispatch(
 
 	result = ourtypes.NewSomething(
 		theText,
-		theName,
 		theFlag,
 		theOtherFlag,
 		theCount,
@@ -727,8 +713,6 @@ func somethingToMap(
 	result = make(map[string]interface{})
 
 	result["text"] = that.Text()
-
-	result["name"] = that.Name()
 
 	result["flag"] = that.Flag()
 

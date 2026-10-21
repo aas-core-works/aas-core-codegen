@@ -1298,14 +1298,13 @@ namespace properties {
 
 enum class OfSomething : std::uint32_t {
   kText = 0,
-  kName = 1,
-  kFlag = 2,
-  kOtherFlag = 3,
-  kCount = 4,
-  kRatio = 5
+  kFlag = 1,
+  kOtherFlag = 2,
+  kCount = 3,
+  kRatio = 4
 };  // enum class OfSomething
 
-const std::size_t kPropertyCountOfSomething = 6;
+const std::size_t kPropertyCountOfSomething = 5;
 
 const std::unordered_map<
   std::string,
@@ -1314,10 +1313,6 @@ const std::unordered_map<
   {
     "text",
     OfSomething::kText
-  },
-  {
-    "name",
-    OfSomething::kName
   },
   {
     "flag",
@@ -1355,8 +1350,6 @@ std::pair<
 
   common::optional<std::wstring> the_text;
 
-  common::optional<std::wstring> the_name;
-
   common::optional<bool> the_flag;
 
   common::optional<bool> the_other_flag;
@@ -1381,11 +1374,6 @@ std::pair<
           case properties::OfSomething::kText:
             return ReadInto(
               the_text,
-              DeserializeWstring(reader)
-            );
-          case properties::OfSomething::kName:
-            return ReadInto(
-              the_name,
               DeserializeWstring(reader)
             );
           case properties::OfSomething::kFlag:
@@ -1436,14 +1424,6 @@ std::pair<
     );
   }
 
-  if (!the_name.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<T>
-    >(
-      L"The required property name is missing"
-    );
-  }
-
   if (!the_flag.has_value()) {
     return NoInstanceAndDeserializationErrorWithCause<
       std::shared_ptr<T>
@@ -1487,7 +1467,6 @@ std::pair<
       // upcast.
       new types::Something(
         std::move(*the_text),
-        std::move(*the_name),
         std::move(*the_flag),
         std::move(*the_other_flag),
         std::move(*the_count),
@@ -1870,17 +1849,6 @@ common::optional<xml_common::SerializationError> SerializeSomethingAsSequence(
     that.text(),
     writer,
     iteration::Property::kText,
-    WriteWstring
-  );
-  if (error.has_value()) {
-    return error;
-  }
-
-  error = WriteProperty(
-    "name",
-    that.name(),
-    writer,
-    iteration::Property::kName,
     WriteWstring
   );
   if (error.has_value()) {

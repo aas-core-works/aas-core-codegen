@@ -327,6 +327,10 @@ def generate(
     # NOTE (mristin):
     # An unused import does not compile in Go, so we import only what the helpers
     # below need.
+    uses_len = intermediate_uses.string_len_call(type_inference)
+    uses_slicing = intermediate_uses.string_slicing(type_inference)
+    uses_find = intermediate_uses.string_find_call(type_inference)
+
     import_lines = []  # type: List[str]
     if intermediate_uses.int_call(symbol_table):
         import_lines.append(f'{I}"fmt"')
@@ -336,7 +340,7 @@ def generate(
 
     import_lines.append(f'{I}"strings"')
 
-    if intermediate_uses.len_slicing_or_find(symbol_table):
+    if uses_len or uses_slicing or uses_find:
         import_lines.append(f'{I}"unicode/utf8"')
 
     import_lines_joined = "\n".join(import_lines)
@@ -489,19 +493,18 @@ func NewAndPointTo[T any](value T) *T {{
     # (code points). Moreover, the native slicing panics on the positions out of
     # range, does not count the negative ones from the end, and ``strings.Index``
     # has no start. We need helpers which follow the Python implementation of
-    # ``len``, slicing and ``str.find``. The helpers are generated only for
-    # a meta-model which might take ``len`` of strings, slice them or call ``find``
-    # on them.
+    # ``len``, slicing and ``str.find``. Each helper is generated only for
+    # a meta-model which uses the respective operation on strings, or another
+    # helper which depends on it.
     #
     # We walk over the byte offsets of the characters instead of converting
     # the strings to ``[]rune``, so that we neither copy the strings nor replace
     # the invalid UTF-8 bytes. Each invalid byte counts as a character of its own,
     # as in ``utf8.RuneCountInString`` and in the ``range`` loop over a string.
-    if intermediate_uses.len_slicing_or_find(symbol_table):
-        blocks.extend(
-            [
-                Stripped(
-                    f"""\
+    if uses_slicing:
+        blocks.append(
+            Stripped(
+                f"""\
 // Resolve `position` in a string of `length` as Python does in slicing.
 //
 // A negative position counts from the end, and the positions out of range are
@@ -520,9 +523,13 @@ func resolvePosition(position int64, length int) int {{
 {I}}}
 {I}return int(position)
 }}"""
-                ),
-                Stripped(
-                    f"""\
+            )
+        )
+
+    if uses_slicing or uses_find:
+        blocks.append(
+            Stripped(
+                f"""\
 // Compute the byte offset of the character at `position` in `text`.
 //
 // The `position` counts the characters (code points), and must not exceed
@@ -537,9 +544,13 @@ func byteOffsetOf(text string, position int) int {{
 {I}}}
 {I}return len(text)
 }}"""
-                ),
-                Stripped(
-                    f"""\
+            )
+        )
+
+    if uses_len or uses_slicing or uses_find:
+        blocks.append(
+            Stripped(
+                f"""\
 // Count the characters (code points) of `text`.
 //
 // We follow the Python implementation of `len`, since Python is the language of
@@ -548,7 +559,12 @@ func byteOffsetOf(text string, position int) int {{
 func LenStr(text string) int {{
 {I}return utf8.RuneCountInString(text)
 }}"""
-                ),
+            )
+        )
+
+    if uses_slicing:
+        blocks.extend(
+            [
                 Stripped(
                     f"""\
 // Slice `text` from `start` up to `end`, exclusive.
@@ -580,8 +596,13 @@ func SliceStrFrom(text string, start int64) string {{
 {I}return text[byteOffsetOf(text, theStart):]
 }}"""
                 ),
-                Stripped(
-                    f"""\
+            ]
+        )
+
+    if uses_find:
+        blocks.append(
+            Stripped(
+                f"""\
 // Find the first `sub` in `text` from `start` on.
 //
 // Return the position of `sub` in `text`, or -1 if `sub` could not be found.
@@ -611,8 +632,7 @@ func FindStr(text string, sub string, start int64) int64 {{
 
 {I}return start + int64(LenStr(text[startOffset:startOffset+index]))
 }}"""
-                ),
-            ]
+            )
         )
 
     # NOTE (mristin):

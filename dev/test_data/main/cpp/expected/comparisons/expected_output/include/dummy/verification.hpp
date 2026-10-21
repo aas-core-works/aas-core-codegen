@@ -214,26 +214,6 @@ class RecursiveVerification : public IVerification {
 
 // region Verification functions
 
-/// \brief Check the ordering of a string with the literals on both sides.
-bool TextIsBetweenBounds(
-  const std::wstring& text
-);
-
-/// \brief Check the ordering of a constrained primitive with a string.
-bool NameIsNotAfterText(
-  const std::wstring& name,
-  const std::wstring& text
-);
-
-/// \brief Check the ordering of a string with a character from U+E000 to U+FFFF.
-///
-/// A character beyond the Basic Multilingual Plane such as "😀" (U+1F600) sorts
-/// after the replacement character (U+FFFD), but its UTF-16 code units (U+D83D and
-/// U+DE00) sort before it.
-bool TextSortsBeforeReplacementCharacter(
-  const std::wstring& text
-);
-
 /// \brief Check all the ordering comparisons of booleans, where `False < True`.
 bool FlagsAreOrdered(
   bool flag,
@@ -257,22 +237,6 @@ bool TextFitsIntoCount(
 );
 
 // endregion Verification functions
-
-// region Verification of constrained primitives
-
-/**
- * \brief Verify that the invariants hold for \p that value.
- *
- * The \p that value should outlive the verification.
- *
- * \param that value to be verified
- * \return Iterable over constraint violations
- */
-std::unique_ptr<IVerification> VerifyNonEmptyString(
-  const std::wstring& that
-);
-
-// endregion Verification of constrained primitives
 
 }  // namespace verification
 /**@}*/

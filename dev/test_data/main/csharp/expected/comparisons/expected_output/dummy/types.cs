@@ -59,8 +59,6 @@ namespace dummy
     {
         public string Text { get; set; }
 
-        public string Name { get; set; }
-
         public bool Flag { get; set; }
 
         public bool OtherFlag { get; set; }
@@ -73,8 +71,6 @@ namespace dummy
     public class Something : ISomething
     {
         public string Text { get; set; }
-
-        public string Name { get; set; }
 
         public bool Flag { get; set; }
 
@@ -145,14 +141,12 @@ namespace dummy
 
         public Something(
             string text,
-            string name,
             bool flag,
             bool otherFlag,
             long count,
             double ratio)
         {
             Text = text;
-            Name = name;
             Flag = flag;
             OtherFlag = otherFlag;
             Count = count;

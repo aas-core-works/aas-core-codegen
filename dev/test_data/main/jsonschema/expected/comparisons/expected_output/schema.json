@@ -19,10 +19,6 @@
         "text": {
           "type": "string"
         },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
         "flag": {
           "type": "boolean"
         },
@@ -38,7 +34,6 @@
       },
       "required": [
         "text",
-        "name",
         "flag",
         "otherFlag",
         "count",

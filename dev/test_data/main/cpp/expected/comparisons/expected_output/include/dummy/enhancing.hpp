@@ -79,20 +79,6 @@ class EnhancedSomething
     instance_->set_text(value);
   }
 
-  const std::wstring& name() const override {
-    return instance_->name();
-  }
-
-  std::wstring& mutable_name() override {
-    return instance_->mutable_name();
-  }
-
-  void set_name(
-    std::wstring value
-  ) override {
-    instance_->set_name(value);
-  }
-
   bool flag() const override {
     return instance_->flag();
   }

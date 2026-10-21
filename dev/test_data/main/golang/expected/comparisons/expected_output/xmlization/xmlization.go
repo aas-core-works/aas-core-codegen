@@ -309,14 +309,12 @@ func readSomethingAsSequence(
 	err error,
 ) {
 	var theText string
-	var theName string
 	var theFlag bool
 	var theOtherFlag bool
 	var theCount int64
 	var theRatio float64
 
 	foundText := false
-	foundName := false
 	foundFlag := false
 	foundOtherFlag := false
 	foundCount := false
@@ -344,15 +342,6 @@ func readSomethingAsSequence(
 				decoder, current,
 			)
 			foundText = true
-		case "name":
-			if foundName {
-				valueErr = duplicatePropertyError(local)
-				break
-			}
-			theName, current, valueErr = xmlcommon.ReadText(
-				decoder, current,
-			)
-			foundName = true
 		case "flag":
 			if foundFlag {
 				valueErr = duplicatePropertyError(local)
@@ -408,11 +397,6 @@ func readSomethingAsSequence(
 		return
 	}
 
-	if !foundName {
-		err = missingProperty("name")
-		return
-	}
-
 	if !foundFlag {
 		err = missingProperty("flag")
 		return
@@ -435,7 +419,6 @@ func readSomethingAsSequence(
 
 	instance = ourtypes.NewSomething(
 		theText,
-		theName,
 		theFlag,
 		theOtherFlag,
 		theCount,
@@ -720,16 +703,6 @@ func writeSomethingAsSequence(
 		"Text()",
 		xmlcommon.WriteElement(
 			encoder, "text", that.Text(), xmlcommon.WriteAsText_string,
-		),
-	)
-	if err != nil {
-		return
-	}
-
-	err = finishProperty(
-		"Name()",
-		xmlcommon.WriteElement(
-			encoder, "name", that.Name(), xmlcommon.WriteAsText_string,
 		),
 	)
 	if err != nil {

@@ -149,11 +149,23 @@ def _generate_concatenate_implementations_for_2_parts_and_above() -> List[Stripp
     return concat_funcs
 
 
+def _uses_string_helpers(
+    type_inference: intermediate_type_inference.TypeInference,
+) -> bool:
+    """Check whether the transpiled code needs any of the string helpers."""
+    return (
+        intermediate_uses.string_len_call(type_inference)
+        or intermediate_uses.string_slicing(type_inference)
+        or intermediate_uses.string_find_call(type_inference)
+        or intermediate_uses.lstrip_call(type_inference)
+    )
+
+
 def _generate_string_helper_declarations(
-    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> List[Stripped]:
     """
-    Generate the declarations of the helpers for ``len``, slicing strings and ``find``.
+    Generate the declarations of the helpers for the operations on strings.
 
     The helpers follow the Python implementation, since Python is the language of
     the meta-model specifications. Hence, the lengths and the positions count
@@ -164,11 +176,19 @@ def _generate_string_helper_declarations(
     nor ``find`` count the negative positions from the end. We also accept
     the positions as ``int64_t``'s, since our integers are ``int64_t``'s in C++.
 
-    We add ``LStrip`` only if the meta-model uses ``str.lstrip``.
+    We declare each helper only if the meta-model uses the corresponding operation.
+    ``SliceStr`` and ``FindStr`` rely on ``LenStr``, so we declare ``LenStr`` for
+    them as well.
     """
-    result = [
-        Stripped(
-            """\
+    uses_slicing = intermediate_uses.string_slicing(type_inference)
+    uses_find = intermediate_uses.string_find_call(type_inference)
+
+    result = []  # type: List[Stripped]
+
+    if intermediate_uses.string_len_call(type_inference) or uses_slicing or uses_find:
+        result.append(
+            Stripped(
+                """\
 /**
  * Count the characters (code points) of \\p text.
  *
@@ -181,9 +201,14 @@ def _generate_string_helper_declarations(
  * \\return the number of characters
  */
 size_t LenStr(const std::wstring& text);"""
-        ),
-        Stripped(
-            f"""\
+            )
+        )
+
+    if uses_slicing:
+        result.extend(
+            [
+                Stripped(
+                    f"""\
 /**
  * Slice \\p text from \\p start up to \\p end, exclusive.
  *
@@ -203,9 +228,9 @@ std::wstring SliceStr(
 {I}int64_t start,
 {I}int64_t end
 );"""
-        ),
-        Stripped(
-            f"""\
+                ),
+                Stripped(
+                    f"""\
 /**
  * Slice \\p text from \\p start up to its end.
  *
@@ -219,9 +244,15 @@ std::wstring SliceStr(
 {I}const std::wstring& text,
 {I}int64_t start
 );"""
-        ),
-        Stripped(
-            f"""\
+                ),
+            ]
+        )
+
+    if uses_find:
+        result.extend(
+            [
+                Stripped(
+                    f"""\
 /**
  * Find the first \\p sub in \\p text.
  *
@@ -235,9 +266,9 @@ int64_t FindStr(
 {I}const std::wstring& text,
 {I}const std::wstring& sub
 );"""
-        ),
-        Stripped(
-            f"""\
+                ),
+                Stripped(
+                    f"""\
 /**
  * Find the first \\p sub in \\p text from \\p start on.
  *
@@ -256,10 +287,11 @@ int64_t FindStr(
 {I}const std::wstring& sub,
 {I}int64_t start
 );"""
-        ),
-    ]  # type: List[Stripped]
+                ),
+            ]
+        )
 
-    if intermediate_uses.lstrip_call(symbol_table):
+    if intermediate_uses.lstrip_call(type_inference):
         result.append(
             Stripped(
                 f"""\
@@ -286,29 +318,32 @@ std::wstring LStrip(
 
 
 def _generate_string_helper_definitions(
-    symbol_table: intermediate.SymbolTable,
+    type_inference: intermediate_type_inference.TypeInference,
 ) -> List[Stripped]:
     """
-    Generate the definitions of the helpers for ``len``, slicing strings and ``find``.
+    Generate the definitions of the helpers for the operations on strings.
 
-    We add ``LStrip`` only if the meta-model uses ``str.lstrip``.
+    We define each helper only if the meta-model uses the corresponding operation,
+    and the internal helpers only if a defined helper relies on them. This way,
+    the compilers do not warn about the unused functions.
     """
+    uses_slicing = intermediate_uses.string_slicing(type_inference)
+    uses_find = intermediate_uses.string_find_call(type_inference)
+    uses_lstrip = intermediate_uses.lstrip_call(type_inference)
+
+    uses_len_str = (
+        intermediate_uses.string_len_call(type_inference) or uses_slicing or uses_find
+    )
+    uses_offset_of = uses_slicing or uses_find
+
     # NOTE (mristin):
     # We count a lone surrogate as a character of its own, as Python does. We do
     # not check whether ``find`` matches in the middle of a surrogate pair, as
     # that could only happen if the searched text started or ended with a lone
     # surrogate.
-    result = [
+    utf16_helpers = [
         Stripped(
             f"""\
-namespace {{
-
-// NOTE (mristin):
-// The type wchar_t is a UTF-16 code unit on Windows, where a character beyond
-// the Basic Multilingual Plane takes two of them (a surrogate pair). On the other
-// platforms, wchar_t is a UTF-32 code unit, so that each character takes exactly
-// one wchar_t.
-#if WCHAR_MAX <= 0xFFFF
 /**
  * Check whether a surrogate pair starts at \\p offset in \\p text.
  */
@@ -320,8 +355,16 @@ bool IsSurrogatePairAt(const std::wstring& text, size_t offset) {{
 {II}&& text[offset + 1] >= 0xDC00
 {II}&& text[offset + 1] <= 0xDFFF
 {I});
-}}
+}}"""
+        )
+    ]  # type: List[Stripped]
 
+    utf32_helpers = []  # type: List[Stripped]
+
+    if uses_len_str:
+        utf16_helpers.append(
+            Stripped(
+                f"""\
 /**
  * Count the characters of \\p text between \\p start_offset and
  * \\p end_offset, both in wchar_t's.
@@ -339,8 +382,30 @@ size_t CountCharacters(
 {I}}}
 
 {I}return count;
-}}
+}}"""
+            )
+        )
+        utf32_helpers.append(
+            Stripped(
+                f"""\
+/**
+ * Count the characters of a text between \\p start_offset and
+ * \\p end_offset, both in wchar_t's.
+ */
+size_t CountCharacters(
+{I}const std::wstring&,
+{I}size_t start_offset,
+{I}size_t end_offset
+) {{
+{I}return end_offset - start_offset;
+}}"""
+            )
+        )
 
+    if uses_offset_of:
+        utf16_helpers.append(
+            Stripped(
+                f"""\
 /**
  * Compute the offset in wchar_t's of the character at \\p position
  * in \\p text.
@@ -352,29 +417,52 @@ size_t OffsetOf(const std::wstring& text, size_t position) {{
 {I}}}
 
 {I}return offset;
-}}
-#else
-/**
- * Count the characters of a text between \\p start_offset and
- * \\p end_offset, both in wchar_t's.
- */
-size_t CountCharacters(
-{I}const std::wstring&,
-{I}size_t start_offset,
-{I}size_t end_offset
-) {{
-{I}return end_offset - start_offset;
-}}
-
+}}"""
+            )
+        )
+        utf32_helpers.append(
+            Stripped(
+                f"""\
 /**
  * Compute the offset in wchar_t's of the character at \\p position
  * in a text.
  */
 size_t OffsetOf(const std::wstring&, size_t position) {{
 {I}return position;
-}}
-#endif
+}}"""
+            )
+        )
 
+    if uses_lstrip:
+        utf16_helpers.append(
+            Stripped(
+                f"""\
+/**
+ * Compute the size in wchar_t's of the character at \\p offset in \\p text.
+ */
+size_t CharacterSizeAt(const std::wstring& text, size_t offset) {{
+{I}return IsSurrogatePairAt(text, offset) ? 2 : 1;
+}}"""
+            )
+        )
+        utf32_helpers.append(
+            Stripped(
+                f"""\
+/**
+ * Compute the size in wchar_t's of a character in a text.
+ */
+size_t CharacterSizeAt(const std::wstring&, size_t) {{
+{I}return 1;
+}}"""
+            )
+        )
+
+    other_helpers = []  # type: List[Stripped]
+
+    if uses_slicing:
+        other_helpers.append(
+            Stripped(
+                f"""\
 /**
  * Resolve \\p position in a string of \\p length as Python does in slicing.
  *
@@ -394,18 +482,63 @@ size_t ResolvePosition(int64_t position, size_t length) {{
 {I}}}
 
 {I}return position > signed_length ? length : static_cast<size_t>(position);
-}}
+}}"""
+            )
+        )
 
-}}  // namespace"""
-        ),
+    utf16_helpers_joined = "\n\n".join(utf16_helpers)
+
+    # NOTE (mristin):
+    # On the platforms where wchar_t is a UTF-32 code unit, we do not need
+    # ``IsSurrogatePairAt`` at all. If no other helper is needed, we leave out
+    # the ``#else`` branch.
+    if len(utf32_helpers) > 0:
+        utf32_helpers_joined = "\n\n".join(utf32_helpers)
+        conditional_helpers = f"""\
+#if WCHAR_MAX <= 0xFFFF
+{utf16_helpers_joined}
+#else
+{utf32_helpers_joined}
+#endif"""
+    else:
+        conditional_helpers = f"""\
+#if WCHAR_MAX <= 0xFFFF
+{utf16_helpers_joined}
+#endif"""
+
+    other_helpers_joined = "".join(f"\n\n{helper}" for helper in other_helpers)
+
+    result = [
         Stripped(
             f"""\
+namespace {{
+
+// NOTE (mristin):
+// The type wchar_t is a UTF-16 code unit on Windows, where a character beyond
+// the Basic Multilingual Plane takes two of them (a surrogate pair). On the other
+// platforms, wchar_t is a UTF-32 code unit, so that each character takes exactly
+// one wchar_t.
+{conditional_helpers}{other_helpers_joined}
+
+}}  // namespace"""
+        )
+    ]  # type: List[Stripped]
+
+    if uses_len_str:
+        result.append(
+            Stripped(
+                f"""\
 size_t LenStr(const std::wstring& text) {{
 {I}return CountCharacters(text, 0, text.size());
 }}"""
-        ),
-        Stripped(
-            f"""\
+            )
+        )
+
+    if uses_slicing:
+        result.extend(
+            [
+                Stripped(
+                    f"""\
 std::wstring SliceStr(
 {I}const std::wstring& text,
 {I}int64_t start,
@@ -423,9 +556,9 @@ std::wstring SliceStr(
 {I}const size_t end_offset = OffsetOf(text, the_end);
 {I}return text.substr(start_offset, end_offset - start_offset);
 }}"""
-        ),
-        Stripped(
-            f"""\
+                ),
+                Stripped(
+                    f"""\
 std::wstring SliceStr(
 {I}const std::wstring& text,
 {I}int64_t start
@@ -434,18 +567,24 @@ std::wstring SliceStr(
 {II}OffsetOf(text, ResolvePosition(start, LenStr(text)))
 {I});
 }}"""
-        ),
-        Stripped(
-            f"""\
+                ),
+            ]
+        )
+
+    if uses_find:
+        result.extend(
+            [
+                Stripped(
+                    f"""\
 int64_t FindStr(
 {I}const std::wstring& text,
 {I}const std::wstring& sub
 ) {{
 {I}return FindStr(text, sub, 0);
 }}"""
-        ),
-        Stripped(
-            f"""\
+                ),
+                Stripped(
+                    f"""\
 int64_t FindStr(
 {I}const std::wstring& text,
 {I}const std::wstring& sub,
@@ -475,36 +614,14 @@ int64_t FindStr(
 {II}CountCharacters(text, start_offset, offset)
 {I});
 }}"""
-        ),
-    ]  # type: List[Stripped]
-
-    if intermediate_uses.lstrip_call(symbol_table):
-        result.extend(
-            [
-                Stripped(
-                    f"""\
-namespace {{
-
-#if WCHAR_MAX <= 0xFFFF
-/**
- * Compute the size in wchar_t's of the character at \\p offset in \\p text.
- */
-size_t CharacterSizeAt(const std::wstring& text, size_t offset) {{
-{I}return IsSurrogatePairAt(text, offset) ? 2 : 1;
-}}
-#else
-/**
- * Compute the size in wchar_t's of a character in a text.
- */
-size_t CharacterSizeAt(const std::wstring&, size_t) {{
-{I}return 1;
-}}
-#endif
-
-}}  // namespace"""
                 ),
-                Stripped(
-                    f"""\
+            ]
+        )
+
+    if uses_lstrip:
+        result.append(
+            Stripped(
+                f"""\
 std::wstring LStrip(
 {I}const std::wstring& text,
 {I}const std::wstring& chars
@@ -540,8 +657,7 @@ std::wstring LStrip(
 
 {I}return text.substr(offset);
 }}"""
-                ),
-            ]
+            )
         )
 
     return result
@@ -1048,19 +1164,21 @@ std::unique_ptr<T> make_unique(
     ]  # type: List[Stripped]
 
     # NOTE (mristin):
-    # The string helpers take the positions as ``int64_t``'s, and need
-    # ``WCHAR_MAX`` to tell whether ``wchar_t`` is a UTF-16 code unit. Hence, we
-    # include these headers only for a meta-model which might take ``len`` of
-    # strings, slice them, or call ``find`` or ``lstrip`` on them.
+    # The string helpers need ``WCHAR_MAX`` to tell whether ``wchar_t`` is
+    # a UTF-16 code unit. Hence, we include ``<cwchar>`` only for a meta-model
+    # which takes ``len`` of strings, slices them, or calls ``find`` or ``lstrip``
+    # on them.
     #
+    # The helpers for slicing and ``find`` take the positions as ``int64_t``'s,
+    # and the transpiled code converts the result of ``LenStr`` to ``int64_t``.
     # The helpers ``FloorMod`` and ``ParseSafeInt`` return ``int64_t``'s as well.
-    uses_string_helpers = intermediate_uses.len_slicing_or_find(
-        symbol_table
-    ) or intermediate_uses.lstrip_call(symbol_table)
+    uses_string_helpers = _uses_string_helpers(type_inference)
 
     extra_std_includes = []  # type: List[str]
     if (
-        uses_string_helpers
+        intermediate_uses.string_len_call(type_inference)
+        or intermediate_uses.string_slicing(type_inference)
+        or intermediate_uses.string_find_call(type_inference)
         or intermediate_uses.modulo(symbol_table)
         or intermediate_uses.int_call(symbol_table)
     ):
@@ -1355,7 +1473,7 @@ size_t LenTuple(const std::tuple<T...>&) {
 }"""
             ),
             *(
-                _generate_string_helper_declarations(symbol_table)
+                _generate_string_helper_declarations(type_inference)
                 if uses_string_helpers
                 else []
             ),
@@ -1657,11 +1775,8 @@ std::wstring Utf8ToWstring(const std::string& utf8_text) {{
 }}"""
         ),
         *(
-            _generate_string_helper_definitions(symbol_table)
-            if (
-                intermediate_uses.len_slicing_or_find(symbol_table)
-                or intermediate_uses.lstrip_call(symbol_table)
-            )
+            _generate_string_helper_definitions(type_inference)
+            if _uses_string_helpers(type_inference)
             else []
         ),
         *([FLOOR_MOD_DEFINITION] if intermediate_uses.modulo(symbol_table) else []),

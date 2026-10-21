@@ -9,7 +9,7 @@ Import this module as ``intermediate_uses`` so that the checks read naturally,
 """
 
 import itertools
-from typing import Iterator, List, Sequence, Set, Union
+from typing import Iterator, List, Mapping, Sequence, Set, Tuple, Union
 
 from aas_core_codegen.intermediate import (
     _types,
@@ -41,50 +41,6 @@ def json_types(symbol_table: _types.SymbolTable) -> bool:
                     ),
                 ):
                     return True
-
-    return False
-
-
-def len_slicing_or_find(symbol_table: _types.SymbolTable) -> bool:
-    """
-    Check whether any transpiled code might take ``len`` of, slice or search a string.
-
-    The targets use this check to generate the string helpers only if the meta-model
-    needs them. The helpers count the characters (code points) as Python does,
-    since Python is the language of the meta-model specifications.
-
-    We check the parse trees of the invariants and of the transpilable
-    verification functions. As we do not have the types at hand here, we
-    over-approximate and count every call to ``len``, even if it were on a list,
-    and every method call named ``find``, even if it were a method of our class.
-    In the worst case, we generate unused helpers.
-    """
-    roots = []  # type: List[parse_tree.Node]
-
-    for our_type in symbol_table.our_types:
-        if isinstance(
-            our_type,
-            (_types.ConstrainedPrimitive, _types.AbstractClass, _types.ConcreteClass),
-        ):
-            roots.extend(invariant.body for invariant in our_type.invariants)
-
-    for verification in symbol_table.verification_functions:
-        if isinstance(verification, _types.TranspilableVerification):
-            roots.extend(verification.parsed.body)
-
-    for root in roots:
-        for node in parse_tree.over_nodes(root):
-            if isinstance(node, parse_tree.Slice):
-                return True
-
-            if isinstance(node, parse_tree.MethodCall) and node.member.name == "find":
-                return True
-
-            if (
-                isinstance(node, parse_tree.FunctionCall)
-                and node.name.identifier == "len"
-            ):
-                return True
 
     return False
 
@@ -137,15 +93,19 @@ def modulo(symbol_table: _types.SymbolTable) -> bool:
     )
 
 
-def _orders(
+def _over_inferred_nodes(
     type_inference: intermediate_type_inference.TypeInference,
-    primitive_type: intermediate_type_inference.PrimitiveType,
-) -> bool:
+) -> Iterator[
+    Tuple[
+        parse_tree.Node,
+        Mapping[parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion],
+    ]
+]:
     """
-    Check whether any transpiled code orders two values of ``primitive_type``.
+    Iterate over all the nodes of the transpilable code along their type maps.
 
-    We look for the comparisons ``<``, ``<=``, ``>`` and ``>=``. The operands of
-    a comparison share the primitive type, so we only check the left one.
+    Each invariant, verification function and understood method is inferred only
+    once, so we visit each node only once.
     """
     roots_and_type_maps = itertools.chain(
         (
@@ -165,18 +125,90 @@ def _orders(
     for roots, type_map in roots_and_type_maps:
         for root in roots:
             for node in parse_tree.over_nodes(root):
-                if (
-                    isinstance(node, parse_tree.Comparison)
-                    and node.op
-                    not in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE)
-                    and intermediate_type_inference.try_primitive_type(
-                        type_map[node.left]
-                    )
-                    is primitive_type
-                ):
-                    return True
+                yield node, type_map
+
+
+def _orders(
+    type_inference: intermediate_type_inference.TypeInference,
+    primitive_type: intermediate_type_inference.PrimitiveType,
+) -> bool:
+    """
+    Check whether any transpiled code orders two values of ``primitive_type``.
+
+    We look for the comparisons ``<``, ``<=``, ``>`` and ``>=``. The operands of
+    a comparison share the primitive type, so we only check the left one.
+    """
+    return any(
+        isinstance(node, parse_tree.Comparison)
+        and node.op not in (parse_tree.Comparator.EQ, parse_tree.Comparator.NE)
+        and intermediate_type_inference.try_primitive_type(type_map[node.left])
+        is primitive_type
+        for node, type_map in _over_inferred_nodes(type_inference)
+    )
+
+
+def _calls_builtin_method(
+    type_inference: intermediate_type_inference.TypeInference,
+    method: intermediate_type_inference.BuiltinMethod,
+) -> bool:
+    """Check whether any transpiled code calls the built-in ``method``."""
+    for node, type_map in _over_inferred_nodes(type_inference):
+        if not isinstance(node, parse_tree.MethodCall):
+            continue
+
+        member_type = type_map[node.member]
+        if (
+            isinstance(
+                member_type, intermediate_type_inference.BuiltinMethodTypeAnnotation
+            )
+            and member_type.method is method
+        ):
+            return True
 
     return False
+
+
+def string_len_call(
+    type_inference: intermediate_type_inference.TypeInference,
+) -> bool:
+    """
+    Check whether any transpiled code takes ``len`` of a string.
+
+    We look beneath the optional, since the transpilers unwrap a narrowed
+    optional string before they take its length.
+    """
+    return any(
+        isinstance(node, parse_tree.FunctionCall)
+        and node.name.identifier == "len"
+        and len(node.args) == 1
+        and intermediate_type_inference.try_primitive_type(
+            intermediate_type_inference.beneath_optional(type_map[node.args[0]])
+        )
+        is intermediate_type_inference.PrimitiveType.STR
+        for node, type_map in _over_inferred_nodes(type_inference)
+    )
+
+
+def string_slicing(type_inference: intermediate_type_inference.TypeInference) -> bool:
+    """
+    Check whether any transpiled code slices a string.
+
+    We look beneath the optional for the same reason as in
+    :py:func:`string_len_call`.
+    """
+    return any(
+        isinstance(node, parse_tree.Slice)
+        and intermediate_type_inference.try_primitive_type(
+            intermediate_type_inference.beneath_optional(type_map[node.collection])
+        )
+        is intermediate_type_inference.PrimitiveType.STR
+        for node, type_map in _over_inferred_nodes(type_inference)
+    )
+
+
+def string_find_call(type_inference: intermediate_type_inference.TypeInference) -> bool:
+    """Check whether any transpiled code calls ``str.find``."""
+    return _calls_builtin_method(type_inference, intermediate_type_inference.STR_FIND)
 
 
 def string_ordering(type_inference: intermediate_type_inference.TypeInference) -> bool:
@@ -242,19 +274,33 @@ def abs_call(symbol_table: _types.SymbolTable) -> bool:
     )
 
 
-def lstrip_call(symbol_table: _types.SymbolTable) -> bool:
+def lstrip_call(type_inference: intermediate_type_inference.TypeInference) -> bool:
     """
-    Check whether the meta-model calls ``str.lstrip`` in transpilable code.
+    Check whether any transpiled code calls ``str.lstrip``.
 
     The generators use this function to decide whether they need to generate
-    the helper functions and the tests for ``lstrip``.
-
-    We do not distinguish between ``str.lstrip`` and a method of our class
-    named ``lstrip``. In the worst case, we generate unused helpers.
+    the helper functions and the tests for ``lstrip``. We rely on the inferred
+    types, so a method of our class named ``lstrip`` does not count.
     """
-    return any(
-        isinstance(node, parse_tree.MethodCall) and node.member.name == "lstrip"
-        for node in _over_transpilable_nodes(symbol_table)
+    return _calls_builtin_method(type_inference, intermediate_type_inference.STR_LSTRIP)
+
+
+def string_operations(
+    type_inference: intermediate_type_inference.TypeInference,
+) -> bool:
+    """
+    Check whether any transpiled code might operate on strings.
+
+    The operations are ``len``, slicing, ``find``, ordering and ``lstrip``.
+    The targets use this check to generate the unit tests of the operations on
+    strings only if the meta-model needs them.
+    """
+    return (
+        string_len_call(type_inference)
+        or string_slicing(type_inference)
+        or string_find_call(type_inference)
+        or string_ordering(type_inference)
+        or lstrip_call(type_inference)
     )
 
 

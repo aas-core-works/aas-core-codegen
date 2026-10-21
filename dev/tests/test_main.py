@@ -355,10 +355,10 @@ class Test_cpp(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CPP,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_is_instance(self) -> None:
@@ -450,9 +450,9 @@ class Test_cpp(_TestCase):
             target=aas_core_codegen.main.Target.CPP, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
-            target=aas_core_codegen.main.Target.CPP, case_name="string_slicing_and_find"
+            target=aas_core_codegen.main.Target.CPP, case_name="string_operations"
         )
 
     def test_expected_switch_statements(self) -> None:
@@ -607,10 +607,10 @@ class Test_csharp(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_is_instance(self) -> None:
@@ -692,10 +692,10 @@ class Test_csharp(_TestCase):
             target=aas_core_codegen.main.Target.CSHARP, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.CSHARP,
-            case_name="string_slicing_and_find",
+            case_name="string_operations",
         )
 
     def test_expected_switch_statements(self) -> None:
@@ -836,10 +836,10 @@ class Test_golang(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_is_instance(self) -> None:
@@ -921,10 +921,10 @@ class Test_golang(_TestCase):
             target=aas_core_codegen.main.Target.GOLANG, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.GOLANG,
-            case_name="string_slicing_and_find",
+            case_name="string_operations",
         )
 
     def test_expected_switch_statements(self) -> None:
@@ -1072,10 +1072,10 @@ class Test_java(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_is_instance(self) -> None:
@@ -1157,10 +1157,10 @@ class Test_java(_TestCase):
             target=aas_core_codegen.main.Target.JAVA, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JAVA,
-            case_name="string_slicing_and_find",
+            case_name="string_operations",
         )
 
     def test_expected_switch_statements(self) -> None:
@@ -1304,10 +1304,10 @@ class Test_jsonschema(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_json_types(self) -> None:
@@ -1412,10 +1412,10 @@ class Test_jsonschema(_TestCase):
             target=aas_core_codegen.main.Target.JSONSCHEMA, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.JSONSCHEMA,
-            case_name="string_slicing_and_find",
+            case_name="string_operations",
         )
 
     def test_expected_switch_statements(self) -> None:
@@ -1545,10 +1545,10 @@ class Test_python(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_is_instance(self) -> None:
@@ -1630,10 +1630,10 @@ class Test_python(_TestCase):
             target=aas_core_codegen.main.Target.PYTHON, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.PYTHON,
-            case_name="string_slicing_and_find",
+            case_name="string_operations",
         )
 
     def test_expected_switch_statements(self) -> None:
@@ -1778,10 +1778,10 @@ class Test_typescript(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_is_instance(self) -> None:
@@ -1871,10 +1871,10 @@ class Test_typescript(_TestCase):
             target=aas_core_codegen.main.Target.TYPESCRIPT, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.TYPESCRIPT,
-            case_name="string_slicing_and_find",
+            case_name="string_operations",
         )
 
     def test_expected_switch_statements(self) -> None:
@@ -2009,10 +2009,10 @@ class Test_xsd(_TestCase):
             case_name="int_length_interplay",
         )
 
-    def test_expected_int_parsing_and_lstrip(self) -> None:
+    def test_expected_int_parsing(self) -> None:
         self._run_expected_test(
             target=aas_core_codegen.main.Target.XSD,
-            case_name="int_parsing_and_lstrip",
+            case_name="int_parsing",
         )
 
     def test_expected_json_types(self) -> None:
@@ -2112,9 +2112,9 @@ class Test_xsd(_TestCase):
             target=aas_core_codegen.main.Target.XSD, case_name="sets"
         )
 
-    def test_expected_string_slicing_and_find(self) -> None:
+    def test_expected_string_operations(self) -> None:
         self._run_expected_test(
-            target=aas_core_codegen.main.Target.XSD, case_name="string_slicing_and_find"
+            target=aas_core_codegen.main.Target.XSD, case_name="string_operations"
         )
 
     def test_expected_switch_statements(self) -> None:

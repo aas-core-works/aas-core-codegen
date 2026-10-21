@@ -13,7 +13,7 @@ from aas_core_codegen.golang.tests import (
     _generate_descend_test_descend_test,
     _generate_enhancing_test,
     _generate_is_xxx_test,
-    _generate_lstrip_and_int_test,
+    _generate_parse_int_test,
     _generate_string_helpers_test,
     _generate_jsonization_test_classes_with_descendants_test,
     _generate_jsonization_test_common_test,
@@ -34,7 +34,7 @@ generate_ourtesting_doc = _generate_ourtesting_doc.generate
 generate_ourtesting_filesystem = _generate_ourtesting_filesystem.generate
 generate_ourtesting_tracing = _generate_ourtesting_tracing.generate
 generate_arithmetic_test = _generate_arithmetic_test.generate
-generate_lstrip_and_int_test = _generate_lstrip_and_int_test.generate
+generate_parse_int_test = _generate_parse_int_test.generate
 generate_descend_test_common = _generate_descend_test_common.generate
 generate_descend_test_descend_once_test = (
     _generate_descend_test_descend_once_test.generate

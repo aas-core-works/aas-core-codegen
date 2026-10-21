@@ -292,36 +292,6 @@ func SliceStrFrom(text string, start int64) string {
 	return text[byteOffsetOf(text, theStart):]
 }
 
-// Find the first `sub` in `text` from `start` on.
-//
-// Return the position of `sub` in `text`, or -1 if `sub` could not be found.
-//
-// We follow the Python implementation of `str.find`, since Python is
-// the language of the meta-model specifications. Hence, the positions count
-// the characters (code points), a negative `start` counts from the end, and
-// a `start` beyond the end of `text` gives -1.
-func FindStr(text string, sub string, start int64) int64 {
-	length := int64(LenStr(text))
-	if start < 0 {
-		start += length
-		if start < 0 {
-			start = 0
-		}
-	}
-
-	if start > length {
-		return -1
-	}
-
-	startOffset := byteOffsetOf(text, int(start))
-	index := strings.Index(text[startOffset:], sub)
-	if index == -1 {
-		return -1
-	}
-
-	return start + int64(LenStr(text[startOffset:startOffset+index]))
-}
-
 // FloorMod computes the remainder of the floored division of dividend
 // by divisor.
 //

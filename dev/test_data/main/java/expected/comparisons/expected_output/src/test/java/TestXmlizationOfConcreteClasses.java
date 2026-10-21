@@ -358,6 +358,137 @@ public class TestXmlizationOfConcreteClasses {
           + " is given twice, but got none");
     }
   } // public void testDuplicatePropertyFails
+
+  /**
+   * Read the first recorded example of Something with the content of
+   * the element {@code xmlName} replaced by {@code text}.
+   */
+  private static Something readWith(String xmlName, String text)
+    throws IOException, XMLStreamException {
+    final Path searchPath =
+      Paths.get(Common.TEST_DATA_DIR, "Xml", "Expected", "something");
+    final List<Path> paths = Common.findPaths(searchPath, ".xml");
+
+    if (paths.isEmpty()) {
+      fail(
+        "Expected at least one recorded example of something, but got none");
+    }
+
+    final String original =
+      new String(Files.readAllBytes(paths.get(0)), StandardCharsets.UTF_8);
+
+    final int start = original.indexOf("<" + xmlName + ">") + xmlName.length() + 2;
+    final int end = original.indexOf("</" + xmlName + ">");
+
+    final String patched =
+      original.substring(0, start) + text + original.substring(end);
+
+    final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    final XMLEventReader xmlReader =
+      xmlInputFactory.createXMLEventReader(new StringReader(patched));
+
+    return Xmlization.Deserialize.deserializeSomething(xmlReader);
+  }
+
+  @Test
+  public void testRatioReadFrom1e400() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("ratio", "1e400");
+
+    assertEquals(
+      Double.POSITIVE_INFINITY,
+      instance.getRatio());
+  } // public void testRatioReadFrom1e400
+
+  @Test
+  public void testRatioReadFromMinus1e400() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("ratio", "-1e400");
+
+    assertEquals(
+      Double.NEGATIVE_INFINITY,
+      instance.getRatio());
+  } // public void testRatioReadFromMinus1e400
+
+  @Test
+  public void testRatioReadFrom1eminus400() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("ratio", "1e-400");
+
+    assertEquals(
+      0.0,
+      instance.getRatio());
+  } // public void testRatioReadFrom1eminus400
+
+  @Test
+  public void testRatioReadFromInf() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("ratio", "INF");
+
+    assertEquals(
+      Double.POSITIVE_INFINITY,
+      instance.getRatio());
+  } // public void testRatioReadFromInf
+
+  @Test
+  public void testRatioReadFromPlusinf() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("ratio", "+INF");
+
+    assertEquals(
+      Double.POSITIVE_INFINITY,
+      instance.getRatio());
+  } // public void testRatioReadFromPlusinf
+
+  @Test
+  public void testRatioReadFromMinusinf() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("ratio", "-INF");
+
+    assertEquals(
+      Double.NEGATIVE_INFINITY,
+      instance.getRatio());
+  } // public void testRatioReadFromMinusinf
+
+  @Test
+  public void testFlagReadFrom1() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("flag", "1");
+
+    assertEquals(
+      true,
+      instance.getFlag());
+  } // public void testFlagReadFrom1
+
+  @Test
+  public void testFlagReadFrom0() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("flag", "0");
+
+    assertEquals(
+      false,
+      instance.getFlag());
+  } // public void testFlagReadFrom0
+
+  @Test
+  public void testFlagReadFromTrue() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("flag", "true");
+
+    assertEquals(
+      true,
+      instance.getFlag());
+  } // public void testFlagReadFromTrue
+
+  @Test
+  public void testFlagReadFromFalse() throws IOException, XMLStreamException {
+    final Something instance =
+      readWith("flag", "false");
+
+    assertEquals(
+      false,
+      instance.getFlag());
+  } // public void testFlagReadFromFalse
 } // class TestXmlizationOfConcreteClasses
 
 // package dummy.tests

@@ -25,8 +25,6 @@ import java.util.Objects;
 public class Something implements ISomething {
   private String text;
 
-  private String name;
-
   private Boolean flag;
 
   private Boolean otherFlag;
@@ -37,7 +35,6 @@ public class Something implements ISomething {
 
   public Something(
     String text,
-    String name,
     Boolean flag,
     Boolean otherFlag,
     Long count,
@@ -45,9 +42,6 @@ public class Something implements ISomething {
     this.text = Objects.requireNonNull(
       text,
       "Argument \"text\" must be non-null.");
-    this.name = Objects.requireNonNull(
-      name,
-      "Argument \"name\" must be non-null.");
     this.flag = Objects.requireNonNull(
       flag,
       "Argument \"flag\" must be non-null.");
@@ -72,18 +66,6 @@ public class Something implements ISomething {
     this.text = Objects.requireNonNull(
       text,
       "Argument \"text\" must be non-null.");
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = Objects.requireNonNull(
-      name,
-      "Argument \"name\" must be non-null.");
   }
 
   @Override
