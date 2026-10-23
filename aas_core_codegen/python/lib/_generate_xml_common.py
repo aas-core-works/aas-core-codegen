@@ -214,11 +214,13 @@ from typing import (
 if sys.version_info >= (3, 8):
 {I}from typing import (
 {II}Final,
+{II}Literal,
 {II}Protocol
 {I})
 else:
 {I}from typing_extensions import (
 {II}Final,
+{II}Literal,
 {II}Protocol
 {I})"""
         ),
@@ -239,10 +241,17 @@ class HasIterparse(Protocol):
 {I}# see: https://github.com/python/mypy/issues/5018 and
 {I}# https://github.com/python/mypy/commit/3efbc5c5e910296a60ed5b9e0e7eb11dd912c3ed#diff-e165eb7aed9dca0a5ebd93985c8cd263a6462d36ac185f9461348dc5a1396d76R9937
 
+{I}# NOTE (mristin):
+{I}# We require only the events which we actually use, and give them no default.
+{I}# Newer type stubs declare :py:func:`xml.etree.ElementTree.iterparse` as
+{I}# overloads over literal event names. A single overload must then match
+{I}# the protocol, which none would if the events were an optional sequence of
+{I}# arbitrary strings.
+
 {I}def iterparse(
 {III}self,
 {III}source: TextIO,
-{III}events: Optional[Sequence[str]] = None
+{III}events: Sequence[Literal["start", "end"]]
 {I}) -> Iterator[Tuple[str, Element]]:
 {II}\"\"\"Behave like :py:func:`xml.etree.ElementTree.iterparse`.\"\"\""""
         ),
