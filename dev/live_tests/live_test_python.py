@@ -15,7 +15,7 @@ from live_tests import common as live_tests_common
 #: Dependencies needed to check and test the generated code, as specified in
 #: ``dev/pyproject.toml`` of the project
 DEV_DEPENDENCIES: Final[Sequence[str]] = (
-    "mypy==0.982",
+    "mypy==2.4.0",
     "pylint==2.15.4; python_version<'3.11'",
     "pylint==4.0.3; python_version>'3.10'",
 )
